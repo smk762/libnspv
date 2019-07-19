@@ -20,7 +20,6 @@
 #define MAX_TX_SIZE_BEFORE_SAPLING 100000
 #define MAX_TX_SIZE_AFTER_SAPLING (2 * MAX_TX_SIZE_BEFORE_SAPLING)
 
-uint32_t NSPV_logintime,NSPV_lastinfo;
 
 btc_chainparams kmd_chainparams_main =
 {

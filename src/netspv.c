@@ -377,11 +377,12 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
         if ( strcmp(hdr->command,"nSPV") == 0 )
         {
             fprintf(stderr,"process nSPV response %d [%d]\n",((uint8_t *)buf->p)[0],varlen);
+            komodo_nSPVresp(node,(uint8_t *)buf->p,varlen);
         }
         else if ( strcmp(hdr->command,"addr") == 0 )
         {
             node->gotaddrs = (uint32_t)time(NULL);
-            fprintf(stderr,"got addr message [%d]\n",varlen);
+            fprintf(stderr,"need to process addr message [%d]\n",varlen);
         }
         return;
     }

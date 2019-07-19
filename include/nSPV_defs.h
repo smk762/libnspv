@@ -61,6 +61,7 @@ int32_t iguana_rwnum(const btc_chainparams *chain,int32_t rwflag,uint8_t *serial
 btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind);
 void NSPV_logout(void);
 int32_t NSPV_periodic(btc_node *node);
+void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
 
 /*int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int32_t height,CTransaction &tx,int64_t extradata,uint32_t tiptime,int64_t &rewardsum);
 UniValue NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis);
