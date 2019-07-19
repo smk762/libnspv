@@ -83,14 +83,14 @@ struct NSPV_txproof *NSPV_txproof_find(btc_chainparams *chain,uint256 txid)
 
 struct NSPV_txproof *NSPV_txproof_add(btc_chainparams *chain,struct NSPV_txproof *ptr)
 {
-    uint32_t i;
+    uint32_t i; char str[65];
     for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
         if ( NSPV_txproof_cache[i].txid == ptr->txid )
         {
             if ( NSPV_txproof_cache[i].txprooflen == 0 && ptr->txprooflen != 0 )
             {
-                NSPV_txproof_purge(&NSPV_txproof_cache[i]);
-                NSPV_txproof_copy(&NSPV_txproof_cache[i],ptr);
+                NSPV_txproof_purge(chain,&NSPV_txproof_cache[i]);
+                NSPV_txproof_copy(chain,&NSPV_txproof_cache[i],ptr);
                 return(&NSPV_txproof_cache[i]);
             }
             else if ( NSPV_txproof_cache[i].txprooflen != 0 || ptr->txprooflen == 0 )
