@@ -27,6 +27,7 @@
 #include <btc/serialize.h>
 #include <btc/tx.h>
 #include <btc/utils.h>
+#include <btc/base58.h>
 
 static const bits256 zeroid;
 
