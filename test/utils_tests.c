@@ -17,14 +17,12 @@
 #include "utest.h"
 
 uint32_t NSPV_logintime,NSPV_lastinfo;
-
+int32_t NSPV_periodic(btc_node *node) { return(0); }
 void NSPV_logout() {}
-
 btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
 {
     return(0);
 }
-
 int32_t iguana_rwnum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
 {
     return(0);
