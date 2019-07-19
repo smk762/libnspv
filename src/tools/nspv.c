@@ -170,12 +170,12 @@ int main(int argc, char* argv[])
     if ( chain->komodo != 0 )
     {
         int32_t i; uint256 revhash;
-        for (i=0; i<sizeof(revhash); i++)
+        for (i=0; i<(int32_t)sizeof(revhash); i++)
         {
             revhash[i] = chain->genesisblockhash[31 - i];
             fprintf(stderr,"%02x",revhash[i]);
         }
-        memcpy(chain->genesisblockhash,revhash,sizeof(chain->genesisblockhash));
+        memcpy((void *)chain->genesisblockhash,revhash,sizeof(chain->genesisblockhash));
         fprintf(stderr," genesisblockhash %s\n",chain->name);
     }
     if (strcmp(data, "scan") == 0)
