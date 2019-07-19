@@ -97,10 +97,10 @@ void copy_cJSON2(char *dest,int32_t maxlen,cJSON *obj)
     struct destbuf tmp;
     maxlen--;
     dest[0] = 0;
-    if ( maxlen > sizeof(tmp.buf) )
+    if ( maxlen > (int32_t)sizeof(tmp.buf) )
         maxlen = sizeof(tmp.buf);
     copy_cJSON(&tmp,obj);
-    if ( strlen(tmp.buf) < maxlen )
+    if ( (int32_t)strlen(tmp.buf) < maxlen )
         strcpy(dest,tmp.buf);
     else dest[0] = 0;
 }

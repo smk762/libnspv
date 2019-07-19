@@ -22,6 +22,8 @@
 
 union _bits256 { uint8_t bytes[32]; uint16_t ushorts[16]; uint32_t uints[8]; uint64_t ulongs[4]; uint64_t txid; };
 typedef union _bits256 bits256;
+#define SATOSHIDEN ((uint64_t)100000000)
+#define dstr(x) ((double)(x) / SATOSHIDEN)
 
 #include "komodo_cJSON.h"
 
@@ -61,7 +63,7 @@ typedef union _bits256 bits256;
 #define NSPV_MEMPOOL_INMEMPOOL 3
 #define NSPV_MEMPOOL_CCEVALCODE 4
 
-#define COIN ((uint64_t)100000000)
+#define COIN SATOSHIDEN
 
 struct NSPV_equihdr
 {

@@ -139,6 +139,68 @@ int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex)
     return(n + adjust);
 }
 
+char *clonestr(char *str)
+{
+    char *clone;
+    if ( str == 0 || str[0] == 0 )
+    {
+        printf("warning cloning nullstr.%p\n",str);
+#ifdef __APPLE__
+        while ( 1 ) sleep(1);
+#endif
+        str = (char *)"<nullstr>";
+    }
+    clone = (char *)malloc(strlen(str)+16);
+    strcpy(clone,str);
+    return(clone);
+}
+
+int32_t safecopy(char *dest,char *src,long len)
+{
+    int32_t i = -1;
+    if ( src != 0 && dest != 0 && src != dest )
+    {
+        if ( dest != 0 )
+            memset(dest,0,len);
+        for (i=0; i<len&&src[i]!=0; i++)
+            dest[i] = src[i];
+        if ( i == len )
+        {
+            printf("safecopy: %s too long %ld\n",src,len);
+#ifdef __APPLE__
+            //getchar();
+#endif
+            return(-1);
+        }
+        dest[i] = 0;
+    }
+    return(i);
+}
+
+char *parse_conf_line(char *line,char *field)
+{
+    line += strlen(field);
+    for (; *line!='='&&*line!=0; line++)
+        break;
+    if ( *line == 0 )
+        return(0);
+    if ( *line == '=' )
+        line++;
+    while ( line[strlen(line)-1] == '\r' || line[strlen(line)-1] == '\n' || line[strlen(line)-1] == ' ' )
+        line[strlen(line)-1] = 0;
+    //printf("LINE.(%s)\n",line);
+    _stripwhite(line,0);
+    return(clonestr(line));
+}
+
+double OS_milliseconds()
+{
+    struct timeval tv; double millis;
+    gettimeofday(&tv,NULL);
+    millis = ((double)tv.tv_sec * 1000. + (double)tv.tv_usec / 1000.);
+    //printf("tv_sec.%ld usec.%d %f\n",tv.tv_sec,tv.tv_usec,millis);
+    return(millis);
+}
 #ifdef LATER
 void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uint8_t *src,int32_t len)
 {
