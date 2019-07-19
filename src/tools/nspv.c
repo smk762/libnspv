@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
         {
             chain = &btc_chainparams_main;
             argc--;
-            argv++'
+            argv++;
         }
     }
     if (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-') {
