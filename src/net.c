@@ -386,6 +386,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             connected_at_least_to_one_node = true;
 
             node->nodegroup->log_write_cb("Trying to connect to %d...\n", node->nodeid);
+            fprintf(stderr,"Trying to connect to %d...\n", node->nodeid);
 
             connect_amount--;
             if (connect_amount <= 0)
@@ -428,6 +429,7 @@ void btc_node_send(btc_node* node, cstring* data)
     bufferevent_write(node->event_bev, data->str, data->len);
     char* dummy = data->str + 4;
     node->nodegroup->log_write_cb("sending message to node %d: %s\n", node->nodeid, dummy);
+    fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, dummy);
 }
 
 void btc_node_send_version(btc_node* node)
@@ -589,6 +591,7 @@ btc_bool btc_node_group_add_peers_by_ip_or_seed(btc_node_group *group, const cha
         for (unsigned int i = 0; i <= strlen(ips); i++) {
             if (i == strlen(ips) || ips[i] == ',') {
                 btc_node* node = btc_node_new();
+                fprintf(stderr,"setnode.(%s)\n",working_str);
                 if (btc_node_set_ipport(node, working_str) > 0) {
                     btc_node_group_add_node(group, node);
                 }

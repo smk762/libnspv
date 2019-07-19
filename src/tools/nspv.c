@@ -185,6 +185,7 @@ int main(int argc, char* argv[])
         }
         memcpy((void *)chain->genesisblockhash,revhash,sizeof(chain->genesisblockhash));
         fprintf(stderr," genesisblockhash %s\n",chain->name);
+        data = (char *)"scan";
     }
     if (strcmp(data, "scan") == 0)
     {
