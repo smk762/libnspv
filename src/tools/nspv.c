@@ -135,7 +135,13 @@ int main(int argc, char* argv[])
     const btc_chainparams *chain = &nspv_chainparams_main;
     if ( argc > 1 )
     {
-        if ( strcmp(argv[1],"BTC") == 0 )
+        if ( strcmp(argv[1],"KMD") == 0 )
+        {
+            chain = &kmd_chainparams_main;
+            argc--;
+            argv++;
+        }
+        else if ( strcmp(argv[1],"BTC") == 0 )
         {
             chain = &btc_chainparams_main;
             argc--;
