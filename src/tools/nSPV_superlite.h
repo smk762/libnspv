@@ -57,7 +57,8 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
     if ( node != 0 )
     {
         cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
-        btc_node_send(node,request);
+        for (i=0; i<3; i++)
+            btc_node_send(node,request);
         cstr_free(request, true);
         fprintf(stderr,"pushmessage [%d] len.%d\n",msg[0],len);
         node->prevtimes[ind] = timestamp;
