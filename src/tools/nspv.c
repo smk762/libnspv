@@ -130,7 +130,8 @@ int main(int argc, char* argv[])
             argv++;
         }
     }
-    if (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-') {
+    if (chain->komodo == 0 && (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-'))
+    {
         /* exit if no command was provided */
         print_usage();
         exit(EXIT_FAILURE);
