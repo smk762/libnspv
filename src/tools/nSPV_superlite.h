@@ -462,7 +462,7 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
 bool NSPV_spentinmempool(btc_spv_client *client,bits256 *spenttxidp,int32_t *spentvinip,bits256 txid,int32_t vout)
 {
     NSPV_mempooltxids(client,(char *)"",0,NSPV_MEMPOOL_ISSPENT,txid,vout);
-    if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids == 1 && memc mp(&NSPV_mempoolresult.txid,&txid,sizeof(txid)) == 0 )
+    if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids == 1 && memcmp(&NSPV_mempoolresult.txid,&txid,sizeof(txid)) == 0 )
     {
         *spenttxidp = NSPV_mempoolresult.txids[0];
         *spentvinip = NSPV_mempoolresult.vindex;
