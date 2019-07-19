@@ -61,8 +61,11 @@ typedef union _bits256 bits256;
 #define NSPV_MEMPOOL_INMEMPOOL 3
 #define NSPV_MEMPOOL_CCEVALCODE 4
 
+#define COIN ((uint64_t)100000000)
+
 extern uint32_t NSPV_logintime,NSPV_lastinfo;
-extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[];
+extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
+uint256 NSPV_hdrhash(struct NSPV_equihdr *hdr);
 
 int32_t iguana_rwnum(const btc_chainparams *chain,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind);
