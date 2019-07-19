@@ -52,7 +52,7 @@ int32_t iguana_rwnum(const btc_chainparams *coin,int32_t rwflag,uint8_t *seriali
     return(len);
 }
 
-int32_t iguana_rwbignum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp)
+int32_t iguana_rwbignum(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp)
 {
     int32_t i;
     if ( rwflag == 0 )
@@ -68,7 +68,7 @@ int32_t iguana_rwbignum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized
     return(len);
 }
 
-int32_t iguana_rwbuf(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *buf)
+int32_t iguana_rwbuf(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *buf)
 {
     if ( rwflag != 0 )
         memcpy(serialized,buf,len);
@@ -76,7 +76,7 @@ int32_t iguana_rwbuf(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,in
     return(len);
 }
 
-int32_t NSPV_rwequihdr(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr)
+int32_t NSPV_rwequihdr(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr)
 {
     int32_t len = 0;
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nVersion),&ptr->nVersion);
@@ -90,7 +90,7 @@ int32_t NSPV_rwequihdr(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,
     return(len);
 }
 
-int32_t iguana_rwequihdrvec(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,uint16_t *vecsizep,struct NSPV_equihdr **ptrp)
+int32_t iguana_rwequihdrvec(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,uint16_t *vecsizep,struct NSPV_equihdr **ptrp)
 {
     int32_t i,vsize,len = 0;
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(*vecsizep),vecsizep);
@@ -105,7 +105,7 @@ int32_t iguana_rwequihdrvec(btc_chainparams *coin,int32_t rwflag,uint8_t *serial
     return(len);
 }
 
-int32_t iguana_rwuint8vec(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t *biglenp,uint8_t **ptrp)
+int32_t iguana_rwuint8vec(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t *biglenp,uint8_t **ptrp)
 {
     int32_t vsize,len = 0;
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(*biglenp),biglenp);
@@ -118,7 +118,7 @@ int32_t iguana_rwuint8vec(btc_chainparams *coin,int32_t rwflag,uint8_t *serializ
     return(len);
 }
 
-int32_t NSPV_rwutxoresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_utxoresp *ptr)
+int32_t NSPV_rwutxoresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_utxoresp *ptr)
 {
     int32_t len = 0;
     len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
@@ -129,7 +129,7 @@ int32_t NSPV_rwutxoresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized
     return(len);
 }
 
-int32_t NSPV_rwutxosresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_utxosresp *ptr) // check mempool
+int32_t NSPV_rwutxosresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_utxosresp *ptr) // check mempool
 {
     int32_t i,len = 0;
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->numutxos),&ptr->numutxos);
@@ -159,7 +159,7 @@ int32_t NSPV_rwutxosresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialize
     return(len);
 }
 
-void NSPV_utxosresp_purge(btc_chainparams *coin,struct NSPV_utxosresp *ptr)
+void NSPV_utxosresp_purge(const btc_chainparams *coin,struct NSPV_utxosresp *ptr)
 {
     if ( ptr != 0 )
     {
@@ -169,7 +169,7 @@ void NSPV_utxosresp_purge(btc_chainparams *coin,struct NSPV_utxosresp *ptr)
     }
 }
 
-void NSPV_utxosresp_copy(btc_chainparams *coin,struct NSPV_utxosresp *dest,struct NSPV_utxosresp *ptr)
+void NSPV_utxosresp_copy(const btc_chainparams *coin,struct NSPV_utxosresp *dest,struct NSPV_utxosresp *ptr)
 {
     *dest = *ptr;
     if ( ptr->utxos != 0 )
@@ -179,7 +179,7 @@ void NSPV_utxosresp_copy(btc_chainparams *coin,struct NSPV_utxosresp *dest,struc
     }
 }
 
-int32_t NSPV_rwtxidresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txidresp *ptr)
+int32_t NSPV_rwtxidresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txidresp *ptr)
 {
     int32_t len = 0;
     len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
@@ -189,7 +189,7 @@ int32_t NSPV_rwtxidresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized
     return(len);
 }
 
-int32_t NSPV_rwtxidsresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txidsresp *ptr)
+int32_t NSPV_rwtxidsresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txidsresp *ptr)
 {
     int32_t i,len = 0;
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->numtxids),&ptr->numtxids);
@@ -218,7 +218,7 @@ int32_t NSPV_rwtxidsresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialize
     return(len);
 }
 
-void NSPV_txidsresp_purge(btc_chainparams *coin,struct NSPV_txidsresp *ptr)
+void NSPV_txidsresp_purge(const btc_chainparams *coin,struct NSPV_txidsresp *ptr)
 {
     if ( ptr != 0 )
     {
@@ -228,7 +228,7 @@ void NSPV_txidsresp_purge(btc_chainparams *coin,struct NSPV_txidsresp *ptr)
     }
 }
 
-void NSPV_txidsresp_copy(btc_chainparams *coin,struct NSPV_txidsresp *dest,struct NSPV_txidsresp *ptr)
+void NSPV_txidsresp_copy(const btc_chainparams *coin,struct NSPV_txidsresp *dest,struct NSPV_txidsresp *ptr)
 {
     *dest = *ptr;
     if ( ptr->txids != 0 )
@@ -238,7 +238,7 @@ void NSPV_txidsresp_copy(btc_chainparams *coin,struct NSPV_txidsresp *dest,struc
     }
 }
 
-int32_t NSPV_rwmempoolresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_mempoolresp *ptr)
+int32_t NSPV_rwmempoolresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_mempoolresp *ptr)
 {
     int32_t i,len = 0;
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->numtxids),&ptr->numtxids);
@@ -269,7 +269,7 @@ int32_t NSPV_rwmempoolresp(btc_chainparams *coin,int32_t rwflag,uint8_t *seriali
     return(len);
 }
 
-void NSPV_mempoolresp_purge(btc_chainparams *coin,struct NSPV_mempoolresp *ptr)
+void NSPV_mempoolresp_purge(const btc_chainparams *coin,struct NSPV_mempoolresp *ptr)
 {
     if ( ptr != 0 )
     {
@@ -279,7 +279,7 @@ void NSPV_mempoolresp_purge(btc_chainparams *coin,struct NSPV_mempoolresp *ptr)
     }
 }
 
-void NSPV_mempoolresp_copy(btc_chainparams *coin,struct NSPV_mempoolresp *dest,struct NSPV_mempoolresp *ptr)
+void NSPV_mempoolresp_copy(const btc_chainparams *coin,struct NSPV_mempoolresp *dest,struct NSPV_mempoolresp *ptr)
 {
     *dest = *ptr;
     if ( ptr->txids != 0 )
@@ -289,7 +289,7 @@ void NSPV_mempoolresp_copy(btc_chainparams *coin,struct NSPV_mempoolresp *dest,s
     }
 }
 
-int32_t NSPV_rwntz(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntz *ptr)
+int32_t NSPV_rwntz(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntz *ptr)
 {
     int32_t len = 0;
     len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->blockhash),(uint8_t *)&ptr->blockhash);
@@ -300,7 +300,7 @@ int32_t NSPV_rwntz(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,stru
     return(len);
 }
 
-int32_t NSPV_rwntzsresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntzsresp *ptr)
+int32_t NSPV_rwntzsresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntzsresp *ptr)
 {
     int32_t len = 0;
     len += NSPV_rwntz(coin,rwflag,&serialized[len],&ptr->prevntz);
@@ -309,18 +309,18 @@ int32_t NSPV_rwntzsresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized
     return(len);
 }
 
-void NSPV_ntzsresp_copy(btc_chainparams *coin,struct NSPV_ntzsresp *dest,struct NSPV_ntzsresp *ptr)
+void NSPV_ntzsresp_copy(const btc_chainparams *coin,struct NSPV_ntzsresp *dest,struct NSPV_ntzsresp *ptr)
 {
     *dest = *ptr;
 }
 
-void NSPV_ntzsresp_purge(btc_chainparams *coin,struct NSPV_ntzsresp *ptr)
+void NSPV_ntzsresp_purge(const btc_chainparams *coin,struct NSPV_ntzsresp *ptr)
 {
     if ( ptr != 0 )
         memset(ptr,0,sizeof(*ptr));
 }
 
-int32_t NSPV_rwinforesp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp *ptr)
+int32_t NSPV_rwinforesp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp *ptr)
 {
     int32_t len = 0;
     len += NSPV_rwntz(coin,rwflag,&serialized[len],&ptr->notarization);
@@ -332,13 +332,13 @@ int32_t NSPV_rwinforesp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized
     return(len);
 }
 
-void NSPV_inforesp_purge(btc_chainparams *coin,struct NSPV_inforesp *ptr)
+void NSPV_inforesp_purge(const btc_chainparams *coin,struct NSPV_inforesp *ptr)
 {
     if ( ptr != 0 )
         memset(ptr,0,sizeof(*ptr));
 }
 
-int32_t NSPV_rwtxproof(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txproof *ptr)
+int32_t NSPV_rwtxproof(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txproof *ptr)
 {
     int32_t len = 0;
     len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
@@ -350,7 +350,7 @@ int32_t NSPV_rwtxproof(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,
     return(len);
 }
 
-void NSPV_txproof_copy(btc_chainparams *coin,struct NSPV_txproof *dest,struct NSPV_txproof *ptr)
+void NSPV_txproof_copy(const btc_chainparams *coin,struct NSPV_txproof *dest,struct NSPV_txproof *ptr)
 {
     *dest = *ptr;
     if ( ptr->tx != 0 && ptr->txlen < coin->maxtxsize )
@@ -365,7 +365,7 @@ void NSPV_txproof_copy(btc_chainparams *coin,struct NSPV_txproof *dest,struct NS
     }
 }
 
-void NSPV_txproof_purge(btc_chainparams *coin,struct NSPV_txproof *ptr)
+void NSPV_txproof_purge(const btc_chainparams *coin,struct NSPV_txproof *ptr)
 {
     if ( ptr != 0 )
     {
@@ -377,7 +377,7 @@ void NSPV_txproof_purge(btc_chainparams *coin,struct NSPV_txproof *ptr)
     }
 }
 
-int32_t NSPV_rwntzproofshared(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntzproofshared *ptr)
+int32_t NSPV_rwntzproofshared(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntzproofshared *ptr)
 {
     int32_t len = 0;
     len += iguana_rwequihdrvec(coin,rwflag,&serialized[len],&ptr->numhdrs,&ptr->hdrs);
@@ -389,7 +389,7 @@ int32_t NSPV_rwntzproofshared(btc_chainparams *coin,int32_t rwflag,uint8_t *seri
     return(len);
 }
 
-int32_t NSPV_rwntzsproofresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntzsproofresp *ptr)
+int32_t NSPV_rwntzsproofresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntzsproofresp *ptr)
 {
     int32_t len = 0;
     len += NSPV_rwntzproofshared(coin,rwflag,&serialized[len],&ptr->common);
@@ -403,7 +403,7 @@ int32_t NSPV_rwntzsproofresp(btc_chainparams *coin,int32_t rwflag,uint8_t *seria
     return(len);
 }
 
-void NSPV_ntzsproofresp_copy(btc_chainparams *coin,struct NSPV_ntzsproofresp *dest,struct NSPV_ntzsproofresp *ptr)
+void NSPV_ntzsproofresp_copy(const btc_chainparams *coin,struct NSPV_ntzsproofresp *dest,struct NSPV_ntzsproofresp *ptr)
 {
     *dest = *ptr;
     if ( ptr->common.hdrs != 0 )
@@ -423,7 +423,7 @@ void NSPV_ntzsproofresp_copy(btc_chainparams *coin,struct NSPV_ntzsproofresp *de
     }
 }
 
-void NSPV_ntzsproofresp_purge(btc_chainparams *coin,struct NSPV_ntzsproofresp *ptr)
+void NSPV_ntzsproofresp_purge(const btc_chainparams *coin,struct NSPV_ntzsproofresp *ptr)
 {
     if ( ptr != 0 )
     {
@@ -437,7 +437,7 @@ void NSPV_ntzsproofresp_purge(btc_chainparams *coin,struct NSPV_ntzsproofresp *p
     }
 }
 
-int32_t NSPV_rwspentinfo(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_spentinfo *ptr) // check mempool
+int32_t NSPV_rwspentinfo(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_spentinfo *ptr) // check mempool
 {
     int32_t len = 0;
     len += NSPV_rwtxproof(coin,rwflag,&serialized[len],&ptr->spent);
@@ -447,7 +447,7 @@ int32_t NSPV_rwspentinfo(btc_chainparams *coin,int32_t rwflag,uint8_t *serialize
     return(len);
 }
 
-void NSPV_spentinfo_purge(btc_chainparams *coin,struct NSPV_spentinfo *ptr)
+void NSPV_spentinfo_purge(const btc_chainparams *coin,struct NSPV_spentinfo *ptr)
 {
     if ( ptr != 0 )
     {
@@ -456,7 +456,7 @@ void NSPV_spentinfo_purge(btc_chainparams *coin,struct NSPV_spentinfo *ptr)
     }
 }
 
-int32_t NSPV_rwbroadcastresp(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_broadcastresp *ptr)
+int32_t NSPV_rwbroadcastresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_broadcastresp *ptr)
 {
     int32_t len = 0;
     len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
@@ -464,7 +464,7 @@ int32_t NSPV_rwbroadcastresp(btc_chainparams *coin,int32_t rwflag,uint8_t *seria
     return(len);
 }
 
-void NSPV_broadcast_purge(btc_chainparams *coin,struct NSPV_broadcastresp *ptr)
+void NSPV_broadcast_purge(const btc_chainparams *coin,struct NSPV_broadcastresp *ptr)
 {
     if ( ptr != 0 )
         memset(ptr,0,sizeof(*ptr));
