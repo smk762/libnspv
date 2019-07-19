@@ -61,6 +61,7 @@ static btc_bool btc_net_spv_node_timer_callback(btc_node *node, uint64_t *now);
 void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buffer *buf);
 void btc_net_spv_node_handshake_done(btc_node *node);
 
+
 void btc_net_set_spv(btc_node_group *nodegroup)
 {
     nodegroup->postcmd_cb = btc_net_spv_post_cmd;
@@ -157,6 +158,25 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
 
     btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
 
+    if ( client->chainparams->nSPV != 0 )
+    {
+        uint8_t msg[256]; int32_t i,len=0; uint32_t timestamp = (uint32_t)time(NULL);
+        if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
+            NSPV_logout();
+        if ( node->prevtimes[NSPV_INFO>>1] > timestamp )
+            node->prevtimes[NSPV_INFO>>1] = 0;
+        if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
+        {
+            int32_t reqht;
+            reqht = 0;
+            len = 0;
+            msg[len++] = NSPV_INFO;
+            len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(reqht),&reqht);
+            //fprintf(stderr,"issue getinfo\n");
+            NSPV_req(client,node,msg,len,NODE_NSPV,NSPV_INFO>>1);
+        }
+        return;
+    }
     client->nodegroup->log_write_cb("Statecheck: amount of connected nodes: %d\n", btc_node_group_amount_of_connected_nodes(client->nodegroup, NODE_CONNECTED));
 
     /* check if the node chosen for NODE_HEADERSYNC during SPV_HEADER_SYNC has stalled */

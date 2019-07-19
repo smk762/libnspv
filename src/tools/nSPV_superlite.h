@@ -17,11 +17,56 @@
 #ifndef KOMODO_NSPVSUPERLITE_H
 #define KOMODO_NSPVSUPERLITE_H
 
-// nSPV client. VERY simplistic "single threaded" networking model. for production GUI best to multithread, etc.
-// no caching, no optimizations, no reducing the number of ntzsproofs needed by detecting overlaps, etc.
-// advantage is that it is simpler to implement and understand to create a design for a more performant version
+#include <btc/block.h>
+#include <btc/blockchain.h>
+#include <btc/headersdb.h>
+#include <btc/headersdb_file.h>
+#include <btc/net.h>
+#include <btc/netspv.h>
+#include <btc/protocol.h>
+#include <btc/serialize.h>
+#include <btc/tx.h>
+#include <btc/utils.h>
 
+btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
+{
+    int32_t i,n,flag = 0; btc_node *nodes[64]; uint32_t timestamp = (uint32_t)time(NULL);
+    if ( node == 0 )
+    {
+        memset(nodes,0,sizeof(nodes));
+        n = 0;
+        for (i=0; i<client->nodegroup->nodes->len; i++)
+        {
+            btc_node *ptr = vector_idx(client->nodegroup->nodes,i);
+            if ( ptr->prevtimes[ind] > timestamp )
+                ptr->prevtimes[ind] = 0;
+            if ( (ptr->state & NODE_CONNECTED) == NODE_CONNECTED )
+            {
+                if ( (ptr->nServices & mask) == mask && timestamp > ptr->prevtimes[ind] )
+                {
+                    flag = 1;
+                    nodes[n++] = ptr;
+                    if ( n == sizeof(nodes)/sizeof(*nodes) )
+                        break;
+                }
+            }
+        }
+        if ( n > 0 )
+            node = nodes[rand() % n];
+    } else flag = 1;
+    if ( node != 0 )
+    {
+        cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
+        btc_node_send(node,request);
+        cstr_free(verack, true);
+        fprintf(stderr,"pushmessage [%d] len.%d\n",msg[0],len);
+        node->prevtimes[ind] = timestamp;
+        return(node);
+    } else fprintf(stderr,"no nodes\n");
+    return(0);
+}
 
+#ifdef later
 CAmount AmountFromValue(const UniValue& value);
 int32_t bitcoin_base58decode(uint8_t *data,char *coinaddr);
 
@@ -877,5 +922,6 @@ UniValue NSPV_broadcast(char *hex)
     B.retcode = -2;
     return(NSPV_broadcast_json(&B,txid));
 }
+#endif
 
 #endif // KOMODO_NSPVSUPERLITE_H

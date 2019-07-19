@@ -17,6 +17,10 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
+#define NODE_NSPV (1 << 30)
+#define NODE_ADDRINDEX (1 << 29)
+#define NODE_SPENTINDEX (1 << 28)
+
 #define NSPV_POLLITERS 100
 #define NSPV_POLLMICROS 50000
 #define NSPV_MAXVINS 64
@@ -48,6 +52,10 @@
 #define NSPV_MEMPOOL_ISSPENT 2
 #define NSPV_MEMPOOL_INMEMPOOL 3
 #define NSPV_MEMPOOL_CCEVALCODE 4
+
+extern uint32_t NSPV_logintime,NSPV_lastinfo;
+int32_t iguana_rwnum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
+btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind);
 
 /*int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int32_t height,CTransaction &tx,int64_t extradata,uint32_t tiptime,int64_t &rewardsum);
 UniValue NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis);

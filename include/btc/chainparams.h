@@ -47,7 +47,7 @@ typedef struct btc_chainparams_ {
     uint256 genesisblockhash;
     int default_port;
     btc_dns_seed dnsseeds[8];
-    int32_t nProtocolVersion,maxtxsize;
+    int32_t blocktime,nProtocolVersion,maxtxsize;
     uint8_t nSPV,komodo,taddr;
 } btc_chainparams;
 
