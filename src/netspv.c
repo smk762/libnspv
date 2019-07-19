@@ -160,7 +160,10 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
     btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
 
     if ( client->chainparams->nSPV != 0 )
-        return(NSPV_periodic(node));
+    {
+        NSPV_periodic(node);
+        return;
+    }
     client->nodegroup->log_write_cb("Statecheck: amount of connected nodes: %d\n", btc_node_group_amount_of_connected_nodes(client->nodegroup, NODE_CONNECTED));
 
     /* check if the node chosen for NODE_HEADERSYNC during SPV_HEADER_SYNC has stalled */
