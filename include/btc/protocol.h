@@ -75,7 +75,7 @@ enum BTC_INV_TYPE {
 };
 
 static const unsigned int MAX_HEADERS_RESULTS = 2000;
-static const int BTC_PROTOCOL_VERSION = 70014;
+#define BTC_PROTOCOL_VERSION 70014
 
 typedef struct btc_p2p_msg_hdr_ {
     unsigned char netmagic[4];
