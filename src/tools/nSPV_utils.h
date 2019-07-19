@@ -71,9 +71,9 @@ char *bits256_str(char *buf,bits256 hash)
 bits256 bits256_doublesha256(uint8_t *data,int32_t datalen)
 {
     bits256 hash,hash2; int32_t i;
-    sha256_Raw(data,len,hash.bytes);
+    sha256_Raw(data,datalen,hash.bytes);
     sha256_Raw(hash.bytes,sizeof(hash),hash2.bytes);
-    for (i=0; i<sizeof(hash); i++)
+    for (i=0; i<(int32_t)sizeof(hash); i++)
         hash.bytes[i] = hash2.bytes[sizeof(hash) - 1 - i];
     return(hash);
 }
