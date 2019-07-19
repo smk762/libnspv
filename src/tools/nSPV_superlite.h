@@ -459,15 +459,18 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
     } else return(false);
 }
 
-bool NSPV_spentinmempool(btc_spv_client *client,bits256 &spenttxid,int32_t &spentvini,bits256 txid,int32_t vout)
+bool NSPV_spentinmempool(btc_spv_client *client,bits256 *spenttxidp,int32_t *spentvinip,bits256 txid,int32_t vout)
 {
     NSPV_mempooltxids(client,(char *)"",0,NSPV_MEMPOOL_ISSPENT,txid,vout);
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids == 1 && memc mp(&NSPV_mempoolresult.txid,&txid,sizeof(txid)) == 0 )
     {
-        spenttxid = NSPV_mempoolresult.txids[0];
-        spentvini = NSPV_mempoolresult.vindex;
+        *spenttxidp = NSPV_mempoolresult.txids[0];
+        *spentvinip = NSPV_mempoolresult.vindex;
         return(true);
-    } else return(false);
+    }
+    *spentvinip = -1;
+    memset(spenttxidp,0,sizeof(*spenttxidp));
+    return(false);
 }
 
 bool NSPV_inmempool(btc_spv_client *client,bits256 txid)
@@ -610,7 +613,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     n = (int32_t)strlen(hex) >> 1;
     data = (uint8_t *)malloc(n);
     decode_hex(data,n,hex);
-    txid = NSPV_doublesha256(data,n);
+    txid = bits256_doublesha256(0,data,n);
     msg = (uint8_t *)malloc(1 + sizeof(txid) + sizeof(n) + n);
     msg[len++] = NSPV_BROADCAST;
     len += iguana_rwbignum(client->chainparams,1,&msg[len],sizeof(txid),(uint8_t *)&txid);

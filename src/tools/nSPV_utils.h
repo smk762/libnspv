@@ -68,17 +68,6 @@ char *bits256_str(char *buf,bits256 hash)
     return(buf);
 }
 
-void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uint8_t *src,int32_t len);
-
-bits256 NSPV_doublesha256(uint8_t *data,int32_t datalen)
-{
-    bits256 hash; int32_t i;
-    hash = bits256_doublesha256(0,data,datalen);
-    for (i=0; i<32; i++)
-        ((uint8_t *)&hash)[i] = _hash.bytes[31 - i];
-    return(hash);
-}
-
 #ifdef LATER
 void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uint8_t *src,int32_t len)
 {
@@ -98,6 +87,14 @@ bits256 bits256_doublesha256(char *deprecated,uint8_t *data,int32_t datalen)
     return(hash);
 }
 
+bits256 NSPV_doublesha256(uint8_t *data,int32_t datalen)
+{
+    bits256 hash; int32_t i;
+    hash = bits256_doublesha256(0,data,datalen);
+    for (i=0; i<32; i++)
+        ((uint8_t *)&hash)[i] = _hash.bytes[31 - i];
+    return(hash);
+}
 
 bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
 {
