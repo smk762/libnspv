@@ -299,7 +299,7 @@ btc_node_group* btc_node_group_new(const btc_chainparams* chainparams)
     };
 
     node_group->nodes = vector_new(1, btc_node_free_cb);
-    node_group->chainparams = (chainparams ? chainparams : &kmd_chainparams_main);
+    node_group->chainparams = (chainparams ? chainparams : &btc_chainparams_main);
     node_group->parse_cmd_cb = NULL;
     strcpy(node_group->clientstr, "libnspv 0.1");
 
