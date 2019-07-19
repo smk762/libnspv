@@ -47,6 +47,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <nSPV_defs.h>
+
 static struct option long_options[] =
     {
         {"testnet", no_argument, NULL, 't'},
@@ -66,16 +68,16 @@ static void print_version()
 static void print_usage()
 {
     print_version();
-    printf("Usage: bitcoin-spv (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-r[--regtest]) (-d[--debug]) (-s[--timeout] <secs>) <command>\n");
+    printf("Usage: nspv (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-r[--regtest]) (-d[--debug]) (-s[--timeout] <secs>) <command>\n");
     printf("Supported commands:\n");
     printf("        scan      (scan blocks up to the tip, creates header.db file)\n");
     printf("\nExamples: \n");
     printf("Sync up to the chain tip and stores all headers in headers.db (quit once synced):\n");
-    printf("> bitcoin-spv scan\n\n");
+    printf("> nspv scan\n\n");
     printf("Sync up to the chain tip and give some debug output during that process:\n");
-    printf("> bitcoin-spv -d scan\n\n");
+    printf("> nspv -d scan\n\n");
     printf("Sync up, show debug info, don't store headers in file (only in memory), wait for new blocks:\n");
-    printf("> bitcoin-spv -d -f 0 -c scan\n\n");
+    printf("> nspv -d -f 0 -c scan\n\n");
 }
 
 static bool showError(const char* er)
@@ -103,6 +105,9 @@ void spv_sync_completed(btc_spv_client* client) {
         printf("Waiting for new blocks or relevant transactions...\n");
     }
 }
+
+#include "nSPV_serdes.h"
+#include "nSPV_utils.h"
 
 int main(int argc, char* argv[])
 {
