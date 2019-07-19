@@ -36,7 +36,7 @@ typedef struct btc_dns_seed_ {
 } btc_dns_seed;
 
 typedef struct btc_chainparams_ {
-    char chainname[32];
+    char name[32];
     uint8_t b58prefix_pubkey_address;
     uint8_t b58prefix_script_address;
     const char bech32_hrp[5];

@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
         }
     }
     if ( ips == 0 )
-        ips = chain->dnsseeds[0].domain;
+        ips = (char *)chain->dnsseeds[0].domain;
     if ( chain->komodo != 0 )
     {
         int32_t i; uint256 revhash;
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
             revhash[i] = chain->genesisblockhash[31 - i];
             fprintf(stderr,"%02x",revhash[i]);
         }
-        chain->genesisblockhash = revhash;
+        memcpy(chain->genesisblockhash,revhash,sizeof(chain->genesisblockhash));
         fprintf(stderr," genesisblockhash %s\n",chain->name);
     }
     if (strcmp(data, "scan") == 0)
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
 
         vector *addrs = vector_new(1,free);
         btc_wallet_get_addresses(wallet,addrs);
-        for (i=0; i<addrs->len; i++)
+        for (i=0; i<(int32_t)addrs->len; i++)
         {
             char* addr= vector_idx(addrs, i);
             printf("Addr: %s\n", addr);
