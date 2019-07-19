@@ -62,8 +62,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
         {
             msg[0] = len - 1;
             cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
-            for (i=0; i<3; i++)
-                btc_node_send(node,request);
+            btc_node_send(node,request);
             cstr_free(request, true);
             //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[0],len);
             node->prevtimes[ind] = timestamp;
@@ -80,12 +79,40 @@ void NSPV_logout()
     if ( NSPV_logintime != 0 )
         fprintf(stderr,"scrub wif and privkey from NSPV memory\n");
     /*else result.push_back(Pair("status","wasnt logged in"));
-    memset(NSPV_ntzsproofresp_cache,0,sizeof(NSPV_ntzsproofresp_cache));
-    memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
-    memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));*/
+     memset(NSPV_ntzsproofresp_cache,0,sizeof(NSPV_ntzsproofresp_cache));
+     memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
+     memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));*/
     //memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
     //memset(&NSPV_key,0,sizeof(NSPV_key));
     NSPV_logintime = 0;
+}
+
+int32_t NSPV_periodic(btc_node *node)
+{
+    uint8_t msg[256]; int32_t i,len=0; uint32_t timestamp = (uint32_t)time(NULL);
+    if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
+        NSPV_logout();
+    if ( node->prevtimes[NSPV_INFO>>1] > timestamp )
+        node->prevtimes[NSPV_INFO>>1] = 0;
+    if ( node->gotaddrs == 0 )
+    {
+        // void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr) to use nSPV flag
+        cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getaddr",NULL,0);
+        btc_node_send(node,request);
+        cstr_free(request, true);
+        fprintf(stderr,"request addrs\n");
+    }
+    if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
+    {
+        int32_t reqht;
+        reqht = 0;
+        len = 1;
+        msg[len++] = NSPV_INFO;
+        len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(reqht),&reqht);
+        //fprintf(stderr,"issue getinfo\n");
+        return(NSPV_req(client,node,msg,len,NODE_NSPV,NSPV_INFO>>1) != 0);
+    }
+    return(0);
 }
 
 #ifdef later
