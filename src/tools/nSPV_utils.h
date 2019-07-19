@@ -68,6 +68,24 @@ char *bits256_str(char *buf,bits256 hash)
     return(buf);
 }
 
+bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
+{
+    bits256 hash;
+    // serialize using iguana_hdrs method
+    /*CBlockHeader block;
+     block.nVersion = hdr->nVersion;
+     block.hashPrevBlock = hdr->hashPrevBlock;
+     block.hashMerkleRoot = hdr->hashMerkleRoot;
+     block.hashFinalSaplingRoot = hdr->hashFinalSaplingRoot;
+     block.nTime = hdr->nTime;
+     block.nBits = hdr->nBits;
+     block.nNonce = hdr->nNonce;
+     block.nSolution.resize(sizeof(hdr->nSolution));
+     memcpy(&block.nSolution[0],hdr->nSolution,sizeof(hdr->nSolution));
+     return(block.GetHash());*/
+    return(hash);
+}
+
 int32_t _unhex(char c)
 {
     if ( c >= '0' && c <= '9' )
@@ -137,6 +155,21 @@ int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex)
     }
     //bytes[i] = 0;
     return(n + adjust);
+}
+
+long _stripwhite(char *buf,int accept)
+{
+    int32_t i,j,c;
+    if ( buf == 0 || buf[0] == 0 )
+        return(0);
+    for (i=j=0; buf[i]!=0; i++)
+    {
+        buf[j] = c = buf[i];
+        if ( c == accept || (c != ' ' && c != '\n' && c != '\r' && c != '\t' && c != '\b') )
+            j++;
+    }
+    buf[j] = 0;
+    return(j);
 }
 
 char *clonestr(char *str)
@@ -229,22 +262,6 @@ bits256 NSPV_doublesha256(uint8_t *data,int32_t datalen)
     return(hash);
 }
 
-bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
-{
-    bits256 hash;
-    /*CBlockHeader block;
-    block.nVersion = hdr->nVersion;
-    block.hashPrevBlock = hdr->hashPrevBlock;
-    block.hashMerkleRoot = hdr->hashMerkleRoot;
-    block.hashFinalSaplingRoot = hdr->hashFinalSaplingRoot;
-    block.nTime = hdr->nTime;
-    block.nBits = hdr->nBits;
-    block.nNonce = hdr->nNonce;
-    block.nSolution.resize(sizeof(hdr->nSolution));
-    memcpy(&block.nSolution[0],hdr->nSolution,sizeof(hdr->nSolution));
-    return(block.GetHash());*/
-    return(hash);
-}
 
 int32_t NSPV_txextract(CTransaction &tx,uint8_t *data,int32_t datalen)
 {

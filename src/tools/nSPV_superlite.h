@@ -31,7 +31,7 @@
 static const bits256 zeroid;
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
-char NSPV_lastpeer[64];
+char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67];
 
 struct NSPV_inforesp NSPV_inforesult;
 struct NSPV_utxosresp NSPV_utxosresult;
