@@ -473,7 +473,7 @@ bool NSPV_spentinmempool(btc_spv_client *client,bits256 &spenttxid,int32_t &spen
 bool NSPV_inmempool(btc_spv_client *client,bits256 txid)
 {
     NSPV_mempooltxids(client,(char *)"",0,NSPV_MEMPOOL_INMEMPOOL,txid,0);
-    if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids == 1 && NSPV_mempoolresult.txids[0] == txid )
+    if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids == 1 && memcmp(&NSPV_mempoolresult.txids[0],&txid,sizeof(txid)) == 0 )
         return(true);
     else return(false);
 }
@@ -561,7 +561,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
         NSPV_txproof_copy(client->chainparams,&NSPV_txproofresult,ptr);
         return(NSPV_txproof_json(ptr));
     }
-    NSPV_txproof_purge(&NSPV_txproofresult);
+    NSPV_txproof_purge(client->chainparams,&NSPV_txproofresult);
     msg[len++] = NSPV_TXPROOF;
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(height),&height);
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(vout),&vout);
