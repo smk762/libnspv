@@ -149,7 +149,8 @@ void test_logdb(logdb_log_db* (*new_func)())
     fseek(f, 0, SEEK_SET);
 
     buf = malloc(fsize + 1);
-    fread(buf, fsize, 1, f);
+    if ( fread(buf, fsize, 1, f) != 0 )
+        fprintf(stderr,"fread error in logdb test\n");
     fclose(f);
 
     /* ---------------------------------------------------- */

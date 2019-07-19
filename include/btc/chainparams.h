@@ -58,7 +58,6 @@ typedef struct btc_checkpoint_ {
 } btc_checkpoint;
 
 extern const btc_chainparams btc_chainparams_main;
-extern const btc_chainparams kmd_chainparams_main;
 extern const btc_chainparams btc_chainparams_test;
 extern const btc_chainparams btc_chainparams_regtest;
 

@@ -165,11 +165,11 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
     }
-    if ( ips == 0 )
-        ips = (char *)chain->dnsseeds[0].domain;
     if ( chain->komodo != 0 )
     {
         int32_t i; uint256 revhash;
+        if ( ips == 0 )
+            ips = (char *)chain->dnsseeds[0].domain;
         for (i=0; i<(int32_t)sizeof(revhash); i++)
         {
             revhash[i] = chain->genesisblockhash[31 - i];
