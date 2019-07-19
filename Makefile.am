@@ -185,6 +185,15 @@ bitcoin_spv_CPPFLAGS = -I$(top_srcdir)/src
 bitcoin_spv_LDFLAGS = -static
 endif
 
+inst_PROGRAMS += nspv
+nspv_LDADD = libbtc.la
+nspv_SOURCES = \
+src/tools/nspv.c
+nspv_CFLAGS = $(libbtc_la_CFLAGS)
+nspv_CPPFLAGS = -I$(top_srcdir)/src
+nspv_LDFLAGS = -static
+endif
+
 endif
 
 clean-local:
