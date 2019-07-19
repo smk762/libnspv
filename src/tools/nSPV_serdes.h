@@ -109,7 +109,7 @@ int32_t iguana_rwuint8vec(int32_t rwflag,uint8_t *serialized,int32_t *biglenp,ui
 {
     int32_t vsize,len = 0;
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(*biglenp),biglenp);
-    if ( (vsize= *biglenp) > 0 && vsize < MAX_TX_SIZE_AFTER_SAPLING )
+    if ( (vsize= *biglenp) > 0 && vsize < coin->maxtxsize )
     {
         if ( *ptrp == 0 )
             *ptrp = (uint8_t *)calloc(1,vsize);
@@ -353,7 +353,7 @@ int32_t NSPV_rwtxproof(int32_t rwflag,uint8_t *serialized,struct NSPV_txproof *p
 void NSPV_txproof_copy(struct NSPV_txproof *dest,struct NSPV_txproof *ptr)
 {
     *dest = *ptr;
-    if ( ptr->tx != 0 && ptr->txlen < MAX_TX_SIZE_AFTER_SAPLING )
+    if ( ptr->tx != 0 && ptr->txlen < coin->maxtxsize )
     {
         dest->tx = (uint8_t *)malloc(ptr->txlen);
         memcpy(dest->tx,ptr->tx,ptr->txlen);

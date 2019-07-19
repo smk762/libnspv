@@ -17,6 +17,17 @@
 #ifndef NSPV_UTILS_H
 #define NSPV_UTILS_H
 
+#define MAX_TX_SIZE_BEFORE_SAPLING 100000;
+#define MAX_TX_SIZE_AFTER_SAPLING (2 * MAX_TX_SIZE_BEFORE_SAPLING);
+
+void NSPV_initcoin(struct nSPV_coin *coin)
+{
+    if ( coin->komodo != 0 )
+        coin->maxtxsize = MAX_TX_SIZE_AFTER_SAPLING;
+    else coin->maxtxsize = 1024 * 1024;
+}
+
+#ifdef LATER
 void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uint8_t *src,int32_t len)
 {
     struct sha256_vstate md;
@@ -62,7 +73,7 @@ uint256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
 int32_t NSPV_txextract(CTransaction &tx,uint8_t *data,int32_t datalen)
 {
     std::vector<uint8_t> rawdata;
-    if ( datalen < MAX_TX_SIZE_AFTER_SAPLING )
+    if ( datalen < coin->maxtxsize )
     {
         rawdata.resize(datalen);
         memcpy(&rawdata[0],data,datalen);
@@ -186,4 +197,7 @@ int32_t NSPV_notarizationextract(int32_t verifyntz,int32_t *ntzheightp,uint256 *
         }
     } else return(-1);
 }
+#endif
+
+
 #endif // NSPV_UTILS_H
