@@ -245,7 +245,7 @@ int32_t NSPV_rwmempoolresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *s
     if ( ptr->numtxids != 0 )
     {
         if ( ptr->txids == 0 )
-            ptr->txids = (uint256 *)calloc(sizeof(*ptr->txids),ptr->numtxids);
+            ptr->txids = (bits256 *)calloc(sizeof(*ptr->txids),ptr->numtxids);
         for (i=0; i<ptr->numtxids; i++)
             len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txids[i]),(uint8_t *)&ptr->txids[i]);
     }
@@ -284,7 +284,7 @@ void NSPV_mempoolresp_copy(const btc_chainparams *coin,struct NSPV_mempoolresp *
     *dest = *ptr;
     if ( ptr->txids != 0 )
     {
-        dest->txids = (uint256 *)malloc(ptr->numtxids * sizeof(*ptr->txids));
+        dest->txids = (bits256 *)malloc(ptr->numtxids * sizeof(*ptr->txids));
         memcpy(dest->txids,ptr->txids,ptr->numtxids * sizeof(*ptr->txids));
     }
 }
@@ -604,9 +604,9 @@ cJSON *NSPV_txidsresp_json(struct NSPV_txidsresp *ptr)
     jaddstr(result,"result","success");
     jadd(result,"txids",NSPV_txidresp_json(ptr->txids,ptr->numtxids));
     jaddstr(result,"address",ptr->coinaddr);
-    jaddnum(item,"isCC",ptr->CCflag);
-    jaddnum(item,"height",ptr->nodeheight);
-    jaddnum(item,"numtxids",ptr->numtxids);
+    jaddnum(result,"isCC",ptr->CCflag);
+    jaddnum(result,"height",ptr->nodeheight);
+    jaddnum(result,"numtxids",ptr->numtxids);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
@@ -657,7 +657,7 @@ cJSON *NSPV_ntzsproof_json(struct NSPV_ntzsproofresp *ptr)
     return(result);
 }
 
-cJSON *NSPV_broadcast_json(struct NSPV_broadcastresp *ptr,uint256 txid)
+cJSON *NSPV_broadcast_json(struct NSPV_broadcastresp *ptr,bits256 txid)
 {
     cJSON *result = cJSON_CreateObject();
     jaddstr(result,"result","success");

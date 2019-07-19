@@ -63,27 +63,21 @@ typedef union _bits256 bits256;
 
 #define COIN ((uint64_t)100000000)
 
-
-/*int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int32_t height,CTransaction &tx,int64_t extradata,uint32_t tiptime,int64_t &rewardsum);
-UniValue NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis);
-extern uint256 SIG_TXHASH;
-uint32_t NSPV_blocktime(int32_t hdrheight);*/
-
 struct NSPV_equihdr
 {
     int32_t nVersion;
-    uint256 hashPrevBlock;
-    uint256 hashMerkleRoot;
-    uint256 hashFinalSaplingRoot;
+    bits256 hashPrevBlock;
+    bits256 hashMerkleRoot;
+    bits256 hashFinalSaplingRoot;
     uint32_t nTime;
     uint32_t nBits;
-    uint256 nNonce;
+    bits256 nNonce;
     uint8_t nSolution[1344];
 };
 
 struct NSPV_utxoresp
 {
-    uint256 txid;
+    bits256 txid;
     int64_t satoshis,extradata;
     int32_t vout,height;
 };
@@ -99,7 +93,7 @@ struct NSPV_utxosresp
 
 struct NSPV_txidresp
 {
-    uint256 txid;
+    bits256 txid;
     int64_t satoshis;
     int32_t vout,height;
 };
@@ -114,16 +108,16 @@ struct NSPV_txidsresp
 
 struct NSPV_mempoolresp
 {
-    uint256 *txids;
+    bits256 *txids;
     char coinaddr[64];
-    uint256 txid;
+    bits256 txid;
     int32_t nodeheight,vout,vindex;
     uint16_t numtxids; uint8_t CCflag,funcid;
 };
 
 struct NSPV_ntz
 {
-    uint256 blockhash,txid,othertxid;
+    bits256 blockhash,txid,othertxid;
     int32_t height,txidheight;
 };
 
@@ -136,14 +130,14 @@ struct NSPV_ntzsresp
 struct NSPV_inforesp
 {
     struct NSPV_ntz notarization;
-    uint256 blockhash;
+    bits256 blockhash;
     int32_t height,hdrheight;
     struct NSPV_equihdr H;
 };
 
 struct NSPV_txproof
 {
-    uint256 txid;
+    bits256 txid;
     int64_t unspentvalue;
     int32_t height,vout,txlen,txprooflen;
     uint8_t *tx,*txproof;
@@ -159,7 +153,7 @@ struct NSPV_ntzproofshared
 struct NSPV_ntzsproofresp
 {
     struct NSPV_ntzproofshared common;
-    uint256 prevtxid,nexttxid;
+    bits256 prevtxid,nexttxid;
     int32_t prevtxidht,nexttxidht,prevtxlen,nexttxlen;
     uint8_t *prevntz,*nextntz;
 };
@@ -173,13 +167,13 @@ struct NSPV_MMRproof
 struct NSPV_spentinfo
 {
     struct NSPV_txproof spent;
-    uint256 txid;
+    bits256 txid;
     int32_t vout,spentvini;
 };
 
 struct NSPV_broadcastresp
 {
-    uint256 txid;
+    bits256 txid;
     int32_t retcode;
 };
 
