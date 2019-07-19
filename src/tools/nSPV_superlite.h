@@ -28,6 +28,8 @@
 #include <btc/tx.h>
 #include <btc/utils.h>
 
+static const bits256 zeroid;
+
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
 char NSPV_lastpeer[64];
 
@@ -413,7 +415,7 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
 
 cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,uint8_t funcid,bits256 txid,int32_t vout)
 {
-    cJSON *result = cJSON_CreateObject(); uint8_t msg[512]; int32_t i,iter,slen,len = 0;
+    cJSON *result = cJSON_CreateObject(); uint8_t msg[512]; char str[65]; int32_t i,iter,slen,len = 0;
     NSPV_mempoolresp_purge(client->chainparams,&NSPV_mempoolresult);
     if ( coinaddr[0] != 0 && bitcoin_base58decode(msg,coinaddr) != 25 )
     {
@@ -430,7 +432,7 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
-    fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,funcid,CCflag,txid.GetHex().c_str(),vout,len);
+    fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,funcid,CCflag,bits256_str(str,txid),vout,len);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
@@ -452,7 +454,7 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
     NSPV_mempooltxids(client,coinaddr,CCflag,NSPV_MEMPOOL_ADDRESS,zeroid,-1);
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == CCflag )
     {
-        LogPrint(logcategory,"found (%s) vout in mempool\n",coinaddr);
+        fprintf(stderr,"found (%s) vout in mempool\n",coinaddr);
         return(true);
     } else return(false);
 }
@@ -551,10 +553,10 @@ cJSON *NSPV_hdrsproof(btc_spv_client *client,int32_t prevht,int32_t nextht)
 
 cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t height)
 {
-    uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_txproof P,*ptr;
+    uint8_t msg[64]; char str[65]; int32_t i,iter,len = 0; struct NSPV_txproof P,*ptr;
     if ( (ptr= NSPV_txproof_find(client->chainparams,txid)) != 0 )
     {
-        fprintf(stderr,"FROM CACHE NSPV_txproof %s\n",txid.GetHex().c_str());
+        fprintf(stderr,"FROM CACHE NSPV_txproof %s\n",bits256_str(str,txid));
         NSPV_txproof_purge(client->chainparams,&NSPV_txproofresult);
         NSPV_txproof_copy(client->chainparams,&NSPV_txproofresult,ptr);
         return(NSPV_txproof_json(ptr));
@@ -564,7 +566,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(height),&height);
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(vout),&vout);
     len += iguana_rwbignum(client->chainparams,1,&msg[len],sizeof(txid),(uint8_t *)&txid);
-    fprintf(stderr,"req txproof %s/v%d at height.%d\n",txid.GetHex().c_str(),vout,height);
+    fprintf(stderr,"req txproof %s/v%d at height.%d\n",bits256_str(str,txid),vout,height);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
@@ -615,7 +617,6 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
-    //fprintf(stderr,"send txid.%s\n",txid.GetHex().c_str());
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
