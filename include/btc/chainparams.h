@@ -48,7 +48,7 @@ typedef struct btc_chainparams_ {
     int default_port;
     btc_dns_seed dnsseeds[8];
     int32_t nProtocolVersion,maxtxsize;
-    uint8_t komodo,taddr;
+    uint8_t nSPV,komodo,taddr;
 } btc_chainparams;
 
 typedef struct btc_checkpoint_ {

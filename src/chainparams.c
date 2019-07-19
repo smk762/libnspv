@@ -41,7 +41,7 @@ const btc_chainparams btc_chainparams_main = {
     {{"seed.bitcoin.jonasschnelli.ch"}, 0},
     BTC_PROTOCOL_VERSION,
     1024*1024,
-    0,0,
+    0,0,0,
 };
 
 const btc_chainparams btc_chainparams_test = {
@@ -58,7 +58,7 @@ const btc_chainparams btc_chainparams_test = {
     {{"testnet-seed.bitcoin.jonasschnelli.ch"}, 0},
     BTC_PROTOCOL_VERSION,
     1024*1024,
-    0,0,
+    0,0,0,
 };
 const btc_chainparams btc_chainparams_regtest = {
     "BTC_regtest",
@@ -74,7 +74,7 @@ const btc_chainparams btc_chainparams_regtest = {
     {0},
     BTC_PROTOCOL_VERSION,
     1024*1024,
-    0,0,
+    0,0,0,
 };
 
 

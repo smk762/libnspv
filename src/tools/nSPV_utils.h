@@ -35,7 +35,7 @@ btc_chainparams kmd_chainparams_main =
     {{"5.9.102.195"}, 0},
     170007,
     MAX_TX_SIZE_AFTER_SAPLING,
-    1,0,
+    1,1,0,
 };
 
 btc_chainparams nspv_chainparams_main =
@@ -53,7 +53,7 @@ btc_chainparams nspv_chainparams_main =
     {{"5.9.102.210:20266"}, 0},
     170007,
     MAX_TX_SIZE_AFTER_SAPLING,
-    1,0,
+    1,1,0,
 };
 
 #ifdef LATER

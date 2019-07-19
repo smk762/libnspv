@@ -83,7 +83,7 @@ btc_spv_client* btc_spv_client_new(const btc_chainparams *params, btc_bool debug
 
     client->nodegroup = btc_node_group_new(params);
     client->nodegroup->ctx = client;
-    client->nodegroup->desired_amount_connected_nodes = params->komodo != 0 ? 1 : 3; /* TODO */
+    client->nodegroup->desired_amount_connected_nodes = 3;
 
     btc_net_set_spv(client->nodegroup);
 
@@ -288,6 +288,11 @@ void btc_net_spv_node_request_headers_or_blocks(btc_node *node, btc_bool blocks)
 
 btc_bool btc_net_spv_request_headers(btc_spv_client *client)
 {
+    if ( client->chainparams->nSPV != 0 )
+    {
+        fprintf(stderr,"skip header request for now\n");
+        return(true);
+    }
     /* make sure only one node is used for header sync */
     for(size_t i =0;i< client->nodegroup->nodes->len; i++)
     {
@@ -363,6 +368,14 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
 {
     btc_spv_client *client = (btc_spv_client *)node->nodegroup->ctx;
 
+    if ( node->nodegroup->chainparams->nSPV != 0 )
+    {
+        if ( strcmp(hdr->command,"nSPV") == 0 )
+        {
+            fprintf(stderr,"process nSPV response [%d]\n",(int32_t)buf->len);
+        }
+        return;
+    }
     if (strcmp(hdr->command, BTC_MSG_INV) == 0 && (node->state & NODE_BLOCKSYNC) == NODE_BLOCKSYNC)
     {
         struct const_buffer original_inv = { buf->p, buf->len };
@@ -502,7 +515,8 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
                 /* see if we can fetch headers from a different peer */
                 btc_net_spv_request_headers(client);
             }
-            else {
+            else
+            {
                 connected_headers++;
                 if (pindex->header.timestamp > client->oldest_item_of_interest - (BLOCK_GAP_TO_DEDUCT_TO_START_SCAN_FROM * BLOCKS_DELTA_IN_S) ) {
 
