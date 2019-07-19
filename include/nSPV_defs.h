@@ -194,7 +194,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
 void NSPV_logout(void);
 int32_t NSPV_periodic(btc_node *node);
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
-bits256 bits256_doublesha256(char *deprecated,uint8_t *data,int32_t datalen);
+bits256 bits256_doublesha256(uint8_t *data,int32_t datalen);
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 int32_t is_hexstr(char *str,int32_t n);
 

@@ -68,6 +68,16 @@ char *bits256_str(char *buf,bits256 hash)
     return(buf);
 }
 
+bits256 bits256_doublesha256(uint8_t *data,int32_t datalen)
+{
+    bits256 hash,hash2; int32_t i;
+    sha256_Raw(data,len,hash.bytes);
+    sha256_Raw(hash.bytes,sizeof(hash),hash2.bytes);
+    for (i=0; i<sizeof(hash); i++)
+        hash.bytes[i] = hash2.bytes[sizeof(hash) - 1 - i];
+    return(hash);
+}
+               
 bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
 {
     bits256 hash;
@@ -234,33 +244,9 @@ double OS_milliseconds()
     //printf("tv_sec.%ld usec.%d %f\n",tv.tv_sec,tv.tv_usec,millis);
     return(millis);
 }
+
+
 #ifdef LATER
-void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uint8_t *src,int32_t len)
-{
-    struct sha256_vstate md;
-    sha256_vinit(&md);
-    sha256_vprocess(&md,src,len);
-    sha256_vdone(&md,hash);
-}
-
-bits256 bits256_doublesha256(char *deprecated,uint8_t *data,int32_t datalen)
-{
-    bits256 hash,hash2; int32_t i;
-    vcalc_sha256(0,hash.bytes,data,datalen);
-    vcalc_sha256(0,hash2.bytes,hash.bytes,sizeof(hash));
-    for (i=0; i<sizeof(hash); i++)
-        hash.bytes[i] = hash2.bytes[sizeof(hash) - 1 - i];
-    return(hash);
-}
-
-bits256 NSPV_doublesha256(uint8_t *data,int32_t datalen)
-{
-    bits256 hash; int32_t i;
-    hash = bits256_doublesha256(0,data,datalen);
-    for (i=0; i<32; i++)
-        ((uint8_t *)&hash)[i] = _hash.bytes[31 - i];
-    return(hash);
-}
 
 
 int32_t NSPV_txextract(CTransaction &tx,uint8_t *data,int32_t datalen)
