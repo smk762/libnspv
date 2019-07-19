@@ -380,7 +380,7 @@ void NSPV_txproof_purge(struct nSPV_coin *coin,struct NSPV_txproof *ptr)
 int32_t NSPV_rwntzproofshared(struct nSPV_coin *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntzproofshared *ptr)
 {
     int32_t len = 0;
-    len += iguana_rwequihdrvec(rwflag,&serialized[len],&ptr->numhdrs,&ptr->hdrs);
+    len += iguana_rwequihdrvec(coin,rwflag,&serialized[len],&ptr->numhdrs,&ptr->hdrs);
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->prevht),&ptr->prevht);
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nextht),&ptr->nextht);
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
