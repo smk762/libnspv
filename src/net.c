@@ -170,27 +170,38 @@ void event_cb(struct bufferevent* ev, short type, void* ctx)
     UNUSED(ev);
     btc_node* node = (btc_node*)ctx;
     node->nodegroup->log_write_cb("Event callback on node %d\n", node->nodeid);
+    fprintf(stddrr,"Event callback on node %d\n", node->nodeid);
 
-    if (((type & BEV_EVENT_TIMEOUT) != 0) && ((node->state & NODE_CONNECTING) == NODE_CONNECTING)) {
-        node->nodegroup->log_write_cb("Timout connecting to node %d.\n", node->nodeid);
+    if (((type & BEV_EVENT_TIMEOUT) != 0) && ((node->state & NODE_CONNECTING) == NODE_CONNECTING))
+    {
+        fprintf(stderr,"Timeout connecting to node %d.\n", node->nodeid);
+        node->nodegroup->log_write_cb("Timeout connecting to node %d.\n", node->nodeid);
         node->state = 0;
         node->state |= NODE_ERRORED;
         node->state |= NODE_TIMEOUT;
         btc_node_connection_state_changed(node);
-    } else if (((type & BEV_EVENT_EOF) != 0) ||
-               ((type & BEV_EVENT_ERROR) != 0)) {
+    }
+    else if (((type & BEV_EVENT_EOF) != 0) || ((type & BEV_EVENT_ERROR) != 0))
+    {
         node->state = 0;
         node->state |= NODE_ERRORED;
         node->state |= NODE_DISCONNECTED;
-        if ((type & BEV_EVENT_EOF) != 0) {
+        if ((type & BEV_EVENT_EOF) != 0)
+        {
+            fprintf(stderr,"Disconnected from the remote peer %d.\n", node->nodeid);
             node->nodegroup->log_write_cb("Disconnected from the remote peer %d.\n", node->nodeid);
             node->state |= NODE_DISCONNECTED_FROM_REMOTE_PEER;
         }
-        else {
+        else
+        {
+            fprintf(stderr,"Error connecting to node %d.\n", node->nodeid);
             node->nodegroup->log_write_cb("Error connecting to node %d.\n", node->nodeid);
         }
         btc_node_connection_state_changed(node);
-    } else if (type & BEV_EVENT_CONNECTED) {
+    }
+    else if (type & BEV_EVENT_CONNECTED)
+    {
+        fprintf(stderr,"Successfull connected to node %d.\n", node->nodeid);
         node->nodegroup->log_write_cb("Successfull connected to node %d.\n", node->nodeid);
         node->state |= NODE_CONNECTED;
         node->state &= ~NODE_CONNECTING;
@@ -251,8 +262,11 @@ btc_bool btc_node_missbehave(btc_node* node)
 
 void btc_node_disconnect(btc_node* node)
 {
-    if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING) {
+    fprintf(stderr,"btc_node_disconnect");
+    if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
+    {
         node->nodegroup->log_write_cb("Disconnect node %d\n", node->nodeid);
+        fprintf(stderr,"Disconnect node %d\n", node->nodeid);
     }
     /* release buffer and timer event */
     btc_node_release_events(node);
@@ -297,7 +311,7 @@ btc_node_group* btc_node_group_new(const btc_chainparams* chainparams)
     node_group->should_connect_to_more_nodes_cb = NULL;
     node_group->handshake_done_cb = NULL;
     node_group->log_write_cb = net_write_log_null;
-    node_group->desired_amount_connected_nodes = 3;
+    node_group->desired_amount_connected_nodes = chainparams->komodo != 0 ? 1 : 3;
 
     return node_group;
 }
@@ -397,7 +411,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
     return connected_at_least_to_one_node;
 }
 
-void btc_node_connection_state_changed(btc_node* node)
+void btc_node_connection_state_changed(btc_node *node)
 {
     if (node->nodegroup->node_connection_state_changed_cb)
         node->nodegroup->node_connection_state_changed_cb(node);
@@ -405,7 +419,7 @@ void btc_node_connection_state_changed(btc_node* node)
     if ((node->state & NODE_ERRORED) == NODE_ERRORED) {
         btc_node_release_events(node);
 
-        /* connect to more nodes are required */
+        // connect to more nodes are required
         btc_bool should_connect_to_more_nodes = true;
         if (node->nodegroup->should_connect_to_more_nodes_cb)
             should_connect_to_more_nodes = node->nodegroup->should_connect_to_more_nodes_cb(node);
@@ -413,12 +427,14 @@ void btc_node_connection_state_changed(btc_node* node)
         if (should_connect_to_more_nodes && (btc_node_group_amount_of_connected_nodes(node->nodegroup, NODE_CONNECTED) + btc_node_group_amount_of_connected_nodes(node->nodegroup, NODE_CONNECTING) < node->nodegroup->desired_amount_connected_nodes))
             btc_node_group_connect_next_nodes(node->nodegroup);
     }
-    if ((node->state & NODE_MISSBEHAVED) == NODE_MISSBEHAVED) {
-        if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING) {
+    if ((node->state & NODE_MISSBEHAVED) == NODE_MISSBEHAVED)
+    {
+        if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
+        {
+            fprintf(stderr,"misbehaved\n");
             btc_node_disconnect(node);
         }
-    } else
-        btc_node_send_version(node);
+    } else btc_node_send_version(node);
 }
 
 void btc_node_send(btc_node* node, cstring* data)

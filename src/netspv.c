@@ -83,7 +83,7 @@ btc_spv_client* btc_spv_client_new(const btc_chainparams *params, btc_bool debug
 
     client->nodegroup = btc_node_group_new(params);
     client->nodegroup->ctx = client;
-    client->nodegroup->desired_amount_connected_nodes = 3; /* TODO */
+    client->nodegroup->desired_amount_connected_nodes = params->komodo != 0 ? 1 : 3; /* TODO */
 
     btc_net_set_spv(client->nodegroup);
 
