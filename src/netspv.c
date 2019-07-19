@@ -170,7 +170,7 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
         {
             int32_t reqht;
             reqht = 0;
-            len = 0;
+            len = 1;
             msg[len++] = NSPV_INFO;
             len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(reqht),&reqht);
             //fprintf(stderr,"issue getinfo\n");
