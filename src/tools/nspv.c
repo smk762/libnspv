@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
         for (i=0; i<(int32_t)sizeof(revhash); i++)
         {
             revhash[i] = chain->genesisblockhash[31 - i];
-            fprintf(stderr,"%02x",revhash[i]);
+            fprintf(stderr,"%02x",chain->genesisblockhash[31 - i]);
         }
         memcpy((void *)chain->genesisblockhash,revhash,sizeof(chain->genesisblockhash));
         fprintf(stderr," genesisblockhash %s\n",chain->name);
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
         size_t strsize = 128;
         char str[strsize];
         btc_hdnode_get_p2pkh_address(node->hdnode,chain,str,strsize);
-        printf("Wallet addr: %s (child %d)\n", str, node->hdnode->child_num);
+        printf("%s Wallet addr: %s (child %d)\n", chain->name.str, node->hdnode->child_num);
 
         vector *addrs = vector_new(1,free);
         btc_wallet_get_addresses(wallet,addrs);
