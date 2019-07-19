@@ -106,8 +106,8 @@ void spv_sync_completed(btc_spv_client* client) {
     }
 }
 
-#include "nSPV_structs.h"
 #include "nSPV_utils.h"
+#include "nSPV_structs.h"
 #include "nSPV_superlite.h"
 
 int main(int argc, char* argv[])

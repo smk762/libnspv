@@ -302,7 +302,7 @@ cJSON *NSPV_getinfo_req(const btc_chainparams *chain,int32_t reqht)
     uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_inforesp I;
     NSPV_inforesp_purge(chain,&NSPV_inforesult);
     msg[len++] = NSPV_INFO;
-    len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(reqht),&reqht);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
@@ -356,7 +356,7 @@ cJSON *NSPV_addressutxos(char *coinaddr,int32_t CCflag,int32_t skipcount)
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(skipcount),&skipcount);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(0,msg,len,NODE_ADDRINDEX,msg[0]>>1) != 0 )
     {
@@ -393,7 +393,7 @@ cJSON *NSPV_addresstxids(char *coinaddr,int32_t CCflag,int32_t skipcount)
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(skipcount),&skipcount);
     //fprintf(stderr,"skipcount.%d\n",skipcount);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(0,msg,len,NODE_ADDRINDEX,msg[0]>>1) != 0 )
@@ -424,9 +424,9 @@ cJSON *NSPV_mempooltxids(char *coinaddr,int32_t CCflag,uint8_t funcid,uint256 tx
     }
     msg[len++] = NSPV_MEMPOOL;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(1,&msg[len],sizeof(funcid),&funcid);
-    len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(funcid),&funcid);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(vout),&vout);
+    len += iguana_rwbignum(chain,1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
@@ -497,7 +497,7 @@ cJSON *NSPV_notarizations(int32_t reqheight)
         return(NSPV_ntzsresp_json(ptr));
     }
     msg[len++] = NSPV_NTZS;
-    len += iguana_rwnum(1,&msg[len],sizeof(reqheight),&reqheight);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(reqheight),&reqheight);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
@@ -562,9 +562,9 @@ cJSON *NSPV_txproof(int32_t vout,uint256 txid,int32_t height)
     }
     NSPV_txproof_purge(&NSPV_txproofresult);
     msg[len++] = NSPV_TXPROOF;
-    len += iguana_rwnum(1,&msg[len],sizeof(height),&height);
-    len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(height),&height);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(vout),&vout);
+    len += iguana_rwbignum(chain,1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     fprintf(stderr,"req txproof %s/v%d at height.%d\n",txid.GetHex().c_str(),vout,height);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
@@ -586,8 +586,8 @@ cJSON *NSPV_spentinfo(uint256 txid,int32_t vout)
     uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_spentinfo I;
     NSPV_spentinfo_purge(&NSPV_spentresult);
     msg[len++] = NSPV_SPENTINFO;
-    len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(vout),&vout);
+    len += iguana_rwbignum(chain,1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(0,msg,len,NODE_SPENTINDEX,msg[0]>>1) != 0 )
     {
@@ -612,8 +612,8 @@ cJSON *NSPV_broadcast(char *hex)
     txid = NSPV_doublesha256(data,n);
     msg = (uint8_t *)malloc(1 + sizeof(txid) + sizeof(n) + n);
     msg[len++] = NSPV_BROADCAST;
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
-    len += iguana_rwnum(1,&msg[len],sizeof(n),&n);
+    len += iguana_rwbignum(chain,1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += iguana_rwnum(chain,1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
     //fprintf(stderr,"send txid.%s\n",txid.GetHex().c_str());

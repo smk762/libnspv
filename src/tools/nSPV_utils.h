@@ -68,6 +68,13 @@ char *bits256_str(char *buf,uint8_t *ptr)
     return(buf);
 }
 
+bits256 NSPV_bits256(uint256 hash)
+{
+    bit256 rethash;
+    memset(&rethash,&hash,sizeof(rethash));
+    return(rethash);
+}
+
 #ifdef LATER
 void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uint8_t *src,int32_t len)
 {
