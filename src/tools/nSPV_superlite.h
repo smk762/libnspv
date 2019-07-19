@@ -90,6 +90,7 @@ void NSPV_logout()
 int32_t NSPV_periodic(btc_node *node)
 {
     uint8_t msg[256]; int32_t i,len=0; uint32_t timestamp = (uint32_t)time(NULL);
+    btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
     if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
         NSPV_logout();
     if ( node->prevtimes[NSPV_INFO>>1] > timestamp )
