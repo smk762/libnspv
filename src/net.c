@@ -31,7 +31,7 @@
 
 #define UNUSED(x) (void)(x)
 
-static const int BTC_PERIODICAL_NODE_TIMER_S = 3;
+static const int BTC_PERIODICAL_NODE_TIMER_S = 5;
 static const int BTC_PING_INTERVAL_S = 180;
 static const int BTC_CONNECT_TIMEOUT_S = 10;
 
@@ -381,8 +381,8 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             node->event_bev = bufferevent_socket_new(group->event_base, -1, BEV_OPT_CLOSE_ON_FREE);
             bufferevent_setcb(node->event_bev, read_cb, write_cb, event_cb, node);
             bufferevent_enable(node->event_bev, EV_READ | EV_WRITE);
-            if (bufferevent_socket_connect(node->event_bev, (struct sockaddr*)&node->addr, sizeof(node->addr)) < 0) {
-                /* Error starting connection */
+            if (bufferevent_socket_connect(node->event_bev, (struct sockaddr*)&node->addr,sizeof(node->addr)) < 0) {
+                // Error starting connection
                 if (node->event_bev)
                     bufferevent_free(node->event_bev);
                 return false;
@@ -393,8 +393,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             struct timeval tv;
             tv.tv_sec = BTC_PERIODICAL_NODE_TIMER_S;
             tv.tv_usec = 0;
-            node->timer_event = event_new(group->event_base, 0, EV_TIMEOUT | EV_PERSIST, node_periodical_timer,
-                                          (void*)node);
+            node->timer_event = event_new(group->event_base, 0, EV_TIMEOUT | EV_PERSIST,node_periodical_timer,(void*)node);
             event_add(node->timer_event, &tv);
             node->state |= NODE_CONNECTING;
             connected_at_least_to_one_node = true;
