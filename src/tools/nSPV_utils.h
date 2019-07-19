@@ -59,6 +59,15 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
+char *bits256_str(char *buf,uint8_t *ptr)
+{
+    int32_t i;
+    for (i=0; i<32; i++)
+        sprintf(&buf[i<<1],"%02x",ptr[i]);
+    buf[i<<1] = 0;
+    return(buf);
+}
+
 #ifdef LATER
 void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uint8_t *src,int32_t len)
 {

@@ -41,6 +41,94 @@ struct NSPV_ntzsproofresp NSPV_ntzsproofresult;
 struct NSPV_txproof NSPV_txproofresult;
 struct NSPV_broadcastresp NSPV_broadcastresult;
 
+struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
+struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
+struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+
+struct NSPV_ntzsresp *NSPV_ntzsresp_find(btc_chainparams *chain,int32_t reqheight)
+{
+    int32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
+        if ( NSPV_ntzsresp_cache[i].reqheight == reqheight )
+            return(&NSPV_ntzsresp_cache[i]);
+    return(0);
+}
+
+struct NSPV_ntzsresp *NSPV_ntzsresp_add(btc_chainparams *chain,struct NSPV_ntzsresp *ptr)
+{
+    int32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
+        if ( NSPV_ntzsresp_cache[i].reqheight == 0 )
+            break;
+    if ( i == sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache) )
+        i == (rand() % (sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache)));
+    NSPV_ntzsresp_purge(&NSPV_ntzsresp_cache[i]);
+    NSPV_ntzsresp_copy(&NSPV_ntzsresp_cache[i],ptr);
+    fprintf(stderr,"ADD CACHE ntzsresp req.%d\n",ptr->reqheight);
+    return(&NSPV_ntzsresp_cache[i]);
+}
+
+struct NSPV_txproof *NSPV_txproof_find(btc_chainparams *chain,uint256 txid)
+{
+    int32_t i; struct NSPV_txproof *backup = 0;
+    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
+        if ( NSPV_txproof_cache[i].txid == txid )
+        {
+            if ( NSPV_txproof_cache[i].txprooflen != 0 )
+                return(&NSPV_txproof_cache[i]);
+            else backup = &NSPV_txproof_cache[i];
+        }
+    return(backup);
+}
+
+struct NSPV_txproof *NSPV_txproof_add(btc_chainparams *chain,struct NSPV_txproof *ptr)
+{
+    int32_t i;
+    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
+        if ( NSPV_txproof_cache[i].txid == ptr->txid )
+        {
+            if ( NSPV_txproof_cache[i].txprooflen == 0 && ptr->txprooflen != 0 )
+            {
+                NSPV_txproof_purge(&NSPV_txproof_cache[i]);
+                NSPV_txproof_copy(&NSPV_txproof_cache[i],ptr);
+                return(&NSPV_txproof_cache[i]);
+            }
+            else if ( NSPV_txproof_cache[i].txprooflen != 0 || ptr->txprooflen == 0 )
+                return(&NSPV_txproof_cache[i]);
+        }
+    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
+        if ( NSPV_txproof_cache[i].txlen == 0 )
+            break;
+    if ( i == sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache) )
+        i == (rand() % (sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache)));
+    NSPV_txproof_purge(chain,&NSPV_txproof_cache[i]);
+    NSPV_txproof_copy(chain,&NSPV_txproof_cache[i],ptr);
+    fprintf(stderr,"ADD CACHE txproof %s\n",bits256_str(str,ptr->txid));
+    return(&NSPV_txproof_cache[i]);
+}
+
+struct NSPV_ntzsproofresp *NSPV_ntzsproof_find(btc_chainparams *chain,uint256 prevtxid,uint256 nexttxid)
+{
+    int32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
+        if ( NSPV_ntzsproofresp_cache[i].prevtxid == prevtxid && NSPV_ntzsproofresp_cache[i].nexttxid == nexttxid )
+            return(&NSPV_ntzsproofresp_cache[i]);
+    return(0);
+}
+
+struct NSPV_ntzsproofresp *NSPV_ntzsproof_add(btc_chainparams *chain,struct NSPV_ntzsproofresp *ptr)
+{
+    int32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
+        if ( NSPV_ntzsproofresp_cache[i].common.hdrs == 0 )
+            break;
+    if ( i == sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache) )
+        i == (rand() % (sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache)));
+    NSPV_ntzsproofresp_purge(chain,&NSPV_ntzsproofresp_cache[i]);
+    NSPV_ntzsproofresp_copy(chain,&NSPV_ntzsproofresp_cache[i],ptr);
+    return(&NSPV_ntzsproofresp_cache[i]);
+}
+
 void NSPV_logout()
 {
     //UniValue result(UniValue::VOBJ);
@@ -87,7 +175,8 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
 
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
-    struct NSPV_inforesp I; uint32_t timestamp = (uint32_t)time(NULL);
+    struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
+    btc_chainparams *chain = node->nodegroup->chainparams;
     sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     if ( len > 0 )
     {
@@ -96,67 +185,67 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_INFORESP:
                 fprintf(stderr,"got info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
                 I = NSPV_inforesult;
-                NSPV_inforesp_purge(&NSPV_inforesult);
-                NSPV_rwinforesp(0,&response[1],&NSPV_inforesult);
+                NSPV_inforesp_purge(chain,&NSPV_inforesult);
+                NSPV_rwinforesp(chain,0,&response[1],&NSPV_inforesult);
                 if ( NSPV_inforesult.height < I.height )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
-                    NSPV_inforesp_purge(&NSPV_inforesult);
+                    NSPV_inforesp_purge(chain,&NSPV_inforesult);
                     NSPV_inforesult = I;
                 }
                 else if ( NSPV_inforesult.height > I.height )
                 {
-                    NSPV_lastinfo = timestamp - node->nodegroup->chainparams->blocktime/4;
+                    NSPV_lastinfo = timestamp - chain->blocktime/4;
                     // need to validate new header to make sure it is valid mainchain
                     if ( NSPV_inforesult.height == NSPV_inforesult.hdrheight )
                         NSPV_tiptime = NSPV_inforesult.H.nTime;
                 }
                 break;
             case NSPV_UTXOSRESP:
-                NSPV_utxosresp_purge(&NSPV_utxosresult);
-                NSPV_rwutxosresp(0,&response[1],&NSPV_utxosresult);
+                NSPV_utxosresp_purge(chain,&NSPV_utxosresult);
+                NSPV_rwutxosresp(chain,0,&response[1],&NSPV_utxosresult);
                 fprintf(stderr,"got utxos response %u size.%d\n",timestamp,len);
                 break;
             case NSPV_TXIDSRESP:
-                NSPV_txidsresp_purge(&NSPV_txidsresult);
-                NSPV_rwtxidsresp(0,&response[1],&NSPV_txidsresult);
+                NSPV_txidsresp_purge(chain,&NSPV_txidsresult);
+                NSPV_rwtxidsresp(chain,0,&response[1],&NSPV_txidsresult);
                 fprintf(stderr,"got txids response %u size.%d %s CC.%d num.%d\n",timestamp,len,NSPV_txidsresult.coinaddr,NSPV_txidsresult.CCflag,NSPV_txidsresult.numtxids);
                 break;
             case NSPV_MEMPOOLRESP:
-                NSPV_mempoolresp_purge(&NSPV_mempoolresult);
-                NSPV_rwmempoolresp(0,&response[1],&NSPV_mempoolresult);
-                fprintf(stderr,"got mempool response %u size.%d %s CC.%d num.%d funcid.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.funcid,NSPV_mempoolresult.txid.GetHex().c_str(),NSPV_mempoolresult.vout);
+                NSPV_mempoolresp_purge(chain,&NSPV_mempoolresult);
+                NSPV_rwmempoolresp(chain,0,&response[1],&NSPV_mempoolresult);
+                fprintf(stderr,"got mempool response %u size.%d %s CC.%d num.%d funcid.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.funcid,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
                 break;
             case NSPV_NTZSRESP:
-                NSPV_ntzsresp_purge(&NSPV_ntzsresult);
-                NSPV_rwntzsresp(0,&response[1],&NSPV_ntzsresult);
-                if ( NSPV_ntzsresp_find(NSPV_ntzsresult.reqheight) == 0 )
-                    NSPV_ntzsresp_add(&NSPV_ntzsresult);
-                fprintf(stderr,"got ntzs response %u size.%d %s prev.%d, %s next.%d\n",timestamp,len,NSPV_ntzsresult.prevntz.txid.GetHex().c_str(),NSPV_ntzsresult.prevntz.height,NSPV_ntzsresult.nextntz.txid.GetHex().c_str(),NSPV_ntzsresult.nextntz.height);
+                NSPV_ntzsresp_purge(chain,&NSPV_ntzsresult);
+                NSPV_rwntzsresp(chain,0,&response[1],&NSPV_ntzsresult);
+                if ( NSPV_ntzsresp_find(chain,NSPV_ntzsresult.reqheight) == 0 )
+                    NSPV_ntzsresp_add(chain,&NSPV_ntzsresult);
+                fprintf(stderr,"got ntzs response %u size.%d %s prev.%d, %s next.%d\n",timestamp,len,bits256_str(str,NSPV_ntzsresult.prevntz.txid),NSPV_ntzsresult.prevntz.height,bits256_str(str2,NSPV_ntzsresult.nextntz.txid),NSPV_ntzsresult.nextntz.height);
                 break;
             case NSPV_NTZSPROOFRESP:
-                NSPV_ntzsproofresp_purge(&NSPV_ntzsproofresult);
-                NSPV_rwntzsproofresp(0,&response[1],&NSPV_ntzsproofresult);
-                if ( NSPV_ntzsproof_find(NSPV_ntzsproofresult.prevtxid,NSPV_ntzsproofresult.nexttxid) == 0 )
-                    NSPV_ntzsproof_add(&NSPV_ntzsproofresult);
+                NSPV_ntzsproofresp_purge(chain,&NSPV_ntzsproofresult);
+                NSPV_rwntzsproofresp(chain,0,&response[1],&NSPV_ntzsproofresult);
+                if ( NSPV_ntzsproof_find(chain,NSPV_ntzsproofresult.prevtxid,NSPV_ntzsproofresult.nexttxid) == 0 )
+                    NSPV_ntzsproof_add(chain,&NSPV_ntzsproofresult);
                 fprintf(stderr,"got ntzproof response %u size.%d prev.%d next.%d\n",timestamp,len,NSPV_ntzsproofresult.common.prevht,NSPV_ntzsproofresult.common.nextht);
                 break;
             case NSPV_TXPROOFRESP:
-                NSPV_txproof_purge(&NSPV_txproofresult);
-                NSPV_rwtxproof(0,&response[1],&NSPV_txproofresult);
-                if ( NSPV_txproof_find(NSPV_txproofresult.txid) == 0 )
-                    NSPV_txproof_add(&NSPV_txproofresult);
-                fprintf(stderr,"got txproof response %u size.%d %s ht.%d\n",timestamp,len,NSPV_txproofresult.txid.GetHex().c_str(),NSPV_txproofresult.height);
+                NSPV_txproof_purge(chain,&NSPV_txproofresult);
+                NSPV_rwtxproof(chain,0,&response[1],&NSPV_txproofresult);
+                if ( NSPV_txproof_find(chain,NSPV_txproofresult.txid) == 0 )
+                    NSPV_txproof_add(chain,&NSPV_txproofresult);
+                fprintf(stderr,"got txproof response %u size.%d %s ht.%d\n",timestamp,len,bits256_str(str,NSPV_txproofresult.txid),NSPV_txproofresult.height);
                 break;
             case NSPV_SPENTINFORESP:
-                NSPV_spentinfo_purge(&NSPV_spentresult);
-                NSPV_rwspentinfo(0,&response[1],&NSPV_spentresult);
+                NSPV_spentinfo_purge(chain,&NSPV_spentresult);
+                NSPV_rwspentinfo(chain,0,&response[1],&NSPV_spentresult);
                 fprintf(stderr,"got spentinfo response %u size.%d\n",timestamp,len);
                 break;
             case NSPV_BROADCASTRESP:
-                NSPV_broadcast_purge(&NSPV_broadcastresult);
-                NSPV_rwbroadcastresp(0,&response[1],&NSPV_broadcastresult);
-                fprintf(stderr,"got broadcast response %u size.%d %s retcode.%d\n",timestamp,len,NSPV_broadcastresult.txid.GetHex().c_str(),NSPV_broadcastresult.retcode);
+                NSPV_broadcast_purge(chain,&NSPV_broadcastresult);
+                NSPV_rwbroadcastresp(chain,0,&response[1],&NSPV_broadcastresult);
+                fprintf(stderr,"got broadcast response %u size.%d %s retcode.%d\n",timestamp,len,bits256_str(str,NSPV_broadcastresult.txid),NSPV_broadcastresult.retcode);
                 break;
             default: fprintf(stderr,"unexpected response %02x size.%d at %u\n",response[0],len,timestamp);
                 break;
@@ -216,95 +305,6 @@ uint32_t NSPV_lastinfo,NSPV_logintime,NSPV_tiptime;
 CKey NSPV_key;
 char NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_lastpeer[128];
 std::string NSPV_address;
-
-struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
-struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
-struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
-
-struct NSPV_ntzsresp *NSPV_ntzsresp_find(int32_t reqheight)
-{
-    int32_t i;
-    for (i=0; i<sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
-        if ( NSPV_ntzsresp_cache[i].reqheight == reqheight )
-            return(&NSPV_ntzsresp_cache[i]);
-    return(0);
-}
-
-struct NSPV_ntzsresp *NSPV_ntzsresp_add(struct NSPV_ntzsresp *ptr)
-{
-    int32_t i;
-    for (i=0; i<sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
-        if ( NSPV_ntzsresp_cache[i].reqheight == 0 )
-            break;
-    if ( i == sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache) )
-        i == (rand() % (sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache)));
-    NSPV_ntzsresp_purge(&NSPV_ntzsresp_cache[i]);
-    NSPV_ntzsresp_copy(&NSPV_ntzsresp_cache[i],ptr);
-    fprintf(stderr,"ADD CACHE ntzsresp req.%d\n",ptr->reqheight);
-    return(&NSPV_ntzsresp_cache[i]);
-}
-
-struct NSPV_txproof *NSPV_txproof_find(uint256 txid)
-{
-    int32_t i; struct NSPV_txproof *backup = 0;
-    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
-        if ( NSPV_txproof_cache[i].txid == txid )
-        {
-            if ( NSPV_txproof_cache[i].txprooflen != 0 )
-                return(&NSPV_txproof_cache[i]);
-            else backup = &NSPV_txproof_cache[i];
-        }
-    return(backup);
-}
-
-struct NSPV_txproof *NSPV_txproof_add(struct NSPV_txproof *ptr)
-{
-    int32_t i;
-    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
-        if ( NSPV_txproof_cache[i].txid == ptr->txid )
-        {
-            if ( NSPV_txproof_cache[i].txprooflen == 0 && ptr->txprooflen != 0 )
-            {
-                NSPV_txproof_purge(&NSPV_txproof_cache[i]);
-                NSPV_txproof_copy(&NSPV_txproof_cache[i],ptr);
-                return(&NSPV_txproof_cache[i]);
-            }
-            else if ( NSPV_txproof_cache[i].txprooflen != 0 || ptr->txprooflen == 0 )
-                return(&NSPV_txproof_cache[i]);
-        }
-    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
-        if ( NSPV_txproof_cache[i].txlen == 0 )
-            break;
-    if ( i == sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache) )
-        i == (rand() % (sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache)));
-    NSPV_txproof_purge(&NSPV_txproof_cache[i]);
-    NSPV_txproof_copy(&NSPV_txproof_cache[i],ptr);
-    fprintf(stderr,"ADD CACHE txproof %s\n",ptr->txid.GetHex().c_str());
-    return(&NSPV_txproof_cache[i]);
-}
-
-struct NSPV_ntzsproofresp *NSPV_ntzsproof_find(uint256 prevtxid,uint256 nexttxid)
-{
-    int32_t i;
-    for (i=0; i<sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
-        if ( NSPV_ntzsproofresp_cache[i].prevtxid == prevtxid && NSPV_ntzsproofresp_cache[i].nexttxid == nexttxid )
-            return(&NSPV_ntzsproofresp_cache[i]);
-    return(0);
-}
-
-struct NSPV_ntzsproofresp *NSPV_ntzsproof_add(struct NSPV_ntzsproofresp *ptr)
-{
-    int32_t i;
-    for (i=0; i<sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
-        if ( NSPV_ntzsproofresp_cache[i].common.hdrs == 0 )
-            break;
-    if ( i == sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache) )
-        i == (rand() % (sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache)));
-    NSPV_ntzsproofresp_purge(&NSPV_ntzsproofresp_cache[i]);
-    NSPV_ntzsproofresp_copy(&NSPV_ntzsproofresp_cache[i],ptr);
-    fprintf(stderr,"ADD CACHE ntzsproof %s %s\n",ptr->prevtxid.GetHex().c_str(),ptr->nexttxid.GetHex().c_str());
-    return(&NSPV_ntzsproofresp_cache[i]);
-}
 
 // komodo_nSPVresp is called from async message processing
 
@@ -577,10 +577,10 @@ UniValue NSPV_login(char *wifstr)
     return(result);
 }
 
-UniValue NSPV_getinfo_req(int32_t reqht)
+UniValue NSPV_getinfo_req(btc_chainparams *chain,int32_t reqht)
 {
     uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_inforesp I;
-    NSPV_inforesp_purge(&NSPV_inforesult);
+    NSPV_inforesp_purge(chain,&NSPV_inforesult);
     msg[len++] = NSPV_INFO;
     len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
     for (iter=0; iter<3; iter++);
