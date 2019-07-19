@@ -443,7 +443,7 @@ void btc_node_send(btc_node* node, cstring* data)
     bufferevent_write(node->event_bev, data->str, data->len);
     char* dummy = data->str + 4;
     node->nodegroup->log_write_cb("sending message to node %d: %s\n", node->nodeid, dummy);
-    fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, dummy);
+    //fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, dummy);
 }
 
 void btc_node_send_version(btc_node* node)

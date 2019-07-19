@@ -143,7 +143,7 @@ void btc_p2paddr_to_addr(btc_p2p_address* p2p_addr, struct sockaddr* addr_out)
 void btc_p2p_msg_version_init(uint32_t protocol,btc_p2p_version_msg* msg, const btc_p2p_address* addrFrom, const btc_p2p_address* addrTo, const char* strSubVer, btc_bool relay)
 {
     msg->version = protocol;
-    fprintf(stderr,"send protocol version %d\n",msg->version);
+    //fprintf(stderr,"send protocol version %d\n",msg->version);
     msg->services = 0;
     msg->timestamp = time(NULL);
     msg->timestamp = time(NULL);

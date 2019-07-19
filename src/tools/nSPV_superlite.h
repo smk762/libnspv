@@ -65,7 +65,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
             for (i=0; i<3; i++)
                 btc_node_send(node,request);
             cstr_free(request, true);
-            fprintf(stderr,"pushmessage [%d] len.%d\n",msg[0],len);
+            //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[0],len);
             node->prevtimes[ind] = timestamp;
             return(node);
         }
