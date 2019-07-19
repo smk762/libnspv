@@ -17,7 +17,7 @@
 #ifndef NSPV_SERDES_H
 #define NSPV_SERDES_H
 
-int32_t iguana_rwnum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
+int32_t iguana_rwnum(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
 {
     int32_t i; uint64_t x;
     if ( rwflag == 0 )

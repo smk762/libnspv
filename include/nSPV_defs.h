@@ -17,6 +17,7 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
+#include <time.h>
 #include <btc/netspv.h>
 
 #define NODE_NSPV (1 << 30)
