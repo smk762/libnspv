@@ -47,8 +47,8 @@ struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
 
 struct NSPV_ntzsresp *NSPV_ntzsresp_find(btc_chainparams *chain,int32_t reqheight)
 {
-    int32_t i;
-    for (i=0; i<(int32_t)sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
+    uint32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
         if ( NSPV_ntzsresp_cache[i].reqheight == reqheight )
             return(&NSPV_ntzsresp_cache[i]);
     return(0);
@@ -56,8 +56,8 @@ struct NSPV_ntzsresp *NSPV_ntzsresp_find(btc_chainparams *chain,int32_t reqheigh
 
 struct NSPV_ntzsresp *NSPV_ntzsresp_add(btc_chainparams *chain,struct NSPV_ntzsresp *ptr)
 {
-    int32_t i;
-    for (i=0; i<(int32_t)sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
+    uint32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache); i++)
         if ( NSPV_ntzsresp_cache[i].reqheight == 0 )
             break;
     if ( i == sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache) )
@@ -70,8 +70,8 @@ struct NSPV_ntzsresp *NSPV_ntzsresp_add(btc_chainparams *chain,struct NSPV_ntzsr
 
 struct NSPV_txproof *NSPV_txproof_find(btc_chainparams *chain,uint256 txid)
 {
-    int32_t i; struct NSPV_txproof *backup = 0;
-    for (i=0; i<(int32_t)sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
+    uint32_t i; struct NSPV_txproof *backup = 0;
+    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
         if ( NSPV_txproof_cache[i].txid == txid )
         {
             if ( NSPV_txproof_cache[i].txprooflen != 0 )
@@ -83,8 +83,8 @@ struct NSPV_txproof *NSPV_txproof_find(btc_chainparams *chain,uint256 txid)
 
 struct NSPV_txproof *NSPV_txproof_add(btc_chainparams *chain,struct NSPV_txproof *ptr)
 {
-    int32_t i;
-    for (i=0; i<(int32_t)sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
+    uint32_t i;
+    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
         if ( NSPV_txproof_cache[i].txid == ptr->txid )
         {
             if ( NSPV_txproof_cache[i].txprooflen == 0 && ptr->txprooflen != 0 )
@@ -96,7 +96,7 @@ struct NSPV_txproof *NSPV_txproof_add(btc_chainparams *chain,struct NSPV_txproof
             else if ( NSPV_txproof_cache[i].txprooflen != 0 || ptr->txprooflen == 0 )
                 return(&NSPV_txproof_cache[i]);
         }
-    for (i=0; i<(int32_t)sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
+    for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
         if ( NSPV_txproof_cache[i].txlen == 0 )
             break;
     if ( i == sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache) )
@@ -109,8 +109,8 @@ struct NSPV_txproof *NSPV_txproof_add(btc_chainparams *chain,struct NSPV_txproof
 
 struct NSPV_ntzsproofresp *NSPV_ntzsproof_find(btc_chainparams *chain,uint256 prevtxid,uint256 nexttxid)
 {
-    int32_t i;
-    for (i=0; i<(int32_t)sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
+    uint32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
         if ( NSPV_ntzsproofresp_cache[i].prevtxid == prevtxid && NSPV_ntzsproofresp_cache[i].nexttxid == nexttxid )
             return(&NSPV_ntzsproofresp_cache[i]);
     return(0);
@@ -118,8 +118,8 @@ struct NSPV_ntzsproofresp *NSPV_ntzsproof_find(btc_chainparams *chain,uint256 pr
 
 struct NSPV_ntzsproofresp *NSPV_ntzsproof_add(btc_chainparams *chain,struct NSPV_ntzsproofresp *ptr)
 {
-    int32_t i;
-    for (i=0; i<(int32_t)sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
+    uint32_t i;
+    for (i=0; i<sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
         if ( NSPV_ntzsproofresp_cache[i].common.hdrs == 0 )
             break;
     if ( i == sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache) )
