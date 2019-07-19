@@ -17,6 +17,8 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
+#include <btc/netspv.h>
+
 #define NODE_NSPV (1 << 30)
 #define NODE_ADDRINDEX (1 << 29)
 #define NODE_SPENTINDEX (1 << 28)
