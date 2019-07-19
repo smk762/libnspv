@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
     int timeout = 15;
     int maxnodes = 10;
     char* dbfile = 0;
-    const btc_chainparams* chain = &btc_chainparams_main;
+    const btc_chainparams *chain = &kmd_chainparams_main;
 
     if (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-') {
         /* exit if no command was provided */
@@ -165,40 +165,58 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
     }
-
-    if (strcmp(data, "scan") == 0) {
+    if ( ips == 0 )
+        ips = chain->dnsseeds[0].domain;
+    if ( chain->komodo != 0 )
+    {
+        int32_t i; uint256 revhash;
+        for (i=0; i<sizeof(revhash); i++)
+        {
+            revhash[i] = chain->genesisblockhash[31 - i];
+            fprintf(stderr,"%02x",revhash[i]);
+        }
+        chain->genesisblockhash = revhash;
+        fprintf(stderr," genesisblockhash %s\n",chain->name);
+    }
+    if (strcmp(data, "scan") == 0)
+    {
+        char walletname[64],headersname[64]; int32_t i,error,res;
+        sprintf(walletname,"wallet.%s",chain->name);
+        sprintf(headersname,"headers.%s",chain->name);
         btc_ecc_start();
         btc_wallet *wallet = btc_wallet_new(chain);
-        int error;
         btc_bool created;
-        int res = btc_wallet_load(wallet, "wallet.db", &error, &created);
-        if (!res) {
-            fprintf(stdout, "Loading wallet failed\n");
+        res = btc_wallet_load(wallet,walletname,&error,&created);
+        if (!res)
+        {
+            fprintf(stdout, "Loading %s failed error.%d\n",walletname,error);
             exit(EXIT_FAILURE);
         }
-        if (created) {
+        if ( created != 0 )
+        {
             // create a new key
-
             btc_hdnode node;
             uint8_t seed[32];
-            assert(btc_random_bytes(seed, sizeof(seed), true));
-            btc_hdnode_from_seed(seed, sizeof(seed), &node);
-            btc_wallet_set_master_key_copy(wallet, &node);
+            assert(btc_random_bytes(seed,sizeof(seed),true));
+            btc_hdnode_from_seed(seed,sizeof(seed),&node);
+            btc_wallet_set_master_key_copy(wallet,&node);
         }
-        else {
+        else
+        {
             // ensure we have a key
-            // TODO
+            fprintf(stderr,"TODO: ensure there is a key\n");
         }
 
         btc_wallet_hdnode* node = btc_wallet_next_key(wallet);
         size_t strsize = 128;
         char str[strsize];
-        btc_hdnode_get_p2pkh_address(node->hdnode, chain, str, strsize);
+        btc_hdnode_get_p2pkh_address(node->hdnode,chain,str,strsize);
         printf("Wallet addr: %s (child %d)\n", str, node->hdnode->child_num);
 
-        vector *addrs = vector_new(1, free);
-        btc_wallet_get_addresses(wallet, addrs);
-        for (unsigned int i = 0; i < addrs->len; i++) {
+        vector *addrs = vector_new(1,free);
+        btc_wallet_get_addresses(wallet,addrs);
+        for (i=0; i<addrs->len; i++)
+        {
             char* addr= vector_idx(addrs, i);
             printf("Addr: %s\n", addr);
         }
@@ -208,14 +226,16 @@ int main(int argc, char* argv[])
         client->sync_completed = spv_sync_completed;
         client->sync_transaction = btc_wallet_check_transaction;
         client->sync_transaction_ctx = wallet;
-        if (!btc_spv_client_load(client, (dbfile ? dbfile : "headers.db"))) {
-            printf("Could not load or create headers database...aborting\n");
+        if (!btc_spv_client_load(client, (dbfile ? dbfile : headersname)))
+        {
+            printf("Could not load or create %s database...aborting\n",headersname);
             ret = EXIT_FAILURE;
         }
-        else {
-            printf("Discover peers...");
-            btc_spv_client_discover_peers(client, ips);
-            printf("done\n");
+        else
+        {
+            fprintf(stderr,"Discover %s peers...",chain->name);
+            btc_spv_client_discover_peers(client,ips);
+            fprintf(stderr,"done\n");
             printf("Connecting to the p2p network...\n");
             btc_spv_client_runloop(client);
             btc_spv_client_free(client);
@@ -223,7 +243,8 @@ int main(int argc, char* argv[])
         }
         btc_ecc_stop();
     }
-    else {
+    else
+    {
         printf("Invalid command (use -?)\n");
         ret = EXIT_FAILURE;
     }

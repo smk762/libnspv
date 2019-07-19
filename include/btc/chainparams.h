@@ -47,6 +47,7 @@ typedef struct btc_chainparams_ {
     uint256 genesisblockhash;
     int default_port;
     btc_dns_seed dnsseeds[8];
+    uint8_t komodo;
 } btc_chainparams;
 
 typedef struct btc_checkpoint_ {
@@ -57,6 +58,7 @@ typedef struct btc_checkpoint_ {
 } btc_checkpoint;
 
 extern const btc_chainparams btc_chainparams_main;
+extern const btc_chainparams kmd_chainparams_main;
 extern const btc_chainparams btc_chainparams_test;
 extern const btc_chainparams btc_chainparams_regtest;
 

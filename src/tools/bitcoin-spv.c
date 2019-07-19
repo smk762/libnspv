@@ -208,8 +208,8 @@ int main(int argc, char* argv[])
             ret = EXIT_FAILURE;
         }
         else {
-            printf("Discover peers...");
-            btc_spv_client_discover_peers(client, ips);
+            printf("Discover peers... (%s)",ips != 0 ? ips : "dnsseed");
+            btc_spv_client_discover_peers(client,ips);
             printf("done\n");
             printf("Connecting to the p2p network...\n");
             btc_spv_client_runloop(client);
@@ -218,7 +218,8 @@ int main(int argc, char* argv[])
         }
         btc_ecc_stop();
     }
-    else {
+    else
+    {
         printf("Invalid command (use -?)\n");
         ret = EXIT_FAILURE;
     }
