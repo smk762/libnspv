@@ -63,15 +63,6 @@ typedef union _bits256 bits256;
 
 #define COIN ((uint64_t)100000000)
 
-extern uint32_t NSPV_logintime,NSPV_lastinfo;
-extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
-uint256 NSPV_hdrhash(struct NSPV_equihdr *hdr);
-
-int32_t iguana_rwnum(const btc_chainparams *chain,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
-btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind);
-void NSPV_logout(void);
-int32_t NSPV_periodic(btc_node *node);
-void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
 
 /*int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int32_t height,CTransaction &tx,int64_t extradata,uint32_t tiptime,int64_t &rewardsum);
 UniValue NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis);
@@ -197,5 +188,15 @@ struct NSPV_CCmtxinfo
     struct NSPV_utxosresp U;
     struct NSPV_utxoresp used[NSPV_MAXVINS];
 };
+
+extern uint32_t NSPV_logintime,NSPV_lastinfo;
+extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
+bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr);
+
+int32_t iguana_rwnum(const btc_chainparams *chain,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
+btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind);
+void NSPV_logout(void);
+int32_t NSPV_periodic(btc_node *node);
+void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
 
 #endif // KOMODO_NSPV_DEFSH
