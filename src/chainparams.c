@@ -27,7 +27,7 @@
 #include <btc/chainparams.h>
 
 const btc_chainparams btc_chainparams_main = {
-    "main",
+    "BTC",
     0x00,
     0x05,
     "bc",
@@ -42,7 +42,7 @@ const btc_chainparams btc_chainparams_main = {
 };
 
 const btc_chainparams btc_chainparams_test = {
-    "testnet3",
+    "BTC_testnet3",
     0x6f,
     0xc4,
     "tb",
@@ -56,7 +56,7 @@ const btc_chainparams btc_chainparams_test = {
     0,
 };
 const btc_chainparams btc_chainparams_regtest = {
-    "regtest",
+    "BTC_regtest",
     0x6f,
     0xc4,
     "bcrt",
