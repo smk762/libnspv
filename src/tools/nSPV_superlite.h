@@ -66,6 +66,21 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
     return(0);
 }
 
+void NSPV_logout()
+{
+    //UniValue result(UniValue::VOBJ);
+    //result.push_back(Pair("result","success"));
+    if ( NSPV_logintime != 0 )
+        fprintf(stderr,"scrub wif and privkey from NSPV memory\n");
+    /*else result.push_back(Pair("status","wasnt logged in"));
+    memset(NSPV_ntzsproofresp_cache,0,sizeof(NSPV_ntzsproofresp_cache));
+    memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
+    memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));*/
+    //memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
+    //memset(&NSPV_key,0,sizeof(NSPV_key));
+    NSPV_logintime = 0;
+}
+
 #ifdef later
 CAmount AmountFromValue(const UniValue& value);
 int32_t bitcoin_base58decode(uint8_t *data,char *coinaddr);
