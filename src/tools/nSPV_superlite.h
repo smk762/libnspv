@@ -28,7 +28,7 @@
 #include <btc/tx.h>
 #include <btc/utils.h>
 
-uint32_t NSPV_logintime,NSPV_lastinfo;
+uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
 char NSPV_lastpeer[64];
 
 struct NSPV_inforesp NSPV_inforesult;
@@ -176,7 +176,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
     struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
-    btc_chainparams *chain = node->nodegroup->chainparams;
+    btc_chainparams *chain = from->nodegroup->chainparams;
     sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     if ( len > 0 )
     {
