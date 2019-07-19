@@ -473,7 +473,7 @@ void NSPV_broadcast_purge(const btc_chainparams *coin,struct NSPV_broadcastresp 
 cJSON *NSPV_txproof_json(struct NSPV_txproof *ptr)
 {
     cJSON *result = cJSON_CreateObject();
-    jaddbits256(result,"txid",NSPV_bits256(ptr->txid));
+    jaddbits256(result,"txid",ptr->txid);
     jaddnum(result,"height",ptr->height);
     jaddnum(result,"txlen",ptr->txlen);
     jaddnum(result,"txprooflen",ptr->txprooflen);
@@ -485,10 +485,10 @@ cJSON *NSPV_spentinfo_json(struct NSPV_spentinfo *ptr)
 {
     cJSON *result = cJSON_CreateObject();
     jaddstr(result,"result","success");
-    jaddbits256(result,"txid",NSPV_bits256(ptr->txid));
+    jaddbits256(result,"txid",ptr->txid);
     jaddnum(result,"vout",ptr->vout);
     jaddnum(result,"spentheight",ptr->spent.height);
-    jaddbits256(result,"spenttxid",NSPV_bits256(ptr->spent.txid));
+    jaddbits256(result,"spenttxid",ptr->spent.txid);
     jaddnum(result,"spentvini",ptr->spentvini);
     jaddnum(result,"spenttxlen",ptr->spent.txlen);
     jaddnum(result,"spenttxprooflen",ptr->spent.txprooflen);
@@ -500,10 +500,10 @@ cJSON *NSPV_ntz_json(struct NSPV_ntz *ptr)
 {
     cJSON *result = cJSON_CreateObject();
     jaddnum(result,"notarized_height",ptr->height);
-    jaddbits256(result,"notarized_blockhash",NSPV_bits256(ptr->blockhash));
-    jaddbits256(result,"notarization_txid",NSPV_bits256(ptr->txid));
+    jaddbits256(result,"notarized_blockhash",ptr->blockhash);
+    jaddbits256(result,"notarization_txid",ptr->txid);
     jaddnum(result,"notarization_txidheight",ptr->txidheight);
-    jaddbits256(result,"notarization_desttxid",NSPV_bits256(ptr->othertxid));
+    jaddbits256(result,"notarization_desttxid",ptr->othertxid);
     return(result);
 }
 
@@ -512,8 +512,8 @@ cJSON *NSPV_header_json(struct NSPV_equihdr *hdr,int32_t height)
     cJSON *item = cJSON_CreateObject();
     jaddnum(item,"height",height);
     jaddbits256(item,"blockhash",NSPV_hdrhash(hdr));
-    jaddbits256(item,"hashPrevBlock",NSPV_bits256(hdr->hashPrevBlock));
-    jaddbits256(item,"hashMerkleRoot",NSPV_bits256(hdr->hashMerkleRoot));
+    jaddbits256(item,"hashPrevBlock",hdr->hashPrevBlock);
+    jaddbits256(item,"hashMerkleRoot",hdr->hashMerkleRoot);
     jaddnum(item,"nTime",hdr->nTime);
     jaddnum(item,"nBits",hdr->nBits);
     return(item);
@@ -543,7 +543,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
         jaddnum(result,"wifexpires",expiration);
     }
     jaddnum(result,"height",ptr->height);
-    jaddbits256(result,"chaintip",NSPV_bits256(ptr->blockhash));
+    jaddbits256(result,"chaintip",ptr->blockhash);
     jadd(result,"notarization",NSPV_ntz_json(&ptr->notarization));
     jadd(result,"header",NSPV_header_json(&ptr->H,ptr->hdrheight));
     jaddstr(result,"lastpeer",NSPV_lastpeer);
@@ -557,7 +557,7 @@ cJSON *NSPV_utxoresp_json(struct NSPV_utxoresp *utxos,int32_t numutxos)
     {
         item = cJSON_CreateObject();
         jaddnum(item,"height",utxos[i].height);
-        jaddbits256(item,"txid",NSPV_bits256(utxos[i].txid));
+        jaddbits256(item,"txid",utxos[i].txid);
         jaddnum(item,"vout",utxos[i].vout);
         jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
         jaddnum(item,"interest",(double)utxos[i].extradata/COIN);
@@ -588,7 +588,7 @@ cJSON *NSPV_txidresp_json(struct NSPV_txidresp *utxos,int32_t numutxos)
     {
         item = cJSON_CreateObject();
         jaddnum(item,"height",utxos[i].height);
-        jaddbits256(item,"txid",NSPV_bits256(utxos[i].txid));
+        jaddbits256(item,"txid",utxos[i].txid);
         jaddnum(item,"interest",(double)utxos[i].satoshis/COIN);
         if ( utxos[i].satoshis > 0 )
             jaddnum(item,"vout",utxos[i].vout);
@@ -616,13 +616,13 @@ cJSON *NSPV_mempoolresp_json(struct NSPV_mempoolresp *ptr)
     int32_t i; cJSON *result = cJSON_CreateObject(), *array = cJSON_CreateArray();
     jaddstr(result,"result","success");
     for (i=0; i<ptr->numtxids; i++)
-        jaddibits256(array,NSPV_bits256(ptr->txids[i]));
+        jaddibits256(array,ptr->txids[i]);
     jadd(result,"txids",array);
     jaddstr(result,"address",ptr->coinaddr);
     jaddnum(result,"isCC",ptr->CCflag);
     jaddnum(result,"height",ptr->nodeheight);
     jaddnum(result,"numtxids",ptr->numtxids);
-    jaddbits256(result,"txid",NSPV_bits256(ptr->txid));
+    jaddbits256(result,"txid",ptr->txid);
     jaddnum(result,"vout",ptr->vout);
     jaddnum(result,"funcid",ptr->funcid);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
@@ -645,10 +645,10 @@ cJSON *NSPV_ntzsproof_json(struct NSPV_ntzsproofresp *ptr)
     jaddstr(result,"result","success");
     jaddnum(result,"prevht",ptr->common.prevht);
     jaddnum(result,"nextht",ptr->common.nextht);
-    jaddbits256(result,"prevtxid",NSPV_bits256(ptr->prevtxid));
+    jaddbits256(result,"prevtxid",ptr->prevtxid);
     jaddnum(result,"prevtxidht",ptr->prevtxidht);
     jaddnum(result,"prevtxlen",ptr->prevtxlen);
-    jaddbits256(result,"nexttxid",NSPV_bits256(ptr->nexttxid));
+    jaddbits256(result,"nexttxid",ptr->nexttxid);
     jaddnum(result,"nexttxidht",ptr->nexttxidht);
     jaddnum(result,"nexttxlen",ptr->nexttxlen);
     jaddnum(result,"numhdrs",ptr->common.numhdrs);
@@ -661,8 +661,8 @@ cJSON *NSPV_broadcast_json(struct NSPV_broadcastresp *ptr,bits256 txid)
 {
     cJSON *result = cJSON_CreateObject();
     jaddstr(result,"result","success");
-    jaddbits256(result,"expected",NSPV_bits256(txid));
-    jaddbits256(result,"broadcast",NSPV_bits256(ptr->txid));
+    jaddbits256(result,"expected",txid);
+    jaddbits256(result,"broadcast",ptr->txid);
     jaddnum(result,"retcode",ptr->retcode);
     switch ( ptr->retcode )
     {
