@@ -192,7 +192,7 @@ LIBBTC_API cstring* btc_p2p_message_new(const unsigned char netmagic[4], const c
 /* =================================== */
 
 /* creates a getheader message */
-LIBBTC_API void btc_p2p_msg_getheaders(vector* blocklocators, uint256 hashstop, cstring* str_out);
+LIBBTC_API void btc_p2p_msg_getheaders(uint32_t protocol,vector* blocklocators, uint256 hashstop, cstring* str_out);
 
 /* directly deserialize a getheaders message to blocklocators, hashstop */
 LIBBTC_API btc_bool btc_p2p_deser_msg_getheaders(vector* blocklocators, uint256 hashstop, struct const_buffer* buf);
