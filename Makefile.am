@@ -192,7 +192,6 @@ src/tools/nspv.c
 nspv_CFLAGS = $(libbtc_la_CFLAGS)
 nspv_CPPFLAGS = -I$(top_srcdir)/src
 nspv_LDFLAGS = -static
-endif
 
 endif
 
