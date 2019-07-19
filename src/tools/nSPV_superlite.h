@@ -176,7 +176,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
     struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
-    btc_chainparams *chain = from->nodegroup->chainparams;
+    const btc_chainparams *chain = from->nodegroup->chainparams;
     sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     if ( len > 0 )
     {
