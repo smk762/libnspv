@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
     int timeout = 15;
     int maxnodes = 10;
     char* dbfile = 0;
-    const btc_chainparams *chain = &kmd_chainparams_main;
+    const btc_chainparams *chain = &nspv_chainparams_main;
     if ( argc > 1 )
     {
         if ( strcmp(argv[1],"BTC") == 0 )
@@ -132,13 +132,13 @@ int main(int argc, char* argv[])
     }
     if (chain->komodo == 0 && (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-'))
     {
-        /* exit if no command was provided */
+        // exit if no command was provided
         print_usage();
         exit(EXIT_FAILURE);
     }
     data = argv[argc - 1];
 
-    /* get arguments */
+    // get arguments
     while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:", long_options, &long_index)) != -1) {
         switch (opt) {
         case 'c':
