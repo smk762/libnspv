@@ -10,6 +10,7 @@
 #include <assert.h>
 
 #include <btc/utils.h>
+#include <btc/net.h>
 #include <btc/netspv.h>
 #include <btc/blockchain.h>
 
