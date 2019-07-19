@@ -59,20 +59,13 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
-char *bits256_str(char *buf,uint8_t *ptr)
+char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;
     for (i=0; i<32; i++)
-        sprintf(&buf[i<<1],"%02x",ptr[i]);
+        sprintf(&buf[i<<1],"%02x",hash.bytes[i]);
     buf[i<<1] = 0;
     return(buf);
-}
-
-bits256 NSPV_bits256(uint256 hash)
-{
-    bits256 rethash;
-    memcpy(&rethash,hash,sizeof(rethash));
-    return(rethash);
 }
 
 #ifdef LATER
