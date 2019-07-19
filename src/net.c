@@ -11,6 +11,7 @@
 #include <btc/protocol.h>
 #include <btc/serialize.h>
 #include <btc/utils.h>
+#include <nSPV_defs.h>
 
 #ifdef _WIN32
 #include <getopt.h>
