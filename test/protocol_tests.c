@@ -93,7 +93,7 @@ void test_protocol()
     btc_p2p_version_msg v_msg_check;
     u_assert_int_eq(btc_p2p_msg_version_deser(&v_msg_check, &buf), true);
 
-    u_assert_int_eq(v_msg_check.version, BTC_PROTOCOL_VERSION);
+    u_assert_int_eq(v_msg_check.version, btc_chainparams_main.nProtocolVersion);
     u_assert_str_eq(v_msg_check.useragent, "client");
     u_assert_int_eq(v_msg_check.start_height, 0);
 
@@ -105,7 +105,7 @@ void test_protocol()
     vector *blocklocators = vector_new(1, NULL);
     vector_add(blocklocators, genesis_hash);
     cstring *getheader_msg = cstr_new_sz(256);
-    btc_p2p_msg_getheaders(blocklocators, NULL, getheader_msg);
+    btc_p2p_msg_getheaders(btc_chainparams_main.nProtocolVersion,blocklocators, NULL, getheader_msg);
     p2p_msg = btc_p2p_message_new((unsigned const char *)&btc_chainparams_main.netmagic, BTC_MSG_GETHEADERS, getheader_msg->str, getheader_msg->len);
 
 

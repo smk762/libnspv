@@ -174,12 +174,4 @@ struct NSPV_CCmtxinfo
     struct NSPV_utxoresp used[NSPV_MAXVINS];
 };
 
-struct nSPV_coin
-{
-    char symbol[64];
-    int32_t maxtxsize;
-    uint16_t p2pport;
-    uint8_t komodo,pubtype,p2shtype,wiftype,taddr,netmagic[4];
-};
-
 #endif // KOMODO_NSPV_DEFSH
