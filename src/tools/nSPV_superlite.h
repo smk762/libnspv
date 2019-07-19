@@ -339,14 +339,15 @@ uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight)
 
 cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount)
 {
-    cJSON *result = cJSON_CreateObject(); uint8_t msg[64]; int32_t i,iter,slen,len = 0;
+    cJSON *result = cJSON_CreateObject(); uint8_t msg[64]; int32_t i,iter,slen,len = 0; size_t sz;
     //fprintf(stderr,"utxos %s NSPV addr %s\n",coinaddr,NSPV_address.c_str());
     if ( NSPV_utxosresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_utxosresult.coinaddr) == 0 && CCflag == NSPV_utxosresult.CCflag  && skipcount == NSPV_utxosresult.skipcount )
         return(NSPV_utxosresp_json(&NSPV_utxosresult));
     if ( skipcount < 0 )
         skipcount = 0;
     NSPV_utxosresp_purge(client->chainparams,&NSPV_utxosresult);
-    if ( bitcoin_base58decode(msg,coinaddr) != 25 )
+    if ( btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25 )
+    //if ( bitcoin_base58decode(msg,coinaddr) != 25 )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid address");
@@ -377,13 +378,14 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
 
 cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount)
 {
-    cJSON *result = cJSON_CreateObject(); uint8_t msg[64]; int32_t i,iter,slen,len = 0;
+    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[64]; int32_t i,iter,slen,len = 0;
     if ( NSPV_txidsresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag && skipcount == NSPV_txidsresult.skipcount )
         return(NSPV_txidsresp_json(&NSPV_txidsresult));
     if ( skipcount < 0 )
         skipcount = 0;
     NSPV_txidsresp_purge(client->chainparams,&NSPV_txidsresult);
-    if ( bitcoin_base58decode(msg,coinaddr) != 25 )
+    if ( btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25 )
+    //if ( bitcoin_base58decode(msg,coinaddr) != 25 )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid address");
@@ -415,9 +417,9 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
 
 cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,uint8_t funcid,bits256 txid,int32_t vout)
 {
-    cJSON *result = cJSON_CreateObject(); uint8_t msg[512]; char str[65]; int32_t i,iter,slen,len = 0;
+    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; char str[65]; int32_t i,iter,slen,len = 0;
     NSPV_mempoolresp_purge(client->chainparams,&NSPV_mempoolresult);
-    if ( coinaddr[0] != 0 && bitcoin_base58decode(msg,coinaddr) != 25 )
+    if ( coinaddr[0] != 0 && (btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25) )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid address");
