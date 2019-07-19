@@ -25,6 +25,7 @@
  */
 
 #include <btc/chainparams.h>
+#include <btc/protocol.h>
 
 const btc_chainparams btc_chainparams_main = {
     "BTC",
