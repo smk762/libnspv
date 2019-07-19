@@ -511,7 +511,7 @@ cJSON *NSPV_header_json(struct NSPV_equihdr *hdr,int32_t height)
 {
     cJSON *item = cJSON_CreateObject();
     jaddnum(item,"height",height);
-    jaddbits256(item,"blockhash",NSPV_bits256(NSPV_hdrhash(hdr)));
+    jaddbits256(item,"blockhash",NSPV_hdrhash(hdr));
     jaddbits256(item,"hashPrevBlock",NSPV_bits256(hdr->hashPrevBlock));
     jaddbits256(item,"hashMerkleRoot",NSPV_bits256(hdr->hashMerkleRoot));
     jaddnum(item,"nTime",hdr->nTime);
@@ -589,7 +589,7 @@ cJSON *NSPV_txidresp_json(struct NSPV_txidresp *utxos,int32_t numutxos)
         item = cJSON_CreateObject();
         jaddnum(item,"height",utxos[i].height);
         jaddbits256(item,"txid",NSPV_bits256(utxos[i].txid));
-        jaddnum(result,"interest",(double)utxos[i].satoshis/COIN);
+        jaddnum(item,"interest",(double)utxos[i].satoshis/COIN);
         if ( utxos[i].satoshis > 0 )
             jaddnum(item,"vout",utxos[i].vout);
         else jaddnum(item,"vin",utxos[i].vout);
