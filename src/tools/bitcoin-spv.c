@@ -240,4 +240,5 @@ int32_t iguana_rwnum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,in
 {
     return(0);
 }
+void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) {}
 
