@@ -121,7 +121,15 @@ int main(int argc, char* argv[])
     int maxnodes = 10;
     char* dbfile = 0;
     const btc_chainparams *chain = &kmd_chainparams_main;
-
+    if ( argc > 1 )
+    {
+        if ( strcmp(argv[1],"BTC") == 0 )
+        {
+            chain = &btc_chainparams_main;
+            argc--;
+            argv++'
+        }
+    }
     if (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-') {
         /* exit if no command was provided */
         print_usage();
