@@ -29,6 +29,7 @@
 #include <btc/utils.h>
 
 uint32_t NSPV_logintime,NSPV_lastinfo;
+char NSPV_lastpeer[64];
 
 struct NSPV_inforesp NSPV_inforesult;
 struct NSPV_utxosresp NSPV_utxosresult;
@@ -86,20 +87,20 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
 
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
-    struct NSPV_inforesp I; int32_t len; uint32_t timestamp = (uint32_t)time(NULL);
+    struct NSPV_inforesp I; uint32_t timestamp = (uint32_t)time(NULL);
     sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     if ( len > 0 )
     {
         switch ( response[0] )
         {
             case NSPV_INFORESP:
-                fprintf(stderr,"got info response %u size.%d height.%d\n",timestamp,(int32_t)response.size(),NSPV_inforesult.height); // update current height and ntrz status
+                fprintf(stderr,"got info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
                 I = NSPV_inforesult;
                 NSPV_inforesp_purge(&NSPV_inforesult);
                 NSPV_rwinforesp(0,&response[1],&NSPV_inforesult);
                 if ( NSPV_inforesult.height < I.height )
                 {
-                    fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,(int32_t)response.size(),NSPV_inforesult.height); // update current height and ntrz status
+                    fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
                     NSPV_inforesp_purge(&NSPV_inforesult);
                     NSPV_inforesult = I;
                 }
@@ -114,50 +115,50 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_UTXOSRESP:
                 NSPV_utxosresp_purge(&NSPV_utxosresult);
                 NSPV_rwutxosresp(0,&response[1],&NSPV_utxosresult);
-                fprintf(stderr,"got utxos response %u size.%d\n",timestamp,(int32_t)response.size());
+                fprintf(stderr,"got utxos response %u size.%d\n",timestamp,len);
                 break;
             case NSPV_TXIDSRESP:
                 NSPV_txidsresp_purge(&NSPV_txidsresult);
                 NSPV_rwtxidsresp(0,&response[1],&NSPV_txidsresult);
-                fprintf(stderr,"got txids response %u size.%d %s CC.%d num.%d\n",timestamp,(int32_t)response.size(),NSPV_txidsresult.coinaddr,NSPV_txidsresult.CCflag,NSPV_txidsresult.numtxids);
+                fprintf(stderr,"got txids response %u size.%d %s CC.%d num.%d\n",timestamp,len,NSPV_txidsresult.coinaddr,NSPV_txidsresult.CCflag,NSPV_txidsresult.numtxids);
                 break;
             case NSPV_MEMPOOLRESP:
                 NSPV_mempoolresp_purge(&NSPV_mempoolresult);
                 NSPV_rwmempoolresp(0,&response[1],&NSPV_mempoolresult);
-                fprintf(stderr,"got mempool response %u size.%d %s CC.%d num.%d funcid.%d %s/v%d\n",timestamp,(int32_t)response.size(),NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.funcid,NSPV_mempoolresult.txid.GetHex().c_str(),NSPV_mempoolresult.vout);
+                fprintf(stderr,"got mempool response %u size.%d %s CC.%d num.%d funcid.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.funcid,NSPV_mempoolresult.txid.GetHex().c_str(),NSPV_mempoolresult.vout);
                 break;
             case NSPV_NTZSRESP:
                 NSPV_ntzsresp_purge(&NSPV_ntzsresult);
                 NSPV_rwntzsresp(0,&response[1],&NSPV_ntzsresult);
                 if ( NSPV_ntzsresp_find(NSPV_ntzsresult.reqheight) == 0 )
                     NSPV_ntzsresp_add(&NSPV_ntzsresult);
-                fprintf(stderr,"got ntzs response %u size.%d %s prev.%d, %s next.%d\n",timestamp,(int32_t)response.size(),NSPV_ntzsresult.prevntz.txid.GetHex().c_str(),NSPV_ntzsresult.prevntz.height,NSPV_ntzsresult.nextntz.txid.GetHex().c_str(),NSPV_ntzsresult.nextntz.height);
+                fprintf(stderr,"got ntzs response %u size.%d %s prev.%d, %s next.%d\n",timestamp,len,NSPV_ntzsresult.prevntz.txid.GetHex().c_str(),NSPV_ntzsresult.prevntz.height,NSPV_ntzsresult.nextntz.txid.GetHex().c_str(),NSPV_ntzsresult.nextntz.height);
                 break;
             case NSPV_NTZSPROOFRESP:
                 NSPV_ntzsproofresp_purge(&NSPV_ntzsproofresult);
                 NSPV_rwntzsproofresp(0,&response[1],&NSPV_ntzsproofresult);
                 if ( NSPV_ntzsproof_find(NSPV_ntzsproofresult.prevtxid,NSPV_ntzsproofresult.nexttxid) == 0 )
                     NSPV_ntzsproof_add(&NSPV_ntzsproofresult);
-                fprintf(stderr,"got ntzproof response %u size.%d prev.%d next.%d\n",timestamp,(int32_t)response.size(),NSPV_ntzsproofresult.common.prevht,NSPV_ntzsproofresult.common.nextht);
+                fprintf(stderr,"got ntzproof response %u size.%d prev.%d next.%d\n",timestamp,len,NSPV_ntzsproofresult.common.prevht,NSPV_ntzsproofresult.common.nextht);
                 break;
             case NSPV_TXPROOFRESP:
                 NSPV_txproof_purge(&NSPV_txproofresult);
                 NSPV_rwtxproof(0,&response[1],&NSPV_txproofresult);
                 if ( NSPV_txproof_find(NSPV_txproofresult.txid) == 0 )
                     NSPV_txproof_add(&NSPV_txproofresult);
-                fprintf(stderr,"got txproof response %u size.%d %s ht.%d\n",timestamp,(int32_t)response.size(),NSPV_txproofresult.txid.GetHex().c_str(),NSPV_txproofresult.height);
+                fprintf(stderr,"got txproof response %u size.%d %s ht.%d\n",timestamp,len,NSPV_txproofresult.txid.GetHex().c_str(),NSPV_txproofresult.height);
                 break;
             case NSPV_SPENTINFORESP:
                 NSPV_spentinfo_purge(&NSPV_spentresult);
                 NSPV_rwspentinfo(0,&response[1],&NSPV_spentresult);
-                fprintf(stderr,"got spentinfo response %u size.%d\n",timestamp,(int32_t)response.size());
+                fprintf(stderr,"got spentinfo response %u size.%d\n",timestamp,len);
                 break;
             case NSPV_BROADCASTRESP:
                 NSPV_broadcast_purge(&NSPV_broadcastresult);
                 NSPV_rwbroadcastresp(0,&response[1],&NSPV_broadcastresult);
-                fprintf(stderr,"got broadcast response %u size.%d %s retcode.%d\n",timestamp,(int32_t)response.size(),NSPV_broadcastresult.txid.GetHex().c_str(),NSPV_broadcastresult.retcode);
+                fprintf(stderr,"got broadcast response %u size.%d %s retcode.%d\n",timestamp,len,NSPV_broadcastresult.txid.GetHex().c_str(),NSPV_broadcastresult.retcode);
                 break;
-            default: fprintf(stderr,"unexpected response %02x size.%d at %u\n",response[0],(int32_t)response.size(),timestamp);
+            default: fprintf(stderr,"unexpected response %02x size.%d at %u\n",response[0],len,timestamp);
                 break;
         }
     }
