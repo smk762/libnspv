@@ -72,7 +72,7 @@ struct NSPV_txproof *NSPV_txproof_find(const btc_chainparams *chain,bits256 txid
 {
     uint32_t i; struct NSPV_txproof *backup = 0;
     for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
-        if ( NSPV_txproof_cache[i].txid == txid )
+        if ( memcmp(&NSPV_txproof_cache[i].txid,&txid,sizeof(txid)) == 0 )
         {
             if ( NSPV_txproof_cache[i].txprooflen != 0 )
                 return(&NSPV_txproof_cache[i]);
@@ -85,7 +85,7 @@ struct NSPV_txproof *NSPV_txproof_add(const btc_chainparams *chain,struct NSPV_t
 {
     uint32_t i; char str[65];
     for (i=0; i<sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache); i++)
-        if ( NSPV_txproof_cache[i].txid == ptr->txid )
+        if ( memcmp(&NSPV_txproof_cache[i].txid,&ptr->txid,sizeof(ptr->txid)) == 0 )
         {
             if ( NSPV_txproof_cache[i].txprooflen == 0 && ptr->txprooflen != 0 )
             {
@@ -111,7 +111,7 @@ struct NSPV_ntzsproofresp *NSPV_ntzsproof_find(const btc_chainparams *chain,bits
 {
     uint32_t i;
     for (i=0; i<sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache); i++)
-        if ( NSPV_ntzsproofresp_cache[i].prevtxid == prevtxid && NSPV_ntzsproofresp_cache[i].nexttxid == nexttxid )
+        if ( memcmp(&NSPV_ntzsproofresp_cache[i].prevtxid,&prevtxid,sizeof(prevtxid)) == 0 && memcmp(&NSPV_ntzsproofresp_cache[i].nexttxid,&nexttxid,sizeof(nexttxid)) == 0 )
             return(&NSPV_ntzsproofresp_cache[i]);
     return(0);
 }
@@ -437,7 +437,7 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && txid == NSPV_mempoolresult.txid && vout == NSPV_mempoolresult.vout && funcid == NSPV_mempoolresult.funcid )
+            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memcmp(&txid,&NSPV_mempoolresult.txid,sizeof(txid)) == 0 && vout == NSPV_mempoolresult.vout && funcid == NSPV_mempoolresult.funcid )
                 return(NSPV_mempoolresp_json(&NSPV_mempoolresult));
         }
     } else sleep(1);
@@ -460,7 +460,7 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
 bool NSPV_spentinmempool(btc_spv_client *client,bits256 &spenttxid,int32_t &spentvini,bits256 txid,int32_t vout)
 {
     NSPV_mempooltxids(client,(char *)"",0,NSPV_MEMPOOL_ISSPENT,txid,vout);
-    if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids == 1 && NSPV_mempoolresult.txid == txid )
+    if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids == 1 && memc mp(&NSPV_mempoolresult.txid,&txid,sizeof(txid)) == 0 )
     {
         spenttxid = NSPV_mempoolresult.txids[0];
         spentvini = NSPV_mempoolresult.vindex;
@@ -531,7 +531,7 @@ cJSON *NSPV_txidhdrsproof(btc_spv_client *client,bits256 prevtxid,bits256 nexttx
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_ntzsproofresult.prevtxid == prevtxid && NSPV_ntzsproofresult.nexttxid == nexttxid )
+            if ( memcmp(&NSPV_ntzsproofresult.prevtxid,&prevtxid,sizeof(prevtxid)) == 0 && memcmp(&NSPV_ntzsproofresult.nexttxid,&nexttxid,sizeof(nexttxid)) == 0 )
                 return(NSPV_ntzsproof_json(&NSPV_ntzsproofresult));
         }
     } else sleep(1);
@@ -571,7 +571,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_txproofresult.txid == txid )
+            if ( memcmp(&NSPV_txproofresult.txid,&txid,sizeof(txid)) == 0 )
                 return(NSPV_txproof_json(&NSPV_txproofresult));
         }
     } else sleep(1);
@@ -593,7 +593,7 @@ cJSON *NSPV_spentinfo(btc_spv_client *client,bits256 txid,int32_t vout)
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_spentresult.txid == txid && NSPV_spentresult.vout == vout )
+            if ( memcmp(&NSPV_spentresult.txid,&txid,sizeof(txid)) == 0 && NSPV_spentresult.vout == vout )
                 return(NSPV_spentinfo_json(&NSPV_spentresult));
         }
     } else sleep(1);
@@ -622,7 +622,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_broadcastresult.txid == txid )
+            if ( memcmp(&NSPV_broadcastresult.txid,&txid,sizeof(txid)) == 0 )
             {
                 free(msg);
                 return(NSPV_broadcast_json(&NSPV_broadcastresult,txid));
