@@ -393,7 +393,9 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
     {
         if ( strcmp(hdr->command,"nSPV") == 0 )
         {
-            fprintf(stderr,"process nSPV response %d [%d]\n",((uint8_t *)buf->p)[0],(int32_t)buf->len);
+            uint32_t varlen;
+            deser_varlen(&varlen, buf);
+            fprintf(stderr,"process nSPV response %d [%d]\n",((uint8_t *)buf->p)[0],varlen);
         }
         return;
     }
