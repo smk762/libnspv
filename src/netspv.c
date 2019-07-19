@@ -391,11 +391,15 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
 
     if ( node->nodegroup->chainparams->nSPV != 0 )
     {
+        uint32_t varlen;
+        deser_varlen(&varlen, buf);
         if ( strcmp(hdr->command,"nSPV") == 0 )
         {
-            uint32_t varlen;
-            deser_varlen(&varlen, buf);
             fprintf(stderr,"process nSPV response %d [%d]\n",((uint8_t *)buf->p)[0],varlen);
+        }
+        else if ( strcmp(hdr->command,"addr") == 0 )
+        {
+            fprintf(stderr,"got addr message [%d]\n",varlen);
         }
         return;
     }
