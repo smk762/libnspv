@@ -71,7 +71,7 @@ char *bits256_str(char *buf,uint8_t *ptr)
 bits256 NSPV_bits256(uint256 hash)
 {
     bits256 rethash;
-    memset(&rethash,hash,sizeof(rethash));
+    memcpy(&rethash,hash,sizeof(rethash));
     return(rethash);
 }
 

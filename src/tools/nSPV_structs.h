@@ -510,12 +510,12 @@ cJSON *NSPV_ntz_json(struct NSPV_ntz *ptr)
 cJSON *NSPV_header_json(struct NSPV_equihdr *hdr,int32_t height)
 {
     cJSON *item = cJSON_CreateObject();
-    jaddnum(result,"height",height);
-    jaddbits256(result,"blockhash",NSPV_bits256(NSPV_hdrhash(hdr)));
-    jaddbits256(result,"hashPrevBlock",NSPV_bits256(hdr->hashPrevBlock));
-    jaddbits256(result,"hashMerkleRoot",NSPV_bits256(hdr->hashMerkleRoot));
-    jaddnum(result,"nTime",hdr->nTime);
-    jaddnum(result,"nBits",hdr->nBits);
+    jaddnum(item,"height",height);
+    jaddbits256(item,"blockhash",NSPV_bits256(NSPV_hdrhash(hdr)));
+    jaddbits256(item,"hashPrevBlock",NSPV_bits256(hdr->hashPrevBlock));
+    jaddbits256(item,"hashMerkleRoot",NSPV_bits256(hdr->hashMerkleRoot));
+    jaddnum(item,"nTime",hdr->nTime);
+    jaddnum(item,"nBits",hdr->nBits);
     return(item);
 }
 
