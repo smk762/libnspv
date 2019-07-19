@@ -20,6 +20,11 @@
 #include <time.h>
 #include <btc/netspv.h>
 
+union _bits256 { uint8_t bytes[32]; uint16_t ushorts[16]; uint32_t uints[8]; uint64_t ulongs[4]; uint64_t txid; };
+typedef union _bits256 bits256;
+
+#include "komodo_cJSON.h"
+
 #define NODE_NSPV (1 << 30)
 #define NODE_ADDRINDEX (1 << 29)
 #define NODE_SPENTINDEX (1 << 28)
@@ -57,6 +62,8 @@
 #define NSPV_MEMPOOL_CCEVALCODE 4
 
 extern uint32_t NSPV_logintime,NSPV_lastinfo;
+extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[];
+
 int32_t iguana_rwnum(const btc_chainparams *chain,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind);
 void NSPV_logout(void);
