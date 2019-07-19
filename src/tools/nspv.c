@@ -111,6 +111,16 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "nSPV_superlite.h"
 #include "komodo_cJSON.c"
 
+/*
+ Todo:
+ HDRhash
+ addr message
+ rpc calls while running
+ login and address/passphrase handling
+ JSON chainparams, maybe use coins repo
+ 
+ */
+
 int main(int argc, char* argv[])
 {
     int ret = 0;
