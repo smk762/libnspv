@@ -104,6 +104,8 @@ void spv_sync_completed(btc_spv_client* client) {
     }
 }
 
+#include "../komodo/src/komodo_nSPV_defs.h"
+
 int main(int argc, char* argv[])
 {
     int ret = 0;
