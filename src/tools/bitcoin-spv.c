@@ -225,3 +225,20 @@ int main(int argc, char* argv[])
     }
     return ret;
 }
+
+
+// stubs for link compatibility
+uint32_t NSPV_logintime,NSPV_lastinfo;
+
+void NSPV_logout() {}
+
+btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
+{
+    return(0);
+}
+
+int32_t iguana_rwnum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
+{
+    return(0);
+}
+
