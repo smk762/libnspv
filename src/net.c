@@ -170,7 +170,7 @@ void event_cb(struct bufferevent* ev, short type, void* ctx)
     UNUSED(ev);
     btc_node* node = (btc_node*)ctx;
     node->nodegroup->log_write_cb("Event callback on node %d\n", node->nodeid);
-    fprintf(stddrr,"Event callback on node %d\n", node->nodeid);
+    fprintf(stderr,"Event callback on node %d\n", node->nodeid);
 
     if (((type & BEV_EVENT_TIMEOUT) != 0) && ((node->state & NODE_CONNECTING) == NODE_CONNECTING))
     {
