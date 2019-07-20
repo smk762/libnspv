@@ -37,6 +37,8 @@ char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
 
+btc_key NSPV_key;
+btc_pubkey NSPV_pubkey;
 struct NSPV_inforesp NSPV_inforesult;
 struct NSPV_utxosresp NSPV_utxosresult;
 struct NSPV_txidsresp NSPV_txidsresult;
@@ -143,7 +145,7 @@ void NSPV_logout()
     memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
     memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));
     memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
-    //memset(&NSPV_key,0,sizeof(NSPV_key));
+    memset(&NSPV_key,0,sizeof(NSPV_key));
     NSPV_logintime = 0;
 }
 
@@ -668,13 +670,14 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     if ( strcmp(NSPV_wifstr,wifstr) != 0 )
     {
         strncpy(NSPV_wifstr,wifstr,sizeof(NSPV_wifstr)-1);
-        //NSPV_key = DecodeSecret(wifstr);
+        if ( btc_privkey_decode_wif(NSPV_wifstr,chain,&NSPV_key) == 0 )
+            jaddstr(result,"wiferror","couldnt decode wif");
     }
     jaddstr(result,"result","success");
     jaddstr(result,"status","wif will expire in 777 seconds");
-    //CPubKey pubkey = NSPV_key.GetPubKey();
-    //CKeyID vchAddress = pubkey.GetID();
-    //NSPV_address = EncodeDestination(vchAddress);
+    btc_pubkey_from_key(&NSPV_key,&NSPV_pubkey);
+    btc_pubkey_get_hex(&NSPV_pubkey,NSPV_pubkeystr,sizeof(NSPV_pubkeystr));
+    btc_pubkey_getaddr_p2pkh(&NSPV_pubkey,chain,NSPV_address);
     jaddstr(result,"address",NSPV_address);
     jaddstr(result,"pubkey",NSPV_pubkeystr);
     jaddnum(result,"wifprefix",(int64_t)data[0]);
