@@ -643,18 +643,17 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 
 cJSON *NSPV_login(btc_chainparams *chain,char *wifstr)
 {
-    cJSON *result = cJSON_CreatObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz;
+    cJSON *result = cJSON_CreateObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz;
     NSPV_logout();
-    len = bitcoin_base58decode(data,wifstr);
     if ( strlen(wifstr) < 64 && btc_base58_decode((void *)data,&sz,wifstr) != 0 && (sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1) )
         valid = 1;
-    if ( valid == 0 || data[0] != chain->wiftype )
+    if ( valid == 0 || data[0] != chain->b58prefix_secret_address )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid wif");
         jaddnum(result,"len",(int64_t)sz);
         jaddnum(result,"wifprefix",(int64_t)data[0]);
-        jaddnum(result,"expected",(int64_t)chain->wiftype);
+        jaddnum(result,"expected",(int64_t)chain->b58prefix_secret_address);
         return(result);
     }
     memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
@@ -681,15 +680,15 @@ cJSON *_NSPV_JSON(cJSON *argjson)
 {
     char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,hdrheight; uint8_t CCflag;
     if ( (method= jstr(argjson,"method")) == 0 )
-        return(clonestr("{\"error\":\"no method\"}"));
+        return(cJSON_Parse("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
-        return(clonestr("{\"error\":\"wrong coin\"}"));
+        return(cJSON_Parse("{\"error\":\"wrong coin\"}"));
     else if ( strcmp("stop",method) == 0 )
     {
         NSPV_STOP_RECEIVED = (uint32_t)time(NULL);
         btc_node_group_shutdown(NSPV_client->nodegroup);
         fprintf(stderr,"shutdown started\n");
-        return(clonestr("{\"result\":\"success\"}"));
+        return(cJSON_Parse("{\"result\":\"success\"}"));
     }
     txid = jbits256(argjson,"txid");
     vout = jint(argjson,"vout");
@@ -708,18 +707,18 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     else if ( strcmp(method,"logout") == 0 )
     {
         NSPV_logout();
-        return(clonestr("{\"result\":\"success\"}"));
+        return(cJSON_Parse("{\"result\":\"success\"}"));
     }
     else if ( strcmp(method,"login") == 0 )
     {
         if ( wifstr == 0 )
-            return(clonestr("{\"error\":\"no wif\"}"));
+            return(cJSON_Parse("{\"error\":\"no wif\"}"));
         else return(NSPV_login(NSPV_chain,wifstr));
     }
     else if ( strcmp(method,"broadcast") == 0 )
     {
         if ( hex == 0 )
-            return(clonestr("{\"error\":\"no hex\"}"));
+            return(cJSON_Parse("{\"error\":\"no hex\"}"));
         else return(NSPV_broadcast(NSPV_client,hex));
     }
     else if ( strcmp(method,"listunspent") == 0 )
@@ -737,34 +736,34 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     else if ( strcmp(method,"notarizations") == 0 )
     {
         if ( height == 0 )
-            return(clonestr("{\"error\":\"no height\"}"));
+            return(cJSON_Parse("{\"error\":\"no height\"}"));
         else return(NSPV_notarizations(NSPV_chain,height));
     }
     else if ( strcmp(method,"hdrsproof") == 0 )
     {
         if ( prevheight > nextheight || nextheight == 0 || (nextheight-prevheight) > 1440 )
-            return(clonestr("{\"error\":\"invalid height range\"}"));
+            return(cJSON_Parse("{\"error\":\"invalid height range\"}"));
         else return(NSPV_hdrsproof(NSPV_chain,prevheight,nextheight));
     }
     else if ( strcmp(method,"txproof") == 0 )
     {
         if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
-            return(clonestr("{\"error\":\"invalid utxo\"}"));
+            return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
         else return(NSPV_txproof(NSPV_chain,txid,vout,height));
     }
     else if ( strcmp(method,"spentinfo") == 0 )
     {
         if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
-            return(clonestr("{\"error\":\"invalid utxo\"}"));
+            return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
         else return(NSPV_spentinfo(NSPV_chain,txid,vout));
     }
     else if ( strcmp(method,"spend") == 0 )
     {
         if ( satoshis < 1000 || coinaddr == 0 )
-            return(clonestr("{\"error\":\"invalid address or amount too small\"}"));
+            return(cJSON_Parse("{\"error\":\"invalid address or amount too small\"}"));
         else return(NSPV_spend(NSPV_chain,coinaddr,satoshis));
     }
-    else return(clonestr("{\"error\":\"invalid method\"}"));
+    else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
 char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
