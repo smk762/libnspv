@@ -642,17 +642,15 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     return(NSPV_broadcast_json(&B,txid));
 }
 
+char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
+{
+    fprintf(stderr,"myipaddr.(%s) remote.(%s) port.%d (%s)\n",myipaddr,remoteaddr,port,jprint(argjson,0));
+    return(clonestr("{\"result\":\"success\"}"));
+}
+
 #ifdef later
-CAmount AmountFromValue(const UniValue& value);
-int32_t bitcoin_base58decode(uint8_t *data,char *coinaddr);
 
-uint32_t NSPV_lastinfo,NSPV_logintime,NSPV_tiptime;
 CKey NSPV_key;
-char NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_lastpeer[128];
-std::string NSPV_address;
-
-// komodo_nSPVresp is called from async message processing
-
 
 
 cJSON *NSPV_logout()

@@ -32,7 +32,7 @@ btc_chainparams kmd_chainparams_main =
     0x0488B21E, // uint32_t b58prefix_bip32_pubkey
     { 0xf9, 0xee, 0xe4, 0x8d },
     { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 }, //{0x6f, 0xe2, 0x8c, 0x0a, 0xb6, 0xf1, 0xb3, 0x72, 0xc1, 0xa6, 0xa2, 0x46, 0xae, 0x63, 0xf7, 0x4f, 0x93, 0x1e, 0x83, 0x65, 0xe1, 0x5a, 0x08, 0x9c, 0x68, 0xd6, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00},
-    7770,
+    7770,7771,
     {{"5.9.253.195:7770, 5.9.253.196:7770, 5.9.253.197:7770, 5.9.253.198:7770, 5.9.253.199:7770, 5.9.253.200:7770, 5.9.253.201:7770, 5.9.253.202:7770, 5.9.253.203:7770"}, 0},
     60,
     170007,
@@ -51,7 +51,7 @@ btc_chainparams nspv_chainparams_main =
     0x0488B21E, // uint32_t b58prefix_bip32_pubkey
     { 0x06, 0x65, 0x02, 0x98 }, //0x98, 0x02, 0x65, 0x06 },
     { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 }, //{0x6f, 0xe2, 0x8c, 0x0a, 0xb6, 0xf1, 0xb3, 0x72, 0xc1, 0xa6, 0xa2, 0x46, 0xae, 0x63, 0xf7, 0x4f, 0x93, 0x1e, 0x83, 0x65, 0xe1, 0x5a, 0x08, 0x9c, 0x68, 0xd6, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00},
-    20266,
+    20266,20267,
     {{"5.9.102.210:20266, 5.9.253.195:20266, 5.9.253.196:20266, 5.9.253.197:20266, 5.9.253.198:20266, 5.9.253.199:20266, 5.9.253.200:20266, 5.9.253.201:20266, 5.9.253.202:20266, 5.9.253.203:20266"}, 0},
     60,
     170007,
@@ -245,6 +245,80 @@ double OS_milliseconds()
     return(millis);
 }
 
+char *OS_portable_path(char *str)
+{
+#ifdef _WIN32
+    int32_t i;
+    for (i=0; str[i]!=0; i++)
+        if ( str[i] == '/' )
+            str[i] = '\\';
+    return(str);
+#else
+#ifdef __PNACL
+    /*int32_t i,n;
+     if ( str[0] == '/' )
+     return(str);
+     else
+     {
+     n = (int32_t)strlen(str);
+     for (i=n; i>0; i--)
+     str[i] = str[i-1];
+     str[0] = '/';
+     str[n+1] = 0;
+     }*/
+#endif
+    return(str);
+#endif
+}
+
+void *OS_loadfile(char *fname,char **bufp,long *lenp,long *allocsizep)
+{
+    FILE *fp;
+    long  filesize,buflen = *allocsizep;
+    char *buf = *bufp;
+    *lenp = 0;
+    if ( (fp= fopen(OS_portable_path(fname),"rb")) != 0 )
+    {
+        fseek(fp,0,SEEK_END);
+        filesize = ftell(fp);
+        if ( filesize == 0 )
+        {
+            fclose(fp);
+            *lenp = 0;
+            //printf("OS_loadfile null size.(%s)\n",fname);
+            return(0);
+        }
+        if ( filesize > buflen-1 )
+        {
+            *allocsizep = filesize+1;
+            *bufp = buf = realloc(buf,(long)*allocsizep);
+        }
+        rewind(fp);
+        if ( buf == 0 )
+            printf("Null buf ???\n");
+        else
+        {
+            if ( fread(buf,1,(long)filesize,fp) != (unsigned long)filesize )
+                printf("error reading filesize.%ld\n",(long)filesize);
+            buf[filesize] = 0;
+        }
+        fclose(fp);
+        *lenp = filesize;
+        //printf("loaded.(%s)\n",buf);
+    } //else printf("OS_loadfile couldnt load.(%s)\n",fname);
+    return(buf);
+}
+
+void *OS_filestr(long *allocsizep,char *_fname)
+{
+    long filesize = 0; char *fname,*buf = 0; void *retptr;
+    *allocsizep = 0;
+    fname = malloc(strlen(_fname)+1);
+    strcpy(fname,_fname);
+    retptr = OS_loadfile(fname,&buf,&filesize,allocsizep);
+    free(fname);
+    return(retptr);
+}
 
 #ifdef LATER
 

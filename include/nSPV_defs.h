@@ -18,12 +18,27 @@
 #define KOMODO_NSPV_DEFSH
 
 #include <time.h>
+#include <pthread.h>
 #include <btc/netspv.h>
 
 union _bits256 { uint8_t bytes[32]; uint16_t ushorts[16]; uint32_t uints[8]; uint64_t ulongs[4]; uint64_t txid; };
 typedef union _bits256 bits256;
 #define SATOSHIDEN ((uint64_t)100000000)
 #define dstr(x) ((double)(x) / SATOSHIDEN)
+#define portable_mutex_t pthread_mutex_t
+#define portable_mutex_init(ptr) pthread_mutex_init(ptr,NULL)
+#define portable_mutex_lock pthread_mutex_lock
+#define portable_mutex_unlock pthread_mutex_unlock
+#define OS_thread_create pthread_create
+
+struct rpcrequest_info
+{
+    struct rpcrequest_info *next,*prev;
+    pthread_t T;
+    int32_t sock;
+    uint32_t ipbits;
+    uint16_t port,pad;
+};
 
 #include "komodo_cJSON.h"
 

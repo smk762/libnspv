@@ -110,15 +110,14 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "nSPV_structs.h"
 #include "nSPV_superlite.h"
 #include "komodo_cJSON.c"
+#include "nSPV_rpc.h"
 
 /*
  Todo:
  HDRhash
  addr message
- rpc calls while running
  login and address/passphrase handling
  JSON chainparams, maybe use coins repo
- 
  */
 
 int main(int argc, char* argv[])
@@ -133,6 +132,7 @@ int main(int argc, char* argv[])
     int maxnodes = 10;
     char* dbfile = 0;
     const btc_chainparams *chain = &nspv_chainparams_main;
+    portable_mutex_init(&NSPV_commandmutex);
     if ( argc > 1 )
     {
         if ( strcmp(argv[1],"KMD") == 0 )
@@ -191,6 +191,12 @@ int main(int argc, char* argv[])
             print_usage();
             exit(EXIT_FAILURE);
         }
+    }
+    uint16_t port = chain->rpcport;
+    if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,(void *)NSPV_rpcloop,(void *)&port) != 0 )
+    {
+        printf("error launching NSPV_rpcloop for port.%u\n",port);
+        exit(-1);
     }
     if ( chain->komodo != 0 )
     {
