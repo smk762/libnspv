@@ -34,7 +34,7 @@ static const bits256 zeroid;
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
 btc_spv_client *NSPV_client;
-btc_chainparams *NSPV_chain;
+const btc_chainparams *NSPV_chain;
 
 struct NSPV_inforesp NSPV_inforesult;
 struct NSPV_utxosresp NSPV_utxosresult;
@@ -677,7 +677,7 @@ cJSON *NSPV_login(btc_chainparams *chain,char *wifstr)
     return(result);
 }
 
-char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
+cJSON *_NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
 {
     char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,hdrheight; uint8_t CCflag;
     if ( (method= jstr(argjson,"method")) == 0 )
@@ -765,6 +765,15 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
         else return(NSPV_spend(NSPV_chain,coinaddr,satoshis));
     }
     else return(clonestr("{\"error\":\"invalid method\"}"));
+}
+
+char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
+{
+    char *retstr; cJSON *retjson;
+    if ( (retjson= _NSPV_JSON(argjson)) != 0 )
+        retstr = jprint(retjson,1);
+    else retstr = clonestr("{\"error\":\"unparseable retjson\"}");
+    return(retstr);
 }
 
 #endif // KOMODO_NSPVSUPERLITE_H
