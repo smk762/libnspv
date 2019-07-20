@@ -116,8 +116,8 @@ void spv_sync_completed(btc_spv_client* client) {
  Todo:
  HDRhash
  addr message
- login and address/passphrase handling
  JSON chainparams, maybe use coins repo
+ spend
  */
 
 int main(int argc, char* argv[])
@@ -138,6 +138,12 @@ int main(int argc, char* argv[])
         if ( strcmp(argv[1],"KMD") == 0 )
         {
             chain = &kmd_chainparams_main;
+            argc--;
+            argv++;
+        }
+        else if ( strcmp(argv[1],"ILN") == 0 )
+        {
+            chain = &iln_chainparams_main;
             argc--;
             argv++;
         }

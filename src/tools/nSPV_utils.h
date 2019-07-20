@@ -59,6 +59,25 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
+btc_chainparams iln_chainparams_main =
+{
+    "ILN",
+    60,
+    85,
+    "bc", // const char bech32_hrp[5]
+    188,
+    0x0488ADE4, // uint32_t b58prefix_bip32_privkey
+    0x0488B21E, // uint32_t b58prefix_bip32_pubkey
+    { 0xfe, 0xb4, 0xcb, 0x23 }, //23cbb4fe },
+    { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 },
+    12985,12986,
+    {{"5.9.102.210:20266, 5.9.253.195:20266, 5.9.253.196:20266, 5.9.253.197:20266, 5.9.253.198:20266, 5.9.253.199:20266, 5.9.253.200:20266, 5.9.253.201:20266, 5.9.253.202:20266, 5.9.253.203:20266"}, 0},
+    60,
+    170007,
+    MAX_TX_SIZE_AFTER_SAPLING,
+    1,1,0,
+};
+
 char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;
