@@ -346,11 +346,12 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     if ( skipcount < 0 )
         skipcount = 0;
     NSPV_utxosresp_purge(client->chainparams,&NSPV_utxosresult);
-    if ( btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25 )
+    if ( (sz= btc_base58_decode_check(coinaddr,msg,sizeof(msg))) != 25 )
     //if ( bitcoin_base58decode(msg,coinaddr) != 25 )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid address");
+        jaddnum(result,"addrlen",(int64_t)sz);
         jaddstr(result,"lastpeer",NSPV_lastpeer);
         return(result);
     }
@@ -384,11 +385,13 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     if ( skipcount < 0 )
         skipcount = 0;
     NSPV_txidsresp_purge(client->chainparams,&NSPV_txidsresult);
-    if ( btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25 )
+    if ( (sz= btc_base58_decode_check(coinaddr,msg,sizeof(msg))) != 25 )
+    //if ( btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25 )
     //if ( bitcoin_base58decode(msg,coinaddr) != 25 )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid address");
+        jaddnum(result,"addrlen",(int64_t)sz);
         jaddstr(result,"lastpeer",NSPV_lastpeer);
         return(result);
     }
@@ -419,10 +422,12 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; char str[65]; int32_t i,iter,slen,len = 1;
     NSPV_mempoolresp_purge(client->chainparams,&NSPV_mempoolresult);
-    if ( coinaddr[0] != 0 && (btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25) )
+    ;
+    if ( coinaddr[0] != 0 && (sz= btc_base58_decode_check(coinaddr,msg,sizeof(msg))) != 25 )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid address");
+        jaddnum(result,"addrlen",(int64_t)sz);
         jaddstr(result,"lastpeer",NSPV_lastpeer);
         return(result);
     }
@@ -645,7 +650,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
     cJSON *result = cJSON_CreateObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz;
     NSPV_logout();
-    if ( strlen(wifstr) < 64 && btc_base58_decode((void *)data,&sz,wifstr) != 0 && (sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1) )
+    if ( strlen(wifstr) < 64 && (sz= btc_base58_decode_check(wifstr,data,sizeof(data))) > 0 && (sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1) )
         valid = 1;
     if ( valid == 0 || data[0] != chain->b58prefix_secret_address )
     {
