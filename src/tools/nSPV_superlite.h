@@ -149,7 +149,7 @@ void NSPV_logout()
 
 int32_t NSPV_periodic(btc_node *node) // called periodically
 {
-    uint8_t msg[256]; int32_t i,len=0; uint32_t timestamp = (uint32_t)time(NULL);
+    uint8_t msg[256]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
     btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
     if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
         NSPV_logout();
@@ -167,7 +167,6 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
     {
         int32_t reqht;
         reqht = 0;
-        len = 1;
         msg[len++] = NSPV_INFO;
         len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(reqht),&reqht);
         //fprintf(stderr,"issue getinfo\n");
@@ -302,7 +301,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
 
 cJSON *NSPV_getinfo_req(btc_spv_client *client,int32_t reqht)
 {
-    uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_inforesp I;
+    uint8_t msg[64]; int32_t i,iter,len = 1; struct NSPV_inforesp I;
     NSPV_inforesp_purge(client->chainparams,&NSPV_inforesult);
     msg[len++] = NSPV_INFO;
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(reqht),&reqht);
@@ -340,7 +339,7 @@ uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight)
 
 cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount)
 {
-    cJSON *result = cJSON_CreateObject(); uint8_t msg[64]; int32_t i,iter,slen,len = 0; size_t sz;
+    cJSON *result = cJSON_CreateObject(); uint8_t msg[64]; int32_t i,iter,slen,len = 1; size_t sz;
     //fprintf(stderr,"utxos %s NSPV addr %s\n",coinaddr,NSPV_address.c_str());
     if ( NSPV_utxosresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_utxosresult.coinaddr) == 0 && CCflag == NSPV_utxosresult.CCflag  && skipcount == NSPV_utxosresult.skipcount )
         return(NSPV_utxosresp_json(&NSPV_utxosresult));
@@ -379,7 +378,7 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
 
 cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount)
 {
-    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[64]; int32_t i,iter,slen,len = 0;
+    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[64]; int32_t i,iter,slen,len = 1;
     if ( NSPV_txidsresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag && skipcount == NSPV_txidsresult.skipcount )
         return(NSPV_txidsresp_json(&NSPV_txidsresult));
     if ( skipcount < 0 )
@@ -418,7 +417,7 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
 
 cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,uint8_t funcid,bits256 txid,int32_t vout)
 {
-    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; char str[65]; int32_t i,iter,slen,len = 0;
+    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; char str[65]; int32_t i,iter,slen,len = 1;
     NSPV_mempoolresp_purge(client->chainparams,&NSPV_mempoolresult);
     if ( coinaddr[0] != 0 && (btc_base58_decode((void *)msg,&sz,coinaddr) == 0 || sz != 25) )
     {
@@ -496,7 +495,7 @@ bool NSPV_evalcode_inmempool(btc_spv_client *client,uint8_t evalcode,uint8_t fun
 
 cJSON *NSPV_notarizations(btc_spv_client *client,int32_t reqheight)
 {
-    uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_ntzsresp N,*ptr;
+    uint8_t msg[64]; int32_t i,iter,len = 1; struct NSPV_ntzsresp N,*ptr;
     if ( (ptr= NSPV_ntzsresp_find(client->chainparams,reqheight)) != 0 )
     {
         fprintf(stderr,"FROM CACHE NSPV_notarizations.%d\n",reqheight);
@@ -522,7 +521,7 @@ cJSON *NSPV_notarizations(btc_spv_client *client,int32_t reqheight)
 
 cJSON *NSPV_txidhdrsproof(btc_spv_client *client,bits256 prevtxid,bits256 nexttxid)
 {
-    uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_ntzsproofresp P,*ptr;
+    uint8_t msg[64]; int32_t i,iter,len = 1; struct NSPV_ntzsproofresp P,*ptr;
     if ( (ptr= NSPV_ntzsproof_find(client->chainparams,prevtxid,nexttxid)) != 0 )
     {
         NSPV_ntzsproofresp_purge(client->chainparams,&NSPV_ntzsproofresult);
@@ -559,7 +558,7 @@ cJSON *NSPV_hdrsproof(btc_spv_client *client,int32_t prevht,int32_t nextht)
 
 cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t height)
 {
-    uint8_t msg[64]; char str[65]; int32_t i,iter,len = 0; struct NSPV_txproof P,*ptr;
+    uint8_t msg[64]; char str[65]; int32_t i,iter,len = 1; struct NSPV_txproof P,*ptr;
     if ( (ptr= NSPV_txproof_find(client->chainparams,txid)) != 0 )
     {
         fprintf(stderr,"FROM CACHE NSPV_txproof %s\n",bits256_str(str,txid));
@@ -590,7 +589,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
 
 cJSON *NSPV_spentinfo(btc_spv_client *client,bits256 txid,int32_t vout)
 {
-    uint8_t msg[64]; int32_t i,iter,len = 0; struct NSPV_spentinfo I;
+    uint8_t msg[64]; int32_t i,iter,len = 1; struct NSPV_spentinfo I;
     NSPV_spentinfo_purge(client->chainparams,&NSPV_spentresult);
     msg[len++] = NSPV_SPENTINFO;
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(vout),&vout);
@@ -611,7 +610,7 @@ cJSON *NSPV_spentinfo(btc_spv_client *client,bits256 txid,int32_t vout)
 
 cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 {
-    uint8_t *msg,*data; bits256 txid; int32_t i,n,iter,len = 0; struct NSPV_broadcastresp B;
+    uint8_t *msg,*data; bits256 txid; int32_t i,n,iter,len = 1; struct NSPV_broadcastresp B;
     NSPV_broadcast_purge(client->chainparams,&NSPV_broadcastresult);
     n = (int32_t)strlen(hex) >> 1;
     data = (uint8_t *)malloc(n);
