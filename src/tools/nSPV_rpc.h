@@ -849,7 +849,7 @@ int32_t iguana_getheadersize(char *buf,int32_t recvlen)
     return(recvlen);
 }
 
-void LP_rpc_processreq(void *_ptr)
+void *LP_rpc_processreq(void *_ptr)
 {
     char filetype[128],content_type[128];
     int32_t recvlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
@@ -1014,6 +1014,7 @@ void LP_rpc_processreq(void *_ptr)
     }
     if ( spawned > 0 )
         spawned--;
+    return(0);
 }
 
 int32_t iguana_socket(int32_t bindflag,char *hostname,uint16_t port)
@@ -1223,7 +1224,8 @@ void *NSPV_rpcloop(void *args)
         req->sock = sock;
         req->ipbits = ipbits;
         req->port = port;
-        LP_rpc_processreq(req);
+        //LP_rpc_processreq(req);
+        OS_thread_create(&req->T,NULL,LP_rpc_processreq,req);
     }
     printf("i got killed\n");
     return(0);
