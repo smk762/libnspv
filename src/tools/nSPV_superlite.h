@@ -420,9 +420,11 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
 
 cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,uint8_t funcid,bits256 txid,int32_t vout)
 {
-    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; char str[65]; int32_t i,iter,slen,len = 1;
+    cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; char str[65],zeroes[64]; int32_t i,iter,slen,len = 1;
     NSPV_mempoolresp_purge(client->chainparams,&NSPV_mempoolresult);
-    ;
+    memset(zeroes,0,sizeof(zeroes));
+    if ( coinaddr == 0 )
+        coinaddr = zeroes;
     if ( coinaddr[0] != 0 && (sz= btc_base58_decode_check(coinaddr,msg,sizeof(msg))) != 25 )
     {
         jaddstr(result,"result","error");
@@ -683,7 +685,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
-    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag;
+    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag,funcid;
     if ( (method= jstr(argjson,"method")) == 0 )
         return(cJSON_Parse("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
@@ -700,6 +702,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     height = jint(argjson,"height");
     hdrheight = jint(argjson,"hdrheight");
     CCflag = jint(argjson,"isCC");
+    funcid = jint(argjson,"funcid");
     skipcount = jint(argjson,"skipcount");
     prevheight = jint(argjson,"prevheight");
     nextheight = jint(argjson,"nextheight");
@@ -768,6 +771,8 @@ cJSON *_NSPV_JSON(cJSON *argjson)
             return(cJSON_Parse("{\"error\":\"invalid address or amount too small\"}"));
         else return(NSPV_spend(NSPV_client,NSPV_address,coinaddr,satoshis));
     }
+    else if ( strcmp(method,"mempool") == 0 )
+        return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,funcid,txid,vout));
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
