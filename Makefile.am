@@ -186,7 +186,7 @@ bitcoin_spv_LDFLAGS = -static
 endif
 
 inst_PROGRAMS += nspv
-nspv_LDADD = libbtc.la
+nspv_LDADD = libbtc.la -lpthread
 nspv_SOURCES = \
 src/tools/nspv.c
 nspv_CFLAGS = $(libbtc_la_CFLAGS)
