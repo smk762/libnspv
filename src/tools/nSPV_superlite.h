@@ -235,7 +235,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_TXPROOFRESP:
                 NSPV_txproof_purge(chain,&NSPV_txproofresult);
                 NSPV_rwtxproof(chain,0,&response[1],&NSPV_txproofresult);
-                if ( NSPV_txproof_find(chain,NSPV_txproofresult.txid) == 0 )
+                if ( NSPV_txproof_find(chain,NSPV_txproofresult.txid,NSPV_txproofresult.height) == 0 )
                     NSPV_txproof_add(chain,&NSPV_txproofresult);
                 fprintf(stderr,"got txproof response %u size.%d %s ht.%d\n",timestamp,len,bits256_str(str,NSPV_txproofresult.txid),NSPV_txproofresult.height);
                 break;
