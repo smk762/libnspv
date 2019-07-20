@@ -248,15 +248,15 @@ int main(int argc, char* argv[])
             char str[strsize];
             btc_hdnode_get_p2pkh_address(node->hdnode,chain,str,strsize);
             printf("%s Wallet addr: %s (child %d)\n", chain->name,str, node->hdnode->child_num);*/
+            vector *addrs = vector_new(1,free);
+            btc_wallet_get_addresses(wallet,addrs);
+            for (i=0; i<(int32_t)addrs->len; i++)
+            {
+                char* addr= vector_idx(addrs, i);
+                printf("Addr: %s\n", addr);
+            }
+            vector_free(addrs, true);
         }
-        vector *addrs = vector_new(1,free);
-        btc_wallet_get_addresses(wallet,addrs);
-        for (i=0; i<(int32_t)addrs->len; i++)
-        {
-            char* addr= vector_idx(addrs, i);
-            printf("Addr: %s\n", addr);
-        }
-        vector_free(addrs, true);
         btc_spv_client* client = btc_spv_client_new(chain, debug, (dbfile && (dbfile[0] == '0' || (strlen(dbfile) > 1 && dbfile[0] == 'n' && dbfile[0] == 'o'))) ? true : false);
         client->header_message_processed = spv_header_message_processed;
         client->sync_completed = spv_sync_completed;
