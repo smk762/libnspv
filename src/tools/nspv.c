@@ -218,35 +218,37 @@ int main(int argc, char* argv[])
         sprintf(walletname,"wallet.%s",chain->name);
         sprintf(headersname,"headers.%s",chain->name);
         btc_ecc_start();
-        btc_wallet *wallet = btc_wallet_new(chain);
-        btc_bool created;
-        res = btc_wallet_load(wallet,walletname,&error,&created);
-        if (!res)
+        if ( chain->nSPV == 0 )
         {
-            fprintf(stdout, "Loading %s failed error.%d\n",walletname,error);
-            exit(EXIT_FAILURE);
+            btc_wallet *wallet = btc_wallet_new(chain);
+            btc_bool created;
+            res = btc_wallet_load(wallet,walletname,&error,&created);
+            if (!res)
+            {
+                fprintf(stdout, "Loading %s failed error.%d\n",walletname,error);
+                exit(EXIT_FAILURE);
+            }
+            if ( created != 0 )
+            {
+                // create a new key
+                btc_hdnode node;
+                uint8_t seed[32];
+                assert(btc_random_bytes(seed,sizeof(seed),true));
+                btc_hdnode_from_seed(seed,sizeof(seed),&node);
+                btc_wallet_set_master_key_copy(wallet,&node);
+            }
+            else
+            {
+                // ensure we have a key
+                fprintf(stderr,"TODO: ensure there is a key\n");
+            }
+            
+            btc_wallet_hdnode* node = btc_wallet_next_key(wallet);
+            size_t strsize = 128;
+            char str[strsize];
+            btc_hdnode_get_p2pkh_address(node->hdnode,chain,str,strsize);
+            printf("%s Wallet addr: %s (child %d)\n", chain->name,str, node->hdnode->child_num);*/
         }
-        if ( created != 0 )
-        {
-            // create a new key
-            btc_hdnode node;
-            uint8_t seed[32];
-            assert(btc_random_bytes(seed,sizeof(seed),true));
-            btc_hdnode_from_seed(seed,sizeof(seed),&node);
-            btc_wallet_set_master_key_copy(wallet,&node);
-        }
-        else
-        {
-            // ensure we have a key
-            fprintf(stderr,"TODO: ensure there is a key\n");
-        }
-
-        btc_wallet_hdnode* node = btc_wallet_next_key(wallet);
-        size_t strsize = 128;
-        char str[strsize];
-        btc_hdnode_get_p2pkh_address(node->hdnode,chain,str,strsize);
-        printf("%s Wallet addr: %s (child %d)\n", chain->name,str, node->hdnode->child_num);
-
         vector *addrs = vector_new(1,free);
         btc_wallet_get_addresses(wallet,addrs);
         for (i=0; i<(int32_t)addrs->len; i++)
@@ -260,7 +262,7 @@ int main(int argc, char* argv[])
         client->sync_completed = spv_sync_completed;
         client->sync_transaction = btc_wallet_check_transaction;
         client->sync_transaction_ctx = wallet;
-        if (!btc_spv_client_load(client, (dbfile ? dbfile : headersname)))
+        if ( chain->nSPV == 0 && !btc_spv_client_load(client, (dbfile ? dbfile : headersname)))
         {
             printf("Could not load or create %s database...aborting\n",headersname);
             ret = EXIT_FAILURE;
@@ -269,8 +271,8 @@ int main(int argc, char* argv[])
         {
             fprintf(stderr,"Discover %s peers...",chain->name);
             btc_spv_client_discover_peers(client,ips);
-            fprintf(stderr,"done\n");
-            printf("Connecting to the p2p network...\n");
+            //fprintf(stderr,"done\n");
+            //printf("Connecting to the p2p network...\n");
             btc_spv_client_runloop(client);
             printf("end of client runloop\n");
             btc_spv_client_free(client);
