@@ -798,4 +798,9 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
     return(retstr);
 }
 
+cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis)
+{
+    return(cJSON_Parse("{\"error\":\"invalid method\"}"));
+}
+
 #endif // KOMODO_NSPVSUPERLITE_H
