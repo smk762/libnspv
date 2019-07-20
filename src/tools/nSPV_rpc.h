@@ -599,7 +599,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
         urlmethod[i] = urlstr[i];
     urlmethod[i++] = 0;
     n = i;
-printf("URLMETHOD.(%s)\n",urlmethod);
+//printf("URLMETHOD.(%s)\n",urlmethod);
     *postflagp = (strcmp(urlmethod,"POST") == 0);
     //printf("POST.%d rpcparse.(%s)\n",*postflagp,urlstr);
     for (i=0; i<(int32_t)sizeof(url)-1&&urlstr[n+i]!=0&&urlstr[n+i]!=' '; i++)

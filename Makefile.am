@@ -62,7 +62,7 @@ libbtc_la_SOURCES = \
     src/utils.c \
     src/vector.c
 
-libbtc_la_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src/logdb/include
+libbtc_la_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src/logdb/include -O2
 libbtc_la_LIBADD = $(LIBSECP256K1)
 
 if USE_TESTS
@@ -88,7 +88,7 @@ tests_SOURCES = \
     test/utils_tests.c \
     test/vector_tests.c
 
-tests_CFLAGS = $(libbtc_la_CFLAGS)
+tests_CFLAGS = $(libbtc_la_CFLAGS) -O2
 tests_CPPFLAGS = -I$(top_srcdir)/src
 tests_LDFLAGS = -static
 TESTS = tests
@@ -141,7 +141,7 @@ libbtc_la_SOURCES += \
     src/protocol.c
 
 libbtc_la_LIBADD += $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
-libbtc_la_CFLAGS += $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+libbtc_la_CFLAGS += $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS) -O2
 
 if USE_TESTS
 tests_SOURCES += \
@@ -163,7 +163,7 @@ inst_PROGRAMS = bitcointool
 bitcointool_LDADD = libbtc.la
 bitcointool_SOURCES = \
     src/tools/bitcointool.c
-bitcointool_CFLAGS = $(libbtc_la_CFLAGS)
+bitcointool_CFLAGS = $(libbtc_la_CFLAGS) -O2
 bitcointool_CPPFLAGS = -I$(top_srcdir)/src
 bitcointool_LDFLAGS = -static
 
@@ -172,7 +172,7 @@ inst_PROGRAMS += bitcoin-send-tx
 bitcoin_send_tx_LDADD = libbtc.la $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
 bitcoin_send_tx_SOURCES = \
     src/tools/bitcoin-send-tx.c
-bitcoin_send_tx_CFLAGS = $(libbtc_la_CFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+bitcoin_send_tx_CFLAGS = $(libbtc_la_CFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS) -O2
 bitcoin_send_tx_CPPFLAGS = -I$(top_srcdir)/src
 bitcoin_send_tx_LDFLAGS = -static
 
@@ -180,7 +180,7 @@ inst_PROGRAMS += bitcoin-spv
 bitcoin_spv_LDADD = libbtc.la
 bitcoin_spv_SOURCES = \
     src/tools/bitcoin-spv.c
-bitcoin_spv_CFLAGS = $(libbtc_la_CFLAGS)
+bitcoin_spv_CFLAGS = $(libbtc_la_CFLAGS) -O2
 bitcoin_spv_CPPFLAGS = -I$(top_srcdir)/src
 bitcoin_spv_LDFLAGS = -static
 endif
@@ -189,7 +189,7 @@ inst_PROGRAMS += nspv
 nspv_LDADD = libbtc.la -lpthread
 nspv_SOURCES = \
 src/tools/nspv.c
-nspv_CFLAGS = $(libbtc_la_CFLAGS)
+nspv_CFLAGS = $(libbtc_la_CFLAGS) -O2
 nspv_CPPFLAGS = -I$(top_srcdir)/src
 nspv_LDFLAGS = -static
 
