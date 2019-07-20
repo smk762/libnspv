@@ -677,7 +677,7 @@ cJSON *NSPV_login(btc_chainparams *chain,char *wifstr)
     return(result);
 }
 
-cJSON *_NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
+cJSON *_NSPV_JSON(cJSON *argjson)
 {
     char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,hdrheight; uint8_t CCflag;
     if ( (method= jstr(argjson,"method")) == 0 )
