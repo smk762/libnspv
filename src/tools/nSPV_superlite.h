@@ -685,7 +685,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
-    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag,funcid;
+    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag,memfunc;
     if ( (method= jstr(argjson,"method")) == 0 )
         return(cJSON_Parse("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
@@ -702,7 +702,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     height = jint(argjson,"height");
     hdrheight = jint(argjson,"hdrheight");
     CCflag = jint(argjson,"isCC");
-    funcid = jint(argjson,"funcid");
+    memfunc = jint(argjson,"memfunc");
     skipcount = jint(argjson,"skipcount");
     prevheight = jint(argjson,"prevheight");
     nextheight = jint(argjson,"nextheight");
@@ -772,7 +772,16 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         else return(NSPV_spend(NSPV_client,NSPV_address,coinaddr,satoshis));
     }
     else if ( strcmp(method,"mempool") == 0 )
-        return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,funcid,txid,vout));
+    {
+        if ( memfunc == NSPV_MEMPOOL_CCEVALCODE )
+        {
+            uint8_t e,f;
+            e = juint(argjson,"evalcode");
+            f = juint(argjson,"CCfunc");
+            vout = ((uint16_t)f << 8) | e;
+        }
+        return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,memfunc,txid,vout));
+    }
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
