@@ -398,7 +398,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             connected_at_least_to_one_node = true;
 
             node->nodegroup->log_write_cb("Trying to connect to %d...\n", node->nodeid);
-            fprintf(stderr,"Trying to connect to %d...\n", node->nodeid);
+            //fprintf(stderr,"Trying to connect to %d...\n", node->nodeid);
 
             connect_amount--;
             if (connect_amount <= 0)

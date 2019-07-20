@@ -196,11 +196,6 @@ int main(int argc, char* argv[])
     if ( port == 0 )
         port = chain->rpcport;
     NSPV_chain = chain;
-    if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,NSPV_rpcloop,(void *)&port) != 0 )
-    {
-        printf("error launching NSPV_rpcloop for port.%u\n",port);
-        exit(-1);
-    }
     if ( chain->komodo != 0 )
     {
         int32_t i; uint256 revhash;
@@ -209,13 +204,18 @@ int main(int argc, char* argv[])
         for (i=0; i<(int32_t)sizeof(revhash); i++)
         {
             revhash[i] = chain->genesisblockhash[31 - i];
-            fprintf(stderr,"%02x",chain->genesisblockhash[31 - i]);
+            fprintf(stderr,"%02x",chain->genesisblockhash[i]);
         }
         memcpy((void *)chain->genesisblockhash,revhash,sizeof(chain->genesisblockhash));
         fprintf(stderr," genesisblockhash %s\n",chain->name);
         data = (char *)"scan";
     }
-    if (strcmp(data, "scan") == 0)
+    if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,NSPV_rpcloop,(void *)&port) != 0 )
+    {
+        printf("error launching NSPV_rpcloop for port.%u\n",port);
+        exit(-1);
+    }
+    if ( strcmp(data, "scan") == 0 )
     {
         char walletname[64],headersname[64]; int32_t i,error,res;
         sprintf(walletname,"wallet.%s",chain->name);
