@@ -671,14 +671,14 @@ cJSON *NSPV_login(btc_chainparams *chain,char *wifstr)
     jaddstr(result,"address",NSPV_address);
     jaddstr(result,"pubkey",NSPV_pubkeystr);
     jaddnum(result,"wifprefix",(int64_t)data[0]);
-    jaddnum(result,"compressed",(int64_t)(data[len-5] == 1));
+    jaddnum(result,"compressed",(int64_t)(data[sz-5] == 1));
     memset(data,0,sizeof(data));
     return(result);
 }
 
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
-    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,hdrheight; uint8_t CCflag;
+    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag;
     if ( (method= jstr(argjson,"method")) == 0 )
         return(cJSON_Parse("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
@@ -703,7 +703,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     coinaddr = jstr(argjson,"address");
     satoshis = jdouble(argjson,"amount")*COIN + 0.0000000049;
     if ( strcmp(method,"getinfo") == 0 )
-        return(NSPV_getinfo(NSPV_client,hdrheight));
+        return(NSPV_getinfo_req(NSPV_client,hdrheight));
     else if ( strcmp(method,"logout") == 0 )
     {
         NSPV_logout();
@@ -723,7 +723,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     }
     else if ( strcmp(method,"listunspent") == 0 )
     {
-        if ( address == 0 )
+        if ( coinaddr == 0 )
             coinaddr = NSPV_address;
         return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount));
     }
@@ -737,31 +737,31 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( height == 0 )
             return(cJSON_Parse("{\"error\":\"no height\"}"));
-        else return(NSPV_notarizations(NSPV_chain,height));
+        else return(NSPV_notarizations(NSPV_client,height));
     }
     else if ( strcmp(method,"hdrsproof") == 0 )
     {
         if ( prevheight > nextheight || nextheight == 0 || (nextheight-prevheight) > 1440 )
             return(cJSON_Parse("{\"error\":\"invalid height range\"}"));
-        else return(NSPV_hdrsproof(NSPV_chain,prevheight,nextheight));
+        else return(NSPV_hdrsproof(NSPV_client,prevheight,nextheight));
     }
     else if ( strcmp(method,"txproof") == 0 )
     {
         if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
             return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
-        else return(NSPV_txproof(NSPV_chain,txid,vout,height));
+        else return(NSPV_txproof(NSPV_client,txid,vout,height));
     }
     else if ( strcmp(method,"spentinfo") == 0 )
     {
         if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
             return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
-        else return(NSPV_spentinfo(NSPV_chain,txid,vout));
+        else return(NSPV_spentinfo(NSPV_client,txid,vout));
     }
     else if ( strcmp(method,"spend") == 0 )
     {
         if ( satoshis < 1000 || coinaddr == 0 )
             return(cJSON_Parse("{\"error\":\"invalid address or amount too small\"}"));
-        else return(NSPV_spend(NSPV_chain,coinaddr,satoshis));
+        else return(NSPV_spend(NSPV_client,coinaddr,satoshis));
     }
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
