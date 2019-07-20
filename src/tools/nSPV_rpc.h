@@ -64,7 +64,7 @@
 #define MSG_NOSIGNAL    0
 #endif
 
-static int32_t spawned,maxspawned;
+static int32_t spawned,maxspawned,rpcdepth;
 portable_mutex_t NSPV_commandmutex;
 uint32_t NSPV_STOP_RECEIVED,DOCKERFLAG;
 
@@ -1224,8 +1224,15 @@ void *NSPV_rpcloop(void *args)
         req->sock = sock;
         req->ipbits = ipbits;
         req->port = port;
-        //LP_rpc_processreq(req);
-        OS_thread_create(&req->T,NULL,LP_rpc_processreq,req);
+        while ( rpcdepth > 0 )
+        {
+            fprintf(stderr,"wait for rpcdepth.%d to 0\n",rpcdepth);
+            sleep(1);
+        }
+        rpcdepth++;
+        LP_rpc_processreq(req);
+        rpcdepth--;
+        //OS_thread_create(&req->T,NULL,LP_rpc_processreq,req);
     }
     printf("i got killed\n");
     return(0);
