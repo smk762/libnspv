@@ -218,6 +218,7 @@ int main(int argc, char* argv[])
         sprintf(walletname,"wallet.%s",chain->name);
         sprintf(headersname,"headers.%s",chain->name);
         btc_ecc_start();
+        btc_spv_client* client = btc_spv_client_new(chain, debug, (dbfile && (dbfile[0] == '0' || (strlen(dbfile) > 1 && dbfile[0] == 'n' && dbfile[0] == 'o'))) ? true : false);
         if ( chain->nSPV == 0 )
         {
             btc_wallet *wallet = btc_wallet_new(chain);
@@ -260,7 +261,6 @@ int main(int argc, char* argv[])
             client->sync_transaction = btc_wallet_check_transaction;
             client->sync_transaction_ctx = wallet;
         }
-        btc_spv_client* client = btc_spv_client_new(chain, debug, (dbfile && (dbfile[0] == '0' || (strlen(dbfile) > 1 && dbfile[0] == 'n' && dbfile[0] == 'o'))) ? true : false);
         client->header_message_processed = spv_header_message_processed;
         if ( chain->nSPV == 0 && !btc_spv_client_load(client, (dbfile ? dbfile : headersname)))
         {
