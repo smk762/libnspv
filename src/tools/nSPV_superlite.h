@@ -657,6 +657,8 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
         fprintf(stderr,"shutdown started\n");
         return(clonestr("{\"result\":\"success\"}"));
     }
+    txid = jbits256(argjson,"txid");
+    vout = jint(argjson,"vout");
     fprintf(stderr,"myipaddr.(%s) remote.(%s) port.%d (%s)\n",myipaddr,remoteaddr,port,jprint(argjson,0));
 }
 
