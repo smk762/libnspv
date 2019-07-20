@@ -96,6 +96,131 @@ bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
     return(hash);
 }
 
+void touppercase(char *str)
+{
+    int32_t i;
+    if ( str == 0 || str[0] == 0 )
+        return;
+    for (i=0; str[i]!=0; i++)
+        str[i] = toupper(((int32_t)str[i]));
+}
+
+void tolowercase(char *str)
+{
+    int32_t i;
+    if ( str == 0 || str[0] == 0 )
+        return;
+    for (i=0; str[i]!=0; i++)
+        str[i] = tolower(((int32_t)str[i]));
+}
+
+char *uppercase_str(char *buf,char *str)
+{
+    if ( str != 0 )
+    {
+        strcpy(buf,str);
+        touppercase(buf);
+    } else buf[0] = 0;
+    return(buf);
+}
+
+char *lowercase_str(char *buf,char *str)
+{
+    if ( str != 0 )
+    {
+        strcpy(buf,str);
+        tolowercase(buf);
+    } else buf[0] = 0;
+    return(buf);
+}
+
+int32_t strsearch(char *strs[],int32_t num,char *name)
+{
+    int32_t i; char strA[32],refstr[32];
+    strcpy(refstr,name), touppercase(refstr);
+    for (i=0; i<num; i++)
+    {
+        strcpy(strA,strs[i]), touppercase(strA);
+        if ( strcmp(strA,refstr) == 0 )
+            return(i);
+    }
+    return(-1);
+}
+
+int32_t is_decimalstr(char *str)
+{
+    int32_t i;
+    if ( str == 0 || str[0] == 0 )
+        return(0);
+    for (i=0; str[i]!=0; i++)
+        if ( str[i] < '0' || str[i] > '9' )
+            return(0);
+    return(i);
+}
+
+int32_t unstringbits(char *buf,uint64_t bits)
+{
+    int32_t i;
+    for (i=0; i<8; i++,bits>>=8)
+        if ( (buf[i]= (char)(bits & 0xff)) == 0 )
+            break;
+    buf[i] = 0;
+    return(i);
+}
+
+uint64_t stringbits(char *str)
+{
+    uint64_t bits = 0;
+    if ( str == 0 )
+        return(0);
+    int32_t i,n = (int32_t)strlen(str);
+    if ( n > 8 )
+        n = 8;
+    for (i=n-1; i>=0; i--)
+        bits = (bits << 8) | (str[i] & 0xff);
+    //printf("(%s) -> %llx %llu\n",str,(long long)bits,(long long)bits);
+    return(bits);
+}
+
+char *unstringify(char *str)
+{
+    int32_t i,j,n;
+    if ( str == 0 )
+        return(0);
+    else if ( str[0] == 0 )
+        return(str);
+    n = (int32_t)strlen(str);
+    if ( str[0] == '"' && str[n-1] == '"' )
+        str[n-1] = 0, i = 1;
+    else i = 0;
+    for (j=0; str[i]!=0; i++)
+    {
+        if ( str[i] == '\\' && (str[i+1] == 't' || str[i+1] == 'n' || str[i+1] == 'b' || str[i+1] == 'r') )
+            i++;
+        else if ( str[i] == '\\' && str[i+1] == '"' )
+            str[j++] = '"', i++;
+        else str[j++] = str[i];
+    }
+    str[j] = 0;
+    return(str);
+}
+
+void reverse_hexstr(char *str)
+{
+    int i,n;
+    char *rev;
+    n = (int32_t)strlen(str);
+    rev = (char *)malloc(n + 1);
+    for (i=0; i<n; i+=2)
+    {
+        rev[n-2-i] = str[i];
+        rev[n-1-i] = str[i+1];
+    }
+    rev[n] = 0;
+    strcpy(str,rev);
+    free(rev);
+}
+
 int32_t _unhex(char c)
 {
     if ( c >= '0' && c <= '9' )

@@ -64,6 +64,17 @@ extern "C"
 #define cJSON_IsReference 256
 #define cJSON_StringIsConst 512
 
+#define is_cJSON_Null(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_NULL)
+#define is_cJSON_Array(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_Array)
+#define is_cJSON_String(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_String)
+#define is_cJSON_Number(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_Number)
+#define is_cJSON_Object(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_Object)
+#define is_cJSON_True(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_True)
+#define is_cJSON_False(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_False)
+    
+#define cJSON_IsReference 256
+    
+
 /* The cJSON structure: */
 typedef struct cJSON
 {

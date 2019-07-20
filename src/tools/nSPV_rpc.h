@@ -65,7 +65,7 @@
 static int32_t spawned,maxspawned;
 portable_mutex_t NSPV_commandmutex;
 //uint16_t RPC_port;
-int32_t NSPV_STOP_RECEIVED;
+int32_t NSPV_STOP_RECEIVED,DOCKERFLAG;
 
 char *stats_validmethods[] =
 {
@@ -85,6 +85,407 @@ int32_t LP_valid_remotemethod(cJSON *argjson)
         printf("got invalid method.%s remotely\n",method);
     }
     return(-1);
+}
+
+#ifdef _WIN32
+#define in6_addr sockaddr
+#define in_addr_t struct sockaddr_storage
+#ifndef NATIVE_WINDOWS
+#define EAFNOSUPPORT WSAEAFNOSUPPORT
+#endif
+
+struct sockaddr_in6 {
+    short   sin6_family;
+    u_short sin6_port;
+    u_long  sin6_flowinfo;
+    struct  in6_addr sin6_addr;
+    u_long  sin6_scope_id;
+};
+#else
+#ifndef __MINGW
+#include <arpa/inet.h>
+#endif
+#endif
+
+#ifdef _WIN32
+#ifdef AF_INET6
+#undef AF_INET6
+#endif
+#define AF_INET6    23
+#endif
+static int inet_ntop4(unsigned char *src, char *dst, size_t size);
+static int inet_ntop6(unsigned char *src, char *dst, size_t size);
+static int inet_pton4(char *src, unsigned char *dst);
+static int inet_pton6(char *src, unsigned char *dst);
+
+int32_t portable_ntop(int af, void* src, char* dst, size_t size)
+{
+    switch (af) {
+        case AF_INET:
+            return (inet_ntop4(src, dst, size));
+        case AF_INET6:
+            return (inet_ntop6(src, dst, size));
+        default:
+            return -1;
+    }
+    /* NOTREACHED */
+}
+
+
+static int inet_ntop4(unsigned char *src, char *dst, size_t size) {
+    static const char fmt[] = "%u.%u.%u.%u";
+    char tmp[sizeof "255.255.255.255"];
+    int l;
+    
+#ifndef _WIN32
+    l = snprintf(tmp, sizeof(tmp), fmt, src[0], src[1], src[2], src[3]);
+#else
+    l = _snprintf(tmp, sizeof(tmp), fmt, src[0], src[1], src[2], src[3]);
+#endif
+    if (l <= 0 || (size_t) l >= size) {
+        return -1;
+    }
+    strncpy(dst, tmp, size);
+    dst[size - 1] = '\0';
+    return 0;
+}
+
+
+static int inet_ntop6(unsigned char *src, char *dst, size_t size) {
+    /*
+     * Note that int32_t and int16_t need only be "at least" large enough
+     * to contain a value of the specified size.  On some systems, like
+     * Crays, there is no such thing as an integer variable with 16 bits.
+     * Keep this in mind if you think this function should have been coded
+     * to use pointer overlays.  All the world's not a VAX.
+     */
+    char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"], *tp;
+    struct { int base, len; } best, cur;
+    unsigned int words[sizeof(struct in6_addr) / sizeof(uint16_t)];
+    int i;
+    
+    /*
+     * Preprocess:
+     *  Copy the input (bytewise) array into a wordwise array.
+     *  Find the longest run of 0x00's in src[] for :: shorthanding.
+     */
+    memset(words, '\0', sizeof words);
+    for (i = 0; i < (int) sizeof(struct in6_addr); i++)
+        words[i / 2] |= (src[i] << ((1 - (i % 2)) << 3));
+    best.base = -1;
+    best.len = 0;
+    cur.base = -1;
+    cur.len = 0;
+    for (i = 0; i < (int)(sizeof(struct in6_addr) / sizeof(uint16_t)); i++) {
+        if (words[i] == 0) {
+            if (cur.base == -1)
+                cur.base = i, cur.len = 1;
+            else
+                cur.len++;
+        } else {
+            if (cur.base != -1) {
+                if (best.base == -1 || cur.len > best.len)
+                    best = cur;
+                cur.base = -1;
+            }
+        }
+    }
+    if (cur.base != -1) {
+        if (best.base == -1 || cur.len > best.len)
+            best = cur;
+    }
+    if (best.base != -1 && best.len < 2)
+        best.base = -1;
+    
+    /*
+     * Format the result.
+     */
+    tp = tmp;
+    for (i = 0; i < (int)(sizeof(struct in6_addr) / sizeof(uint16_t)); i++) {
+        /* Are we inside the best run of 0x00's? */
+        if (best.base != -1 && i >= best.base &&
+            i < (best.base + best.len)) {
+            if (i == best.base)
+                *tp++ = ':';
+            continue;
+        }
+        /* Are we following an initial run of 0x00s or any real hex? */
+        if (i != 0)
+            *tp++ = ':';
+        /* Is this address an encapsulated IPv4? */
+        if (i == 6 && best.base == 0 && (best.len == 6 ||
+                                         (best.len == 7 && words[7] != 0x0001) ||
+                                         (best.len == 5 && words[5] == 0xffff))) {
+            int err = inet_ntop4(src+12, tp, sizeof tmp - (tp - tmp));
+            if (err)
+                return err;
+            tp += strlen(tp);
+            break;
+        }
+        tp += sprintf(tp, "%x", words[i]);
+    }
+    /* Was it a trailing run of 0x00's? */
+    if (best.base != -1 && (best.base + best.len) == (sizeof(struct in6_addr) / sizeof(uint16_t)))
+        *tp++ = ':';
+    *tp++ = '\0';
+    
+    /*
+     * Check for overflow, copy, and we're done.
+     */
+    if ((size_t)(tp - tmp) > size) {
+        return ENOSPC;
+    }
+    strcpy(dst, tmp);
+    return 0;
+}
+
+
+int portable_pton(int af, char* src, void* dst)
+{
+    switch (af) {
+        case AF_INET:
+            return (inet_pton4(src, dst));
+        case AF_INET6:
+            return (inet_pton6(src, dst));
+        default:
+            return EAFNOSUPPORT;
+    }
+    /* NOTREACHED */
+}
+
+
+static int inet_pton4(char *src, unsigned char *dst) {
+    static const char digits[] = "0123456789";
+    int saw_digit, octets, ch;
+    unsigned char tmp[sizeof(struct in_addr)], *tp;
+    char savestr[64];
+    strcpy(savestr,src);
+    
+    //printf("inet_pton4(%s)\n",src);
+    saw_digit = 0;
+    octets = 0;
+    *(tp = tmp) = 0;
+    while ((ch = (uint8_t)*src++) != '\0')
+    {
+        char *pch;
+        if ( (pch = strchr(digits, ch)) != NULL )
+        {
+            unsigned int nw = (unsigned int)(*tp * 10 + (pch - digits));
+            if (saw_digit && *tp == 0)
+            {
+                printf("inet_pton4 0\n");
+                return EINVAL;
+            }
+            if ( nw > 255 )
+            {
+                printf("inet_pton4 1\n");
+                return EINVAL;
+            }
+            *tp = nw;
+            if (!saw_digit) {
+                if (++octets > 4)
+                {
+                    printf("inet_pton4 2\n");
+                    return EINVAL;
+                }
+                saw_digit = 1;
+            }
+        } else if (ch == '.' && saw_digit) {
+            if (octets == 4)
+            {
+                printf("inet_pton4 3\n");
+                return EINVAL;
+            }
+            *++tp = 0;
+            saw_digit = 0;
+        } else
+        {
+            printf("inet_pton4 4 error.(%s)\n",savestr); //getchar();
+            return EINVAL;
+        }
+    }
+    if (octets < 4)
+    {
+        printf("inet_pton4 5 error.(%s)\n",savestr); //getchar();
+        return EINVAL;
+    }
+    memcpy(dst, tmp, sizeof(struct in_addr));
+    //printf("not errors %08x\n",*(int32_t *)dst);
+    return 0;
+}
+
+
+static int inet_pton6(char *src, unsigned char *dst) {
+    static char xdigits_l[] = "0123456789abcdef",
+    xdigits_u[] = "0123456789ABCDEF";
+    unsigned char tmp[sizeof(struct in6_addr)], *tp, *endp, *colonp;
+    char *xdigits, *curtok;
+    int ch, seen_xdigits;
+    unsigned int val;
+    
+    memset((tp = tmp), '\0', sizeof tmp);
+    endp = tp + sizeof tmp;
+    colonp = NULL;
+    /* Leading :: requires some special handling. */
+    if (*src == ':')
+        if (*++src != ':')
+            return EINVAL;
+    curtok = src;
+    seen_xdigits = 0;
+    val = 0;
+    while ((ch = *src++) != '\0' && ch != '%') {
+        char *pch;
+        
+        if ((pch = strchr((xdigits = xdigits_l), ch)) == NULL)
+            pch = strchr((xdigits = xdigits_u), ch);
+        if (pch != NULL) {
+            val <<= 4;
+            val |= (pch - xdigits);
+            if (++seen_xdigits > 4)
+                return EINVAL;
+            continue;
+        }
+        if (ch == ':') {
+            curtok = src;
+            if (!seen_xdigits) {
+                if (colonp)
+                    return EINVAL;
+                colonp = tp;
+                continue;
+            } else if (*src == '\0') {
+                return EINVAL;
+            }
+            if (tp + sizeof(uint16_t) > endp)
+                return EINVAL;
+            *tp++ = (unsigned char) (val >> 8) & 0xff;
+            *tp++ = (unsigned char) val & 0xff;
+            seen_xdigits = 0;
+            val = 0;
+            continue;
+        }
+        if (ch == '.' && ((tp + sizeof(struct in_addr)) <= endp)) {
+            int err;
+            
+            /* Scope id present, parse ipv4 addr without it */
+            pch = strchr(curtok, '%');
+            if (pch != NULL) {
+                char tmp2[sizeof "255.255.255.255"];
+                
+                memcpy(tmp2, curtok, pch - curtok);
+                curtok = tmp2;
+                src = pch;
+            }
+            
+            err = inet_pton4(curtok, tp);
+            if (err == 0) {
+                tp += sizeof(struct in_addr);
+                seen_xdigits = 0;
+                break;  /*%< '\\0' was seen by inet_pton4(). */
+            }
+        }
+        return EINVAL;
+    }
+    if (seen_xdigits) {
+        if (tp + sizeof(uint16_t) > endp)
+            return EINVAL;
+        *tp++ = (unsigned char) (val >> 8) & 0xff;
+        *tp++ = (unsigned char) val & 0xff;
+    }
+    if (colonp != NULL) {
+        /*
+         * Since some memmove()'s erroneously fail to handle
+         * overlapping regions, we'll do the shift by hand.
+         */
+        int n = (int)(tp - colonp);
+        int i;
+        
+        if (tp == endp)
+            return EINVAL;
+        for (i = 1; i <= n; i++) {
+            endp[- i] = colonp[n - i];
+            colonp[n - i] = 0;
+        }
+        tp = endp;
+    }
+    if (tp != endp)
+        return EINVAL;
+    memcpy(dst, tmp, sizeof tmp);
+    return 0;
+}
+
+uint64_t _calc_ipbits(char *ip_port)
+{
+    int32_t port;
+    char ipaddr[64];
+    struct sockaddr_in addr;
+    port = parse_ipaddr(ipaddr,ip_port);
+    memset(&addr,0,sizeof(addr));
+    portable_pton(ip_port[0] == '[' ? AF_INET6 : AF_INET,ipaddr,&addr);
+    if ( (0) )
+    {
+        int i;
+        for (i=0; i<16; i++)
+            printf("%02x ",((uint8_t *)&addr)[i]);
+        printf("<- %s %x\n",ip_port,*(uint32_t *)&addr);
+    }
+    return(*(uint32_t *)&addr | ((uint64_t)port << 32));
+}
+
+void expand_ipbits(char *ipaddr,uint64_t ipbits)
+{
+    uint16_t port;
+    struct sockaddr_in addr;
+    memset(&addr,0,sizeof(addr));
+    *(uint32_t *)&addr = (uint32_t)ipbits;
+    portable_ntop(AF_INET,&addr,ipaddr,64);
+    if ( (port= (uint16_t)(ipbits>>32)) != 0 )
+        sprintf(ipaddr + strlen(ipaddr),":%d",port);
+    //sprintf(ipaddr,"%d.%d.%d.%d",(ipbits>>24)&0xff,(ipbits>>16)&0xff,(ipbits>>8)&0xff,(ipbits&0xff));
+}
+
+uint64_t calc_ipbits(char *ip_port)
+{
+    uint64_t ipbits = 0; char ipaddr[64],ipaddr2[64]; int32_t i;
+    if ( ip_port != 0 )
+    {
+        ipbits = _calc_ipbits(ip_port);
+        expand_ipbits(ipaddr,ipbits);
+        if ( ipbits != 0 && strcmp(ipaddr,ip_port) != 0 )
+        {
+            for (i=0; i<63; i++)
+                if ( (ipaddr[i]= ip_port[i]) == ':' || ipaddr[i] == 0 )
+                    break;
+            ipaddr[i] = 0;
+            ipbits = _calc_ipbits(ipaddr);
+            expand_ipbits(ipaddr2,ipbits);
+            if ( ipbits != 0 && strcmp(ipaddr,ipaddr2) != 0 )
+            {
+                if ( ipaddr[0] != 0 )
+                    printf("calc_ipbits error: (%s) -> %llx -> (%s)\n",ip_port,(long long)ipbits,ipaddr);//, getchar();
+                ipbits = 0;
+            }
+        }
+    }
+    return(ipbits);
+}
+
+char *ipbits_str(char ipaddr[64],uint64_t ipbits)
+{
+    expand_ipbits(ipaddr,ipbits);
+    return(ipaddr);
+}
+
+uint32_t is_ipaddr(char *str)
+{
+    uint64_t ipbits; char ipaddr[64];
+    if ( str != 0 && str[0] != 0 && (ipbits= calc_ipbits(str)) != 0 )
+    {
+        expand_ipbits(ipaddr,(uint32_t)ipbits);
+        if ( strncmp(ipaddr,str,strlen(ipaddr)) == 0 )
+            return((uint32_t)ipbits);
+    }
+    // printf("(%s) is not ipaddr\n",str);
+    return(0);
 }
 
 int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax,char *src)
@@ -176,14 +577,14 @@ cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
 {
     cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr,*token = 0; int32_t i,j,n,num=0; uint32_t queueid;
-    for (i=0; i<sizeof(urlmethod)-1&&urlstr[i]!=0&&urlstr[i]!=' '; i++)
+    for (i=0; i<(int32_t)sizeof(urlmethod)-1&&urlstr[i]!=0&&urlstr[i]!=' '; i++)
         urlmethod[i] = urlstr[i];
     urlmethod[i++] = 0;
     n = i;
 printf("URLMETHOD.(%s)\n",urlmethod);
     *postflagp = (strcmp(urlmethod,"POST") == 0);
     //printf("POST.%d rpcparse.(%s)\n",*postflagp,urlstr);
-    for (i=0; i<sizeof(url)-1&&urlstr[n+i]!=0&&urlstr[n+i]!=' '; i++)
+    for (i=0; i<(int32_t)sizeof(url)-1&&urlstr[n+i]!=0&&urlstr[n+i]!=' '; i++)
         url[i] = urlstr[n+i];
     url[i++] = 0;
     n += i;
@@ -776,82 +1177,7 @@ int32_t iguana_socket(int32_t bindflag,char *hostname,uint16_t port)
     return(sock);
 }
 
-uint64_t _calc_ipbits(char *ip_port)
-{
-    int32_t port;
-    char ipaddr[64];
-    struct sockaddr_in addr;
-    port = parse_ipaddr(ipaddr,ip_port);
-    memset(&addr,0,sizeof(addr));
-    portable_pton(ip_port[0] == '[' ? AF_INET6 : AF_INET,ipaddr,&addr);
-    if ( (0) )
-    {
-        int i;
-        for (i=0; i<16; i++)
-            printf("%02x ",((uint8_t *)&addr)[i]);
-        printf("<- %s %x\n",ip_port,*(uint32_t *)&addr);
-    }
-    return(*(uint32_t *)&addr | ((uint64_t)port << 32));
-}
-
-void expand_ipbits(char *ipaddr,uint64_t ipbits)
-{
-    uint16_t port;
-    struct sockaddr_in addr;
-    memset(&addr,0,sizeof(addr));
-    *(uint32_t *)&addr = (uint32_t)ipbits;
-    portable_ntop(AF_INET,&addr,ipaddr,64);
-    if ( (port= (uint16_t)(ipbits>>32)) != 0 )
-        sprintf(ipaddr + strlen(ipaddr),":%d",port);
-    //sprintf(ipaddr,"%d.%d.%d.%d",(ipbits>>24)&0xff,(ipbits>>16)&0xff,(ipbits>>8)&0xff,(ipbits&0xff));
-}
-
-uint64_t calc_ipbits(char *ip_port)
-{
-    uint64_t ipbits = 0; char ipaddr[64],ipaddr2[64]; int32_t i;
-    if ( ip_port != 0 )
-    {
-        ipbits = _calc_ipbits(ip_port);
-        expand_ipbits(ipaddr,ipbits);
-        if ( ipbits != 0 && strcmp(ipaddr,ip_port) != 0 )
-        {
-            for (i=0; i<63; i++)
-                if ( (ipaddr[i]= ip_port[i]) == ':' || ipaddr[i] == 0 )
-                    break;
-            ipaddr[i] = 0;
-            ipbits = _calc_ipbits(ipaddr);
-            expand_ipbits(ipaddr2,ipbits);
-            if ( ipbits != 0 && strcmp(ipaddr,ipaddr2) != 0 )
-            {
-                if ( ipaddr[0] != 0 )
-                    printf("calc_ipbits error: (%s) -> %llx -> (%s)\n",ip_port,(long long)ipbits,ipaddr);//, getchar();
-                ipbits = 0;
-            }
-        }
-    }
-    return(ipbits);
-}
-
-char *ipbits_str(char ipaddr[64],uint64_t ipbits)
-{
-    expand_ipbits(ipaddr,ipbits);
-    return(ipaddr);
-}
-
-uint32_t is_ipaddr(char *str)
-{
-    uint64_t ipbits; char ipaddr[64];
-    if ( str != 0 && str[0] != 0 && (ipbits= calc_ipbits(str)) != 0 )
-    {
-        expand_ipbits(ipaddr,(uint32_t)ipbits);
-        if ( strncmp(ipaddr,str,strlen(ipaddr)) == 0 )
-            return((uint32_t)ipbits);
-    }
-    // printf("(%s) is not ipaddr\n",str);
-    return(0);
-}
-
-void NSPV_rpcloop(void *args)
+void *NSPV_rpcloop(void *args)
 {
     uint16_t port; int32_t retval,sock=-1,bindsock=-1; socklen_t clilen; struct sockaddr_in cli_addr; uint32_t ipbits,localhostbits; struct rpcrequest_info *req;
     if ( (port= *(uint16_t *)args) == 0 )
@@ -859,7 +1185,7 @@ void NSPV_rpcloop(void *args)
     printf("Start NSPV_rpcloop.%u\n",port);
     localhostbits = (uint32_t)calc_ipbits("127.0.0.1");
     //initial_bindsock_reset = LP_bindsock_reset;
-    while ( LP_STOP_RECEIVED == 0 )//LP_bindsock_reset == initial_bindsock_reset )
+    while ( NSPV_STOP_RECEIVED == 0 )//LP_bindsock_reset == initial_bindsock_reset )
     {
         //printf("LP_bindsock.%d\n",LP_bindsock);
         if ( bindsock < 0 )
@@ -900,6 +1226,7 @@ void NSPV_rpcloop(void *args)
         LP_rpc_processreq(req);
     }
     printf("i got killed\n");
+    return(0);
 }
 
 #endif // NSPV_RPC_H

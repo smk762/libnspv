@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
         }
     }
     uint16_t port = chain->rpcport;
-    if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,(void *)NSPV_rpcloop,(void *)&port) != 0 )
+    if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,NSPV_rpcloop,(void *)&port) != 0 )
     {
         printf("error launching NSPV_rpcloop for port.%u\n",port);
         exit(-1);
