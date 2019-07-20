@@ -642,7 +642,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     return(NSPV_broadcast_json(&B,txid));
 }
 
-cJSON *NSPV_login(btc_chainparams *chain,char *wifstr)
+cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
     cJSON *result = cJSON_CreateObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz;
     NSPV_logout();
@@ -730,7 +730,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     }
     else if ( strcmp(method,"listtransactions") == 0 )
     {
-        if ( address == 0 )
+        if ( coinaddr == 0 )
             coinaddr = NSPV_address;
         return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount));
     }
