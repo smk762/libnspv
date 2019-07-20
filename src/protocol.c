@@ -140,11 +140,10 @@ void btc_p2paddr_to_addr(btc_p2p_address* p2p_addr, struct sockaddr* addr_out)
     }
 }
 
-void btc_p2p_msg_version_init(btc_p2p_version_msg* msg, const btc_p2p_address* addrFrom, const btc_p2p_address* addrTo, const char* strSubVer, btc_bool relay)
+void btc_p2p_msg_version_init(uint32_t protocol,btc_p2p_version_msg* msg, const btc_p2p_address* addrFrom, const btc_p2p_address* addrTo, const char* strSubVer, btc_bool relay)
 {
-    msg->version = BTC_PROTOCOL_VERSION;
+    msg->version = protocol;
     msg->services = 0;
-    msg->timestamp = time(NULL);
     msg->timestamp = time(NULL);
     if (addrTo)
         msg->addr_recv = *addrTo;
@@ -241,11 +240,11 @@ btc_bool btc_p2p_msg_inv_deser(btc_p2p_inv_msg* msg, struct const_buffer* buf)
     return true;
 }
 
-void btc_p2p_msg_getheaders(vector* blocklocators, uint256 hashstop, cstring* s)
+void btc_p2p_msg_getheaders(uint32_t protocol,vector* blocklocators, uint256 hashstop, cstring* s)
 {
     unsigned int i;
 
-    ser_u32(s, BTC_PROTOCOL_VERSION);
+    ser_u32(s, protocol);
     ser_varlen(s, blocklocators->len);
     for (i = 0; i < blocklocators->len; i++) {
         uint256 *hash = vector_idx(blocklocators, i);

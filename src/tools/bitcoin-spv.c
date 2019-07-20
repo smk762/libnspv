@@ -208,8 +208,8 @@ int main(int argc, char* argv[])
             ret = EXIT_FAILURE;
         }
         else {
-            printf("Discover peers...");
-            btc_spv_client_discover_peers(client, ips);
+            printf("Discover peers... (%s)",ips != 0 ? ips : "dnsseed");
+            btc_spv_client_discover_peers(client,ips);
             printf("done\n");
             printf("Connecting to the p2p network...\n");
             btc_spv_client_runloop(client);
@@ -218,9 +218,27 @@ int main(int argc, char* argv[])
         }
         btc_ecc_stop();
     }
-    else {
+    else
+    {
         printf("Invalid command (use -?)\n");
         ret = EXIT_FAILURE;
     }
     return ret;
 }
+
+
+// stubs for link compatibility
+uint32_t NSPV_logintime,NSPV_lastinfo;
+
+int32_t NSPV_periodic(btc_node *node) { return(0); }
+void NSPV_logout() {}
+btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
+{
+    return(0);
+}
+int32_t iguana_rwnum(btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
+{
+    return(0);
+}
+void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) {}
+

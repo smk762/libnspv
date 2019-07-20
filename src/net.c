@@ -11,6 +11,7 @@
 #include <btc/protocol.h>
 #include <btc/serialize.h>
 #include <btc/utils.h>
+#include <nSPV_defs.h>
 
 #ifdef _WIN32
 #include <getopt.h>
@@ -31,7 +32,7 @@
 
 #define UNUSED(x) (void)(x)
 
-static const int BTC_PERIODICAL_NODE_TIMER_S = 3;
+static const int BTC_PERIODICAL_NODE_TIMER_S = 5;
 static const int BTC_PING_INTERVAL_S = 180;
 static const int BTC_CONNECT_TIMEOUT_S = 10;
 
@@ -171,26 +172,35 @@ void event_cb(struct bufferevent* ev, short type, void* ctx)
     btc_node* node = (btc_node*)ctx;
     node->nodegroup->log_write_cb("Event callback on node %d\n", node->nodeid);
 
-    if (((type & BEV_EVENT_TIMEOUT) != 0) && ((node->state & NODE_CONNECTING) == NODE_CONNECTING)) {
-        node->nodegroup->log_write_cb("Timout connecting to node %d.\n", node->nodeid);
+    if (((type & BEV_EVENT_TIMEOUT) != 0) && ((node->state & NODE_CONNECTING) == NODE_CONNECTING))
+    {
+        node->nodegroup->log_write_cb("Timeout connecting to node %d.\n", node->nodeid);
         node->state = 0;
         node->state |= NODE_ERRORED;
         node->state |= NODE_TIMEOUT;
         btc_node_connection_state_changed(node);
-    } else if (((type & BEV_EVENT_EOF) != 0) ||
-               ((type & BEV_EVENT_ERROR) != 0)) {
+    }
+    else if (((type & BEV_EVENT_EOF) != 0) || ((type & BEV_EVENT_ERROR) != 0))
+    {
         node->state = 0;
         node->state |= NODE_ERRORED;
         node->state |= NODE_DISCONNECTED;
-        if ((type & BEV_EVENT_EOF) != 0) {
+        if ((type & BEV_EVENT_EOF) != 0)
+        {
+            //fprintf(stderr,"Disconnected from the remote peer %d.\n", node->nodeid);
             node->nodegroup->log_write_cb("Disconnected from the remote peer %d.\n", node->nodeid);
             node->state |= NODE_DISCONNECTED_FROM_REMOTE_PEER;
         }
-        else {
+        else
+        {
+            //fprintf(stderr,"Error connecting to node %d.\n", node->nodeid);
             node->nodegroup->log_write_cb("Error connecting to node %d.\n", node->nodeid);
         }
         btc_node_connection_state_changed(node);
-    } else if (type & BEV_EVENT_CONNECTED) {
+    }
+    else if (type & BEV_EVENT_CONNECTED)
+    {
+        //fprintf(stderr,"Successfull connected to node %d.\n", node->nodeid);
         node->nodegroup->log_write_cb("Successfull connected to node %d.\n", node->nodeid);
         node->state |= NODE_CONNECTED;
         node->state &= ~NODE_CONNECTING;
@@ -251,8 +261,11 @@ btc_bool btc_node_missbehave(btc_node* node)
 
 void btc_node_disconnect(btc_node* node)
 {
-    if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING) {
+    //fprintf(stderr,"btc_node_disconnect");
+    if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
+    {
         node->nodegroup->log_write_cb("Disconnect node %d\n", node->nodeid);
+        fprintf(stderr,"Disconnect node %d\n", node->nodeid);
     }
     /* release buffer and timer event */
     btc_node_release_events(node);
@@ -289,7 +302,7 @@ btc_node_group* btc_node_group_new(const btc_chainparams* chainparams)
     node_group->nodes = vector_new(1, btc_node_free_cb);
     node_group->chainparams = (chainparams ? chainparams : &btc_chainparams_main);
     node_group->parse_cmd_cb = NULL;
-    strcpy(node_group->clientstr, "libbtc 0.1");
+    strcpy(node_group->clientstr, "libnspv 0.1");
 
     /* nullify callbacks */
     node_group->postcmd_cb = NULL;
@@ -367,8 +380,8 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             node->event_bev = bufferevent_socket_new(group->event_base, -1, BEV_OPT_CLOSE_ON_FREE);
             bufferevent_setcb(node->event_bev, read_cb, write_cb, event_cb, node);
             bufferevent_enable(node->event_bev, EV_READ | EV_WRITE);
-            if (bufferevent_socket_connect(node->event_bev, (struct sockaddr*)&node->addr, sizeof(node->addr)) < 0) {
-                /* Error starting connection */
+            if (bufferevent_socket_connect(node->event_bev, (struct sockaddr*)&node->addr,sizeof(node->addr)) < 0) {
+                // Error starting connection
                 if (node->event_bev)
                     bufferevent_free(node->event_bev);
                 return false;
@@ -379,13 +392,13 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             struct timeval tv;
             tv.tv_sec = BTC_PERIODICAL_NODE_TIMER_S;
             tv.tv_usec = 0;
-            node->timer_event = event_new(group->event_base, 0, EV_TIMEOUT | EV_PERSIST, node_periodical_timer,
-                                          (void*)node);
+            node->timer_event = event_new(group->event_base, 0, EV_TIMEOUT | EV_PERSIST,node_periodical_timer,(void*)node);
             event_add(node->timer_event, &tv);
             node->state |= NODE_CONNECTING;
             connected_at_least_to_one_node = true;
 
             node->nodegroup->log_write_cb("Trying to connect to %d...\n", node->nodeid);
+            //fprintf(stderr,"Trying to connect to %d...\n", node->nodeid);
 
             connect_amount--;
             if (connect_amount <= 0)
@@ -396,7 +409,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
     return connected_at_least_to_one_node;
 }
 
-void btc_node_connection_state_changed(btc_node* node)
+void btc_node_connection_state_changed(btc_node *node)
 {
     if (node->nodegroup->node_connection_state_changed_cb)
         node->nodegroup->node_connection_state_changed_cb(node);
@@ -404,7 +417,7 @@ void btc_node_connection_state_changed(btc_node* node)
     if ((node->state & NODE_ERRORED) == NODE_ERRORED) {
         btc_node_release_events(node);
 
-        /* connect to more nodes are required */
+        // connect to more nodes are required
         btc_bool should_connect_to_more_nodes = true;
         if (node->nodegroup->should_connect_to_more_nodes_cb)
             should_connect_to_more_nodes = node->nodegroup->should_connect_to_more_nodes_cb(node);
@@ -412,12 +425,14 @@ void btc_node_connection_state_changed(btc_node* node)
         if (should_connect_to_more_nodes && (btc_node_group_amount_of_connected_nodes(node->nodegroup, NODE_CONNECTED) + btc_node_group_amount_of_connected_nodes(node->nodegroup, NODE_CONNECTING) < node->nodegroup->desired_amount_connected_nodes))
             btc_node_group_connect_next_nodes(node->nodegroup);
     }
-    if ((node->state & NODE_MISSBEHAVED) == NODE_MISSBEHAVED) {
-        if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING) {
+    if ((node->state & NODE_MISSBEHAVED) == NODE_MISSBEHAVED)
+    {
+        if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
+        {
+            fprintf(stderr,"misbehaved\n");
             btc_node_disconnect(node);
         }
-    } else
-        btc_node_send_version(node);
+    } else btc_node_send_version(node);
 }
 
 void btc_node_send(btc_node* node, cstring* data)
@@ -428,6 +443,7 @@ void btc_node_send(btc_node* node, cstring* data)
     bufferevent_write(node->event_bev, data->str, data->len);
     char* dummy = data->str + 4;
     node->nodegroup->log_write_cb("sending message to node %d: %s\n", node->nodeid, dummy);
+    //fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, dummy);
 }
 
 void btc_node_send_version(btc_node* node)
@@ -450,7 +466,7 @@ void btc_node_send_version(btc_node* node)
     memset(&version_msg, 0, sizeof(version_msg));
 
     /* create a serialized version message */
-    btc_p2p_msg_version_init(&version_msg, &fromAddr, &toAddr, node->nodegroup->clientstr, true);
+    btc_p2p_msg_version_init(node->nodegroup->chainparams->nProtocolVersion,&version_msg, &fromAddr, &toAddr, node->nodegroup->clientstr, true);
     btc_p2p_msg_version_ser(&version_msg, version_msg_cstr);
 
     /* create p2p message */
@@ -467,6 +483,7 @@ void btc_node_send_version(btc_node* node)
 int btc_node_parse_message(btc_node* node, btc_p2p_msg_hdr* hdr, struct const_buffer* buf)
 {
     node->nodegroup->log_write_cb("received command from node %d: %s\n", node->nodeid, hdr->command);
+    //fprintf(stderr,"received command from node %d: %s\n", node->nodeid, hdr->command);
     if (memcmp(hdr->netmagic, node->nodegroup->chainparams->netmagic, sizeof(node->nodegroup->chainparams->netmagic)) != 0) {
         return btc_node_missbehave(node);
     }
@@ -479,9 +496,14 @@ int btc_node_parse_message(btc_node* node, btc_p2p_msg_hdr* hdr, struct const_bu
             if (!btc_p2p_msg_version_deser(&v_msg_check, buf)) {
                 return btc_node_missbehave(node);
             }
-            if ((v_msg_check.services & BTC_NODE_NETWORK) != BTC_NODE_NETWORK) {
+            if ( node->nodegroup->chainparams->nSPV != 0 && (v_msg_check.services & NODE_NSPV) == 0 )
+            {
+                fprintf(stderr,"nServices.%x disconnect from node %d: %s (%d)\n",(uint32_t)v_msg_check.services, node->nodeid, v_msg_check.useragent, v_msg_check.start_height);
                 btc_node_disconnect(node);
             }
+            if ((v_msg_check.services & BTC_NODE_NETWORK) != BTC_NODE_NETWORK)
+                btc_node_disconnect(node);
+            node->nServices = v_msg_check.services;
             node->bestknownheight = v_msg_check.start_height;
             node->nodegroup->log_write_cb("Connected to node %d: %s (%d)\n", node->nodeid, v_msg_check.useragent, v_msg_check.start_height);
             /* confirm version via verack */
@@ -582,13 +604,16 @@ btc_bool btc_node_group_add_peers_by_ip_or_seed(btc_node_group *group, const cha
         vector_free(ips_dns, true);
     } else {
         // add comma seperated ips (nodes)
-        char working_str[64];
+        char working_str[64],ipaddr[64];
         memset(working_str, 0, sizeof(working_str));
         size_t offset = 0;
         for (unsigned int i = 0; i <= strlen(ips); i++) {
             if (i == strlen(ips) || ips[i] == ',') {
                 btc_node* node = btc_node_new();
-                if (btc_node_set_ipport(node, working_str) > 0) {
+                
+                sprintf(ipaddr,"%s:%u",working_str,group->chainparams->default_port);
+                fprintf(stderr,"setnode.(%s) -> %s\n",working_str,ipaddr);
+                if (btc_node_set_ipport(node, ipaddr) > 0) {
                     btc_node_group_add_node(group, node);
                 }
                 offset = 0;
