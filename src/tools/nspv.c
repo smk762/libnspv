@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
     data = argv[argc - 1];
-
+    strcpy(NSPV_symbol,chain->symbol);
     // get arguments
     while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:", long_options, &long_index)) != -1) {
         switch (opt) {
@@ -219,6 +219,7 @@ int main(int argc, char* argv[])
         sprintf(headersname,"headers.%s",chain->name);
         btc_ecc_start();
         btc_spv_client* client = btc_spv_client_new(chain, debug, (dbfile && (dbfile[0] == '0' || (strlen(dbfile) > 1 && dbfile[0] == 'n' && dbfile[0] == 'o'))) ? true : false);
+        NSPV_client = client;
         if ( chain->nSPV == 0 )
         {
             btc_wallet *wallet = btc_wallet_new(chain);

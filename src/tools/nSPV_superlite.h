@@ -32,7 +32,8 @@
 static const bits256 zeroid;
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
-char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67];
+char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
+btc_spv_client *NSPV_client;
 
 struct NSPV_inforesp NSPV_inforesult;
 struct NSPV_utxosresp NSPV_utxosresult;
@@ -644,8 +645,19 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 
 char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
 {
+    char *method; bits256 txid; char *symbol,*coinaddr,*wifstr; int32_t vout,func;
+    if ( (method= jstr(argjson,"method")) == 0 )
+        return(clonestr("{\"error\":\"no method\"}"));
+    else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(coin,NSPV_symbol) != 0 )
+        return(clonestr("{\"error\":\"wrong coin\"}"));
+    else if ( strcmp("stop",method) == 0 )
+    {
+        NSPV_STOP_RECEIVED = (uint32_t)time(NULL);
+        btc_node_group_shutdown(NSPV_client->nodegroup);
+        fprintf(stderr,"shutdown started\n");
+        return(clonestr("{\"result\":\"success\"}"));
+    }
     fprintf(stderr,"myipaddr.(%s) remote.(%s) port.%d (%s)\n",myipaddr,remoteaddr,port,jprint(argjson,0));
-    return(clonestr("{\"result\":\"success\"}"));
 }
 
 #ifdef later
