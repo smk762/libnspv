@@ -256,12 +256,12 @@ int main(int argc, char* argv[])
                 printf("Addr: %s\n", addr);
             }
             vector_free(addrs, true);
+            client->sync_completed = spv_sync_completed;
+            client->sync_transaction = btc_wallet_check_transaction;
+            client->sync_transaction_ctx = wallet;
         }
         btc_spv_client* client = btc_spv_client_new(chain, debug, (dbfile && (dbfile[0] == '0' || (strlen(dbfile) > 1 && dbfile[0] == 'n' && dbfile[0] == 'o'))) ? true : false);
         client->header_message_processed = spv_header_message_processed;
-        client->sync_completed = spv_sync_completed;
-        client->sync_transaction = btc_wallet_check_transaction;
-        client->sync_transaction_ctx = wallet;
         if ( chain->nSPV == 0 && !btc_spv_client_load(client, (dbfile ? dbfile : headersname)))
         {
             printf("Could not load or create %s database...aborting\n",headersname);
