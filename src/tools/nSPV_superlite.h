@@ -30,7 +30,7 @@
 #include <btc/base58.h>
 
 static const bits256 zeroid;
-cJSON *NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis);
+cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
@@ -776,7 +776,7 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
     return(retstr);
 }
 
-cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
+cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis)
 {
     return(cJSON_Parse("{\"error\":\"wallet not yet\"}"));
 }
