@@ -17,7 +17,6 @@
 #ifndef KOMODO_NSPVWALLET_H
 #define KOMODO_NSPVWALLET_H
 
-// nSPV wallet uses superlite functions (and some komodod built in functions) to implement nSPV_spend
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
 
 int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
@@ -60,8 +59,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
 
 int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int32_t height,CTransaction &tx,int64_t extradata,uint32_t tiptime,int64_t &rewardsum)
 {
-    struct NSPV_txproof *ptr; int32_t i,offset,retval = 0; int64_t rewards = 0; uint32_t nLockTime; std::vector<uint8_t> proof;
-    //fprintf(stderr,"NSPV_gettx %s/v%d ht.%d\n",txid.GetHex().c_str(),vout,height);
+    struct NSPV_txproof *ptr; char str[65],str2[65]; int32_t i,offset,retval = 0; int64_t rewards = 0; uint32_t nLockTime; std::vector<uint8_t> proof;
     if ( (ptr= NSPV_txproof_find(txid)) == 0 )
     {
         NSPV_txproof(vout,txid,height);
@@ -69,7 +67,7 @@ int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int
     }
     if ( ptr->txid != txid )
     {
-        fprintf(stderr,"txproof error %s != %s\n",ptr->txid.GetHex().c_str(),txid.GetHex().c_str());
+        fprintf(stderr,"txproof error %s != %s\n",bits256_str(str,ptr->txid),bits256_str(str2,txid));
         return(-1);
     }
     else if ( NSPV_txextract(tx,ptr->tx,ptr->txlen) < 0 || ptr->txlen <= 0 )
@@ -85,10 +83,6 @@ int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int
             fprintf(stderr,"extradata %.8f vs rewards %.8f\n",dstr(extradata),dstr(rewards));
         rewardsum += rewards;
     }
-    //char coinaddr[64];
-    //Getscriptaddress(coinaddr,tx.vout[0].scriptPubKey);  causes crash??
-    //fprintf(stderr,"%s txid.%s vs hash.%s\n",coinaddr,txid.GetHex().c_str(),tx.GetHash().GetHex().c_str());
-    
     if ( skipvalidation == 0 )
     {
         if ( ptr->txprooflen > 0 )
@@ -110,7 +104,7 @@ int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int
             offset = (height - NSPV_ntzsresult.prevntz.height);
             if ( offset >= 0 && height <= NSPV_ntzsresult.nextntz.height )
             {
-                //fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",NSPV_ntzsresult.prevntz.txid.GetHex().c_str(),NSPV_ntzsresult.nextntz.txid.GetHex().c_str());
+                fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
                 NSPV_txidhdrsproof(NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
                 if ( (retval= NSPV_validatehdrs(&NSPV_ntzsproofresult)) == 0 )
@@ -119,7 +113,7 @@ int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int
                     proofroot = BitcoinGetProofMerkleRoot(proof,txids);
                     if ( proofroot != NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot )
                     {
-                        fprintf(stderr,"prooflen.%d proofroot.%s vs %s\n",(int32_t)proof.size(),proofroot.GetHex().c_str(),NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot.GetHex().c_str());
+                        fprintf(stderr,"prooflen.%d proofroot.%s vs %s\n",(int32_t)proof.size(),bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
                         retval = -2003;
                     }
                 }
@@ -242,15 +236,15 @@ bool NSPV_SignTx(CMutableTransaction &mtx,int32_t vini,int64_t utxovalue,const C
     if ( ProduceSignature(TransactionSignatureCreator(&keystore,&txNewConst,vini,utxovalue,SIGHASH_ALL),scriptPubKey,sigdata,branchid) != 0 )
     {
         UpdateTransaction(mtx,vini,sigdata);
-        //fprintf(stderr,"SIG_TXHASH %s vini.%d %.8f\n",SIG_TXHASH.GetHex().c_str(),vini,(double)utxovalue/COIN);
+        //fprintf(stderr,"SIG_TXHASH %s vini.%d %.8f\n",bits256_str(str,SIG_TXHASH),vini,(double)utxovalue/COIN);
         return(true);
-    }  //else fprintf(stderr,"sigerr SIG_TXHASH %s vini.%d %.8f\n",SIG_TXHASH.GetHex().c_str(),vini,(double)utxovalue/COIN);
+    }  //else fprintf(stderr,"sigerr SIG_TXHASH %s vini.%d %.8f\n",bits256_str(str,SIG_TXHASH),vini,(double)utxovalue/COIN);
     return(false);
 }
 
-std::string NSPV_signtx(int64_t &rewardsum,int64_t &interestsum,UniValue &retcodes,CMutableTransaction &mtx,uint64_t txfee,CScript opret,struct NSPV_utxoresp used[])
+std::string NSPV_signtx(int64_t &rewardsum,int64_t &interestsum,cJSON *retcodes,CMutableTransaction &mtx,uint64_t txfee,CScript opret,struct NSPV_utxoresp used[])
 {
-    CTransaction vintx; std::string hex; uint256 hashBlock; int64_t interest=0,change,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n,validation;
+    CTransaction vintx; std::string hex; char str[65]; uint256 hashBlock; int64_t interest=0,change,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n,validation;
     n = mtx.vout.size();
     for (i=0; i<n; i++)
         totaloutputs += mtx.vout[i].nValue;
@@ -274,7 +268,7 @@ std::string NSPV_signtx(int64_t &rewardsum,int64_t &interestsum,UniValue &retcod
         if ( i > 0 )
             sleep(1);
         validation = NSPV_gettransaction(0,utxovout,mtx.vin[i].prevout.hash,used[i].height,vintx,used[i].extradata,NSPV_tiptime,rewardsum);
-        retcodes.push_back(validation);
+        jaddinum(retcodes,validation);
         if ( validation != -1 ) // most others are degraded security
         {
             if ( vintx.vout[utxovout].nValue != used[i].satoshis )
@@ -292,26 +286,26 @@ std::string NSPV_signtx(int64_t &rewardsum,int64_t &interestsum,UniValue &retcod
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return("");
             }
-        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent\n",mtx.vin[i].prevout.hash.GetHex().c_str(),utxovout); // of course much better handling is needed
+        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent\n",bits256_str(str,mtx.vin[i].prevout.hash),utxovout); // of course much better handling is needed
     }
     fprintf(stderr,"sign %d inputs %.8f + interest %.8f -> %d outputs %.8f change %.8f\n",(int32_t)mtx.vin.size(),(double)totalinputs/COIN,(double)interest/COIN,(int32_t)mtx.vout.size(),(double)totaloutputs/COIN,(double)change/COIN);
     return(EncodeHexTx(mtx));
 }
 
-UniValue NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis) // what its all about!
+cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis)
 {
-    UniValue result(UniValue::VOBJ),retcodes(UniValue::VARR); std::vector<uint8_t> data; CScript scriptPubKey; uint8_t *ptr,rmd160[128]; int32_t len; int64_t txfee = 10000;
+    UniValue result = cJSON_CreateObject(),retcodes = cJSON_CreateArray(); std::vector<uint8_t> data; CScript scriptPubKey; uint8_t *ptr,rmd160[128]; int32_t len; int64_t txfee = 10000;
     if ( NSPV_logintime == 0 || time(NULL) > NSPV_logintime+NSPV_AUTOLOGOUT )
     {
-        result.push_back(Pair("result","error"));
-        result.push_back(Pair("error","wif expired"));
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","wif expired");
         return(result);
     }
-    if ( strcmp(srcaddr,NSPV_address.c_str()) != 0 )
+    if ( strcmp(srcaddr,NSPV_address) != 0 )
     {
-        result.push_back(Pair("result","error"));
-        result.push_back(Pair("error","invalid address"));
-        result.push_back(Pair("mismatched",srcaddr));
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","invalid address");
+        jaddstr(result,"mismatched",srcaddr);
         return(result);
     }
     else if ( bitcoin_base58decode(rmd160,destaddr) != 25 )
@@ -422,6 +416,7 @@ UniValue NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis) // what its a
     }
 }
 
+#ifdef SUPPORT_CC
 int64_t NSPV_AddNormalinputs(CMutableTransaction &mtx,CPubKey mypk,int64_t total,int32_t maxinputs,struct NSPV_CCmtxinfo *ptr)
 {
     char coinaddr[64]; int32_t CCflag = 0;
@@ -503,5 +498,6 @@ void NSPV_CCtxids(std::vector<std::pair<CAddressIndexKey, CAmount> > &txids,char
     NSPV_addresstxids(coinaddr,ccflag,0);
     NSPV_txids2CCtxids(&NSPV_txidsresult,txids);
 }
+#endif
 
 #endif // KOMODO_NSPVWALLET_H

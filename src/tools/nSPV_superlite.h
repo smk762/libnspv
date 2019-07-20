@@ -190,7 +190,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 I = NSPV_inforesult;
                 NSPV_inforesp_purge(chain,&NSPV_inforesult);
                 NSPV_rwinforesp(chain,0,&response[1],&NSPV_inforesult);
-                fprintf(stderr,"got info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
+                fprintf(stderr,"got info response %u from.%d size.%d height.%d\n",timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
                 if ( NSPV_inforesult.height < I.height )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
@@ -798,8 +798,4 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
     return(retstr);
 }
 
-cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis)
-{
-    return(cJSON_Parse("{\"error\":\"wallet not yet\"}"));
-}
 #endif // KOMODO_NSPVSUPERLITE_H

@@ -109,6 +109,7 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
 #include "nSPV_superlite.h"
+//#include "nSPV_wallet.h"
 #include "komodo_cJSON.c"
 #include "nSPV_rpc.h"
 
