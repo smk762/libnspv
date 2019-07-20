@@ -676,7 +676,8 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     jaddstr(result,"result","success");
     jaddstr(result,"status","wif will expire in 777 seconds");
     btc_pubkey_from_key(&NSPV_key,&NSPV_pubkey);
-    btc_pubkey_get_hex(&NSPV_pubkey,NSPV_pubkeystr,sizeof(NSPV_pubkeystr));
+    sz = sizeof(NSPV_pubkeystr);
+    btc_pubkey_get_hex(&NSPV_pubkey,NSPV_pubkeystr,&sz);
     btc_pubkey_getaddr_p2pkh(&NSPV_pubkey,chain,NSPV_address);
     jaddstr(result,"address",NSPV_address);
     jaddstr(result,"pubkey",NSPV_pubkeystr);
