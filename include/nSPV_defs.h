@@ -131,7 +131,7 @@ struct NSPV_mempoolresp
     char coinaddr[64];
     bits256 txid;
     int32_t nodeheight,vout,vindex;
-    uint16_t numtxids; uint8_t CCflag,funcid;
+    uint16_t numtxids; uint8_t CCflag,memfunc;
 };
 
 struct NSPV_ntz

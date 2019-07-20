@@ -254,7 +254,7 @@ int32_t NSPV_rwmempoolresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *s
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vindex),&ptr->vindex);
     len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->CCflag),&ptr->CCflag);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->funcid),&ptr->funcid);
+    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->memfunc),&ptr->memfunc);
     if ( rwflag != 0 )
     {
         memcpy(&serialized[len],ptr->coinaddr,sizeof(ptr->coinaddr));
@@ -624,7 +624,19 @@ cJSON *NSPV_mempoolresp_json(struct NSPV_mempoolresp *ptr)
     jaddnum(result,"numtxids",ptr->numtxids);
     jaddbits256(result,"txid",ptr->txid);
     jaddnum(result,"vout",ptr->vout);
-    jaddnum(result,"funcid",ptr->funcid);
+    jaddnum(result,"memfunc",ptr->memfunc);
+    switch ( ptr->memfunc )
+    {
+        case NSPV_MEMPOOL_ALL: jaddstr(result,"type","all mempool"); break;
+        case NSPV_MEMPOOL_ADDRESS: jaddstr(result,"type","scan for address received"); break;
+        case NSPV_MEMPOOL_ISSPENT: jaddstr(result,"type","scan for utxo spent"); break;
+        case NSPV_MEMPOOL_INMEMPOOL: jaddstr(result,"type","scan txid in mempool"); break;
+        case NSPV_MEMPOOL_CCEVALCODE:
+            jaddstr(result,"type","scan CC/funcid output");
+            jaddnum(result,"evalcode",(int64_t)(vout & 0xff));
+            jaddnum(result,"CCfunc",(int64_t)((vout>>8) & 0xff));
+            break;
+    }
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }

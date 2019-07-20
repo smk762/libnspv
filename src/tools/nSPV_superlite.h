@@ -216,7 +216,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_MEMPOOLRESP:
                 NSPV_mempoolresp_purge(chain,&NSPV_mempoolresult);
                 NSPV_rwmempoolresp(chain,0,&response[1],&NSPV_mempoolresult);
-                fprintf(stderr,"got mempool response %u size.%d %s CC.%d num.%d funcid.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.funcid,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
+                fprintf(stderr,"got mempool response %u size.%d (%s) CC.%d num.%d memfunc.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.memfunc,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
                 break;
             case NSPV_NTZSRESP:
                 NSPV_ntzsresp_purge(chain,&NSPV_ntzsresult);
@@ -418,7 +418,7 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     return(result);
 }
 
-cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,uint8_t funcid,bits256 txid,int32_t vout)
+cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,uint8_t memfunc,bits256 txid,int32_t vout)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; char str[65],zeroes[64]; int32_t i,iter,slen,len = 1;
     NSPV_mempoolresp_purge(client->chainparams,&NSPV_mempoolresult);
@@ -435,20 +435,20 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
     }
     msg[len++] = NSPV_MEMPOOL;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(funcid),&funcid);
+    len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(memfunc),&memfunc);
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(vout),&vout);
     len += iguana_rwbignum(client->chainparams,1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
-    fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,funcid,CCflag,bits256_str(str,txid),vout,len);
+    fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memcmp(&txid,&NSPV_mempoolresult.txid,sizeof(txid)) == 0 && vout == NSPV_mempoolresult.vout && funcid == NSPV_mempoolresult.funcid )
+            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memcmp(&txid,&NSPV_mempoolresult.txid,sizeof(txid)) == 0 && vout == NSPV_mempoolresult.vout && memfunc == NSPV_mempoolresult.memfunc )
                 return(NSPV_mempoolresp_json(&NSPV_mempoolresult));
         }
     } else sleep(1);
@@ -490,10 +490,10 @@ bool NSPV_inmempool(btc_spv_client *client,bits256 txid)
     else return(false);
 }
 
-bool NSPV_evalcode_inmempool(btc_spv_client *client,uint8_t evalcode,uint8_t funcid)
+bool NSPV_evalcode_inmempool(btc_spv_client *client,uint8_t evalcode,uint8_t memfunc)
 {
     int32_t vout;
-    vout = ((uint32_t)funcid << 8) | evalcode;
+    vout = ((uint32_t)memfunc << 8) | evalcode;
     NSPV_mempooltxids(client,(char *)"",1,NSPV_MEMPOOL_CCEVALCODE,zeroid,vout);
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && NSPV_mempoolresult.vout == vout )
         return(true);
