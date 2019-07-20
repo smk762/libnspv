@@ -3,9 +3,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libbtc
-Description: C library for manipulating bitcoin data structures
-URL: https://github.com/jonasschnelli/libbtc
+Name: libnspv
+Description: C library for nSPV superlite client
+URL: https://github.com/jl777/libnspv
 Version: @PACKAGE_VERSION@
 Cflags: -I${includedir}
 Libs: -L${libdir} -lbtc

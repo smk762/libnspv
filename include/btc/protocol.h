@@ -75,7 +75,7 @@ enum BTC_INV_TYPE {
 };
 
 static const unsigned int MAX_HEADERS_RESULTS = 2000;
-static const int BTC_PROTOCOL_VERSION = 70014;
+#define BTC_PROTOCOL_VERSION 70014
 
 typedef struct btc_p2p_msg_hdr_ {
     unsigned char netmagic[4];
@@ -134,7 +134,7 @@ enum GetDataMsg
 /* =================================== */
 
 /* sets a version message*/
-LIBBTC_API void btc_p2p_msg_version_init(btc_p2p_version_msg* msg, const btc_p2p_address* addrFrom, const btc_p2p_address* addrTo, const char* strSubVer, btc_bool relay);
+LIBBTC_API void btc_p2p_msg_version_init(uint32_t protocol,btc_p2p_version_msg* msg, const btc_p2p_address* addrFrom, const btc_p2p_address* addrTo, const char* strSubVer, btc_bool relay);
 
 /* serialize a p2p "version" message to an existing cstring */
 LIBBTC_API void btc_p2p_msg_version_ser(btc_p2p_version_msg* msg, cstring* buf);
@@ -192,7 +192,7 @@ LIBBTC_API cstring* btc_p2p_message_new(const unsigned char netmagic[4], const c
 /* =================================== */
 
 /* creates a getheader message */
-LIBBTC_API void btc_p2p_msg_getheaders(vector* blocklocators, uint256 hashstop, cstring* str_out);
+LIBBTC_API void btc_p2p_msg_getheaders(uint32_t protocol,vector* blocklocators, uint256 hashstop, cstring* str_out);
 
 /* directly deserialize a getheaders message to blocklocators, hashstop */
 LIBBTC_API btc_bool btc_p2p_deser_msg_getheaders(vector* blocklocators, uint256 hashstop, struct const_buffer* buf);
