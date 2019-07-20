@@ -604,14 +604,16 @@ btc_bool btc_node_group_add_peers_by_ip_or_seed(btc_node_group *group, const cha
         vector_free(ips_dns, true);
     } else {
         // add comma seperated ips (nodes)
-        char working_str[64];
+        char working_str[64],ipaddr[64];
         memset(working_str, 0, sizeof(working_str));
         size_t offset = 0;
         for (unsigned int i = 0; i <= strlen(ips); i++) {
             if (i == strlen(ips) || ips[i] == ',') {
                 btc_node* node = btc_node_new();
-                fprintf(stderr,"setnode.(%s)\n",working_str);
-                if (btc_node_set_ipport(node, working_str) > 0) {
+                
+                sprintf(ipaddr,"%s:%u",working_str,group->chainparams->default_port);
+                fprintf(stderr,"setnode.(%s) -> %s\n",working_str,ipaddr);
+                if (btc_node_set_ipport(node, ipaddr) > 0) {
                     btc_node_group_add_node(group, node);
                 }
                 offset = 0;

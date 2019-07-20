@@ -281,8 +281,6 @@ int main(int argc, char* argv[])
         {
             fprintf(stderr,"Discover %s peers...",chain->name);
             btc_spv_client_discover_peers(client,ips);
-            //fprintf(stderr,"done\n");
-            //printf("Connecting to the p2p network...\n");
             btc_spv_client_runloop(client);
             printf("end of client runloop\n");
             btc_spv_client_free(client);

@@ -69,7 +69,7 @@ struct NSPV_ntzsresp *NSPV_ntzsresp_add(const btc_chainparams *chain,struct NSPV
         if ( NSPV_ntzsresp_cache[i].reqheight == 0 )
             break;
     if ( i == sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache) )
-        i == (rand() % (sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache)));
+        i = (rand() % (sizeof(NSPV_ntzsresp_cache)/sizeof(*NSPV_ntzsresp_cache)));
     NSPV_ntzsresp_purge(chain,&NSPV_ntzsresp_cache[i]);
     NSPV_ntzsresp_copy(chain,&NSPV_ntzsresp_cache[i],ptr);
     fprintf(stderr,"ADD CACHE ntzsresp req.%d\n",ptr->reqheight);
@@ -108,7 +108,7 @@ struct NSPV_txproof *NSPV_txproof_add(const btc_chainparams *chain,struct NSPV_t
         if ( NSPV_txproof_cache[i].txlen == 0 )
             break;
     if ( i == sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache) )
-        i == (rand() % (sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache)));
+        i = (rand() % (sizeof(NSPV_txproof_cache)/sizeof(*NSPV_txproof_cache)));
     NSPV_txproof_purge(chain,&NSPV_txproof_cache[i]);
     NSPV_txproof_copy(chain,&NSPV_txproof_cache[i],ptr);
     fprintf(stderr,"ADD CACHE txproof %s\n",bits256_str(str,ptr->txid));
@@ -131,7 +131,7 @@ struct NSPV_ntzsproofresp *NSPV_ntzsproof_add(const btc_chainparams *chain,struc
         if ( NSPV_ntzsproofresp_cache[i].common.hdrs == 0 )
             break;
     if ( i == sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache) )
-        i == (rand() % (sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache)));
+        i = (rand() % (sizeof(NSPV_ntzsproofresp_cache)/sizeof(*NSPV_ntzsproofresp_cache)));
     NSPV_ntzsproofresp_purge(chain,&NSPV_ntzsproofresp_cache[i]);
     NSPV_ntzsproofresp_copy(chain,&NSPV_ntzsproofresp_cache[i],ptr);
     return(&NSPV_ntzsproofresp_cache[i]);
