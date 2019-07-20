@@ -90,7 +90,7 @@ void postcmd(struct btc_node_ *node, btc_p2p_msg_hdr *hdr, struct const_buffer *
         vector_add(blocklocators, from_hash);
 
         cstring *getheader_msg = cstr_new_sz(256);
-        btc_p2p_msg_getheaders(blocklocators, stop_hash, getheader_msg);
+        btc_p2p_msg_getheaders(node->nodegroup->chainparams->nProtocolVersion,blocklocators, stop_hash, getheader_msg);
 
         /* create p2p message */
         cstring *p2p_msg = btc_p2p_message_new(node->nodegroup->chainparams->netmagic, "getblocks", getheader_msg->str, getheader_msg->len);
@@ -125,7 +125,7 @@ void handshake_done(struct btc_node_ *node)
     vector_add(blocklocators, (void *)node->nodegroup->chainparams->genesisblockhash);
 
     cstring *getheader_msg = cstr_new_sz(256);
-    btc_p2p_msg_getheaders(blocklocators, NULL, getheader_msg);
+    btc_p2p_msg_getheaders(node->nodegroup->chainparams->nProtocolVersion,blocklocators, NULL, getheader_msg);
 
     /* create p2p message */
     cstring *p2p_msg = btc_p2p_message_new(node->nodegroup->chainparams->netmagic, "getheaders", getheader_msg->str, getheader_msg->len);
