@@ -372,7 +372,7 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
         }
     } else sleep(1);
     jaddstr(result,"result","error");
-    jaddstr(result,"error","no txid result");
+    jaddstr(result,"error","timeout");
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
@@ -413,7 +413,7 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
         }
     } else sleep(1);
     jaddstr(result,"result","error");
-    jaddstr(result,"error","no txid result");
+    jaddstr(result,"error","timeout");
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
@@ -453,7 +453,7 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
         }
     } else sleep(1);
     jaddstr(result,"result","error");
-    jaddstr(result,"error","no txid result");
+    jaddstr(result,"error","timeout");
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
@@ -578,7 +578,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(height),&height);
     len += iguana_rwnum(client->chainparams,1,&msg[len],sizeof(vout),&vout);
     len += iguana_rwbignum(client->chainparams,1,&msg[len],sizeof(txid),(uint8_t *)&txid);
-    fprintf(stderr,"req txproof %s/v%d at height.%d\n",bits256_str(str,txid),vout,height);
+    //fprintf(stderr,"req txproof %s/v%d at height.%d\n",bits256_str(str,txid),vout,height);
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
