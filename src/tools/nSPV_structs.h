@@ -58,12 +58,12 @@ int32_t iguana_rwbignum(const btc_chainparams *coin,int32_t rwflag,uint8_t *seri
     if ( rwflag == 0 )
     {
         for (i=0; i<len; i++)
-            endianedp[i] = serialized[i];
+            endianedp[i] = serialized[len-1-i];
     }
     else
     {
         for (i=0; i<len; i++)
-            serialized[i] = endianedp[i];
+            serialized[len-1-i] = endianedp[i];
     }
     return(len);
 }
