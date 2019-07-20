@@ -30,6 +30,7 @@
 #include <btc/base58.h>
 
 static const bits256 zeroid;
+cJSON *NSPV_spend(char *srcaddr,char *destaddr,int64_t satoshis);
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
@@ -747,13 +748,13 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     }
     else if ( strcmp(method,"txproof") == 0 )
     {
-        if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
+        if ( vout < 0 || memcmp(&zeroid,&txid,sizeof(txid)) == 0 )
             return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
-        else return(NSPV_txproof(NSPV_client,txid,vout,height));
+        else return(NSPV_txproof(NSPV_client,vout,txid,height));
     }
     else if ( strcmp(method,"spentinfo") == 0 )
     {
-        if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
+        if ( vout < 0 || memcmp(&zeroid,&txid,sizeof(txid)) == 0 )
             return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
         else return(NSPV_spentinfo(NSPV_client,txid,vout));
     }
@@ -761,7 +762,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( satoshis < 1000 || coinaddr == 0 )
             return(cJSON_Parse("{\"error\":\"invalid address or amount too small\"}"));
-        else return(NSPV_spend(NSPV_client,coinaddr,satoshis));
+        else return(NSPV_spend(NSPV_client,NSPV_address,coinaddr,satoshis));
     }
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
@@ -775,4 +776,8 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
     return(retstr);
 }
 
+cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
+{
+    return(cJSON_Parse("{\"error\":\"wallet not yet\"}"));
+}
 #endif // KOMODO_NSPVSUPERLITE_H
