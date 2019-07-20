@@ -55,7 +55,6 @@ int btc_base58_decode(void* bin, size_t* binszp, const char* b58)
     uint32_t zeromask = bytesleft ? (0xffffffff << (bytesleft * 8)) : 0;
     unsigned zerocount = 0;
     size_t b58sz;
-    fprintf(stderr,"decode58 (%s)\n",b58);
     b58sz = strlen(b58);
 
     memset(outi, 0, outisz * sizeof(*outi));
