@@ -648,7 +648,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 
 cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
-    cJSON *result = cJSON_CreateObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz;
+    cJSON *result = cJSON_CreateObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0;
     NSPV_logout();
     if ( strlen(wifstr) < 64 && (sz= btc_base58_decode_check(wifstr,data,sizeof(data))) > 0 && (sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1) )
         valid = 1;
