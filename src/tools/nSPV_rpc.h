@@ -54,6 +54,8 @@
 #define closesocket close
 #endif
 
+#include <errno.h>
+
 #ifndef _WIN32
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL    0x4000    // Do not generate SIGPIPE
@@ -64,8 +66,7 @@
 
 static int32_t spawned,maxspawned;
 portable_mutex_t NSPV_commandmutex;
-//uint16_t RPC_port;
-int32_t NSPV_STOP_RECEIVED,DOCKERFLAG;
+uint32_t NSPV_STOP_RECEIVED,DOCKERFLAG;
 
 char *stats_validmethods[] =
 {
@@ -79,7 +80,7 @@ int32_t LP_valid_remotemethod(cJSON *argjson)
         return(1);
     if ( (method= jstr(argjson,"method")) != 0 )
     {
-        for (i=0; i<sizeof(stats_validmethods)/sizeof(*stats_validmethods); i++)
+        for (i=0; i<(int32_t)sizeof(stats_validmethods)/sizeof(*stats_validmethods); i++)
             if ( strcmp(method,stats_validmethods[i]) == 0 )
                 return(1);
         printf("got invalid method.%s remotely\n",method);
@@ -411,6 +412,24 @@ static int inet_pton6(char *src, unsigned char *dst) {
         return EINVAL;
     memcpy(dst, tmp, sizeof tmp);
     return 0;
+}
+
+uint16_t parse_ipaddr(char *ipaddr,char *ip_port)
+{
+    int32_t j; uint16_t port = 0;
+    if ( ip_port != 0 && ip_port[0] != 0 )
+    {
+        strcpy(ipaddr,ip_port);
+        for (j=0; ipaddr[j]!=0&&j<60; j++)
+            if ( ipaddr[j] == ':' )
+            {
+                port = atoi(ipaddr+j+1);
+                break;
+            }
+        ipaddr[j] = 0;
+        //printf("%p.(%s) -> (%s:%d)\n",ip_port,ip_port,ipaddr,port);
+    } else strcpy(ipaddr,"127.0.0.1");
+    return(port);
 }
 
 uint64_t _calc_ipbits(char *ip_port)
@@ -836,7 +855,7 @@ void LP_rpc_processreq(void *_ptr)
     char filetype[128],content_type[128];
     int32_t recvlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
     char helpname[512],remoteaddr[64],*buf,*retstr,space[8192],space2[32786],*jsonbuf; struct rpcrequest_info *req = _ptr;
-    uint32_t ipbits,i,size = IGUANA_MAXPACKETSIZE + 512;
+    uint32_t ipbits,i,size = NSPV_MAXPACKETSIZE + 512;
     ipbits = req->ipbits;;
     expand_ipbits(remoteaddr,ipbits);
     sock = req->sock;
@@ -996,24 +1015,6 @@ void LP_rpc_processreq(void *_ptr)
     }
     if ( spawned > 0 )
         spawned--;
-}
-
-uint16_t parse_ipaddr(char *ipaddr,char *ip_port)
-{
-    int32_t j; uint16_t port = 0;
-    if ( ip_port != 0 && ip_port[0] != 0 )
-    {
-        strcpy(ipaddr,ip_port);
-        for (j=0; ipaddr[j]!=0&&j<60; j++)
-            if ( ipaddr[j] == ':' )
-            {
-                port = atoi(ipaddr+j+1);
-                break;
-            }
-        ipaddr[j] = 0;
-        //printf("%p.(%s) -> (%s:%d)\n",ip_port,ip_port,ipaddr,port);
-    } else strcpy(ipaddr,"127.0.0.1");
-    return(port);
 }
 
 int32_t iguana_socket(int32_t bindflag,char *hostname,uint16_t port)

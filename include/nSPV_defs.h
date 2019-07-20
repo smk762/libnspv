@@ -30,6 +30,7 @@ typedef union _bits256 bits256;
 #define portable_mutex_lock pthread_mutex_lock
 #define portable_mutex_unlock pthread_mutex_unlock
 #define OS_thread_create pthread_create
+#define NSPV_MAXPACKETSIZE (4096 * 1024)
 
 struct rpcrequest_info
 {
