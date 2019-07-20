@@ -34,6 +34,7 @@ static const bits256 zeroid;
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
 btc_spv_client *NSPV_client;
+btc_chainparams *NSPV_chain;
 
 struct NSPV_inforesp NSPV_inforesult;
 struct NSPV_utxosresp NSPV_utxosresult;
@@ -135,15 +136,12 @@ struct NSPV_ntzsproofresp *NSPV_ntzsproof_add(const btc_chainparams *chain,struc
 
 void NSPV_logout()
 {
-    //cJSON *result(UniValue::VOBJ);
-    //result.push_back(Pair("result","success"));
     if ( NSPV_logintime != 0 )
         fprintf(stderr,"scrub wif and privkey from NSPV memory\n");
-    /*else result.push_back(Pair("status","wasnt logged in"));
-     memset(NSPV_ntzsproofresp_cache,0,sizeof(NSPV_ntzsproofresp_cache));
-     memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
-     memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));*/
-    //memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
+    memset(NSPV_ntzsproofresp_cache,0,sizeof(NSPV_ntzsproofresp_cache));
+    memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
+    memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));
+    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
     //memset(&NSPV_key,0,sizeof(NSPV_key));
     NSPV_logintime = 0;
 }
@@ -643,9 +641,45 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     return(NSPV_broadcast_json(&B,txid));
 }
 
+cJSON *NSPV_login(btc_chainparams *chain,char *wifstr)
+{
+    cJSON *result = cJSON_CreatObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz;
+    NSPV_logout();
+    len = bitcoin_base58decode(data,wifstr);
+    if ( strlen(wifstr) < 64 && btc_base58_decode((void *)data,&sz,wifstr) != 0 && (sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1) )
+        valid = 1;
+    if ( valid == 0 || data[0] != chain->wiftype )
+    {
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","invalid wif");
+        jaddnum(result,"len",(int64_t)sz);
+        jaddnum(result,"wifprefix",(int64_t)data[0]);
+        jaddnum(result,"expected",(int64_t)chain->wiftype);
+        return(result);
+    }
+    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
+    NSPV_logintime = (uint32_t)time(NULL);
+    if ( strcmp(NSPV_wifstr,wifstr) != 0 )
+    {
+        strncpy(NSPV_wifstr,wifstr,sizeof(NSPV_wifstr)-1);
+        //NSPV_key = DecodeSecret(wifstr);
+    }
+    jaddstr(result,"result","success");
+    jaddstr(result,"status","wif will expire in 777 seconds");
+    //CPubKey pubkey = NSPV_key.GetPubKey();
+    //CKeyID vchAddress = pubkey.GetID();
+    //NSPV_address = EncodeDestination(vchAddress);
+    jaddstr(result,"address",NSPV_address);
+    jaddstr(result,"pubkey",NSPV_pubkeystr);
+    jaddnum(result,"wifprefix",(int64_t)data[0]);
+    jaddnum(result,"compressed",(int64_t)(data[len-5] == 1));
+    memset(data,0,sizeof(data));
+    return(result);
+}
+
 char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
 {
-    char *method; bits256 txid; char *symbol,*coinaddr,*wifstr; int32_t vout,func;
+    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,hdrheight; uint8_t CCflag;
     if ( (method= jstr(argjson,"method")) == 0 )
         return(clonestr("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
@@ -659,71 +693,78 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
     }
     txid = jbits256(argjson,"txid");
     vout = jint(argjson,"vout");
-    fprintf(stderr,"myipaddr.(%s) remote.(%s) port.%d (%s)\n",myipaddr,remoteaddr,port,jprint(argjson,0));
-}
-
-#ifdef later
-
-CKey NSPV_key;
-
-
-cJSON *NSPV_logout()
-{
-    cJSON *result(UniValue::VOBJ);
-    result.push_back(Pair("result","success"));
-    if ( NSPV_logintime != 0 )
-        fprintf(stderr,"scrub wif and privkey from NSPV memory\n");
-    else result.push_back(Pair("status","wasnt logged in"));
-    memset(NSPV_ntzsproofresp_cache,0,sizeof(NSPV_ntzsproofresp_cache));
-    memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
-    memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));
-    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
-    memset(&NSPV_key,0,sizeof(NSPV_key));
-    NSPV_logintime = 0;
-    return(result);
-}
-
-// komodo_nSPV from main polling loop (really this belongs in its own file, but it is so small, it ended up here)
-
-
-cJSON *NSPV_login(char *wifstr)
-{
-    cJSON *result(UniValue::VOBJ); char coinaddr[64]; uint8_t data[128]; int32_t len,valid = 0;
-    NSPV_logout();
-    len = bitcoin_base58decode(data,wifstr);
-    if ( strlen(wifstr) < 64 && (len == 38 && data[len-5] == 1) || (len == 37 && data[len-5] != 1) )
-        valid = 1;
-    if ( valid == 0 || data[0] != 188 )
+    height = jint(argjson,"height");
+    hdrheight = jint(argjson,"hdrheight");
+    CCflag = jint(argjson,"isCC");
+    skipcount = jint(argjson,"skipcount");
+    prevheight = jint(argjson,"prevheight");
+    nextheight = jint(argjson,"nextheight");
+    hex = jstr(argjson,"hex");
+    wifstr = jstr(argjson,"wif");
+    coinaddr = jstr(argjson,"address");
+    satoshis = jdouble(argjson,"amount")*COIN + 0.0000000049;
+    if ( strcmp(method,"getinfo") == 0 )
+        return(NSPV_getinfo(NSPV_client,hdrheight));
+    else if ( strcmp(method,"logout") == 0 )
     {
-        result.push_back(Pair("result","error"));
-        result.push_back(Pair("error","invalid wif"));
-        result.push_back(Pair("len",(int64_t)len));
-        result.push_back(Pair("prefix",(int64_t)data[0]));
-        return(result);
+        NSPV_logout();
+        return(clonestr("{\"result\":\"success\"}"));
     }
-    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
-    NSPV_logintime = (uint32_t)time(NULL);
-    if ( strcmp(NSPV_wifstr,wifstr) != 0 )
+    else if ( strcmp(method,"login") == 0 )
     {
-        strncpy(NSPV_wifstr,wifstr,sizeof(NSPV_wifstr)-1);
-        NSPV_key = DecodeSecret(wifstr);
+        if ( wifstr == 0 )
+            return(clonestr("{\"error\":\"no wif\"}"));
+        else return(NSPV_login(NSPV_chain,wifstr));
     }
-    result.push_back(Pair("result","success"));
-    result.push_back(Pair("status","wif will expire in 777 seconds"));
-    CPubKey pubkey = NSPV_key.GetPubKey();
-    CKeyID vchAddress = pubkey.GetID();
-    NSPV_address = EncodeDestination(vchAddress);
-    result.push_back(Pair("address",NSPV_address));
-    result.push_back(Pair("pubkey",HexStr(pubkey)));
-    strcpy(NSPV_pubkeystr,HexStr(pubkey).c_str());
-    if ( KOMODO_NSPV != 0 )
-        decode_hex(NOTARY_PUBKEY33,33,NSPV_pubkeystr);
-    result.push_back(Pair("wifprefix",(int64_t)data[0]));
-    result.push_back(Pair("compressed",(int64_t)(data[len-5] == 1)));
-    memset(data,0,sizeof(data));
-    return(result);
+    else if ( strcmp(method,"broadcast") == 0 )
+    {
+        if ( hex == 0 )
+            return(clonestr("{\"error\":\"no hex\"}"));
+        else return(NSPV_broadcast(NSPV_client,hex));
+    }
+    else if ( strcmp(method,"listunspent") == 0 )
+    {
+        if ( address == 0 )
+            coinaddr = NSPV_address;
+        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount));
+    }
+    else if ( strcmp(method,"listtransactions") == 0 )
+    {
+        if ( address == 0 )
+            coinaddr = NSPV_address;
+        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount));
+    }
+    else if ( strcmp(method,"notarizations") == 0 )
+    {
+        if ( height == 0 )
+            return(clonestr("{\"error\":\"no height\"}"));
+        else return(NSPV_notarizations(NSPV_chain,height));
+    }
+    else if ( strcmp(method,"hdrsproof") == 0 )
+    {
+        if ( prevheight > nextheight || nextheight == 0 || (nextheight-prevheight) > 1440 )
+            return(clonestr("{\"error\":\"invalid height range\"}"));
+        else return(NSPV_hdrsproof(NSPV_chain,prevheight,nextheight));
+    }
+    else if ( strcmp(method,"txproof") == 0 )
+    {
+        if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
+            return(clonestr("{\"error\":\"invalid utxo\"}"));
+        else return(NSPV_txproof(NSPV_chain,txid,vout,height));
+    }
+    else if ( strcmp(method,"spentinfo") == 0 )
+    {
+        if ( vout < 0 || memcmp(&zeroid,txid,sizeof(txid)) == 0 )
+            return(clonestr("{\"error\":\"invalid utxo\"}"));
+        else return(NSPV_spentinfo(NSPV_chain,txid,vout));
+    }
+    else if ( strcmp(method,"spend") == 0 )
+    {
+        if ( satoshis < 1000 || coinaddr == 0 )
+            return(clonestr("{\"error\":\"invalid address or amount too small\"}"));
+        else return(NSPV_spend(NSPV_chain,coinaddr,satoshis));
+    }
+    else return(clonestr("{\"error\":\"invalid method\"}"));
 }
-
-#endif
 
 #endif // KOMODO_NSPVSUPERLITE_H

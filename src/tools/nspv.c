@@ -157,6 +157,7 @@ int main(int argc, char* argv[])
     data = argv[argc - 1];
     strcpy(NSPV_symbol,chain->name);
     // get arguments
+    uint16_t port = 0;
     while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:", long_options, &long_index)) != -1) {
         switch (opt) {
         case 'c':
@@ -192,7 +193,9 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
     }
-    uint16_t port = chain->rpcport;
+    if ( port == 0 )
+        port = chain->rpcport;
+    NSPV_chain = chain;
     if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,NSPV_rpcloop,(void *)&port) != 0 )
     {
         printf("error launching NSPV_rpcloop for port.%u\n",port);
