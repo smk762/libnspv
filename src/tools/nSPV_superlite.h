@@ -648,7 +648,7 @@ char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) //
     char *method; bits256 txid; char *symbol,*coinaddr,*wifstr; int32_t vout,func;
     if ( (method= jstr(argjson,"method")) == 0 )
         return(clonestr("{\"error\":\"no method\"}"));
-    else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(coin,NSPV_symbol) != 0 )
+    else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
         return(clonestr("{\"error\":\"wrong coin\"}"));
     else if ( strcmp("stop",method) == 0 )
     {

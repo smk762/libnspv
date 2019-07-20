@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
     data = argv[argc - 1];
-    strcpy(NSPV_symbol,chain->symbol);
+    strcpy(NSPV_symbol,chain->name);
     // get arguments
     while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:", long_options, &long_index)) != -1) {
         switch (opt) {
