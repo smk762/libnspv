@@ -483,7 +483,7 @@ void btc_node_send_version(btc_node* node)
 int btc_node_parse_message(btc_node* node, btc_p2p_msg_hdr* hdr, struct const_buffer* buf)
 {
     node->nodegroup->log_write_cb("received command from node %d: %s\n", node->nodeid, hdr->command);
-    fprintf(stderr,"received command from node %d: %s\n", node->nodeid, hdr->command);
+    //fprintf(stderr,"received command from node %d: %s\n", node->nodeid, hdr->command);
     if (memcmp(hdr->netmagic, node->nodegroup->chainparams->netmagic, sizeof(node->nodegroup->chainparams->netmagic)) != 0) {
         return btc_node_missbehave(node);
     }
