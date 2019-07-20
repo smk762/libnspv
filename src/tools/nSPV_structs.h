@@ -633,8 +633,8 @@ cJSON *NSPV_mempoolresp_json(struct NSPV_mempoolresp *ptr)
         case NSPV_MEMPOOL_INMEMPOOL: jaddstr(result,"type","scan txid in mempool"); break;
         case NSPV_MEMPOOL_CCEVALCODE:
             jaddstr(result,"type","scan CC/funcid output");
-            jaddnum(result,"evalcode",(int64_t)(vout & 0xff));
-            jaddnum(result,"CCfunc",(int64_t)((vout>>8) & 0xff));
+            jaddnum(result,"evalcode",(int64_t)(ptr->vout & 0xff));
+            jaddnum(result,"CCfunc",(int64_t)((ptr->vout>>8) & 0xff));
             break;
     }
     jaddstr(result,"lastpeer",NSPV_lastpeer);
