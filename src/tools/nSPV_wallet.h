@@ -294,7 +294,8 @@ std::string NSPV_signtx(int64_t &rewardsum,int64_t &interestsum,cJSON *retcodes,
 
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis)
 {
-    UniValue result = cJSON_CreateObject(),retcodes = cJSON_CreateArray(); std::vector<uint8_t> data; CScript scriptPubKey; uint8_t *ptr,rmd160[128]; int32_t len; int64_t txfee = 10000;
+    cJSON *result = cJSON_CreateObject(),*retcodes = cJSON_CreateArray(); uint8_t *ptr,rmd160[128]; int32_t len; int64_t txfee = 10000;
+    std::vector<uint8_t> data; CScript scriptPubKey;
     if ( NSPV_logintime == 0 || time(NULL) > NSPV_logintime+NSPV_AUTOLOGOUT )
     {
         jaddstr(result,"result","error");
@@ -308,7 +309,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         jaddstr(result,"mismatched",srcaddr);
         return(result);
     }
-    else if ( bitcoin_base58decode(rmd160,destaddr) != 25 )
+    else if ( btc_base58_decode_check(destaddr,rmd160,sizeof(rmd160)) != 25 )
     {
         if ( (len= is_hexstr(destaddr,0)) > 0 )
         {
@@ -319,8 +320,9 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         }
         else
         {
-            result.push_back(Pair("result","error"));
-            result.push_back(Pair("error","invalid destaddr"));
+            jaddstr(result,"result","error");
+            jaddstr(result,"error","invalid destaddr");
+            jaddstr(result,"destaddr",destaddr);
             return(result);
         }
     }
@@ -332,32 +334,33 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
     }
     if ( NSPV_inforesult.height == 0 )
     {
-        result.push_back(Pair("result","error"));
-        result.push_back(Pair("error","couldnt getinfo"));
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","couldnt getinfo");
         return(result);
     }
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
         NSPV_addressutxos(srcaddr,0,0);
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
     {
-        result.push_back(Pair("result","error"));
-        result.push_back(Pair("address",NSPV_utxosresult.coinaddr));
-        result.push_back(Pair("srcaddr",srcaddr));
-        result.push_back(Pair("nodeheight",(int64_t)NSPV_utxosresult.nodeheight));
-        result.push_back(Pair("infoheight",(int64_t)NSPV_inforesult.height));
-        result.push_back(Pair("error","couldnt get addressutxos"));
+        jaddstr(result,"result","error");
+        jaddstr(result,"address",NSPV_utxosresult.coinaddr);
+        jaddstr(result,"srcaddr",srcaddr);
+        jaddnum(result,"nodeheight",NSPV_utxosresult.nodeheight);
+        jaddnum(result,"infoheight",NSPV_inforesult.height);
+        jaddstr(result,"error","couldnt get addressutxos");
         return(result);
     }
     if ( NSPV_utxosresult.total < satoshis+txfee )
     {
-        result.push_back(Pair("result","error"));
-        result.push_back(Pair("error","not enough funds"));
-        result.push_back(Pair("balance",(double)NSPV_utxosresult.total/COIN));
-        result.push_back(Pair("amount",(double)satoshis/COIN));
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","not enough funds");
+        jaddnum(result,"balance",(double)NSPV_utxosresult.total/COIN);
+        jaddnum(result,"amount",(double)satoshis/COIN);
         return(result);
     }
     printf("%s numutxos.%d balance %.8f\n",NSPV_utxosresult.coinaddr,NSPV_utxosresult.numutxos,(double)NSPV_utxosresult.total/COIN);
-    CScript opret; std::string hex; struct NSPV_utxoresp used[NSPV_MAXVINS]; CMutableTransaction mtx; CTransaction tx; int64_t rewardsum=0,interestsum=0;
+    CScript opret; std::string hex; CMutableTransaction mtx; CTransaction tx;
+    struct NSPV_utxoresp used[NSPV_MAXVINS]; int64_t rewardsum=0,interestsum=0;
     mtx.fOverwintered = true;
     mtx.nExpiryHeight = 0;
     mtx.nVersionGroupId = SAPLING_VERSION_GROUP_ID;
@@ -371,8 +374,8 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         mtx.vout.push_back(CTxOut(satoshis,scriptPubKey));
         if ( NSPV_logintime == 0 || time(NULL) > NSPV_logintime+NSPV_AUTOLOGOUT )
         {
-            result.push_back(Pair("result","error"));
-            result.push_back(Pair("error","wif expired"));
+            jaddstr(result,"result","error");
+            jaddstr(result,"error","wif expired");
             return(result);
         }
         hex = NSPV_signtx(rewardsum,interestsum,retcodes,mtx,txfee,opret,used);
@@ -380,38 +383,38 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         {
             char numstr[64];
             sprintf(numstr,"%.8f",(double)interestsum/COIN);
-            result.push_back(Pair("rewards",numstr));
+            jaddstr(result,"rewards",numstr);
             sprintf(numstr,"%.8f",(double)rewardsum/COIN);
-            result.push_back(Pair("validated",numstr));
+            jaddstr(result,"validated",numstr);
         }
         if ( hex.size() > 0 )
         {
             if ( DecodeHexTx(tx,hex) != 0 )
             {
                 TxToJSON(tx,uint256(),result);
-                result.push_back(Pair("result","success"));
-                result.push_back(Pair("hex",hex));
-                result.push_back(Pair("retcodes",retcodes));
+                jaddstr(result,"result","success");
+                jaddstr(result,"hex",hex);
+                jadd(result,"retcodes",retcodes);
             }
             else
             {
-                result.push_back(Pair("result","error"));
-                result.push_back(Pair("error","couldnt decode"));
-                result.push_back(Pair("hex",hex));
+                jaddstr(result,"result","error");
+                jaddstr(result,"error","couldnt decode");
+                jaddstr(result,"hex",hex);
             }
         }
         else
         {
-            result.push_back(Pair("result","error"));
-            result.push_back(Pair("retcodes",retcodes));
-            result.push_back(Pair("error","signing error"));
+            jaddstr(result,"result","error");
+            jadd(result,"retcodes",retcodes);
+            jaddstr(result,"error","signing error");
         }
         return(result);
     }
     else
     {
-        result.push_back(Pair("result","error"));
-        result.push_back(Pair("error","couldnt create tx"));
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","couldnt create tx");
         return(result);
     }
 }
