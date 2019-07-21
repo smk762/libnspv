@@ -546,7 +546,7 @@ char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
         //    sprintf(&hexstr[i << 1],"%02x",cstr->str[i]);
         hexstr[len << 1] = 0;
     }
-    fprintf(stderr,"clen.%d maxlen.%d cmp.%d\n",len,maxlen,(int32_t)cstr->len <= (maxlen>>1)-1)
+    fprintf(stderr,"clen.%d maxlen.%d cmp.%d\n",len,maxlen,(int32_t)cstr->len <= (maxlen>>1)-1);
     return(hexstr);
 }
 
