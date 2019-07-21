@@ -317,7 +317,7 @@ int main(int argc, char* argv[])
         }
 
         //deserialize transaction
-        btc_tx* tx = btc_tx_new();
+        btc_tx* tx = btc_tx_new(1);
         uint8_t* data_bin = btc_malloc(strlen(txhex) / 2 + 1);
         int outlen = 0;
         utils_hex_to_bin(txhex, data_bin, strlen(txhex), &outlen);

@@ -17,6 +17,12 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
+#define NSPV_MAXPACKETSIZE (4096 * 1024)
+#define NSPV_MAXSCRIPTSIZE 10000
+#define NSPV_LOCKTIME_THRESHOLD 500000000
+#define NSPV_KOMODO_ENDOFERA 7777777
+#define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
+
 #include <time.h>
 #include <pthread.h>
 #include <btc/netspv.h>
@@ -31,7 +37,7 @@ typedef union _bits256 bits256;
 #define portable_mutex_lock pthread_mutex_lock
 #define portable_mutex_unlock pthread_mutex_unlock
 #define OS_thread_create pthread_create
-#define NSPV_MAXPACKETSIZE (4096 * 1024)
+
 
 struct rpcrequest_info
 {
@@ -202,18 +208,18 @@ struct NSPV_CCmtxinfo
     struct NSPV_utxoresp used[NSPV_MAXVINS];
 };
 
-extern uint32_t NSPV_logintime,NSPV_lastinfo;
+extern portable_mutex_t NSPV_netmutex;
+extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime,NSPV_lastinfo;
 extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
 bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr);
-extern uint32_t NSPV_STOP_RECEIVED;
 
-int32_t iguana_rwnum(const btc_chainparams *chain,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
-btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind);
-void NSPV_logout(void);
-int32_t NSPV_periodic(btc_node *node);
-void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
-bits256 bits256_doublesha256(uint8_t *data,int32_t datalen);
-int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
-int32_t is_hexstr(char *str,int32_t n);
+extern int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
+extern int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
+extern int32_t NSPV_periodic(btc_node *node);
+extern void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
+extern uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight);
+extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
+extern int32_t is_hexstr(char *str,int32_t n);
+extern int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr,int32_t addlenflag);
 
 #endif // KOMODO_NSPV_DEFSH
