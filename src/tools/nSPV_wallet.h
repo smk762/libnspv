@@ -553,6 +553,9 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         {
             int z;
             for (z=0; z<25; z++)
+                fprintf(stderr,"%02x",rmd160[z]);
+            fprintf(stderr," rmd160\n");
+            for (z=0; z<25; z++)
                 fprintf(stderr,"%02x",scriptPubKey->str[z]&0xff);
             fprintf(stderr," scriptPubKey\n");
         }
