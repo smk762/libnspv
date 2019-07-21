@@ -385,20 +385,25 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     {
         sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
         btc_bits256_to_uint256(hash,sighash);
-        siglen = sizeof(sig);
-        if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
-            sigerr = -1;
-        else
-        {
-            //for (i=0; i<(int32_t)siglen; i++)
-            //    fprintf(stderr,"%02x",sig[i]);
-            vin = btc_tx_vin(mtx,vini);
-            vin->script_sig = cstr_new_sz(siglen+1);
-            memcpy(vin->script_sig->str,sig,siglen);
-            vin->script_sig->str[siglen] = 1;
-            vin->script_sig->len = siglen+1;
-        }
-        //fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:siglen);
+    }
+    else
+    {
+        memset(hash,0,sizeof(hash));
+        btc_tx_sighash(mtx,scriptPubKey,vini,SIGHASH_ALL,utxovalue,SIGVERSION_BASE,hash);
+    }
+    siglen = sizeof(sig);
+    if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
+        sigerr = -1;
+    else
+    {
+        for (i=0; i<(int32_t)siglen; i++)
+            fprintf(stderr,"%02x",sig[i]);
+        vin = btc_tx_vin(mtx,vini);
+        vin->script_sig = cstr_new_sz(siglen+1);
+        memcpy(vin->script_sig->str,sig,siglen);
+        vin->script_sig->str[siglen] = 1;
+        vin->script_sig->len = siglen+1;
+        fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:siglen);
     }
     return(true);
 }
