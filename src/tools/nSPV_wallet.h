@@ -400,7 +400,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
             fprintf(stderr,"%02x",sig[i]);
         vin = btc_tx_vin(mtx,vini);
         vin->script_sig = cstr_new_sz(siglen+2);
-        vin->script_sig->str[0] = siglen;
+        vin->script_sig->str[0] = siglen+1;
         memcpy(vin->script_sig->str+1,sig,siglen);
         vin->script_sig->str[siglen+1] = 1;
         vin->script_sig->len = siglen+2;
