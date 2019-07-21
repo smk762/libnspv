@@ -398,13 +398,14 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     }
     else
     {
-        //for (i=0; i<(int32_t)siglen; i++)
-        //    fprintf(stderr,"%02x",sig[i]);
         vin = btc_tx_vin(mtx,vini);
         vin->script_sig = cstr_new_sz(siglen+1);
         memcpy(vin->script_sig->str,sig,siglen);
         vin->script_sig->str[siglen] = 1;
         vin->script_sig->len = siglen+1;
+        for (i=0; i<(int32_t)vin->script_sig->len; i++)
+            fprintf(stderr,"%02x",vin->script_sig->str[i]&0xff);
+        fprintf(stderr," sig vini.%d\n",vini);
         return(true);
     }
     //fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:siglen);
@@ -475,7 +476,7 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
             {
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return(0);
-            } else fprintf(stderr,"signed vini.%d\n",i);
+            } //else fprintf(stderr,"signed vini.%d\n",i);
         } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent retcode.%d\n",bits256_str(str,prevhash),utxovout,validation); // of course much better handling is needed
         if ( vintx != 0 )
         {
