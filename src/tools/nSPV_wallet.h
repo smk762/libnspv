@@ -48,7 +48,7 @@ bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t
         for (i=0; i<(int32_t)tx->vin->len; i++)
         {
             vin = btc_tx_vin(tx,i);
-            prev_outs_len += iguana_rwbignum(1,&prev_outs[prev_outs_len],sizeof(vin->prevout.hash), (uint8_t *)vin->prevout.hash);
+            prev_outs_len += iguana_rwbignum2(1,&prev_outs[prev_outs_len],sizeof(vin->prevout.hash), (uint8_t *)vin->prevout.hash);
             prev_outs_len += iguana_rwnum(1, &prev_outs[prev_outs_len], sizeof(vin->prevout.n), &vin->prevout.n);
         }
         crypto_generichash_blake2b_salt_personal(hash_prev_outs,32,prev_outs,(uint64_t)prev_outs_len,
@@ -113,7 +113,7 @@ bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t
         len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->valueBalance), &tx->valueBalance);
     len += iguana_rwnum(1, &for_sig_hash[len], sizeof(hashtype), &hashtype);
     vin = btc_tx_vin(tx,vini);
-    len += iguana_rwbignum(1, &for_sig_hash[len], sizeof(vin->prevout.hash), vin->prevout.hash);
+    len += iguana_rwbignum2(1, &for_sig_hash[len], sizeof(vin->prevout.hash), vin->prevout.hash);
     len += iguana_rwnum(1, &for_sig_hash[len], sizeof(vin->prevout.n), &vin->prevout.n);
     
     for_sig_hash[len++] = (uint8_t)spendlen;
