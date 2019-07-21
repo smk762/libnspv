@@ -90,7 +90,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
         NSPV_txproof(client,v,txid,height);
         ptr = &NSPV_txproofresult;
     }
-    if ( ptr->txid != txid )
+    if ( bits256_cmp(ptr->txid,txid) != 0 )
     {
         fprintf(stderr,"txproof error %s != %s\n",bits256_str(str,ptr->txid),bits256_str(str2,txid));
         return(0);
@@ -124,13 +124,13 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
             proof = cstr_new_sz(ptr->txprooflen);
             memcpy(proof->str,ptr->txproof,ptr->txprooflen);
         }
-        NSPV_notarizations(height); // gets the prev and next notarizations
+        NSPV_notarizations(client,height); // gets the prev and next notarizations
         if ( NSPV_inforesult.notarization.height >= height && (NSPV_ntzsresult.prevntz.height == 0 || NSPV_ntzsresult.prevntz.height >= NSPV_ntzsresult.nextntz.height) )
         {
             fprintf(stderr,"issue manual bracket\n");
-            NSPV_notarizations(height-1);
-            NSPV_notarizations(height+1);
-            NSPV_notarizations(height); // gets the prev and next notarizations
+            NSPV_notarizations(client,height-1);
+            NSPV_notarizations(client,height+1);
+            NSPV_notarizations(client,height); // gets the prev and next notarizations
         }
         if ( NSPV_ntzsresult.prevntz.height != 0 && NSPV_ntzsresult.prevntz.height <= NSPV_ntzsresult.nextntz.height )
         {
@@ -139,7 +139,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
             if ( offset >= 0 && height <= NSPV_ntzsresult.nextntz.height )
             {
                 fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
-                NSPV_txidhdrsproof(NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
+                NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
                 if ( (retval= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
