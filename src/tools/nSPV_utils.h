@@ -853,7 +853,7 @@ int32_t getkmdseason(int32_t height)
             return(i+1);
     }
     return(0);
-};
+}
 
 int32_t getacseason(uint32_t timestamp)
 {
@@ -865,7 +865,7 @@ int32_t getacseason(uint32_t timestamp)
             return(i+1);
     }
     return(0);
-};
+}
 
 int32_t komodo_notaries(char *symbol,uint8_t pubkeys[64][33],int32_t height)
 {
@@ -874,12 +874,12 @@ int32_t komodo_notaries(char *symbol,uint8_t pubkeys[64][33],int32_t height)
     isKMD = (strcmp(symbol,"KMD") == 0);
     if ( isKMD != 0 )
     {
-        if ( height >= KOMODO_NOTARIES_HARDCODED )
+        if ( height >= 180000 )
             kmd_season = getkmdseason(height);
     }
     else
     {
-        timestamp = NSPV_blocktime(ntzheight);
+        timestamp = NSPV_blocktime(height);
         kmd_season = getacseason(timestamp);
     }
     if ( kmd_season != 0 )
@@ -896,16 +896,16 @@ int32_t komodo_notaries(char *symbol,uint8_t pubkeys[64][33],int32_t height)
     return(-1);
 }
 
-uint256 NSPV_opretextract(int32_t *heightp,uint256 *blockhashp,char *symbol,cstring *opret)
+bits256 NSPV_opretextract(int32_t *heightp,uint256 *blockhashp,char *symbol,cstring *opret)
 {
-    uint256 desttxid; int32_t i,offset=2; char str[65];
+    bits256 desttxid; int32_t i,offset=2; char str[65];
     if ( opret != 0 )
     {
         iguana_rwnum(0,(uint8_t *)&opret->str[offset + 32],sizeof(*heightp),heightp);
         for (i=0; i<32; i++)
-            ((uint8_t *)blockhashp)[i] = opret->str[offset + i];
+            ((uint8_t *)blockhashp)[31 - i] = opret->str[offset + i];
         for (i=0; i<32; i++)
-            ((uint8_t *)&desttxid)[i] = opret->str[offset + 4 + 32 + i];
+            ((uint8_t *)&desttxid)[31 - i] = opret->str[offset + 4 + 32 + i];
         fprintf(stderr," ntzht.%d %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)opret->len);
         return(desttxid);
     } else return(zeroid);
