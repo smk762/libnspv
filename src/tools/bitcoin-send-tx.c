@@ -44,6 +44,8 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <nSPV_defs.h>
+portable_mutex_t NSPV_netmutex;
 
 static struct option long_options[] =
     {
@@ -136,7 +138,7 @@ int main(int argc, char* argv[])
     int outlen = 0;
     utils_hex_to_bin(data, data_bin, strlen(data), &outlen);
 
-    btc_tx* tx = btc_tx_new();
+    btc_tx* tx = btc_tx_new(1);
     if (btc_tx_deserialize(data_bin, outlen, tx, NULL, true)) {
         broadcast_tx(chain, tx, ips, maxnodes, timeout, debug);
     } else {

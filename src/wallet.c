@@ -113,7 +113,7 @@ btc_wtx* btc_wallet_wtx_new()
     btc_wtx* wtx;
     wtx = btc_calloc(1, sizeof(*wtx));
     wtx->height = 0;
-    wtx->tx = btc_tx_new();
+    wtx->tx = btc_tx_new(1);
 
     return wtx;
 }

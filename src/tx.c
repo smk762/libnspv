@@ -128,23 +128,27 @@ btc_tx_out* btc_tx_out_new()
 
 void btc_tx_free(btc_tx* tx)
 {
-    if (tx->vin)
-        vector_free(tx->vin, true);
-
-    if (tx->vout)
-        vector_free(tx->vout, true);
-
-    btc_free(tx);
+    if ( tx != 0 )
+    {
+        if (tx->vin)
+            vector_free(tx->vin, true);
+        
+        if (tx->vout)
+            vector_free(tx->vout, true);
+        
+        btc_free(tx);
+    }
 }
 
 
-btc_tx* btc_tx_new()
+btc_tx* btc_tx_new(int32_t version)
 {
     btc_tx* tx;
     tx = btc_calloc(1, sizeof(*tx));
     tx->vin = vector_new(8, btc_tx_in_free_cb);
     tx->vout = vector_new(8, btc_tx_out_free_cb);
-    tx->version = 1;
+    if ( (tx->version= version) == SAPLING_TX_VERSION )
+        tx->nVersionGroupId = SAPLING_VERSION_GROUP_ID;
     tx->locktime = 0;
     return tx;
 }
@@ -179,7 +183,8 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
 
     //tx needs to be initialized
     deser_s32(&tx->version, &buf);
-
+    if ( tx->version == SAPLING_TX_VERSION )
+        deser_u32(&tx->nVersionGroupId, &buf);
     uint32_t vlen;
     if (!deser_varlen(&vlen, &buf))
         return false;
@@ -244,6 +249,21 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
 
     if (!deser_u32(&tx->locktime, &buf))
         return false;
+    if ( tx->version == SAPLING_TX_VERSION )
+    {
+        uint32_t v0,v1,v2;
+        if (!deser_u32(&tx->nExpiryHeight, &buf))
+            return false;
+        if (!deser_s64(&tx->valueBalance, &buf))
+            return false;
+        if (!deser_varlen(&v0, &buf))
+            return false;
+        if (!deser_varlen(&v1, &buf))
+            return false;
+        if (!deser_varlen(&v2, &buf))
+            return false;
+        //fprintf(stderr,"deser sapling inlen.%d vs buf.len %d (%d %d %d)\n",(int32_t)inlen,(int32_t)buf.len,v0,v1,v2);
+    }
 
     if (consumed_length)
         *consumed_length = inlen - buf.len;
@@ -278,6 +298,8 @@ btc_bool btc_tx_has_witness(const btc_tx *tx)
 void btc_tx_serialize(cstring* s, const btc_tx* tx, btc_bool allow_witness)
 {
     ser_s32(s, tx->version);
+    if ( tx->version == SAPLING_TX_VERSION )
+        ser_u32(s,tx->nVersionGroupId);
     uint8_t flags = 0;
     // Consistency check
     if (allow_witness) {
@@ -334,6 +356,14 @@ void btc_tx_serialize(cstring* s, const btc_tx* tx, btc_bool allow_witness)
     }
 
     ser_u32(s, tx->locktime);
+    if ( tx->version == SAPLING_TX_VERSION )
+    {
+        ser_u32(s, tx->nExpiryHeight);
+        ser_s64(s, tx->valueBalance);
+        ser_varlen(s,0);
+        ser_varlen(s,0);
+        ser_varlen(s,0);
+    }
 }
 
 void btc_tx_hash(const btc_tx* tx, uint256 hashout)
@@ -485,7 +515,7 @@ btc_bool btc_tx_sighash(const btc_tx* tx_to, const cstring* fromPubKey, unsigned
 
     btc_bool ret = true;
 
-    btc_tx* tx_tmp = btc_tx_new();
+    btc_tx* tx_tmp = btc_tx_new(1);
     btc_tx_copy(tx_tmp, tx_to);
 
     cstring* s = NULL;

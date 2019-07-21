@@ -850,10 +850,10 @@ void test_tx_serialization()
         int outlen;
         utils_hex_to_bin(one_test->hextx, tx_data, strlen(one_test->hextx), &outlen);
 
-        btc_tx* tx = btc_tx_new();
+        btc_tx* tx = btc_tx_new(1);
         btc_tx_deserialize(tx_data, outlen, tx, NULL, true);
 
-        btc_tx* tx_copy = btc_tx_new();
+        btc_tx* tx_copy = btc_tx_new(1);
         btc_tx_copy(tx_copy, tx);
 
 
@@ -896,7 +896,7 @@ void test_tx_sighash_ext()
         int outlen_sighash = 0;
         uint8_t tx_data_sighash[sizeof(txvalid_sighash[i].sertx) / 2];
         utils_hex_to_bin(txvalid_sighash[i].sertx, tx_data_sighash, strlen(txvalid_sighash[i].sertx), &outlen_sighash);
-        btc_tx* tx_sighash = btc_tx_new();
+        btc_tx* tx_sighash = btc_tx_new(1);
         btc_tx_deserialize(tx_data_sighash, outlen_sighash, tx_sighash, NULL, true);
 
         uint8_t script_data[strlen(txvalid_sighash[i].script)];
@@ -929,7 +929,7 @@ void test_tx_sighash()
         int outlen;
         utils_hex_to_bin(test->txhex, tx_data, strlen(test->txhex), &outlen);
 
-        btc_tx* tx = btc_tx_new();
+        btc_tx* tx = btc_tx_new(1);
         btc_tx_deserialize(tx_data, outlen, tx, NULL, true);
 
         uint8_t script_data[strlen(test->script) / 2];
@@ -969,7 +969,7 @@ void test_tx_negative_version()
     int outlen;
     utils_hex_to_bin(txhex, tx_data, strlen(txhex), &outlen);
 
-    btc_tx* tx = btc_tx_new();
+    btc_tx* tx = btc_tx_new(1);
     btc_tx_deserialize(tx_data, outlen, tx, NULL, true);
     u_assert_int_eq(versionGoal, tx->version);
 
@@ -1064,7 +1064,7 @@ void test_script_parse()
     memcpy(&pubkeytx.pubkey, pubkeydat, 33);
     pubkeytx.compressed = true;
 
-    btc_tx* tx = btc_tx_new();
+    btc_tx* tx = btc_tx_new(1);
     btc_tx_add_p2pkh_out(tx, 1000000000, &pubkeytx);
 
     cstring* txser = cstr_new_sz(1024);
@@ -1152,7 +1152,7 @@ void test_script_parse()
     btc_pubkey_init(&pubkeytx_rev);
     btc_pubkey_from_key(&key, &pubkeytx_rev);
 
-    tx = btc_tx_new();
+    tx = btc_tx_new(1);
     btc_tx_add_data_out(tx, 100000, sigcmp, outlencmp); //0.001 BTC
     btc_tx_add_p2pkh_out(tx, 10000, &pubkeytx_rev);
 
@@ -1193,7 +1193,7 @@ void test_invalid_tx_deser()
     int outlen;
     utils_hex_to_bin(txstr, tx_data, strlen(txstr), &outlen);
 
-    btc_tx* tx = btc_tx_new();
+    btc_tx* tx = btc_tx_new(1);
     u_assert_int_eq(btc_tx_deserialize(tx_data, outlen, tx, NULL, true), false);
     btc_tx_free(tx);
 
@@ -1201,7 +1201,7 @@ void test_invalid_tx_deser()
     uint8_t tx_data_fo[sizeof(failed_output) / 2+1];
     utils_hex_to_bin(failed_output, tx_data_fo, strlen(failed_output), &outlen);
 
-    btc_tx* tx_o = btc_tx_new();
+    btc_tx* tx_o = btc_tx_new(1);
     u_assert_int_eq(btc_tx_deserialize(tx_data, outlen, tx_o, NULL, true), false);
     btc_tx_free(tx_o);
 
@@ -1235,7 +1235,7 @@ void test_tx_sign_p2sh_p2wpkh() {
     btc_privkey_init(&pkey);
     btc_privkey_decode_wif(pkey_wif, &btc_chainparams_regtest, &pkey);
 
-    btc_tx* tx = btc_tx_new();
+    btc_tx* tx = btc_tx_new(1);
     btc_tx_deserialize(tx_data, outlen, tx, NULL, true);
 
 
@@ -1357,7 +1357,7 @@ void test_tx_sign_p2pkh_i2(btc_tx *tx) {
 
 void test_tx_sign() {
     test_tx_sign_p2sh_p2wpkh();
-    btc_tx* tx = btc_tx_new();
+    btc_tx* tx = btc_tx_new(1);
     test_tx_sign_p2pkh(tx);
     test_tx_sign_p2pkh_i2(tx);
     btc_tx_free(tx);
