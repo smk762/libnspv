@@ -227,8 +227,10 @@ int main(int argc, char* argv[])
 }
 
 
+#include <nSPV_defs.h>
 // stubs for link compatibility
 uint32_t NSPV_logintime,NSPV_lastinfo;
+portable_mutex_t NSPV_netmutex;
 
 int32_t NSPV_periodic(btc_node *node) { return(0); }
 /*void NSPV_logout() {}

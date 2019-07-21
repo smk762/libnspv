@@ -15,7 +15,9 @@
 #include <btc/blockchain.h>
 
 #include "utest.h"
+#include <nSPV_defs.h>
 
+portable_mutex_t NSPV_netmutex;
 uint32_t NSPV_logintime,NSPV_lastinfo;
 int32_t NSPV_periodic(btc_node *node) { return(0); }
 /*void NSPV_logout() {}
