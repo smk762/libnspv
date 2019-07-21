@@ -20,7 +20,7 @@
 #define MAX_TX_SIZE_BEFORE_SAPLING 100000
 #define MAX_TX_SIZE_AFTER_SAPLING (2 * MAX_TX_SIZE_BEFORE_SAPLING)
 static const bits256 zeroid;
-
+portable_mutex_t NSPV_netmutex;
 
 btc_chainparams kmd_chainparams_main =
 {

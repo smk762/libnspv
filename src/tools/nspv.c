@@ -138,6 +138,7 @@ int main(int argc, char* argv[])
     char* dbfile = 0;
     const btc_chainparams *chain = &nspv_chainparams_main;
     portable_mutex_init(&NSPV_commandmutex);
+    portable_mutex_init(&NSPV_netmutex);
     if ( argc > 1 )
     {
         if ( strcmp(argv[1],"KMD") == 0 )
