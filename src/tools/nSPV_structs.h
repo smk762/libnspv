@@ -68,6 +68,22 @@ int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *
     return(len);
 }
 
+int32_t iguana_rwbignum2(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp)
+{
+    int32_t i;
+    if ( rwflag == 0 )
+    {
+        for (i=0; i<len; i++)
+            endianedp[i] = serialized[i];
+    }
+    else
+    {
+        for (i=0; i<len; i++)
+            serialized[i] = endianedp[i];
+    }
+    return(len);
+}
+
 int32_t iguana_rwbuf(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *buf)
 {
     if ( rwflag != 0 )

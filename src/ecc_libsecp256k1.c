@@ -104,10 +104,15 @@ btc_bool btc_ecc_sign(const uint8_t* private_key, const uint256 hash, unsigned c
 
     secp256k1_ecdsa_signature sig;
     if (!secp256k1_ecdsa_sign(secp256k1_ctx, &sig, hash, private_key, secp256k1_nonce_function_rfc6979, NULL))
+    {
+        fprintf(stderr,"sigerr A\n");
         return 0;
-
+    }
     if (!secp256k1_ecdsa_signature_serialize_der(secp256k1_ctx, sigder, outlen, &sig))
+    {
+        fprintf(stderr,"sigerr B\n");
         return 0;
+    }
 
     return 1;
 }

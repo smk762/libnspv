@@ -116,7 +116,6 @@ void spv_sync_completed(btc_spv_client* client) {
 /*
  Todo:
  
- signature
  -merkleproof
  addr message
  JSON chainparams, maybe use coins repo

@@ -330,7 +330,7 @@ uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight)
         {
             timestamp = NSPV_inforesult.H.nTime;
             NSPV_inforesult = old;
-            fprintf(stderr,"NSPV_blocktime ht.%d -> t%u\n",hdrheight,timestamp);
+            //fprintf(stderr,"NSPV_blocktime ht.%d -> t%u\n",hdrheight,timestamp);
             return(timestamp);
         }
     }

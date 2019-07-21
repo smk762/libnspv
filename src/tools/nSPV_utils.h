@@ -465,6 +465,14 @@ void *OS_filestr(long *allocsizep,char *_fname)
     return(retptr);
 }
 
+bits256 bits256_rev(bits256 hash)
+{
+    bits256 rev; int32_t i;
+    for (i=0; i<32; i++)
+        rev.bytes[i] = hash.bytes[31 - i];
+    return(rev);
+}
+
 bits256 btc_uint256_to_bits256(uint256 hash256)
 {
     bits256 hash;
@@ -938,32 +946,34 @@ int32_t bitweight(uint64_t x)
 
 int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
 {
-    int32_t vini; uint64_t mask = 0; btc_tx_in *vin;
+    int32_t vini,j; btc_pubkey pubkeys[64]; uint64_t mask = 0; btc_tx_in *vin; bits256 sighash; uint256 hash; uint8_t script[35];
     if ( tx == 0 || tx->vin == 0 )
         return(-1);
+    memset(pubkeys,0,sizeof(pubkeys));
+    for (j=0; j<64; j++)
+    {
+        memcpy(pubkeys[j].pubkey,elected[j],BTC_ECKEY_COMPRESSED_LENGTH);
+        pubkeys[j].compressed = true;
+    }
+    script[0] = 33;
+    script[34] = OP_CHECKSIG;
     for (vini=0; vini<(int32_t)tx->vin->len; vini++)
     {
         if ( (vin= btc_tx_vin(tx,vini)) == 0 )
             return(-vini-2);
-        /*CScript::const_iterator pc = tx.vin[vini].scriptSig.begin();
-        if ( tx.vin[vini].scriptSig.GetPushedData(pc,vData) != 0 )
+        for (j=0; j<64; j++)
         {
-            vData[0].pop_back();
-            for (j=0; j<64; j++)
+            if ( ((1LL << j) & mask) != 0 )
+                continue;
+            memcpy(script+1,elected[j],33);
+            sighash = NSPV_sapling_sighash(tx,vini,10000,script,35);
+            btc_bits256_to_uint256(hash,sighash);
+            if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str,vin->script_sig->len) > 0 )
             {
-                if ( ((1LL << j) & mask) != 0 )
-                    continue;
-                char coinaddr[64]; Getscriptaddress(coinaddr,scriptPubKeys[j]);
-                NSPV_SignTx(mtx,vini,10000,scriptPubKeys[j],nTime); // sets SIG_TXHASH
-                if ( (retval= pubkeys[j].Verify(SIG_TXHASH,vData[0])) != 0 )
-                {
-                    fprintf(stderr,"(vini.%d %s.%d) ",vini,coinaddr,retval);
-                    mask |= (1LL << j);
-                    break;
-                }
+                mask |= (1LL << j);
+                break;
             }
-            fprintf(stderr," verified %llx\n",(long long)mask);
-        }*/
+        }
     }
     return(bitweight(mask));
 }
