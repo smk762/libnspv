@@ -551,7 +551,7 @@ cstring *btc_tx_to_cstr(btc_tx *tx)
     hex = cstr_new_sz(txser->len*2 + 1);
     btc_cstr_to_hex(hex->str,hex->len,txser);
     cstr_free(txser,1);
-    fprintf("tx to (%s) len.%d\n",hex->str,(int32_t)hex->len);
+    fprintf(stderr,"tx to (%s) len.%d\n",hex->str,(int32_t)hex->len);
     return(hex);
 }
 
