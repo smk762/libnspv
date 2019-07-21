@@ -42,12 +42,12 @@ bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t
     len = iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->version), &tx->version);
     len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->nVersionGroupId), &tx->nVersionGroupId);
     {
-        uint8_t prev_outs[1000],hash_prev_outs[32]; int32_t ,prev_outs_len = 0;
+        uint8_t prev_outs[1000],hash_prev_outs[32]; int32_t prev_outs_len = 0;
         for (i=0; i<(int32_t)tx->vin->len; i++)
         {
             vin = btc_tx_vin(tx,i);
             prev_outs_len += iguana_rwbignum(1,&prev_outs[prev_outs_len],sizeof(vin->prevout.hash), (uint8_t *)vin->prevout.hash);
-            prev_outs_len += iguana_rwnum(1, &prev_outs[prev_outs_len], sizeof(vin->prevouut.n), &vin->prevout.n);
+            prev_outs_len += iguana_rwnum(1, &prev_outs[prev_outs_len], sizeof(vin->prevout.n), &vin->prevout.n);
         }
         crypto_generichash_blake2b_salt_personal(hash_prev_outs,32,prev_outs,(uint64_t)prev_outs_len,
                                                  NULL,0,NULL,ZCASH_PREVOUTS_HASH_PERSONALIZATION);
@@ -381,15 +381,15 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     }
     if ( branchid != 0 )
     {
-        sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,scriptPubKey->str,scriptPubKey->len);
+        sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
         btc_bits256_to_uint256(hash,sighash);
-        if ( btc_key_sign_hash(&NSPV_key,hash,sig,siglen) == 0 )
+        if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
             sigerr = -1;
         else
         {
-            for (i=0; i<siglen; i++)
+            for (i=0; i<(int32_t)siglen; i++)
                 fprintf(stderr,"%02x",sig[i]);
-            vin = btc_tx_vin(tx,vini);
+            vin = btc_tx_vin(mtx,vini);
             vin->script_sig = cstr_new_sz(siglen);
             memcpy(vin->script_sig->str,sig,siglen);
         }
