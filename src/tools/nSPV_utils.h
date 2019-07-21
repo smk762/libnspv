@@ -524,6 +524,16 @@ char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
     return(hexstr);
 }
 
+cstring *btc_tx_to_cstr(btc_tx *tx)
+{
+    cstring *hex,*txser = cstr_new_sz(1024);
+    btc_tx_serialize(txser,tx,false);
+    hex = cstr_new_sz(txser->len*2 + 1);
+    btc_cstr_to_hex(hex->str,hex->len,txser);
+    cstr_free(txser,1);
+    return(hex);
+}
+
 bits256 btc_uint256_to_bits256(uint256 hash256)
 {
     bits256 hash;
@@ -534,16 +544,6 @@ bits256 btc_uint256_to_bits256(uint256 hash256)
 void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
 {
     iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
-}
-
-cstring *btc_tx_to_cstr(btc_tx *tx)
-{
-    cstring *hex,*txser = cstr_new_sz(1024);
-    btc_tx_serialize(txser,tx,false);
-    hex = cstr_new_sz(txser->len*2 + 1);
-    btc_cstr_to_hex(hex->str,hex->len,txser->str);
-    cstr_free(txser);
-    return(hex);
 }
 
 bits256 NSPV_tx_hash(btc_tx *tx)

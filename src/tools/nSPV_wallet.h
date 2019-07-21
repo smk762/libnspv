@@ -335,7 +335,7 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
                 fprintf(stderr,"vintx vout mismatch %d != %d\n",utxovout,used[i].vout);
                 return(0);
             }
-            else if ( NSPV_SignTx(mtx,i,vout->value,vout->script_pubKey,0) == 0 )
+            else if ( NSPV_SignTx(mtx,i,vout->value,vout->script_pubkey,0) == 0 )
             {
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return(0);
@@ -408,8 +408,8 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
     }
     else
     {
-        scriptPubkey = cstr_new_sz(25);
-        btc_script_build_p2pkh(scriptPubkey,rmd160);
+        scriptPubKey = cstr_new_sz(25);
+        btc_script_build_p2pkh(scriptPubKey,rmd160);
     }
     printf("%s numutxos.%d balance %.8f\n",NSPV_utxosresult.coinaddr,NSPV_utxosresult.numutxos,(double)NSPV_utxosresult.total/COIN);
     mtx = btc_tx_new(client->chainparams->komodo != 0 ? SAPLING_TX_VERSION : 1);
@@ -427,7 +427,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
             btc_tx_free(mtx);
             return(result);
         }
-        hex = NSPV_signtx(client,isKMD,rewardsum,interestsum,retcodes,mtx,txfee,used);
+        hex = NSPV_signtx(client,isKMD,&rewardsum,&interestsum,retcodes,mtx,txfee,used);
         if ( isKMD != 0 )
         {
             char numstr[64];
@@ -438,7 +438,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         }
         if ( hex != 0 && hex->len > 0 )
         {
-            if ( (tx= btc_tx_decodehex(hex->str) != 0 )
+            if ( (tx= btc_tx_decodehex(hex->str)) != 0 )
             {
                 jadd(result,"tx",btc_tx_to_json(tx));
                 jaddstr(result,"result","success");
