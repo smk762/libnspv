@@ -546,11 +546,13 @@ char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
 
 cstring *btc_tx_to_cstr(btc_tx *tx)
 {
-    cstring *hex,*txser = cstr_new_sz(1024);
+    int32_t hexlen; cstring *hex,*txser = cstr_new_sz(1024);
     btc_tx_serialize(txser,tx,false);
-    hex = cstr_new_sz(txser->len*2 + 1);
+    hexlen = txser->len*2;
+    hex = cstr_new_sz(hexlen+1);
+    hex->len = hexlen;
     fprintf(stderr,"tx[%d] to (%s) len.%d\n",(int32_t)txser->len,hex->str,(int32_t)hex->len);
-    btc_cstr_to_hex(hex->str,txser->len*2 + 1,txser);
+    btc_cstr_to_hex(hex->str,txser->len,txser);
     cstr_free(txser,1);
     return(hex);
 }
