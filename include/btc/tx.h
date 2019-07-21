@@ -35,6 +35,7 @@
 #include "vector.h"
 
 #define SAPLING_TX_VERSION ((1<<31) | 4)
+#define SAPLING_VERSION_GROUP_ID 0x892F2085
 
 LIBBTC_BEGIN_DECL
 

@@ -147,7 +147,8 @@ btc_tx* btc_tx_new(int32_t version)
     tx = btc_calloc(1, sizeof(*tx));
     tx->vin = vector_new(8, btc_tx_in_free_cb);
     tx->vout = vector_new(8, btc_tx_out_free_cb);
-    tx->version = version;
+    if ( (tx->version= version) == SAPLING_VERSION )
+        tx->nVersionGroupId = SAPLING_VERSION_GROUP_ID;
     tx->locktime = 0;
     return tx;
 }
@@ -250,11 +251,18 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
         return false;
     if ( tx->version == SAPLING_TX_VERSION )
     {
+        uint32_t v0,v1,v2;
         if (!deser_u32(&tx->nExpiryHeight, &buf))
             return false;
         if (!deser_s64(&tx->valueBalance, &buf))
             return false;
-        fprintf(stderr,"deser sapling inlen.%d vs buf.len %d\n",(int32_t)inlen,(int32_t)buf.len);
+        if (!deser_varlen(&v0, &buf))
+            return false;
+        if (!deser_varlen(&v1, &buf))
+            return false;
+        if (!deser_varlen(&v2, &buf))
+            return false;
+        fprintf(stderr,"deser sapling inlen.%d vs buf.len %d (%d %d %d)\n",(int32_t)inlen,(int32_t)buf.len,v0,v1,v2);
     }
 
     if (consumed_length)
@@ -290,6 +298,8 @@ btc_bool btc_tx_has_witness(const btc_tx *tx)
 void btc_tx_serialize(cstring* s, const btc_tx* tx, btc_bool allow_witness)
 {
     ser_s32(s, tx->version);
+    if ( tx->version == SAPLING_TX_VERSION )
+        ser_u32(s,tx->nVersionGroupId);
     uint8_t flags = 0;
     // Consistency check
     if (allow_witness) {
@@ -350,6 +360,9 @@ void btc_tx_serialize(cstring* s, const btc_tx* tx, btc_bool allow_witness)
     {
         ser_u32(s, tx->nExpiryHeight);
         ser_s64(s, tx->valueBalance);
+        ser_varlen(s,0);
+        ser_varlen(s,0);
+        ser_varlen(s,0);
     }
 }
 
