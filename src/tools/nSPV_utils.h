@@ -945,7 +945,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
     for (j=0; j<64; j++)
     {
         memcpy(pubkeys[j].pubkey,elected[j],BTC_ECKEY_COMPRESSED_LENGTH);
-        pubkey->compressed = true;
+        pubkeys[j].compressed = true;
     }
     script[0] = 33;
     script[34] = OP_CHECKSIG;
