@@ -243,7 +243,7 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
         }
         //fprintf(stderr,"i.%d ind.%d abovei.%d belowi.%d n.%d\n",i,ind,abovei,belowi,n);
         up = &utxos[ind];
-        mtx.vin.push_back(CTxIn(up->txid,up->vout,CScript()));
+        btc_tx_add_txin(mtx,up->txid,up->vout);
         used[i] = *up;
         totalinputs += up->satoshis;
         remains -= up->satoshis;

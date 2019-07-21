@@ -475,6 +475,26 @@ void *OS_filestr(long *allocsizep,char *_fname)
     return(retptr);
 }
 
+bits256 btc_uint256_to_bits256(uint256 hash256)
+{
+    bits256 hash;
+    iguana_rwbignum(1,hash.bytes,sizeof(hash),(uint8_t *)hash256);
+    return(hash);
+}
+
+void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
+{
+    iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
+}
+
+void btc_tx_add_txin(btc_tx *mtx,bits256 txid,int32_t vout)
+{
+    btc_tx_in *vin = btc_tx_in_new();
+    btc_bits256_to_uint256(vin->prevout.hash,txid);
+    vin->prevout.n = vout;
+    vector_add(mtx->vin,vin);
+}
+    
 void btc_tx_add_txout(btc_tx *mtx,uint64_t satoshis,cstring *scriptPubKey)
 {
     btc_tx_out *vout = btc_tx_out_new();
@@ -532,18 +552,6 @@ cstring *btc_tx_to_cstr(btc_tx *tx)
     btc_cstr_to_hex(hex->str,hex->len,txser);
     cstr_free(txser,1);
     return(hex);
-}
-
-bits256 btc_uint256_to_bits256(uint256 hash256)
-{
-    bits256 hash;
-    iguana_rwbignum(1,hash.bytes,sizeof(hash),(uint8_t *)hash256);
-    return(hash);
-}
-
-void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
-{
-    iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
 }
 
 bits256 NSPV_tx_hash(btc_tx *tx)
