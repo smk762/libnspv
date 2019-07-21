@@ -654,6 +654,7 @@ cJSON *NSPV_ntzsresp_json(struct NSPV_ntzsresp *ptr)
 cJSON *NSPV_ntzsproof_json(struct NSPV_ntzsproofresp *ptr)
 {
     cJSON *result = cJSON_CreateObject();
+    fprintf(stderr,"NSPV_ntzsproof_json\n");
     jaddstr(result,"result","success");
     jaddnum(result,"prevht",ptr->common.prevht);
     jaddnum(result,"nextht",ptr->common.nextht);
@@ -666,6 +667,7 @@ cJSON *NSPV_ntzsproof_json(struct NSPV_ntzsproofresp *ptr)
     jaddnum(result,"numhdrs",ptr->common.numhdrs);
     jadd(result,"headers",NSPV_headers_json(ptr->common.hdrs,ptr->common.numhdrs,ptr->common.prevht));
     jaddstr(result,"lastpeer",NSPV_lastpeer);
+    fprintf(stderr,"end NSPV_ntzsproof_json\n");
     return(result);
 }
 

@@ -530,16 +530,19 @@ cJSON *NSPV_notarizations(btc_spv_client *client,int32_t reqheight)
 cJSON *NSPV_txidhdrsproof(btc_spv_client *client,bits256 prevtxid,bits256 nexttxid)
 {
     uint8_t msg[64]; int32_t i,iter,len = 1; struct NSPV_ntzsproofresp P,*ptr;
+    fprintf(stderr,"hdrsproof\n");
     if ( (ptr= NSPV_ntzsproof_find(client->chainparams,prevtxid,nexttxid)) != 0 )
     {
         NSPV_ntzsproofresp_purge(client->chainparams,&NSPV_ntzsproofresult);
         NSPV_ntzsproofresp_copy(client->chainparams,&NSPV_ntzsproofresult,ptr);
         return(NSPV_ntzsproof_json(ptr));
     }
+    fprintf(stderr,"hdrsproof 2\n");
     NSPV_ntzsproofresp_purge(client->chainparams,&NSPV_ntzsproofresult);
     msg[len++] = NSPV_NTZSPROOF;
     len += iguana_rwbignum(1,&msg[len],sizeof(prevtxid),(uint8_t *)&prevtxid);
     len += iguana_rwbignum(1,&msg[len],sizeof(nexttxid),(uint8_t *)&nexttxid);
+    fprintf(stderr,"hdrsproof 3\n");
     for (iter=0; iter<3; iter++);
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
