@@ -385,6 +385,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     {
         sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
         btc_bits256_to_uint256(hash,sighash);
+        siglen = sizeof(sig);
         if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
             sigerr = -1;
         else
