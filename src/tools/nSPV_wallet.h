@@ -17,6 +17,117 @@
 #ifndef KOMODO_NSPVWALLET_H
 #define KOMODO_NSPVWALLET_H
 
+#include <sodium/crypto_generichash_blake2b.h>
+const unsigned char ZCASH_PREVOUTS_HASH_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','P','r','e','v','o','u','t','H','a','s','h' };
+const unsigned char ZCASH_SEQUENCE_HASH_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','S','e','q','u','e','n','c','H','a','s','h' };
+const unsigned char ZCASH_OUTPUTS_HASH_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','O','u','t','p','u','t','s','H','a','s','h' };
+const unsigned char ZCASH_JOINSPLITS_HASH_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','J','S','p','l','i','t','s','H','a','s','h' };
+const unsigned char ZCASH_SHIELDED_SPENDS_HASH_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','S','S','p','e','n','d','s','H','a','s','h' };
+const unsigned char ZCASH_SHIELDED_OUTPUTS_HASH_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','S','O','u','t','p','u','t','H','a','s','h' };
+const unsigned char ZCASH_SIG_HASH_SAPLING_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','S','i','g','H','a','s','h', '\xBB', '\x09', '\xB8', '\x76' };
+const unsigned char ZCASH_SIG_HASH_OVERWINTER_PERSONALIZATION[16] =
+{ 'Z','c','a','s','h','S','i','g','H','a','s','h', '\x19', '\x1B', '\xA8', '\x5B' };
+
+bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen)
+{
+    // sapling tx sighash preimage
+    uint8_t for_sig_hash[1000]; bits256 sigtxid; int32_t hashtype,version,i,len=0; btc_tx_in *vin; btc_tx_out *vout;
+    hashtype = SIGHASH_ALL;
+    version = (tx->version & 0x7fffffff);
+    len = iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->version), &tx->version);
+    len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->nVersionGroupId), &tx->nVersionGroupId);
+    {
+        uint8_t prev_outs[1000],hash_prev_outs[32]; int32_t prev_outs_len = 0;
+        for (i=0; i<(int32_t)tx->vin->len; i++)
+        {
+            vin = btc_tx_vin(tx,i);
+            prev_outs_len += iguana_rwbignum2(1,&prev_outs[prev_outs_len],sizeof(vin->prevout.hash), (uint8_t *)vin->prevout.hash);
+            prev_outs_len += iguana_rwnum(1, &prev_outs[prev_outs_len], sizeof(vin->prevout.n), &vin->prevout.n);
+        }
+        crypto_generichash_blake2b_salt_personal(hash_prev_outs,32,prev_outs,(uint64_t)prev_outs_len,
+                                                 NULL,0,NULL,ZCASH_PREVOUTS_HASH_PERSONALIZATION);
+        memcpy(&for_sig_hash[len], hash_prev_outs, 32);
+        len += 32;
+    }
+    {
+        uint8_t sequence[1000], sequence_hash[32];
+        int32_t sequence_len = 0;
+        for (i=0; i<(int32_t)tx->vin->len; i++)
+        {
+            vin = btc_tx_vin(tx,i);
+            sequence_len += iguana_rwnum(1, &sequence[sequence_len], sizeof(vin->sequence),&vin->sequence);
+        }
+        crypto_generichash_blake2b_salt_personal(sequence_hash,32,sequence,(uint64_t)sequence_len,
+                                                 NULL,0,NULL,ZCASH_SEQUENCE_HASH_PERSONALIZATION);
+        memcpy(&for_sig_hash[len],sequence_hash,32);
+        len += 32;
+    }
+    // assumes script_pubkey < 256 bytes
+    {
+        uint8_t *outputs, hash_outputs[32]; int32_t outputs_len = 0;
+        for (i=0; i<(int32_t)tx->vout->len; i++)
+        {
+            vout = btc_tx_vout(tx,i);
+            outputs_len += sizeof(vout->value);
+            outputs_len++;
+            outputs_len += (uint8_t)vout->script_pubkey->len;
+        } // calc size for outputs buffer
+        outputs = malloc(outputs_len);
+        outputs_len = 0;
+        for (i=0; i<(int32_t)tx->vout->len; i++)
+        {
+            vout = btc_tx_vout(tx,i);
+            outputs_len += iguana_rwnum(1, &outputs[outputs_len], sizeof(vout->value), &vout->value);
+            outputs[outputs_len++] = (uint8_t)vout->script_pubkey->len;
+            memcpy(&outputs[outputs_len],vout->script_pubkey->str,(uint8_t)vout->script_pubkey->len);
+            outputs_len += (uint8_t)vout->script_pubkey->len;
+        }
+        crypto_generichash_blake2b_salt_personal(hash_outputs,32,outputs,(uint64_t)outputs_len,
+                                                 NULL,0,NULL,ZCASH_OUTPUTS_HASH_PERSONALIZATION);
+        memcpy(&for_sig_hash[len],hash_outputs,32);
+        len += 32;
+        free(outputs);
+    }
+    // no join splits, fill the hashJoinSplits with 32 zeros
+    memset(&for_sig_hash[len], 0, 32);
+    len += 32;
+    if ( version > 3 )
+    {
+        // no shielded spends, fill the hashShieldedSpends with 32 zeros
+        memset(&for_sig_hash[len], 0, 32);
+        len += 32;
+        // no shielded outputs, fill the hashShieldedOutputs with 32 zeros
+        memset(&for_sig_hash[len], 0, 32);
+        len += 32;
+    }
+    len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->locktime), &tx->locktime);
+    len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->nExpiryHeight), &tx->nExpiryHeight);
+    if (version > 3)
+        len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->valueBalance), &tx->valueBalance);
+    len += iguana_rwnum(1, &for_sig_hash[len], sizeof(hashtype), &hashtype);
+    vin = btc_tx_vin(tx,vini);
+    len += iguana_rwbignum2(1, &for_sig_hash[len], sizeof(vin->prevout.hash), vin->prevout.hash);
+    len += iguana_rwnum(1, &for_sig_hash[len], sizeof(vin->prevout.n), &vin->prevout.n);
+    
+    for_sig_hash[len++] = (uint8_t)spendlen;
+    memcpy(&for_sig_hash[len],spendscript,spendlen), len += spendlen;
+    len += iguana_rwnum(1, &for_sig_hash[len], sizeof(spendamount), &spendamount);
+    len += iguana_rwnum(1, &for_sig_hash[len], sizeof(vin->sequence), &vin->sequence);
+    unsigned const char *sig_hash_personal = ZCASH_SIG_HASH_OVERWINTER_PERSONALIZATION;
+    if (version == 4)
+        sig_hash_personal = ZCASH_SIG_HASH_SAPLING_PERSONALIZATION;
+    crypto_generichash_blake2b_salt_personal(sigtxid.bytes,32,for_sig_hash,(uint64_t)len,
+                                             NULL,0,NULL,sig_hash_personal);
+    return(bits256_rev(sigtxid));
+}
+
 int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
 {
     int32_t i,height,txidht; btc_tx *tx; bits256 blockhash,txid,desttxid;
@@ -264,31 +375,57 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
 
 bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKey,uint32_t nTime)
 {
-    uint32_t branchid;
+    uint32_t branchid; bits256 sighash; char str[65]; int32_t i,extralen,sigerr=0; uint256 hash; uint8_t sig[128]; size_t siglen=0; btc_tx_in *vin=0;
     if ( nTime != 0 && mtx->version == 1 )
     {
         fprintf(stderr,"use legacy sig validation\n");
         branchid = 0;
-    }
-    /*CTransaction txNewConst(mtx); SignatureData sigdata; CBasicKeyStore keystore; int64_t branchid = NSPV_BRANCHID;
-    keystore.AddKey(NSPV_key);
-    if ( ProduceSignature(TransactionSignatureCreator(&keystore,&txNewConst,vini,utxovalue,SIGHASH_ALL),scriptPubKey,sigdata,branchid) != 0 )
+    } else branchid = SAPLING_VERSION_GROUP_ID;
+    if ( branchid != 0 )
     {
-        UpdateTransaction(mtx,vini,sigdata);
-        //fprintf(stderr,"SIG_TXHASH %s vini.%d %.8f\n",bits256_str(str,SIG_TXHASH),vini,(double)utxovalue/COIN);
-        return(true);
-    }  //else fprintf(stderr,"sigerr SIG_TXHASH %s vini.%d %.8f\n",bits256_str(str,SIG_TXHASH),vini,(double)utxovalue/COIN);
-    return(false);*/
-    fprintf(stderr,"create signature txversion.%x\n",mtx->version);
+        sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
+        btc_bits256_to_uint256(hash,sighash);
+    }
+    else
+    {
+        memset(hash,0,sizeof(hash));
+        btc_tx_sighash(mtx,scriptPubKey,vini,SIGHASH_ALL,utxovalue,SIGVERSION_BASE,hash);
+    }
+    siglen = sizeof(sig);
+    if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
+        sigerr = -1;
+    else
+    {
+        for (i=0; i<(int32_t)siglen; i++)
+            fprintf(stderr,"%02x",sig[i]);
+        vin = btc_tx_vin(mtx,vini);
+        if ( scriptPubKey->len == 25 )
+            extralen = 34;
+        else extralen = 0;
+        vin->script_sig = cstr_new_sz(siglen+2+extralen);
+        vin->script_sig->str[0] = siglen+1;
+        memcpy(vin->script_sig->str+1,sig,siglen);
+        vin->script_sig->str[siglen+1] = 1;
+        if ( extralen != 0 )
+        {
+            vin->script_sig->str[2 + siglen] = 33;
+            memcpy(vin->script_sig->str+2+siglen+1,NSPV_pubkey.pubkey,extralen-1);
+        }
+        vin->script_sig->len = siglen+2+extralen;
+        fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:(int32_t)siglen);
+    }
     return(true);
 }
 
 cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,int64_t txfee,struct NSPV_utxoresp used[])
 {
-    btc_tx *vintx; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change=0,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n=0,validation;
+    btc_tx *vintx=0; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change=0,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n=0,validation;
     *rewardsump = *interestsump = 0;
     if ( mtx == 0 )
+    {
+        fprintf(stderr,"cant sign null mtx\n");
         return(0);
+    }
     if ( mtx->vout != 0 )
     {
         n = mtx->vout->len;
@@ -345,8 +482,13 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
             {
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return(0);
-            }
-        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent\n",bits256_str(str,prevhash),utxovout); // of course much better handling is needed
+            } // else fprintf(stderr,"signed vini.%d\n",i);
+        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent retcode.%d\n",bits256_str(str,prevhash),utxovout,validation); // of course much better handling is needed
+        if ( vintx != 0 )
+        {
+            btc_tx_free(vintx);
+            vintx = 0;
+        }
     }
     fprintf(stderr,"sign %d inputs %.8f + interest %.8f -> %d outputs %.8f change %.8f\n",(int32_t)mtx->vin->len,(double)totalinputs/COIN,(double)interest/COIN,(int32_t)mtx->vout->len,(double)totaloutputs/COIN,(double)change/COIN);
     return(btc_tx_to_cstr(mtx));
@@ -415,7 +557,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
     else
     {
         scriptPubKey = cstr_new_sz(25);
-        btc_script_build_p2pkh(scriptPubKey,rmd160);
+        btc_script_build_p2pkh(scriptPubKey,rmd160+1);
     }
     printf("%s numutxos.%d balance %.8f\n",NSPV_utxosresult.coinaddr,NSPV_utxosresult.numutxos,(double)NSPV_utxosresult.total/COIN);
     mtx = btc_tx_new(client->chainparams->komodo != 0 ? SAPLING_TX_VERSION : 1);

@@ -55,7 +55,7 @@ struct rpcrequest_info
 #define NODE_SPENTINDEX (1 << 28)
 
 #define NSPV_POLLITERS 100
-#define NSPV_POLLMICROS 50000
+#define NSPV_POLLMICROS 10000
 #define NSPV_MAXVINS 64
 #define NSPV_AUTOLOGOUT 777
 #define NSPV_BRANCHID 0x76b809bb
@@ -221,5 +221,6 @@ extern uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight);
 extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 extern int32_t is_hexstr(char *str,int32_t n);
 extern int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr,int32_t addlenflag);
+extern bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen);
 
 #endif // KOMODO_NSPV_DEFSH
