@@ -552,7 +552,9 @@ cJSON *NSPV_txidhdrsproof(btc_spv_client *client,bits256 prevtxid,bits256 nexttx
             if ( memcmp(&NSPV_ntzsproofresult.prevtxid,&prevtxid,sizeof(prevtxid)) == 0 && memcmp(&NSPV_ntzsproofresult.nexttxid,&nexttxid,sizeof(nexttxid)) == 0 )
                 return(NSPV_ntzsproof_json(&NSPV_ntzsproofresult));
         }
+        fprintf(stderr,"hdrsproof iter.%d\n",iter);
     } else sleep(1);
+    fprintf(stderr,"timeout hdrsproof\n");
     memset(&P,0,sizeof(P));
     return(NSPV_ntzsproof_json(&P));
 }
