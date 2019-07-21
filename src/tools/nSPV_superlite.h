@@ -689,7 +689,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67];
-    btc_random_bytes(key->privkey,32,0);
+    btc_random_bytes(key.privkey,32,0);
     btc_pubkey_from_key(&key,&pubkey);
     sz = sizeof(pubkeystr);
     btc_pubkey_get_hex(&pubkey,pubkeystr,&sz);
