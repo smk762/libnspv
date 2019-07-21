@@ -550,6 +550,12 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
     {
         scriptPubKey = cstr_new_sz(25);
         btc_script_build_p2pkh(scriptPubKey,rmd160+1);
+        {
+            int z;
+            for (z=0; z<25; z++)
+                fprintf(stderr,"%02x",scriptPubKey->str[z]&0xff);
+            fprintf(stderr," scriptPubKey\n");
+        }
     }
     printf("%s numutxos.%d balance %.8f\n",NSPV_utxosresult.coinaddr,NSPV_utxosresult.numutxos,(double)NSPV_utxosresult.total/COIN);
     mtx = btc_tx_new(client->chainparams->komodo != 0 ? SAPLING_TX_VERSION : 1);
