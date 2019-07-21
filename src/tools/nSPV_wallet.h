@@ -81,13 +81,13 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
     return(0);
 }
 
-btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t vout,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump)
+btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump)
 {
     struct NSPV_txproof *ptr; btc_tx_vout *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t i,offset; int64_t rewards = 0; uint32_t nLockTime; cstr *proof = 0; bits256 proofroot = zeroid;
     *retvalp = -1;
     if ( (ptr= NSPV_txproof_find(txid)) == 0 )
     {
-        NSPV_txproof(vout,txid,height);
+        NSPV_txproof(v,txid,height);
         ptr = &NSPV_txproofresult;
     }
     if ( ptr->txid != txid )
@@ -109,7 +109,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
     }
     else if ( isKMD != 0 && tiptime != 0 )
     {
-        if ( (vout= btc_tx_vout(tx,vout)) != 0 )
+        if ( (vout= btc_tx_vout(tx,v)) != 0 )
         {
             rewards = komodo_interestnew(height!=0?height:1000000,vout->value,tx->locktime,tiptime);
             (*rewardsump) += rewards;

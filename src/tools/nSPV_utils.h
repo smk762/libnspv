@@ -911,9 +911,18 @@ bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char *symbol,cstr
     } else return(zeroid);
 }
 
+int32_t bitweight(uint64_t x)
+{
+    int i,wt = 0;
+    for (i=0; i<64; i++)
+        if ( (1LL << i) & x )
+            wt++;
+    return(wt);
+}
+
 int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
 {
-    int32_t vini; uint64_t mask = 0; struct btc_tx_vin *vin;
+    int32_t vini; uint64_t mask = 0; struct btc_tx_in *vin;
     if ( tx == 0 || tx->vin == 0 )
         return(-1);
     for (vini=0; vini<tx->vin->len; vini++)
