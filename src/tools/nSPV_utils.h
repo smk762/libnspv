@@ -514,19 +514,17 @@ bits256 btc_uint256_to_bits256(uint256 hash256)
     return(hash);
 }
 
-uint256 btc_bits256_to_uint256(bits256 hash)
+void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
 {
-    uint256 hash256;
     iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
-    return(hash);
 }
 
 cJSON *btc_txvin_to_json(btc_tx_in *vin)
 {
     char hexstr[NSPV_MAXSCRIPTSIZE*2+1]; cJSON *item = cJSON_CreateObject();
-    jaddbits256(item,"txid",btc_uint256_to_bits256(tx_in->prevout.hash));
+    jaddbits256(item,"txid",btc_uint256_to_bits256(vin->prevout.hash));
     jaddnum(item,"vout",vin->prevout.n);
-    jaddstr(item,"scriptSig",btc_cstr2hex(hexstr,sizeof(hexstr),vin->script_sig));
+    jaddstr(item,"scriptSig",btc_cstr_to_hex(hexstr,sizeof(hexstr),vin->script_sig));
     jaddnum(item,"sequenceid",vin->sequence);
     return(item);
 }
@@ -534,10 +532,10 @@ cJSON *btc_txvin_to_json(btc_tx_in *vin)
 cJSON *btc_txvins_to_json(vector *vin)
 {
     int32_t i; cJSON *vins = cJSON_CreateArray();
-    if ( tx->vin != 0 )
+    if ( vin != 0 )
     {
-        for (i=0; i<tx->vin->len; i++)
-            jaddi(vins,btc_txvin_to_json(vector_idx(tx->vin,i)));
+        for (i=0; i<vin->len; i++)
+            jaddi(vins,btc_txvin_to_json(vector_idx(vin,i)));
     }
     return(vins);
 }
@@ -553,10 +551,10 @@ cJSON *btc_txvout_to_json(btc_tx_out *vout)
 cJSON *btc_txvouts_to_json(vector *vout)
 {
     int32_t i; cJSON *vouts = cJSON_CreateArray();
-    if ( tx->vout != 0 )
+    if ( vout != 0 )
     {
-        for (i=0; i<tx->vout->len; i++)
-            jaddi(vouts,btc_txvout_to_json(vector_idx(tx->vout,i)));
+        for (i=0; i<vout->len; i++)
+            jaddi(vouts,btc_txvout_to_json(vector_idx(vout,i)));
     }
     return(vouts);
 }
@@ -564,14 +562,14 @@ cJSON *btc_txvouts_to_json(vector *vout)
 cJSON *btc_tx_to_json(btc_tx *tx)
 {
     cJSON *txjson = cJSON_CreateObject();
-    jaddnum(tx,"nVersion",tx->version);
-    jadd(tx,"vin",btc_txvins_to_json(tx->vin));
-    jadd(tx,"vout",btc_txvouts_to_json(tx->vout));
-    jaddnum(tx,"nLockTime",tx->locktime);
+    jaddnum(txjson,"nVersion",tx->version);
+    jadd(txjson,"vin",btc_txvins_to_json(tx->vin));
+    jadd(txjson,"vout",btc_txvouts_to_json(tx->vout));
+    jaddnum(txjson,"nLockTime",tx->locktime);
     if ( tx->version == SAPLING_TX_VERSION )
     {
-        jaddnum(tx,"nExpiryHeight",tx->nExpiryHeight);
-        jaddnum(tx,"valueBalance",tx->valueBalance);
+        jaddnum(txjson,"nExpiryHeight",tx->nExpiryHeight);
+        jaddnum(txjson,"valueBalance",tx->valueBalance);
     }
     return(txjson);
 }
