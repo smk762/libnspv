@@ -66,8 +66,9 @@ typedef struct btc_tx_ {
     vector* vin;
     vector* vout;
     uint32_t locktime;
-    uint32_t nExpiryHeight;  // only for sapling version 4
-    int64_t valueBalance;    // only for sapling version 4
+    uin32_t nVersionGroupId; // only for saplint
+    uint32_t nExpiryHeight;  // only for sapling
+    int64_t valueBalance;    // only for sapling
 } btc_tx;
 
 
