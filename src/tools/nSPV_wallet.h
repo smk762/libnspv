@@ -403,10 +403,13 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
 
 cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,int64_t txfee,struct NSPV_utxoresp used[])
 {
-    btc_tx *vintx; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change=0,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n=0,validation;
+    btc_tx *vintx=0; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change=0,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n=0,validation;
     *rewardsump = *interestsump = 0;
     if ( mtx == 0 )
+    {
+        fprintf(stderr,"cant sign null mtx\n");
         return(0);
+    }
     if ( mtx->vout != 0 )
     {
         n = mtx->vout->len;
@@ -463,8 +466,13 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
             {
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return(0);
-            }
-        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent\n",bits256_str(str,prevhash),utxovout); // of course much better handling is needed
+            } else fprintf(stderr,"signed vini.%d\n",i);
+        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent retcode.%d\n",bits256_str(str,prevhash),utxovout,retcode); // of course much better handling is needed
+        if ( vintx != 0 )
+        {
+            btc_tx_free(vintx);
+            vintx = 0;
+        }
     }
     fprintf(stderr,"sign %d inputs %.8f + interest %.8f -> %d outputs %.8f change %.8f\n",(int32_t)mtx->vin->len,(double)totalinputs/COIN,(double)interest/COIN,(int32_t)mtx->vout->len,(double)totaloutputs/COIN,(double)change/COIN);
     return(btc_tx_to_cstr(mtx));
