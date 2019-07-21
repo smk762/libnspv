@@ -686,6 +686,20 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     return(result);
 }
 
+cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
+{
+    cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67];
+    btc_random_bytes(key->privkey,32,0);
+    btc_pubkey_from_key(&key,&pubkey);
+    sz = sizeof(pubkeystr);
+    btc_pubkey_get_hex(&pubkey,pubkeystr,&sz);
+    btc_pubkey_getaddr_p2pkh(&pubkey,chain,address);
+    jaddstr(result,"address",address);
+    jaddstr(result,"pubkey",pubkeystr);
+    jaddnum(result,"wifprefix",chain->b58prefix_secret_address);
+    jaddnum(result,"compressed",1);
+}
+
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
     char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag,memfunc;
@@ -726,6 +740,8 @@ cJSON *_NSPV_JSON(cJSON *argjson)
             return(cJSON_Parse("{\"error\":\"no wif\"}"));
         else return(NSPV_login(NSPV_chain,wifstr));
     }
+    else if ( strcmp(method,"getnewaddress") == 0 )
+        return(NSPV_getnewaddress(NSPV_chain));
     else if ( strcmp(method,"broadcast") == 0 )
     {
         if ( hex == 0 )
