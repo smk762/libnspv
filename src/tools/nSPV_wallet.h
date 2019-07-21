@@ -17,7 +17,7 @@
 #ifndef KOMODO_NSPVWALLET_H
 #define KOMODO_NSPVWALLET_H
 
-int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
+int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
 {
     int32_t i,height,txidht; btc_tx *tx; bits256 blockhash,txid,desttxid;
     if ( (ptr->common.nextht-ptr->common.prevht+1) != ptr->common.numhdrs )
@@ -32,7 +32,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-4);
     }
-    else if ( NSPV_notarizationextract(1,&height,&blockhash,&desttxid,tx) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx) < 0 )
     {
         btc_tx_free(tx);
         return(-5);
@@ -62,7 +62,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-9);
     }
-    else if ( NSPV_notarizationextract(1,&height,&blockhash,&desttxid,tx) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx) < 0 )
     {
         btc_tx_free(tx);
         return(-10);
@@ -81,7 +81,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
     return(0);
 }
 
-btc_tx *NSPV_gettransaction(int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t vout,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump)
+btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t vout,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump)
 {
     struct NSPV_txproof *ptr; btc_tx_vout *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t i,offset; int64_t rewards = 0; uint32_t nLockTime; cstr *proof = 0; bits256 proofroot = zeroid;
     *retvalp = -1;
@@ -141,7 +141,7 @@ btc_tx *NSPV_gettransaction(int32_t *retvalp,int32_t isKMD,int32_t skipvalidatio
                 fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
                 NSPV_txidhdrsproof(NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
-                if ( (retval= NSPV_validatehdrs(&NSPV_ntzsproofresult)) == 0 )
+                if ( (retval= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
                     fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",proof->len);
                     /*std::vector<uint256> txids; uint256 proofroot;
@@ -279,7 +279,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     return(true);
 }
 
-cstring *NSPV_signtx(int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,uint64_t txfee,struct NSPV_utxoresp used[])
+cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,uint64_t txfee,struct NSPV_utxoresp used[])
 {
     btc_tx *vintx; btc_tx_vin *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n,validation;
     *rewardsump = *interestsump = 0;
@@ -320,7 +320,7 @@ cstring *NSPV_signtx(int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJS
         prevhash = btc_uint256_to_bits256(vin->prevout.hash);
         if ( i > 0 )
             sleep(1);
-        vintx = NSPV_gettransaction(&validation,isKMD,0,utxovout,prevhash,used[i].height,used[i].extradata,NSPV_tiptime,rewardsump);
+        vintx = NSPV_gettransaction(client,&validation,isKMD,0,utxovout,prevhash,used[i].height,used[i].extradata,NSPV_tiptime,rewardsump);
         jaddinum(retcodes,validation);
         if ( vintx != 0 && validation != -1 && (vout= btc_tx_vout(vintx,utxovout)) != 0 ) // other validation retcodes are degraded security
         {
@@ -426,7 +426,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
             btc_tx_free(mtx);
             return(result);
         }
-        hex = NSPV_signtx(isKMD,rewardsum,interestsum,retcodes,mtx,txfee,used);
+        hex = NSPV_signtx(client,isKMD,rewardsum,interestsum,retcodes,mtx,txfee,used);
         if ( isKMD != 0 )
         {
             char numstr[64];
