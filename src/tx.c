@@ -184,7 +184,7 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
     deser_s32(&tx->version, &buf);
 fprintf(stderr,"vers.%x\n",tx->version);
     if ( tx->version == SAPLING_TX_VERSION )
-        deser_s32(&tx->nVersionGroupId, &buf);
+        deser_u32(&tx->nVersionGroupId, &buf);
     fprintf(stderr,"nVersionGroupId.%x\n",tx->nVersionGroupId);
     uint32_t vlen;
     if (!deser_varlen(&vlen, &buf))
