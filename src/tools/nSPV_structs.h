@@ -17,7 +17,7 @@
 #ifndef NSPV_SERDES_H
 #define NSPV_SERDES_H
 
-int32_t iguana_rwnum(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
+int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
 {
     int32_t i; uint64_t x;
     if ( rwflag == 0 )
@@ -52,7 +52,7 @@ int32_t iguana_rwnum(const btc_chainparams *coin,int32_t rwflag,uint8_t *seriali
     return(len);
 }
 
-int32_t iguana_rwbignum(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp)
+int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp)
 {
     int32_t i;
     if ( rwflag == 0 )
@@ -68,7 +68,23 @@ int32_t iguana_rwbignum(const btc_chainparams *coin,int32_t rwflag,uint8_t *seri
     return(len);
 }
 
-int32_t iguana_rwbuf(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *buf)
+int32_t iguana_rwbignum2(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp)
+{
+    int32_t i;
+    if ( rwflag == 0 )
+    {
+        for (i=0; i<len; i++)
+            endianedp[i] = serialized[i];
+    }
+    else
+    {
+        for (i=0; i<len; i++)
+            serialized[i] = endianedp[i];
+    }
+    return(len);
+}
+
+int32_t iguana_rwbuf(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *buf)
 {
     if ( rwflag != 0 )
         memcpy(serialized,buf,len);
@@ -76,31 +92,37 @@ int32_t iguana_rwbuf(const btc_chainparams *coin,int32_t rwflag,uint8_t *seriali
     return(len);
 }
 
-int32_t NSPV_rwequihdr(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr)
+int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr,int32_t addlenflag)
 {
     int32_t len = 0;
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nVersion),&ptr->nVersion);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->hashPrevBlock),(uint8_t *)&ptr->hashPrevBlock);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->hashMerkleRoot),(uint8_t *)&ptr->hashMerkleRoot);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->hashFinalSaplingRoot),(uint8_t *)&ptr->hashFinalSaplingRoot);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nTime),&ptr->nTime);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nBits),&ptr->nBits);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->nNonce),(uint8_t *)&ptr->nNonce);
-    len += iguana_rwbuf(coin,rwflag,&serialized[len],sizeof(ptr->nSolution),ptr->nSolution);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nVersion),&ptr->nVersion);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->hashPrevBlock),(uint8_t *)&ptr->hashPrevBlock);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->hashMerkleRoot),(uint8_t *)&ptr->hashMerkleRoot);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->hashFinalSaplingRoot),(uint8_t *)&ptr->hashFinalSaplingRoot);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nTime),&ptr->nTime);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nBits),&ptr->nBits);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->nNonce),(uint8_t *)&ptr->nNonce);
+    if ( addlenflag != 0 && rwflag == 1 )
+    {
+        serialized[len++] = 0xfd;
+        serialized[len++] = 1344 & 0xff;
+        serialized[len++] = (1344 >> 8) & 0xff;
+    }
+    len += iguana_rwbuf(rwflag,&serialized[len],sizeof(ptr->nSolution),ptr->nSolution);
     return(len);
 }
 
 int32_t iguana_rwequihdrvec(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,uint16_t *vecsizep,struct NSPV_equihdr **ptrp)
 {
     int32_t i,vsize,len = 0;
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(*vecsizep),vecsizep);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(*vecsizep),vecsizep);
     if ( (vsize= *vecsizep) != 0 )
     {
         //fprintf(stderr,"vsize.%d ptrp.%p alloc %ld\n",vsize,*ptrp,sizeof(struct NSPV_equihdr)*vsize);
         if ( *ptrp == 0 )
             *ptrp = (struct NSPV_equihdr *)calloc(sizeof(struct NSPV_equihdr),vsize); // relies on uint16_t being "small" to prevent mem exhaustion
         for (i=0; i<vsize; i++)
-            len += NSPV_rwequihdr(coin,rwflag,&serialized[len],&(*ptrp)[i]);
+            len += NSPV_rwequihdr(rwflag,&serialized[len],&(*ptrp)[i],0);
     }
     return(len);
 }
@@ -108,12 +130,12 @@ int32_t iguana_rwequihdrvec(const btc_chainparams *coin,int32_t rwflag,uint8_t *
 int32_t iguana_rwuint8vec(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,int32_t *biglenp,uint8_t **ptrp)
 {
     int32_t vsize,len = 0;
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(*biglenp),biglenp);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(*biglenp),biglenp);
     if ( (vsize= *biglenp) > 0 && vsize < coin->maxtxsize )
     {
         if ( *ptrp == 0 )
             *ptrp = (uint8_t *)calloc(1,vsize);
-        len += iguana_rwbuf(coin,rwflag,&serialized[len],vsize,*ptrp);
+        len += iguana_rwbuf(rwflag,&serialized[len],vsize,*ptrp);
     }
     return(len);
 }
@@ -121,18 +143,18 @@ int32_t iguana_rwuint8vec(const btc_chainparams *coin,int32_t rwflag,uint8_t *se
 int32_t NSPV_rwutxoresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_utxoresp *ptr)
 {
     int32_t len = 0;
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->satoshis),&ptr->satoshis);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->extradata),&ptr->extradata);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->satoshis),&ptr->satoshis);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->extradata),&ptr->extradata);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
     return(len);
 }
 
 int32_t NSPV_rwutxosresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_utxosresp *ptr) // check mempool
 {
     int32_t i,len = 0;
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->numutxos),&ptr->numutxos);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->numutxos),&ptr->numutxos);
     if ( ptr->numutxos != 0 )
     {
         if ( ptr->utxos == 0 )
@@ -140,12 +162,12 @@ int32_t NSPV_rwutxosresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *ser
         for (i=0; i<ptr->numutxos; i++)
             len += NSPV_rwutxoresp(coin,rwflag,&serialized[len],&ptr->utxos[i]);
     }
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->total),&ptr->total);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->interest),&ptr->interest);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nodeheight),&ptr->nodeheight);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->CCflag),&ptr->CCflag);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->skipcount),&ptr->skipcount);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->total),&ptr->total);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->interest),&ptr->interest);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nodeheight),&ptr->nodeheight);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->CCflag),&ptr->CCflag);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->skipcount),&ptr->skipcount);
     if ( rwflag != 0 )
     {
         memcpy(&serialized[len],ptr->coinaddr,sizeof(ptr->coinaddr));
@@ -182,17 +204,17 @@ void NSPV_utxosresp_copy(const btc_chainparams *coin,struct NSPV_utxosresp *dest
 int32_t NSPV_rwtxidresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txidresp *ptr)
 {
     int32_t len = 0;
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->satoshis),&ptr->satoshis);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->satoshis),&ptr->satoshis);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
     return(len);
 }
 
 int32_t NSPV_rwtxidsresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txidsresp *ptr)
 {
     int32_t i,len = 0;
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->numtxids),&ptr->numtxids);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->numtxids),&ptr->numtxids);
     if ( ptr->numtxids != 0 )
     {
         if ( ptr->txids == 0 )
@@ -200,10 +222,10 @@ int32_t NSPV_rwtxidsresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *ser
         for (i=0; i<ptr->numtxids; i++)
             len += NSPV_rwtxidresp(coin,rwflag,&serialized[len],&ptr->txids[i]);
     }
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nodeheight),&ptr->nodeheight);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->CCflag),&ptr->CCflag);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->skipcount),&ptr->skipcount);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nodeheight),&ptr->nodeheight);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->CCflag),&ptr->CCflag);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->skipcount),&ptr->skipcount);
     if ( rwflag != 0 )
     {
         memcpy(&serialized[len],ptr->coinaddr,sizeof(ptr->coinaddr));
@@ -241,20 +263,20 @@ void NSPV_txidsresp_copy(const btc_chainparams *coin,struct NSPV_txidsresp *dest
 int32_t NSPV_rwmempoolresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_mempoolresp *ptr)
 {
     int32_t i,len = 0;
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->numtxids),&ptr->numtxids);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->numtxids),&ptr->numtxids);
     if ( ptr->numtxids != 0 )
     {
         if ( ptr->txids == 0 )
             ptr->txids = (bits256 *)calloc(sizeof(*ptr->txids),ptr->numtxids);
         for (i=0; i<ptr->numtxids; i++)
-            len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txids[i]),(uint8_t *)&ptr->txids[i]);
+            len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txids[i]),(uint8_t *)&ptr->txids[i]);
     }
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nodeheight),&ptr->nodeheight);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vindex),&ptr->vindex);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->CCflag),&ptr->CCflag);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->memfunc),&ptr->memfunc);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nodeheight),&ptr->nodeheight);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->vindex),&ptr->vindex);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->CCflag),&ptr->CCflag);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->memfunc),&ptr->memfunc);
     if ( rwflag != 0 )
     {
         memcpy(&serialized[len],ptr->coinaddr,sizeof(ptr->coinaddr));
@@ -292,11 +314,11 @@ void NSPV_mempoolresp_copy(const btc_chainparams *coin,struct NSPV_mempoolresp *
 int32_t NSPV_rwntz(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_ntz *ptr)
 {
     int32_t len = 0;
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->blockhash),(uint8_t *)&ptr->blockhash);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->othertxid),(uint8_t *)&ptr->othertxid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->txidheight),&ptr->txidheight);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->blockhash),(uint8_t *)&ptr->blockhash);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->othertxid),(uint8_t *)&ptr->othertxid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->txidheight),&ptr->txidheight);
     return(len);
 }
 
@@ -305,7 +327,7 @@ int32_t NSPV_rwntzsresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *seri
     int32_t len = 0;
     len += NSPV_rwntz(coin,rwflag,&serialized[len],&ptr->prevntz);
     len += NSPV_rwntz(coin,rwflag,&serialized[len],&ptr->nextntz);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->reqheight),&ptr->reqheight);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->reqheight),&ptr->reqheight);
     return(len);
 }
 
@@ -324,10 +346,10 @@ int32_t NSPV_rwinforesp(const btc_chainparams *coin,int32_t rwflag,uint8_t *seri
 {
     int32_t len = 0;
     len += NSPV_rwntz(coin,rwflag,&serialized[len],&ptr->notarization);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->blockhash),(uint8_t *)&ptr->blockhash);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->hdrheight),&ptr->hdrheight);
-    len += NSPV_rwequihdr(coin,rwflag,&serialized[len],&ptr->H);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->blockhash),(uint8_t *)&ptr->blockhash);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->hdrheight),&ptr->hdrheight);
+    len += NSPV_rwequihdr(rwflag,&serialized[len],&ptr->H,0);
     //fprintf(stderr,"hdr rwlen.%d\n",len);
     return(len);
 }
@@ -341,10 +363,10 @@ void NSPV_inforesp_purge(const btc_chainparams *coin,struct NSPV_inforesp *ptr)
 int32_t NSPV_rwtxproof(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_txproof *ptr)
 {
     int32_t len = 0;
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->unspentvalue),&ptr->unspentvalue);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->unspentvalue),&ptr->unspentvalue);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
     len += iguana_rwuint8vec(coin,rwflag,&serialized[len],&ptr->txlen,&ptr->tx);
     len += iguana_rwuint8vec(coin,rwflag,&serialized[len],&ptr->txprooflen,&ptr->txproof);
     return(len);
@@ -381,10 +403,10 @@ int32_t NSPV_rwntzproofshared(const btc_chainparams *coin,int32_t rwflag,uint8_t
 {
     int32_t len = 0;
     len += iguana_rwequihdrvec(coin,rwflag,&serialized[len],&ptr->numhdrs,&ptr->hdrs);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->prevht),&ptr->prevht);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nextht),&ptr->nextht);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->pad16),&ptr->pad16);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->prevht),&ptr->prevht);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nextht),&ptr->nextht);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->pad16),&ptr->pad16);
     //fprintf(stderr,"rwcommon prev.%d next.%d\n",ptr->prevht,ptr->nextht);
     return(len);
 }
@@ -393,10 +415,10 @@ int32_t NSPV_rwntzsproofresp(const btc_chainparams *coin,int32_t rwflag,uint8_t 
 {
     int32_t len = 0;
     len += NSPV_rwntzproofshared(coin,rwflag,&serialized[len],&ptr->common);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->prevtxid),(uint8_t *)&ptr->prevtxid);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->nexttxid),(uint8_t *)&ptr->nexttxid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->prevtxidht),&ptr->prevtxidht);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->nexttxidht),&ptr->nexttxidht);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->prevtxid),(uint8_t *)&ptr->prevtxid);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->nexttxid),(uint8_t *)&ptr->nexttxid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->prevtxidht),&ptr->prevtxidht);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nexttxidht),&ptr->nexttxidht);
     len += iguana_rwuint8vec(coin,rwflag,&serialized[len],&ptr->prevtxlen,&ptr->prevntz);
     len += iguana_rwuint8vec(coin,rwflag,&serialized[len],&ptr->nexttxlen,&ptr->nextntz);
     //fprintf(stderr,"retlen.%d\n",len);
@@ -441,9 +463,9 @@ int32_t NSPV_rwspentinfo(const btc_chainparams *coin,int32_t rwflag,uint8_t *ser
 {
     int32_t len = 0;
     len += NSPV_rwtxproof(coin,rwflag,&serialized[len],&ptr->spent);
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->spentvini),&ptr->spentvini);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->vout),&ptr->vout);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->spentvini),&ptr->spentvini);
     return(len);
 }
 
@@ -459,8 +481,8 @@ void NSPV_spentinfo_purge(const btc_chainparams *coin,struct NSPV_spentinfo *ptr
 int32_t NSPV_rwbroadcastresp(const btc_chainparams *coin,int32_t rwflag,uint8_t *serialized,struct NSPV_broadcastresp *ptr)
 {
     int32_t len = 0;
-    len += iguana_rwbignum(coin,rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
-    len += iguana_rwnum(coin,rwflag,&serialized[len],sizeof(ptr->retcode),&ptr->retcode);
+    len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->retcode),&ptr->retcode);
     return(len);
 }
 

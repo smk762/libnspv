@@ -32,6 +32,8 @@
 
 #define UNUSED(x) (void)(x)
 
+#include <nSPV_defs.h>
+
 static const int BTC_PERIODICAL_NODE_TIMER_S = 5;
 static const int BTC_PING_INTERVAL_S = 180;
 static const int BTC_CONNECT_TIMEOUT_S = 10;
@@ -440,10 +442,13 @@ void btc_node_send(btc_node* node, cstring* data)
     if ((node->state & NODE_CONNECTED) != NODE_CONNECTED)
         return;
 
+    //portable_mutex_lock(&NSPV_netmutex);
+    //fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, data->str+4);
     bufferevent_write(node->event_bev, data->str, data->len);
     char* dummy = data->str + 4;
+    //fprintf(stderr,"sent message to node %d: %s\n", node->nodeid, data->str+4);
+    //portable_mutex_unlock(&NSPV_netmutex);
     node->nodegroup->log_write_cb("sending message to node %d: %s\n", node->nodeid, dummy);
-    //fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, dummy);
 }
 
 void btc_node_send_version(btc_node* node)

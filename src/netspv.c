@@ -464,7 +464,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
             size_t consumedlength = 0;
             for (unsigned int i=0;i<amount_of_txs;i++)
             {
-                btc_tx* tx = btc_tx_new();
+                btc_tx* tx = btc_tx_new(1);
                 if (!btc_tx_deserialize(buf->p, buf->len, tx, &consumedlength, true)) {
                     printf("Error deserializing transaction\n");
                 }

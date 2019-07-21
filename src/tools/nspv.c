@@ -109,16 +109,18 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
 #include "nSPV_superlite.h"
-//#include "nSPV_wallet.h"
+#include "nSPV_wallet.h"
 #include "komodo_cJSON.c"
 #include "nSPV_rpc.h"
 
 /*
  Todo:
- HDRhash
+ 
+ -merkleproof
  addr message
  JSON chainparams, maybe use coins repo
- spend
+ 
+ need api support for non-nSPV coins
  */
 
 int main(int argc, char* argv[])
@@ -134,6 +136,7 @@ int main(int argc, char* argv[])
     char* dbfile = 0;
     const btc_chainparams *chain = &nspv_chainparams_main;
     portable_mutex_init(&NSPV_commandmutex);
+    portable_mutex_init(&NSPV_netmutex);
     if ( argc > 1 )
     {
         if ( strcmp(argv[1],"KMD") == 0 )
