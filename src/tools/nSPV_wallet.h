@@ -437,7 +437,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         }
         if ( hex != 0 && hex->len > 0 )
         {
-            if ( (tx= btc_tx_decodehex(hex) != 0 )
+            if ( (tx= btc_tx_decodehex(hex->str) != 0 )
             {
                 jadd(result,"tx",btc_tx_to_json(tx));
                 jaddstr(result,"result","success");

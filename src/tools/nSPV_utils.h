@@ -922,7 +922,7 @@ int32_t bitweight(uint64_t x)
 
 int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
 {
-    int32_t vini; uint64_t mask = 0; struct btc_tx_in *vin;
+    int32_t vini; uint64_t mask = 0; btc_tx_in *vin;
     if ( tx == 0 || tx->vin == 0 )
         return(-1);
     for (vini=0; vini<(int32_t)tx->vin->len; vini++)
