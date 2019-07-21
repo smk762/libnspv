@@ -925,7 +925,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
     int32_t vini; uint64_t mask = 0; struct btc_tx_in *vin;
     if ( tx == 0 || tx->vin == 0 )
         return(-1);
-    for (vini=0; vini<tx->vin->len; vini++)
+    for (vini=0; vini<(int32_t)tx->vin->len; vini++)
     {
         if ( (vin= btc_tx_vin(tx,vini)) == 0 )
             return(-vini-2);

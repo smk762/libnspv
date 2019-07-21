@@ -83,7 +83,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
 
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump)
 {
-    struct NSPV_txproof *ptr; btc_tx_vout *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t i,offset; int64_t rewards = 0; uint32_t nLockTime; cstr *proof = 0; bits256 proofroot = zeroid;
+    struct NSPV_txproof *ptr; btc_tx_out *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t i,offset; int64_t rewards = 0; uint32_t nLockTime; cstr *proof = 0; bits256 proofroot = zeroid;
     *retvalp = -1;
     if ( (ptr= NSPV_txproof_find(txid)) == 0 )
     {
@@ -281,7 +281,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
 
 cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,uint64_t txfee,struct NSPV_utxoresp used[])
 {
-    btc_tx *vintx; btc_tx_vin *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n,validation;
+    btc_tx *vintx; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n,validation;
     *rewardsump = *interestsump = 0;
     if ( mtx == 0 )
         return(0);
