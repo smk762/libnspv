@@ -54,7 +54,7 @@ int net_write_log_null(const char* format, ...)
     return 1;
 }
 
-void _read_cb(struct bufferevent* bev, void* ctx)
+void read_cb(struct bufferevent* bev, void* ctx)
 {
     struct evbuffer* input = bufferevent_get_input(bev);
     if (!input)
@@ -129,13 +129,6 @@ void _read_cb(struct bufferevent* bev, void* ctx)
         cstr_free(node->recvBuffer, true);
         node->recvBuffer = tmp;
     }
-}
-
-void read_cb(struct bufferevent* bev, void* ctx)
-{
-    portable_mutex_lock(&NSPV_netmutex);
-    _read_cb(bev,ctx);
-    portable_mutex_unlock(&NSPV_netmutex);
 }
 
 void write_cb(struct bufferevent* ev, void* ctx)
