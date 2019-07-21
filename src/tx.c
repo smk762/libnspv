@@ -147,7 +147,7 @@ btc_tx* btc_tx_new(int32_t version)
     tx = btc_calloc(1, sizeof(*tx));
     tx->vin = vector_new(8, btc_tx_in_free_cb);
     tx->vout = vector_new(8, btc_tx_out_free_cb);
-    if ( (tx->version= version) == SAPLING_VERSION )
+    if ( (tx->version= version) == SAPLING_TX_VERSION )
         tx->nVersionGroupId = SAPLING_VERSION_GROUP_ID;
     tx->locktime = 0;
     return tx;
