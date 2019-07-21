@@ -922,7 +922,7 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
 
 bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char *symbol,cstring *opret)
 {
-    bits256 desttxid; int32_t i,offset=2; char str[65];
+    bits256 desttxid; int32_t i,offset=3; char str[65];
     if ( opret != 0 )
     {
         iguana_rwnum(0,(uint8_t *)&opret->str[offset + 32],sizeof(*heightp),heightp);
