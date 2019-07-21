@@ -474,7 +474,7 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
             {
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return(0);
-            } else fprintf(stderr,"signed vini.%d\n",i);
+            } // else fprintf(stderr,"signed vini.%d\n",i);
         } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent retcode.%d\n",bits256_str(str,prevhash),utxovout,validation); // of course much better handling is needed
         if ( vintx != 0 )
         {
@@ -549,7 +549,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
     else
     {
         scriptPubKey = cstr_new_sz(25);
-        btc_script_build_p2pkh(scriptPubKey,rmd160);
+        btc_script_build_p2pkh(scriptPubKey,rmd160+1);
     }
     printf("%s numutxos.%d balance %.8f\n",NSPV_utxosresult.coinaddr,NSPV_utxosresult.numutxos,(double)NSPV_utxosresult.total/COIN);
     mtx = btc_tx_new(client->chainparams->komodo != 0 ? SAPLING_TX_VERSION : 1);
