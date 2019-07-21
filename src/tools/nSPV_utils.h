@@ -550,7 +550,7 @@ cstring *btc_tx_to_cstr(btc_tx *tx)
     btc_tx_serialize(txser,tx,false);
     hex = cstr_new_sz(txser->len*2 + 1);
     btc_cstr_to_hex(hex->str,hex->len,txser);
-    fprintf(stderr,"tx[%d] to (%s) len.%d\n",txser->len,hex->str,(int32_t)hex->len);
+    fprintf(stderr,"tx[%d] to (%s) len.%d\n",(int32_t)txser->len,hex->str,(int32_t)hex->len);
     cstr_free(txser,1);
     return(hex);
 }
