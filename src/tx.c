@@ -249,6 +249,7 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
         return false;
     if ( tx->version == SAPLING_TX_VERSION )
     {
+        fprintf(stderr,"deser sapling\n");
         if (!deser_u32(&tx->nExpiryHeight, &buf))
             return false;
         if (!deser_s64(&tx->valueBalance, &buf))
