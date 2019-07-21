@@ -516,9 +516,9 @@ void btc_tx_add_p2pk(btc_tx *mtx,uint64_t satoshis,uint8_t *pubkey33)
 btc_tx *NSPV_txextract(uint8_t *data,int32_t datalen)
 {
     btc_tx *tx = btc_tx_new(SAPLING_TX_VERSION);
-    if ( btc_tx_deserialize(data,datalen,tx,0,false) == 0 ) 
+    if ( btc_tx_deserialize(data,datalen,tx,0,false) == 0 )
     {
-        fprintf(stderr,"NSPV_txextract btc_tx_deserialize error\n",datalen);
+        fprintf(stderr,"NSPV_txextract btc_tx_deserialize error datalen.%d\n",datalen);
         btc_tx_free(tx);
         tx = 0;
     }
