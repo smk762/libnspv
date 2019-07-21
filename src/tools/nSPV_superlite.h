@@ -540,7 +540,6 @@ cJSON *NSPV_txidhdrsproof(btc_spv_client *client,bits256 prevtxid,bits256 nexttx
     msg[len++] = NSPV_NTZSPROOF;
     len += iguana_rwbignum(1,&msg[len],sizeof(prevtxid),(uint8_t *)&prevtxid);
     len += iguana_rwbignum(1,&msg[len],sizeof(nexttxid),(uint8_t *)&nexttxid);
-    fprintf(stderr,"hdrsproof 3\n");
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[1]>>1) != 0 )
     {
@@ -550,7 +549,6 @@ cJSON *NSPV_txidhdrsproof(btc_spv_client *client,bits256 prevtxid,bits256 nexttx
             if ( memcmp(&NSPV_ntzsproofresult.prevtxid,&prevtxid,sizeof(prevtxid)) == 0 && memcmp(&NSPV_ntzsproofresult.nexttxid,&nexttxid,sizeof(nexttxid)) == 0 )
                 return(NSPV_ntzsproof_json(&NSPV_ntzsproofresult));
         }
-        fprintf(stderr,"hdrsproof iter.%d\n",iter);
     } else sleep(1);
     fprintf(stderr,"timeout hdrsproof\n");
     memset(&P,0,sizeof(P));
