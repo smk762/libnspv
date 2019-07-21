@@ -110,19 +110,9 @@ bits256 bits256_doublesha256(uint8_t *data,int32_t datalen)
                
 bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
 {
-    bits256 hash;
-    // serialize using iguana_hdrs method
-    /*CBlockHeader block;
-     block.nVersion = hdr->nVersion;
-     block.hashPrevBlock = hdr->hashPrevBlock;
-     block.hashMerkleRoot = hdr->hashMerkleRoot;
-     block.hashFinalSaplingRoot = hdr->hashFinalSaplingRoot;
-     block.nTime = hdr->nTime;
-     block.nBits = hdr->nBits;
-     block.nNonce = hdr->nNonce;
-     block.nSolution.resize(sizeof(hdr->nSolution));
-     memcpy(&block.nSolution[0],hdr->nSolution,sizeof(hdr->nSolution));
-     return(block.GetHash());*/
+    bits256 hash; int32_t len; uint8_t H[sizeof(*hdr) + 4];
+    len = NSPV_rwequihdr(1,H,hdr,1);
+    hash = bits256_doublesha256(H,len);
     return(hash);
 }
 
@@ -930,8 +920,8 @@ bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char *symbol,cstr
             ((uint8_t *)blockhashp)[31 - i] = opret->str[offset + i];
         for (i=0; i<32; i++)
             ((uint8_t *)&desttxid)[31 - i] = opret->str[offset + 4 + 32 + i];
-        for (i=0; i<opret->len; i++)
-            fprintf(stderr,"%02x",opret->str[i]&0xff);
+        //for (i=0; i<opret->len; i++)
+        //    fprintf(stderr,"%02x",opret->str[i]&0xff);
         fprintf(stderr," ntzht.%d %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)opret->len);
         return(desttxid);
     } else return(zeroid);
