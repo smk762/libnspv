@@ -125,7 +125,7 @@ bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t
         sig_hash_personal = ZCASH_SIG_HASH_SAPLING_PERSONALIZATION;
     crypto_generichash_blake2b_salt_personal(sigtxid.bytes,32,for_sig_hash,(uint64_t)len,
                                              NULL,0,NULL,sig_hash_personal);
-    return(sigtxid);
+    return(bits256_rev(sigtxid));
 }
 
 int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)

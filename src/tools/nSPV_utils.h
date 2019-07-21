@@ -465,6 +465,14 @@ void *OS_filestr(long *allocsizep,char *_fname)
     return(retptr);
 }
 
+bits256 bits256_rev(bits256 hash)
+{
+    bits256 rev; int32_t i;
+    for (i=0; i<32; i++)
+        rev.bytes[i] = hash.bytes[31 - i];
+    return(rev);
+}
+
 bits256 btc_uint256_to_bits256(uint256 hash256)
 {
     bits256 hash;
