@@ -467,7 +467,7 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return(0);
             } else fprintf(stderr,"signed vini.%d\n",i);
-        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent retcode.%d\n",bits256_str(str,prevhash),utxovout,retcode); // of course much better handling is needed
+        } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent retcode.%d\n",bits256_str(str,prevhash),utxovout,validation); // of course much better handling is needed
         if ( vintx != 0 )
         {
             btc_tx_free(vintx);
