@@ -541,11 +541,12 @@ char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
     hexstr[0] = 0;
     if ( cstr != 0 && cstr->str != 0 && (len= cstr->len) <= (maxlen>>1)-1 )
     {
-        //utils_bin_to_hex((uint8_t *)cstr->str,len,hexstr);
-        for (i=0; i<len; i++)
-            sprintf(&hexstr[i << 1],"%02x",cstr->str[i]);
+        utils_bin_to_hex((uint8_t *)cstr->str,len,hexstr);
+        //for (i=0; i<len; i++)
+        //    sprintf(&hexstr[i << 1],"%02x",cstr->str[i]);
         hexstr[len << 1] = 0;
     }
+    fprintf(stderr,"clen.%d maxlen.%d cmp.%d\n",len,maxlen,cstr->len <= (maxlen>>1)-1)
     return(hexstr);
 }
 
