@@ -149,6 +149,50 @@ void NSPV_logout()
     NSPV_logintime = 0;
 }
 
+btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
+{
+    int32_t i,n,flag = 0; btc_node *nodes[64]; uint32_t timestamp = (uint32_t)time(NULL);
+    if ( node == 0 )
+    {
+        memset(nodes,0,sizeof(nodes));
+        n = 0;
+        for (i=0; i<(int32_t)client->nodegroup->nodes->len; i++)
+        {
+            btc_node *ptr = vector_idx(client->nodegroup->nodes,i);
+            if ( ptr->prevtimes[ind] > timestamp )
+                ptr->prevtimes[ind] = 0;
+            if ( (ptr->state & NODE_CONNECTED) == NODE_CONNECTED )
+            {
+                if ( (ptr->nServices & mask) == mask && timestamp > ptr->prevtimes[ind] )
+                {
+                    flag = 1;
+                    nodes[n++] = ptr;
+                    if ( n == sizeof(nodes)/sizeof(*nodes) )
+                        break;
+                }
+            }
+        }
+        if ( n > 0 )
+            node = nodes[rand() % n];
+    } else flag = 1;
+    if ( node != 0 )
+    {
+        if ( len >= 0xfd )
+            fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
+        else
+        {
+            msg[0] = len - 1;
+            cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
+            btc_node_send(node,request);
+            cstr_free(request, true);
+            //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[0],len);
+            node->prevtimes[ind] = timestamp;
+            return(node);
+        }
+    } else fprintf(stderr,"no nodes\n");
+    return(0);
+}
+
 int32_t NSPV_periodic(btc_node *node) // called periodically
 {
     uint8_t msg[256]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
@@ -255,50 +299,6 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 break;
         }
     }
-}
-
-btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
-{
-    int32_t i,n,flag = 0; btc_node *nodes[64]; uint32_t timestamp = (uint32_t)time(NULL);
-    if ( node == 0 )
-    {
-        memset(nodes,0,sizeof(nodes));
-        n = 0;
-        for (i=0; i<(int32_t)client->nodegroup->nodes->len; i++)
-        {
-            btc_node *ptr = vector_idx(client->nodegroup->nodes,i);
-            if ( ptr->prevtimes[ind] > timestamp )
-                ptr->prevtimes[ind] = 0;
-            if ( (ptr->state & NODE_CONNECTED) == NODE_CONNECTED )
-            {
-                if ( (ptr->nServices & mask) == mask && timestamp > ptr->prevtimes[ind] )
-                {
-                    flag = 1;
-                    nodes[n++] = ptr;
-                    if ( n == sizeof(nodes)/sizeof(*nodes) )
-                        break;
-                }
-            }
-        }
-        if ( n > 0 )
-            node = nodes[rand() % n];
-    } else flag = 1;
-    if ( node != 0 )
-    {
-        if ( len >= 0xfd )
-            fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
-        else
-        {
-            msg[0] = len - 1;
-            cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
-            btc_node_send(node,request);
-            cstr_free(request, true);
-            //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[0],len);
-            node->prevtimes[ind] = timestamp;
-            return(node);
-        }
-    } else fprintf(stderr,"no nodes\n");
-    return(0);
 }
 
 cJSON *NSPV_getinfo_req(btc_spv_client *client,int32_t reqht)

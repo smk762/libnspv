@@ -469,7 +469,7 @@ void btc_tx_add_txout(btc_tx *mtx,uint64_t satoshis,cstring *scriptPubKey)
     btc_tx_out *vout = btc_tx_out_new();
     vout->script_pubkey = scriptPubKey;
     vout->value = satoshis;
-    vector_add(mtx->vout,tx_out);
+    vector_add(mtx->vout,vout);
 }
 
 void btc_tx_add_p2pk(btc_tx *mtx,uint64_t satoshis,uint8_t *pubkey33)
@@ -478,7 +478,7 @@ void btc_tx_add_p2pk(btc_tx *mtx,uint64_t satoshis,uint8_t *pubkey33)
     vout->script_pubkey = cstr_new_sz(35);
     btc_script_append_pushdata(vout->script_pubkey,pubkey33,33);
     btc_script_append_op(vout->script_pubkey,OP_CHECKSIG);
-    vout->value = change;
+    vout->value = satoshis;
     vector_add(mtx->vout,vout);
 }
 
@@ -488,7 +488,7 @@ btc_tx *btc_tx_decodehex(char *hexstr)
     data = btc_malloc(len);
     decode_hex(data,len,hexstr);
     tx = btc_tx_new(SAPLING_TX_VERSION);
-    if ( btc_tx_deserialize(data,len,tx,&consumed,false) == 0 || consumed != len )
+    if ( btc_tx_deserialize(data,len,tx,&consumed,false) == 0 || consumed != (size_t)len )
     {
         fprintf(stderr,"btc_tx_decodehex consumed %d != len %d error\n",(int32_t)consumed,len);
         btc_tx_free(tx);
@@ -511,7 +511,14 @@ bits256 btc_uint256_to_bits256(uint256 hash256)
 {
     bits256 hash;
     iguana_rwbignum(1,hash.bytes,sizeof(hash),(uint8_t *)hash256);
-    return(hash);)
+    return(hash);
+}
+
+uint256 btc_bits256_to_uint256(bits256 hash)
+{
+    uint256 hash256;
+    iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
+    return(hash);
 }
 
 cJSON *btc_txvin_to_json(btc_tx_in *vin)
