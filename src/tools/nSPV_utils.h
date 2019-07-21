@@ -989,7 +989,7 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )
             {
                 fprintf(stderr,"need to implement fastnotaries count, numsigs.%d error\n",numsigs);
-                return(-3);
+                return(13);
             }
             return(0);
         }

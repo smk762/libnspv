@@ -442,12 +442,12 @@ void btc_node_send(btc_node* node, cstring* data)
     if ((node->state & NODE_CONNECTED) != NODE_CONNECTED)
         return;
 
-    portable_mutex_lock(&NSPV_netmutex);
-    fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, data->str+4);
+    //portable_mutex_lock(&NSPV_netmutex);
+    //fprintf(stderr,"sending message to node %d: %s\n", node->nodeid, data->str+4);
     bufferevent_write(node->event_bev, data->str, data->len);
     char* dummy = data->str + 4;
-    fprintf(stderr,"sent message to node %d: %s\n", node->nodeid, data->str+4);
-    portable_mutex_unlock(&NSPV_netmutex);
+    //fprintf(stderr,"sent message to node %d: %s\n", node->nodeid, data->str+4);
+    //portable_mutex_unlock(&NSPV_netmutex);
     node->nodegroup->log_write_cb("sending message to node %d: %s\n", node->nodeid, dummy);
 }
 
