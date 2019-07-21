@@ -253,6 +253,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
                 NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
+                fprintf(stderr,"call validate\n");
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
                     fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);
@@ -374,7 +375,7 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
 
 bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKey,uint32_t nTime)
 {
-    uint32_t branchid; bits256 sighash; char str[65]; int32_t i,sigerr=0; uint256 hash; uint8_t sig[74]; size_t siglen=0; btc_tx_in *vin=0;
+    uint32_t branchid; bits256 sighash; char str[65]; int32_t i,sigerr=0; uint256 hash; uint8_t sig[128]; size_t siglen=0; btc_tx_in *vin=0;
     if ( nTime != 0 && mtx->version == 1 )
     {
         fprintf(stderr,"use legacy sig validation\n");
@@ -384,31 +385,22 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     {
         sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
         btc_bits256_to_uint256(hash,sighash);
+        siglen = sizeof(sig);
+        if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
+            sigerr = -1;
+        else
+        {
+            //for (i=0; i<(int32_t)siglen; i++)
+            //    fprintf(stderr,"%02x",sig[i]);
+            vin = btc_tx_vin(mtx,vini);
+            vin->script_sig = cstr_new_sz(siglen+1);
+            memcpy(vin->script_sig->str,sig,siglen);
+            vin->script_sig->str[siglen] = 1;
+            vin->script_sig->len = siglen+1;
+        }
+        //fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:siglen);
     }
-    else
-    {
-        memset(hash,0,sizeof(hash));
-        btc_tx_sighash(mtx,scriptPubKey,vini,SIGHASH_ALL,utxovalue,SIGVERSION_BASE,hash);
-    }
-    siglen = sizeof(sig);
-    if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
-    {
-        sigerr = -1;
-        return(false);
-    }
-    else
-    {
-        vin = btc_tx_vin(mtx,vini);
-        vin->script_sig = cstr_new_sz(siglen+1);
-        memcpy(vin->script_sig->str,sig,siglen);
-        vin->script_sig->str[siglen] = 1;
-        vin->script_sig->len = siglen+1;
-        for (i=0; i<(int32_t)vin->script_sig->len; i++)
-            fprintf(stderr,"%02x",vin->script_sig->str[i]&0xff);
-        fprintf(stderr," sig vini.%d len.%d\n",vini,(int32_t)siglen);
-        return(true);
-    }
-    //fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:siglen);
+    return(true);
 }
 
 cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,int64_t txfee,struct NSPV_utxoresp used[])
@@ -476,7 +468,7 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
             {
                 fprintf(stderr,"signing error for vini.%d\n",i);
                 return(0);
-            } //else fprintf(stderr,"signed vini.%d\n",i);
+            } else fprintf(stderr,"signed vini.%d\n",i);
         } else fprintf(stderr,"couldnt find txid.%s/v%d or it was spent retcode.%d\n",bits256_str(str,prevhash),utxovout,validation); // of course much better handling is needed
         if ( vintx != 0 )
         {
