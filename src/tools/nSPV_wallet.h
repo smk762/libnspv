@@ -141,15 +141,15 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
                 NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
-                if ( (retval= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
+                if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
-                    fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",proof->len);
+                    fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);
                     /*std::vector<uint256> txids; uint256 proofroot;
                     proofroot = BitcoinGetProofMerkleRoot(proof,txids);*/
-                    if ( proofroot != NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot )
+                    if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 )
                     {
-                        fprintf(stderr,"prooflen.%d proofroot.%s vs %s\n",(int32_t)proof.size(),bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
-                        retval = -2003;
+                        fprintf(stderr,"prooflen.%d proofroot.%s vs %s\n",(int32_t)proof->len,bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
+                        *retvalp = -2003;
                     } else *retvalp = 0;
                 }
             } else *retvalp = -2005;
@@ -261,6 +261,7 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
 
 bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKey,uint32_t nTime)
 {
+    uint32_t branchid;
     if ( nTime != 0 && mtx->version == 1 )
     {
         fprintf(stderr,"use legacy sig validation\n");
@@ -279,7 +280,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     return(true);
 }
 
-cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,uint64_t txfee,struct NSPV_utxoresp used[])
+cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,int64_t txfee,struct NSPV_utxoresp used[])
 {
     btc_tx *vintx; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n,validation;
     *rewardsump = *interestsump = 0;
@@ -307,7 +308,7 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
     if ( (totalinputs+interest) >= totaloutputs+2*txfee )
     {
         change = (totalinputs+interest) - (totaloutputs+txfee);
-        btc_tx_add_p2pk(mtx,change,NSPV_pubkey->pubkey);
+        btc_tx_add_p2pk(mtx,change,NSPV_pubkey.pubkey);
     }
     for (i=0; i<n; i++)
     {
@@ -368,7 +369,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         return(result);
     }
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
-        NSPV_addressutxos(srcaddr,0,0);
+        NSPV_addressutxos(client,srcaddr,0,0);
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
     {
         jaddstr(result,"result","error");
