@@ -182,10 +182,11 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
 
     //tx needs to be initialized
     deser_s32(&tx->version, &buf);
-
+fprintf(stderr,"vers.%d\n",tx->version);
     uint32_t vlen;
     if (!deser_varlen(&vlen, &buf))
         return false;
+fprintf(stderr,"numvins.%d\n",vlen);
 
     uint8_t flags = 0;
     if (vlen == 0 && allow_witness) {
@@ -212,6 +213,7 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
 
     if (!deser_varlen(&vlen, &buf))
         return false;
+fprintf(stderr,"numvouts.%d\n",vlen);
     for (i = 0; i < vlen; i++) {
         btc_tx_out* tx_out = btc_tx_out_new();
 
@@ -247,6 +249,7 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
 
     if (!deser_u32(&tx->locktime, &buf))
         return false;
+    fprintf(stderr,"locktime.%d\n",tx->locktime);
     if ( tx->version == SAPLING_TX_VERSION )
     {
         fprintf(stderr,"deser sapling\n");
