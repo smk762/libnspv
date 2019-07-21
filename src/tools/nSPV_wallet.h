@@ -374,7 +374,7 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
 
 bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKey,uint32_t nTime)
 {
-    uint32_t branchid; bits256 sighash; char str[65]; int32_t i,sigerr=0; uint256 hash; uint8_t sig[128]; size_t siglen=0; btc_tx_in *vin=0;
+    uint32_t branchid; bits256 sighash; char str[65]; int32_t i,sigerr=0; uint256 hash; uint8_t sig[74]; size_t siglen=0; btc_tx_in *vin=0;
     if ( nTime != 0 && mtx->version == 1 )
     {
         fprintf(stderr,"use legacy sig validation\n");
@@ -390,7 +390,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
         memset(hash,0,sizeof(hash));
         btc_tx_sighash(mtx,scriptPubKey,vini,SIGHASH_ALL,utxovalue,SIGVERSION_BASE,hash);
     }
-    siglen = 0;
+    siglen = sizeof(sig);
     if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )
     {
         sigerr = -1;
@@ -405,7 +405,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
         vin->script_sig->len = siglen+1;
         for (i=0; i<(int32_t)vin->script_sig->len; i++)
             fprintf(stderr,"%02x",vin->script_sig->str[i]&0xff);
-        fprintf(stderr," sig vini.%d\n",vini);
+        fprintf(stderr," sig vini.%d len.%d\n",vini,(int32_t)siglen);
         return(true);
     }
     //fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:siglen);
