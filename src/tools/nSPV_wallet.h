@@ -40,7 +40,7 @@ bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t
     // sapling tx sighash preimage
     uint8_t for_sig_hash[1000]; bits256 sigtxid; int32_t hashtype,version,i,len=0; btc_tx_in *vin; btc_tx_out *vout;
     hashtype = SIGHASH_ALL;
-    version = (mtx->version & 0x7fffffff);
+    version = (tx->version & 0x7fffffff);
     len = iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->version), &tx->version);
     len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->nVersionGroupId), &tx->nVersionGroupId);
     {
