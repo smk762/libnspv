@@ -871,7 +871,7 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
 {
     static uint8_t kmd_pubkeys[NUM_KMD_SEASONS][64][33],didinit[NUM_KMD_SEASONS];
     int32_t i,isKMD,n,kmd_season = 0; uint64_t mask = 0; uint32_t timestamp = 0;
-    isKMD = (strcmp(client->chainparams->bame,"KMD") == 0);
+    isKMD = (strcmp(client->chainparams->name,"KMD") == 0);
     if ( isKMD != 0 )
     {
         if ( height >= 180000 )
