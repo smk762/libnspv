@@ -388,7 +388,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     else
     {
         memset(hash,0,sizeof(hash));
-        btc_tx_sighash(tx,scriptPubKey,vini,SIGHASH_ALL,utxovalue,SIGVERSION_BASE,hash);
+        btc_tx_sighash(mtx,scriptPubKey,vini,SIGHASH_ALL,utxovalue,SIGVERSION_BASE,hash);
     }
     siglen = sizeof(sig);
     if ( btc_key_sign_hash(&NSPV_key,hash,sig,&siglen) == 0 )

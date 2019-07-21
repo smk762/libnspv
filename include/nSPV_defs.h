@@ -221,5 +221,6 @@ extern uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight);
 extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 extern int32_t is_hexstr(char *str,int32_t n);
 extern int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr,int32_t addlenflag);
+extern bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen);
 
 #endif // KOMODO_NSPV_DEFSH

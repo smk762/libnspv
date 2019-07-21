@@ -941,6 +941,12 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
     int32_t vini,j; btc_pubkey pubkeys[64]; uint64_t mask = 0; btc_tx_in *vin; bits256 sighash; uint256 hash; uint8_t script[35];
     if ( tx == 0 || tx->vin == 0 )
         return(-1);
+    memset(pubkeys,0,sizeof(pubkeys));
+    for (j=0; j<64; j++)
+    {
+        memcpy(pubkeys[j].pubkey,elected[j],BTC_ECKEY_COMPRESSED_LENGTH);
+        pubkey->compressed = true;
+    }
     script[0] = 33;
     script[34] = OP_CHECKSIG;
     for (vini=0; vini<(int32_t)tx->vin->len; vini++)
@@ -956,7 +962,6 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
             btc_bits256_to_uint256(hash,sighash);
             if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str,vin->script_sig->len) > 0 )
             {
-                fprintf(stderr,"(vini.%d %s.%d) ",vini,coinaddr,retval);
                 mask |= (1LL << j);
                 break;
             }
