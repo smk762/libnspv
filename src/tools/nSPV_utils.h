@@ -87,6 +87,16 @@ char *bits256_str(char *buf,bits256 hash)
     return(buf);
 }
 
+int32_t bits256_cmp(bits256 a,bits256 b)
+{
+    return(memcmp(a.bytes,b.bytes,sizeof(bits256)));
+}
+
+int32_t bits256_nonz(bits256 a)
+{
+    return(memcmp(a.bytes,zeroid.bytes,sizeof(bits256)));
+}
+
 bits256 bits256_doublesha256(uint8_t *data,int32_t datalen)
 {
     bits256 hash,hash2; int32_t i;
