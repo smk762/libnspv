@@ -547,7 +547,7 @@ char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
 
 cstring *btc_tx_to_cstr(btc_tx *tx)
 {
-    int32_t hexlen; cstring *hex,*txser = cstr_new_sz(1024);
+    int32_t hexlen; cstring *hex=0,*txser = cstr_new_sz(1024);
     btc_tx_serialize(txser,tx,false);
     if ( (hexlen= txser->len*2) > 0 )
     {
