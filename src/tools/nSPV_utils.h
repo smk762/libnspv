@@ -464,6 +464,147 @@ void *OS_filestr(long *allocsizep,char *_fname)
     return(retptr);
 }
 
+void btc_tx_add_txout(btc_tx *mtx,uint64_t satoshis,cstring *scriptPubKey)
+{
+    btc_tx_out *vout = btc_tx_out_new();
+    vout->script_pubkey = scriptPubKey;
+    vout->value = satoshis;
+    vector_add(mtx->vout,tx_out);
+}
+
+void btc_tx_add_p2pk(btc_tx *mtx,uint64_t satoshis,uint8_t *pubkey33)
+{
+    btc_tx_out *vout = btc_tx_out_new();
+    vout->script_pubkey = cstr_new_sz(35);
+    btc_script_append_pushdata(vout->script_pubkey,pubkey33,33);
+    btc_script_append_op(vout->script_pubkey,OP_CHECKSIG);
+    vout->value = change;
+    vector_add(mtx->vout,vout);
+}
+
+btc_tx *btc_tx_decodehex(char *hexstr)
+{
+    uint8_t *data; btc_tx *tx; size_t consumed = 0; int32_t len = (int32_t)strlen(hexstr) >> 1;
+    data = btc_malloc(len);
+    decode_hex(data,len,hexstr);
+    tx = btc_tx_new(SAPLING_TX_VERSION);
+    if ( btc_tx_deserialize(data,len,tx,&consumed,false) == 0 || consumed != len )
+    {
+        fprintf(stderr,"btc_tx_decodehex consumed %d != len %d error\n",(int32_t)consumed,len);
+        btc_tx_free(tx);
+        tx = 0;
+    }
+    btc_free(data);
+    return(tx);
+}
+
+char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
+{
+    int32_t len;
+    hexstr[0] = 0;
+    if ( cstr != 0 && cstr->str != 0 && (len= cstr->len) <= (maxlen>>1)-1 )
+        utils_bin_to_hex((uint8_t *)cstr->str,len,hexstr);
+    return(hexstr);
+}
+
+bits256 btc_uint256_to_bits256(uint256 hash256)
+{
+    bits256 hash;
+    iguana_rwbignum(1,hash.bytes,sizeof(hash),(uint8_t *)hash256);
+    return(hash);)
+}
+
+cJSON *btc_txvin_to_json(btc_tx_in *vin)
+{
+    char hexstr[NSPV_MAXSCRIPTSIZE*2+1]; cJSON *item = cJSON_CreateObject();
+    jaddbits256(item,"txid",btc_uint256_to_bits256(tx_in->prevout.hash));
+    jaddnum(item,"vout",vin->prevout.n);
+    jaddstr(item,"scriptSig",btc_cstr2hex(hexstr,sizeof(hexstr),vin->script_sig));
+    jaddnum(item,"sequenceid",vin->sequence);
+    return(item);
+}
+
+cJSON *btc_txvins_to_json(vector *vin)
+{
+    int32_t i; cJSON *vins = cJSON_CreateArray();
+    if ( tx->vin != 0 )
+    {
+        for (i=0; i<tx->vin->len; i++)
+            jaddi(vins,btc_txvin_to_json(vector_idx(tx->vin,i)));
+    }
+    return(vins);
+}
+
+cJSON *btc_txvout_to_json(btc_tx_out *vout)
+{
+    char hexstr[NSPV_MAXSCRIPTSIZE*2+1]; cJSON *item = cJSON_CreateObject();
+    jaddnum(item,"value",dstr(vout->value));
+    jaddstr(item,"scriptPubKey",btc_cstr_to_hex(hexstr,sizeof(hexstr),vout->script_pubkey));
+    return(item);
+}
+
+cJSON *btc_txvouts_to_json(vector *vout)
+{
+    int32_t i; cJSON *vouts = cJSON_CreateArray();
+    if ( tx->vout != 0 )
+    {
+        for (i=0; i<tx->vout->len; i++)
+            jaddi(vouts,btc_txvout_to_json(vector_idx(tx->vout,i)));
+    }
+    return(vouts);
+}
+
+cJSON *btc_tx_to_json(btc_tx *tx)
+{
+    cJSON *txjson = cJSON_CreateObject();
+    jaddnum(tx,"nVersion",tx->version);
+    jadd(tx,"vin",btc_txvins_to_json(tx->vin));
+    jadd(tx,"vout",btc_txvouts_to_json(tx->vout));
+    jaddnum(tx,"nLockTime",tx->locktime);
+    if ( tx->version == SAPLING_TX_VERSION )
+    {
+        jaddnum(tx,"nExpiryHeight",tx->nExpiryHeight);
+        jaddnum(tx,"valueBalance",tx->valueBalance);
+    }
+    return(txjson);
+}
+
+btc_tx_in *btc_tx_vin(btc_tx *tx,int32_t vini)
+{
+    if ( tx != 0 && tx->vin != 0 && vini < tx->vin->len )
+        return(vector_idx(tx->vin,vini));
+    else return(0);
+}
+
+btc_tx_out *btc_tx_vout(btc_tx *tx,int32_t v)
+{
+    if ( tx != 0 && tx->vout != 0 && v < tx->vout->len )
+        return(vector_idx(tx->vout,v));
+    else return(0);
+}
+
+uint64_t _komodo_interestnew(int32_t txheight,uint64_t nValue,uint32_t nLockTime,uint32_t tiptime)
+{
+    int32_t minutes; uint64_t interest = 0;
+    if ( nLockTime >= NSPV_LOCKTIME_THRESHOLD && tiptime > nLockTime && (minutes= (tiptime - nLockTime) / 60) >= (NSPV_KOMODO_MAXMEMPOOLTIME/60) )
+    {
+        if ( minutes > 365 * 24 * 60 )
+            minutes = 365 * 24 * 60;
+        if ( txheight >= 1000000 && minutes > 31 * 24 * 60 )
+            minutes = 31 * 24 * 60;
+        minutes -= ((NSPV_KOMODO_MAXMEMPOOLTIME/60) - 1);
+        interest = ((nValue / 10512000) * minutes);
+    }
+    return(interest);
+}
+
+uint64_t komodo_interestnew(int32_t txheight,uint64_t nValue,uint32_t nLockTime,uint32_t tiptime)
+{
+    uint64_t interest = 0;
+    if ( txheight < NSPV_KOMODO_ENDOFERA && nLockTime >= NSPV_LOCKTIME_THRESHOLD && tiptime != 0 && nLockTime < tiptime && nValue >= 10*COIN )
+        interest = _komodo_interestnew(txheight,nValue,nLockTime,tiptime);
+    return(interest);
+}
 #ifdef LATER
 
 

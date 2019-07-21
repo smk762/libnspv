@@ -34,6 +34,8 @@
 #include "script.h"
 #include "vector.h"
 
+#define SAPLING_TX_VERSION 4
+
 LIBBTC_BEGIN_DECL
 
 typedef struct btc_script_ {
@@ -64,6 +66,8 @@ typedef struct btc_tx_ {
     vector* vin;
     vector* vout;
     uint32_t locktime;
+    uint32_t nExpiryHeight;  // only for sapling version 4
+    int64_t valueBalance;    // only for sapling version 4
 } btc_tx;
 
 
@@ -78,7 +82,7 @@ LIBBTC_API void btc_tx_out_free(btc_tx_out* tx_out);
 LIBBTC_API void btc_tx_out_copy(btc_tx_out* dest, const btc_tx_out* src);
 
 //!create a new tx input
-LIBBTC_API btc_tx* btc_tx_new();
+LIBBTC_API btc_tx* btc_tx_new(int32_t version);
 LIBBTC_API void btc_tx_free(btc_tx* tx);
 LIBBTC_API void btc_tx_copy(btc_tx* dest, const btc_tx* src);
 
