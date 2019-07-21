@@ -146,13 +146,14 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
                     fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);
-                    /*std::vector<uint256> txids; uint256 proofroot;
-                    proofroot = BitcoinGetProofMerkleRoot(proof,txids);*/
-                    if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 )
+                    //proofroot = BitcoinGetProofMerkleRoot(proof,txids);
+                    bits256 *txids = calloc(1,proof->len); // upper bound
+                    if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 || bits256_cmp(txid,txids[0]) != 0 )
                     {
                         fprintf(stderr,"prooflen.%d proofroot.%s vs %s\n",(int32_t)proof->len,bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
                         *retvalp = -2003;
                     } else *retvalp = 0;
+                    free(txids);
                 }
             } else *retvalp = -2005;
         } else *retvalp = -2004;
