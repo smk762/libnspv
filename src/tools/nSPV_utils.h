@@ -537,10 +537,15 @@ btc_tx *btc_tx_decodehex(char *hexstr)
 
 char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
 {
-    int32_t len;
+    int32_t i,len;
     hexstr[0] = 0;
     if ( cstr != 0 && cstr->str != 0 && (len= cstr->len) <= (maxlen>>1)-1 )
-        utils_bin_to_hex((uint8_t *)cstr->str,len,hexstr);
+    {
+        //utils_bin_to_hex((uint8_t *)cstr->str,len,hexstr);
+        for (i=0; i<len; i++)
+            sprintf(&hexstr[i << 1],"%02x",cstr->str[i]);
+        hexstr[len << 1] = 0;
+    }
     return(hexstr);
 }
 
