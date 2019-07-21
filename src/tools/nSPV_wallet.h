@@ -276,7 +276,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
         return(true);
     }  //else fprintf(stderr,"sigerr SIG_TXHASH %s vini.%d %.8f\n",bits256_str(str,SIG_TXHASH),vini,(double)utxovalue/COIN);
     return(false);*/
-    fprintf(stderr,"create signature txversion.%d\n",mtx->version);
+    fprintf(stderr,"create signature txversion.%x\n",mtx->version);
     return(true);
 }
 

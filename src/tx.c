@@ -182,14 +182,11 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
 
     //tx needs to be initialized
     deser_s32(&tx->version, &buf);
-fprintf(stderr,"vers.%x\n",tx->version);
     if ( tx->version == SAPLING_TX_VERSION )
         deser_u32(&tx->nVersionGroupId, &buf);
-    fprintf(stderr,"nVersionGroupId.%x\n",tx->nVersionGroupId);
     uint32_t vlen;
     if (!deser_varlen(&vlen, &buf))
         return false;
-fprintf(stderr,"numvins.%d\n",vlen);
 
     uint8_t flags = 0;
     if (vlen == 0 && allow_witness) {
@@ -216,7 +213,6 @@ fprintf(stderr,"numvins.%d\n",vlen);
 
     if (!deser_varlen(&vlen, &buf))
         return false;
-fprintf(stderr,"numvouts.%d\n",vlen);
     for (i = 0; i < vlen; i++) {
         btc_tx_out* tx_out = btc_tx_out_new();
 
@@ -252,14 +248,13 @@ fprintf(stderr,"numvouts.%d\n",vlen);
 
     if (!deser_u32(&tx->locktime, &buf))
         return false;
-    fprintf(stderr,"locktime.%d\n",tx->locktime);
     if ( tx->version == SAPLING_TX_VERSION )
     {
-        fprintf(stderr,"deser sapling\n");
         if (!deser_u32(&tx->nExpiryHeight, &buf))
             return false;
         if (!deser_s64(&tx->valueBalance, &buf))
             return false;
+        fprintf(stderr,"deser sapling inlen.%d vs buf.len %d\n",(int32_t)inlen,(int32_t)buf.len);
     }
 
     if (consumed_length)
