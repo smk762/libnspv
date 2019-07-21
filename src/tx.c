@@ -262,7 +262,7 @@ int btc_tx_deserialize(const unsigned char* tx_serialized, size_t inlen, btc_tx*
             return false;
         if (!deser_varlen(&v2, &buf))
             return false;
-        fprintf(stderr,"deser sapling inlen.%d vs buf.len %d (%d %d %d)\n",(int32_t)inlen,(int32_t)buf.len,v0,v1,v2);
+        //fprintf(stderr,"deser sapling inlen.%d vs buf.len %d (%d %d %d)\n",(int32_t)inlen,(int32_t)buf.len,v0,v1,v2);
     }
 
     if (consumed_length)

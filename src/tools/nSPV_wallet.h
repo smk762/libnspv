@@ -141,6 +141,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
                 NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
+                fprintf(stderr,"call validate\n");
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
                     fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);

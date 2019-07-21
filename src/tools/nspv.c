@@ -115,6 +115,7 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
+ 
  HDRhash
  signature
  merkleproof
