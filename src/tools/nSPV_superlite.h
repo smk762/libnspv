@@ -698,6 +698,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
     jaddstr(result,"pubkey",pubkeystr);
     jaddnum(result,"wifprefix",chain->b58prefix_secret_address);
     jaddnum(result,"compressed",1);
+    return(result);
 }
 
 cJSON *_NSPV_JSON(cJSON *argjson)
