@@ -282,7 +282,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
 
 cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,int64_t *interestsump,cJSON *retcodes,btc_tx *mtx,int64_t txfee,struct NSPV_utxoresp used[])
 {
-    btc_tx *vintx; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n,validation;
+    btc_tx *vintx; btc_tx_in *vin; btc_tx_out *vout; cstring *hex = 0; char str[65]; bits256 prevhash; int64_t interest=0,change=0,totaloutputs=0,totalinputs=0; int32_t i,utxovout,n=0,validation;
     *rewardsump = *interestsump = 0;
     if ( mtx == 0 )
         return(0);
@@ -310,6 +310,9 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
         change = (totalinputs+interest) - (totaloutputs+txfee);
         btc_tx_add_p2pk(mtx,change,NSPV_pubkey.pubkey);
     }
+    if ( mtx->vin != 0 )
+        n = mtx->vin->len;
+    else n = 0;
     for (i=0; i<n; i++)
     {
         if ( (vin= btc_tx_vin(mtx,i)) == 0 )

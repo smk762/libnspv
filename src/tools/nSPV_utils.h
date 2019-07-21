@@ -972,12 +972,12 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
 
 int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_t *ntzheightp,bits256 *blockhashp,bits256 *desttxidp,btc_tx *tx)
 {
-    int32_t numsigs=0; btc_tx_out *vout; uint8_t elected[64][33]; char *symbol;
+    int32_t numsigs=0; btc_tx_out *vout; uint8_t elected[64][33];
     if ( tx->vout != 0 && tx->vout->len >= 2 && (vout= btc_tx_vout(tx,1)) != 0 )
     {
         if ( vout->script_pubkey != 0 && vout->script_pubkey->len >= 2+32*2+4 && vout->script_pubkey->str[0] == OP_RETURN )
         {
-            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,symbol,vout->script_pubkey);
+            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,client->chainparams->name,vout->script_pubkey);
             if ( komodo_notaries(client,elected,*ntzheightp) <= 0 )
                 fprintf(stderr,"non-support notary list\n");
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )
