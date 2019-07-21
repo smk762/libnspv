@@ -541,7 +541,7 @@ char *btc_cstr_to_hex(char *hexstr,int32_t maxlen,cstring *cstr)
     hexstr[0] = 0;
     if ( cstr != 0 && cstr->str != 0 && (len= cstr->len) <= (maxlen>>1) )
         utils_bin_to_hex((uint8_t *)cstr->str,len,hexstr);
-    fprintf(stderr,"clen.%d maxlen.%d cmp.%d\n",len,maxlen,(int32_t)cstr->len <= (maxlen>>1)-1);
+    //fprintf(stderr,"clen.%d maxlen.%d cmp.%d\n",len,maxlen,(int32_t)cstr->len <= (maxlen>>1)-1);
     return(hexstr);
 }
 
@@ -553,7 +553,7 @@ cstring *btc_tx_to_cstr(btc_tx *tx)
     hex = cstr_new_sz(hexlen+1);
     hex->len = hexlen;
     btc_cstr_to_hex(hex->str,hex->len,txser);
-    fprintf(stderr,"tx[%d] to (%s) len.%d\n",(int32_t)txser->len,hex->str,(int32_t)hex->len);
+    //fprintf(stderr,"tx[%d] to (%s) len.%d\n",(int32_t)txser->len,hex->str,(int32_t)hex->len);
     cstr_free(txser,1);
     return(hex);
 }
@@ -608,7 +608,7 @@ cJSON *btc_txvouts_to_json(vector *vout)
 cJSON *btc_tx_to_json(btc_tx *tx)
 {
     cJSON *txjson = cJSON_CreateObject();
-    jaddnum(txjson,"nVersion",tx->version);
+    jaddnum(txjson,"nVersion",tx->version & 0x7fffffff);
     jadd(txjson,"vin",btc_txvins_to_json(tx->vin));
     jadd(txjson,"vout",btc_txvouts_to_json(tx->vout));
     jaddnum(txjson,"nLockTime",tx->locktime);
