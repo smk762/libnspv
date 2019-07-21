@@ -27,7 +27,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
     }
     else if ( (tx= NSPV_txextract(ptr->nextntz,ptr->nexttxlen)) == 0 )
         return(-3);
-    else if ( btc_tx_hash(tx) != ptr->nexttxid )
+    else if ( NSPV_tx_hash(tx) != ptr->nexttxid )
     {
         btc_tx_free(tx);
         return(-4);
@@ -57,7 +57,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
     sleep(1); // need this to get past the once per second rate limiter per message
     if ( (tx= NSPV_txextract(ptr->prevntz,ptr->prevtxlen)) == 0 )
         return(-8);
-    else if ( btc_tx_hash(tx) != ptr->prevtxid )
+    else if ( NSPV_tx_hash(tx) != ptr->prevtxid )
     {
         btc_tx_free(tx);
         return(-9);
@@ -97,7 +97,7 @@ btc_tx *NSPV_gettransaction(int32_t *retvalp,int32_t isKMD,int32_t skipvalidatio
     }
     else if ( (tx= NSPV_txextract(ptr->tx,ptr->txlen)) == 0 )
         return(0);
-    else if ( btc_tx_hash(tx) != txid )
+    else if ( NSPV_tx_hash(tx) != txid )
     {
         *retvalp = -2001;
         return(tx);

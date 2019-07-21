@@ -482,18 +482,24 @@ void btc_tx_add_p2pk(btc_tx *mtx,uint64_t satoshis,uint8_t *pubkey33)
     vector_add(mtx->vout,vout);
 }
 
-btc_tx *btc_tx_decodehex(char *hexstr)
+btc_tx *NSPV_txextract(uint8_t *data,int32_t datalen)
 {
-    uint8_t *data; btc_tx *tx; size_t consumed = 0; int32_t len = (int32_t)strlen(hexstr) >> 1;
-    data = btc_malloc(len);
-    decode_hex(data,len,hexstr);
-    tx = btc_tx_new(SAPLING_TX_VERSION);
-    if ( btc_tx_deserialize(data,len,tx,&consumed,false) == 0 || consumed != (size_t)len )
+    size_t consumed = 0; btc_tx tx = btc_tx_new(SAPLING_TX_VERSION);
+    if ( btc_tx_deserialize(data,datalen,tx,&consumed,false) == 0 || consumed != (size_t)datalen )
     {
-        fprintf(stderr,"btc_tx_decodehex consumed %d != len %d error\n",(int32_t)consumed,len);
+        fprintf(stderr,"NSPV_txextract consumed %d != len %d error\n",(int32_t)consumed,datalen);
         btc_tx_free(tx);
         tx = 0;
     }
+    return(tx);
+}
+
+btc_tx *btc_tx_decodehex(char *hexstr)
+{
+    uint8_t *data; btc_tx *tx; int32_t len = (int32_t)strlen(hexstr) >> 1;
+    data = btc_malloc(len);
+    decode_hex(data,len,hexstr);
+    tx = NSPV_txextract(data,len);
     btc_free(data);
     return(tx);
 }
@@ -519,6 +525,13 @@ void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
     iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
 }
 
+bits256 NSPV_tx_hash(btc_tx *tx)
+{
+    uint256 hash;
+    btc_tx_hash(tx,hash);
+    return(btc_uint256_to_bits256(hash));
+}
+
 cJSON *btc_txvin_to_json(btc_tx_in *vin)
 {
     char hexstr[NSPV_MAXSCRIPTSIZE*2+1]; cJSON *item = cJSON_CreateObject();
@@ -534,7 +547,7 @@ cJSON *btc_txvins_to_json(vector *vin)
     int32_t i; cJSON *vins = cJSON_CreateArray();
     if ( vin != 0 )
     {
-        for (i=0; i<vin->len; i++)
+        for (i=0; i<(int32_t)vin->len; i++)
             jaddi(vins,btc_txvin_to_json(vector_idx(vin,i)));
     }
     return(vins);
@@ -553,7 +566,7 @@ cJSON *btc_txvouts_to_json(vector *vout)
     int32_t i; cJSON *vouts = cJSON_CreateArray();
     if ( vout != 0 )
     {
-        for (i=0; i<vout->len; i++)
+        for (i=0; i<(int32_t)vout->len; i++)
             jaddi(vouts,btc_txvout_to_json(vector_idx(vout,i)));
     }
     return(vouts);
@@ -576,14 +589,14 @@ cJSON *btc_tx_to_json(btc_tx *tx)
 
 btc_tx_in *btc_tx_vin(btc_tx *tx,int32_t vini)
 {
-    if ( tx != 0 && tx->vin != 0 && vini < tx->vin->len )
+    if ( tx != 0 && tx->vin != 0 && vini < (int32_t)tx->vin->len )
         return(vector_idx(tx->vin,vini));
     else return(0);
 }
 
 btc_tx_out *btc_tx_vout(btc_tx *tx,int32_t v)
 {
-    if ( tx != 0 && tx->vout != 0 && v < tx->vout->len )
+    if ( tx != 0 && tx->vout != 0 && v < (int32_t)tx->vout->len )
         return(vector_idx(tx->vout,v));
     else return(0);
 }
