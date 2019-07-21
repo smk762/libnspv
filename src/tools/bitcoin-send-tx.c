@@ -44,6 +44,8 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <nSPV_defs.h>
+portable_mutex_t NSPV_netmutex;
 
 static struct option long_options[] =
     {
