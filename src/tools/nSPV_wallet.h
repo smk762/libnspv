@@ -39,6 +39,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
     }
     else if ( height != ptr->common.nextht )
     {
+        fprintf(stderr,"height.%d != common %d\n",height,ptr->common.nextht);
         btc_tx_free(tx);
         return(-6);
     }

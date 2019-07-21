@@ -930,6 +930,8 @@ bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char *symbol,cstr
             ((uint8_t *)blockhashp)[31 - i] = opret->str[offset + i];
         for (i=0; i<32; i++)
             ((uint8_t *)&desttxid)[31 - i] = opret->str[offset + 4 + 32 + i];
+        for (i=0; i<opret->len; i++)
+            fprintf(stderr,"%02x",opret->str[i]);
         fprintf(stderr," ntzht.%d %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)opret->len);
         return(desttxid);
     } else return(zeroid);
