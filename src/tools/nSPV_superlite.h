@@ -306,7 +306,7 @@ cJSON *NSPV_getinfo_req(btc_spv_client *client,int32_t reqht)
     NSPV_inforesp_purge(client->chainparams,&NSPV_inforesult);
     msg[len++] = NSPV_INFO;
     len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -362,7 +362,7 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     memcpy(&msg[len],coinaddr,slen), len += slen;
     msg[len++] = (CCflag != 0);
     len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_ADDRINDEX,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -403,7 +403,7 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     msg[len++] = (CCflag != 0);
     len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
     //fprintf(stderr,"skipcount.%d\n",skipcount);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_ADDRINDEX,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -443,7 +443,7 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
     fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -513,7 +513,7 @@ cJSON *NSPV_notarizations(btc_spv_client *client,int32_t reqheight)
     }
     msg[len++] = NSPV_NTZS;
     len += iguana_rwnum(1,&msg[len],sizeof(reqheight),&reqheight);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -543,7 +543,7 @@ cJSON *NSPV_txidhdrsproof(btc_spv_client *client,bits256 prevtxid,bits256 nexttx
     len += iguana_rwbignum(1,&msg[len],sizeof(prevtxid),(uint8_t *)&prevtxid);
     len += iguana_rwbignum(1,&msg[len],sizeof(nexttxid),(uint8_t *)&nexttxid);
     fprintf(stderr,"hdrsproof 3\n");
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -585,7 +585,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
     len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
     len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     //fprintf(stderr,"req txproof %s/v%d at height.%d\n",bits256_str(str,txid),vout,height);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -607,7 +607,7 @@ cJSON *NSPV_spentinfo(btc_spv_client *client,bits256 txid,int32_t vout)
     msg[len++] = NSPV_SPENTINFO;
     len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
     len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_SPENTINDEX,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
@@ -635,7 +635,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     len += iguana_rwnum(1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
-    for (iter=0; iter<3; iter++);
+    for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
