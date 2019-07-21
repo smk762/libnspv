@@ -380,7 +380,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     {
         fprintf(stderr,"use legacy sig validation\n");
         branchid = 0;
-    }
+    } else branchid = SAPLING_VERSION_GROUP_ID;
     if ( branchid != 0 )
     {
         sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
