@@ -42,7 +42,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-6);
     }
-    else if ( NSPV_hdrhash(&ptr->common.hdrs[ptr->common.numhdrs-1]) != blockhash )
+    else if ( bits256_cmp(NSPV_hdrhash(&ptr->common.hdrs[ptr->common.numhdrs-1]),blockhash) != 0 )
     {
         btc_tx_free(tx);
         return(-7);
@@ -51,7 +51,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
     for (i=ptr->common.numhdrs-1; i>0; i--)
     {
         blockhash = NSPV_hdrhash(&ptr->common.hdrs[i-1]);
-        if ( blockhash != ptr->common.hdrs[i].hashPrevBlock )
+        if ( bits256_cmp(blockhash,ptr->common.hdrs[i].hashPrevBlock) != 0 )
             return(-i-13);
     }
     sleep(1); // need this to get past the once per second rate limiter per message
@@ -72,7 +72,7 @@ int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-11);
     }
-    else if ( NSPV_hdrhash(&ptr->common.hdrs[0]) != blockhash )
+    else if ( bits256_cmp(NSPV_hdrhash(&ptr->common.hdrs[0]),blockhash) != 0 )
     {
         btc_tx_free(tx);
         return(-12);

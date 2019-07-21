@@ -29,7 +29,6 @@
 #include <btc/utils.h>
 #include <btc/base58.h>
 
-static const bits256 zeroid;
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
