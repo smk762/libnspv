@@ -394,9 +394,9 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         if ( (len= is_hexstr(destaddr,0)) > 0 ) // all hex string
         {
             len >>= 1;
-            scriptPubkey = cstr_new_sz(len);
-            decode_hex((uint8_t *)scriptPubkey->str,len,destaddr);
-            scriptPubkey->len = len;
+            scriptPubKey = cstr_new_sz(len);
+            decode_hex((uint8_t *)scriptPubKey->str,len,destaddr);
+            scriptPubKey->len = len;
         }
         else
         {
