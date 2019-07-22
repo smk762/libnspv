@@ -373,17 +373,25 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
     if ( node->nodegroup->chainparams->nSPV != 0 )
     {
         uint32_t varlen;
+        deser_varlen(&varlen, buf);
         if ( strcmp(hdr->command,"nSPV") == 0 )
         {
-            deser_varlen(&varlen, buf);
             //fprintf(stderr,"process nSPV response %d [%d]\n",((uint8_t *)buf->p)[0],varlen);
             komodo_nSPVresp(node,(uint8_t *)buf->p,varlen);
         }
         else if ( strcmp(hdr->command,"addr") == 0 )
         {
-            int32_t i;
-            for (i=0; i<buf->len; i++)
-                fprintf(stderr,"%02x",((uint8_t *)buf->p)[i]);
+            int32_t i; uint32_t timestamp; char ipaddr[64]; uint64_t services; uint8_t ipdata[16]; uint16_t port;
+            for (i=0; i<varlen; i++)
+            {
+                deser_u32(&timestamp,buf);
+                deser_u64(&services,buf);
+                deser_bytes(ipdata,buf,sizeof(ipdata));
+                deser_u16(&port,buf);
+                expand_ipbits(ipaddr,*(uint32_t *)&ipdata[12]);
+                fprintf(stderr,"%d: %u %llx %s:%u\n",i,timestamp,(long long)services,ipaddr,port);
+
+            }
             node->gotaddrs = (uint32_t)time(NULL);
             fprintf(stderr," need to process addr message [%d]\n",varlen);
         }
