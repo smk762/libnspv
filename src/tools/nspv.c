@@ -115,6 +115,7 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
+ new apis: getpeerinfo
  
 -merkleproof -> dimxy
  make some way to add peers dynamically
@@ -170,6 +171,11 @@ int main(int argc, char* argv[])
             argv++;
         }
         else */
+    }
+    if ( chain == 0 )
+    {
+        chain = &nspv_chainparams_main;
+        fprintf(stderr,"couldnt match coin, defaulting to NSPV chain\n");
     }
     if (chain->komodo == 0 && (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-'))
     {
