@@ -972,7 +972,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
             if ( btc_pubkey_verify_sig(&pubkeys[j],sighash.bytes,(uint8_t *)vin->script_sig->str,vin->script_sig->len) > 0 )
             {
                 mask |= (1LL << j);
-                fprintf("validated.%llx ",(long long)mask);
+                fprintf(stderr,"validated.%llx ",(long long)mask);
                 break;
             }
         }
