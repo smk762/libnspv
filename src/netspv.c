@@ -383,7 +383,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
         }
         else if ( strcmp(hdr->command,"addr") == 0 )
         {
-            int32_t i; uint32_t timestamp; char ipaddr[64]; uint64_t services; uint8_t ipdata[16]; uint16_t port;
+            int32_t i; uint32_t timestamp; char ipaddr[64]; uint64_t services; uint8_t ipdata[16]; uint16_t port,revport;
             for (i=0; i<(int32_t)varlen; i++)
             {
                 deser_u32(&timestamp,buf);
@@ -391,8 +391,12 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
                 deser_bytes(ipdata,buf,sizeof(ipdata));
                 deser_u16(&port,buf);
                 expand_ipbits(ipaddr,*(uint32_t *)&ipdata[12]);
-                fprintf(stderr,"%d: %u %llx %s:%u\n",i,timestamp,(long long)services,ipaddr,port);
-
+                if ( (services & NSPV_NODE) != 0 )
+                {
+                    revport = ((port >> 8) & 0xff) | ((port & 0xff) << 8);
+                    sprintf(ipaddr+strlen(ipaddr),":%u",revport);
+                    fprintf(stderr,"%d: %u %llx %s\n",i,timestamp,(long long)services,ipaddr);
+                }
             }
             node->gotaddrs = (uint32_t)time(NULL);
             fprintf(stderr," need to process addr message [%d]\n",varlen);
