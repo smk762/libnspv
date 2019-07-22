@@ -961,6 +961,9 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
     {
         if ( (vin= btc_tx_vin(tx,vini)) == 0 )
             return(-vini-2);
+        for (j=0; j<vin->script_sig->len; j++)
+            fprintf(stderr,"%02x",vin->script_sig->str[j]&0xff);
+        fprintf(stderr," sig.%d\n",vini);
         for (j=0; j<64; j++)
         {
             if ( ((1LL << j) & mask) != 0 )
@@ -969,7 +972,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
             sighash = NSPV_sapling_sighash(tx,vini,10000,script,35);
             //fprintf(stderr,"%s ",bits256_str(str,sighash));
             btc_bits256_to_uint256(hash,sighash);
-            if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str,vin->script_sig->len-1) > 0 )
+            if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str+1,vin->script_sig->len-2) > 0 )
             {
                 mask |= (1LL << j);
                 //fprintf(stderr,"validated.%llx ",(long long)mask);
