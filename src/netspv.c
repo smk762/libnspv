@@ -381,8 +381,11 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
         }
         else if ( strcmp(hdr->command,"addr") == 0 )
         {
+            int32_t i;
+            for (i=0; i<varlen; i++)
+                fprintf(stderr,"%02x",((uint8_t *)buf->p)[i]);
             node->gotaddrs = (uint32_t)time(NULL);
-            fprintf(stderr,"need to process addr message [%d]\n",varlen);
+            fprintf(stderr," need to process addr message [%d]\n",varlen);
         }
         return;
     }
