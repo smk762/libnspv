@@ -946,13 +946,13 @@ int32_t bitweight(uint64_t x)
 
 int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
 {
-    int32_t vini,j; btc_pubkey pubkeys[64]; uint64_t mask = 0; btc_tx_in *vin; bits256 sighash; uint256 hash; uint8_t script[35];
+    int32_t vini,j; btc_pubkey pubkeys[64]; uint64_t mask = 0; btc_tx_in *vin; bits256 sighash; uint256 hash; uint8_t script[35]; char str[65];
     if ( tx == 0 || tx->vin == 0 )
         return(-1);
     memset(pubkeys,0,sizeof(pubkeys));
     for (j=0; j<64; j++)
     {
-        memcpy(pubkeys[j].pubkey,elected[j],BTC_ECKEY_COMPRESSED_LENGTH);
+        memcpy(pubkeys[j].pubkey,elected[j],33);
         pubkeys[j].compressed = true;
     }
     script[0] = 33;
@@ -967,13 +967,16 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
                 continue;
             memcpy(script+1,elected[j],33);
             sighash = NSPV_sapling_sighash(tx,vini,10000,script,35);
+            fprintf(stderr,"%s ",bits256_str(str,sighash));
             btc_bits256_to_uint256(hash,sighash);
-            if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str,vin->script_sig->len) > 0 )
+            if ( btc_pubkey_verify_sig(&pubkeys[j],sighash.bytes,(uint8_t *)vin->script_sig->str,vin->script_sig->len) > 0 )
             {
                 mask |= (1LL << j);
+                fprintf("validated.%llx ",(long long)mask);
                 break;
             }
         }
+        fprintf(stderr,"vini.%d\n",vini);
     }
     return(bitweight(mask));
 }

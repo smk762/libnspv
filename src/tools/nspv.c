@@ -116,8 +116,9 @@ void spv_sync_completed(btc_spv_client* client) {
 /*
  Todo:
  
- -merkleproof
- addr message
+ need to implement fastnotaries count, numsigs.0 error
+-merkleproof -> dimxy
+ addr message: nSPV mode
  JSON chainparams, maybe use coins repo
  
  need api support for non-nSPV coins
