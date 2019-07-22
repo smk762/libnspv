@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
     strcpy(NSPV_symbol,chain->name);
     // get arguments
     uint16_t port = 0;
-    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:", long_options, &long_index)) != -1) {
+    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:", long_options, &long_index)) != -1) {
         switch (opt) {
         case 'c':
             quit_when_synced = false;
