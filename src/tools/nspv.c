@@ -68,7 +68,7 @@ static void print_version()
 static void print_usage()
 {
     print_version();
-    printf("Usage: nspv (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-r[--regtest]) (-d[--debug]) (-s[--timeout] <secs>) <command>\n");
+    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-s[--timeout] <secs>) <command>\n");
     printf("Supported commands:\n");
     printf("        scan      (scan blocks up to the tip, creates header.db file)\n");
     printf("\nExamples: \n");
@@ -115,13 +115,60 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
+ new apis: getpeerinfo
  
- -merkleproof
- addr message
- JSON chainparams, maybe use coins repo
- 
- need api support for non-nSPV coins
+-merkleproof -> dimxy
+ make some way to add peers dynamically
+  
  */
+
+const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
+{
+    btc_chainparams *chain = 0; char *filestr,*name,*seeds,*magic; int32_t i,n; cJSON *array,*coin; long filesize;
+    chain = calloc(1,sizeof(*chain));
+    memcpy(chain,template,sizeof(*chain));
+    chain->default_port = 0;
+    memset(chain->name,0,sizeof(chain->name));
+    if ( (filestr= OS_filestr(&filesize,"coins")) != 0 )
+    {
+        //fprintf(stderr,"loaded %ld\n",filesize);
+        if ( (array= cJSON_Parse(filestr)) != 0 )
+        {
+            n = cJSON_GetArraySize(array);
+            for (i=0; i<n; i++)
+            {
+                coin = jitem(array,i);
+                //fprintf(stderr,"%s\n",jprint(coin,0));
+                if ( (name= jstr(coin,"coin")) != 0 && strcmp(name,symbol) == 0 && jstr(coin,"asset") != 0 )
+                {
+                    if ( (seeds= jstr(coin,"nSPV")) != 0 && strlen(seeds) < sizeof(chain->dnsseeds[0].domain)-1 && (magic= jstr(coin,"magic")) != 0 && strlen(magic) == 8 )
+                    {
+                        chain->default_port = juint(coin,"p2p");
+                        chain->rpcport = juint(coin,"rpcport");
+                        strcpy(chain->dnsseeds[0].domain,seeds);
+                        decode_hex((uint8_t *)chain->netmagic,4,magic);
+                        strcpy(chain->name,symbol);
+                        fprintf(stderr,"Found (%s) magic.%s, p2p.%u seeds.(%s)\n",symbol,magic,chain->default_port,seeds);
+                        break;
+                    }
+                }
+            }
+            if ( i == n )
+            {
+                free(chain);
+                chain = 0;
+            }
+            free(array);
+        }
+        else
+        {
+            fprintf(stderr,"parse error of coins file\n");
+            exit(-1);
+        }
+        free(filestr);
+    }
+    return((const btc_chainparams *)chain);
+}
 
 int main(int argc, char* argv[])
 {
@@ -139,24 +186,36 @@ int main(int argc, char* argv[])
     portable_mutex_init(&NSPV_netmutex);
     if ( argc > 1 )
     {
-        if ( strcmp(argv[1],"KMD") == 0 )
+        if ( strcmp(argv[1],"BTC") == 0 )
+        {
+            chain = &btc_chainparams_main;
+            argc--;
+            argv++;
+        }
+        else if ( strcmp(argv[1],"KMD") == 0 )
         {
             chain = &kmd_chainparams_main;
             argc--;
             argv++;
         }
+        else if ( (chain= NSPV_coinlist_scan(argv[1],&kmd_chainparams_main)) != 0 )
+        {
+            argc--;
+            argv++;
+        }
+        /*
         else if ( strcmp(argv[1],"ILN") == 0 )
         {
             chain = &iln_chainparams_main;
             argc--;
             argv++;
         }
-        else if ( strcmp(argv[1],"BTC") == 0 )
-        {
-            chain = &btc_chainparams_main;
-            argc--;
-            argv++;
-        }
+        else */
+    }
+    if ( chain == 0 )
+    {
+        chain = &nspv_chainparams_main;
+        fprintf(stderr,"couldnt match coin, defaulting to NSPV chain\n");
     }
     if (chain->komodo == 0 && (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-'))
     {
@@ -168,7 +227,7 @@ int main(int argc, char* argv[])
     strcpy(NSPV_symbol,chain->name);
     // get arguments
     uint16_t port = 0;
-    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:", long_options, &long_index)) != -1) {
+    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:", long_options, &long_index)) != -1) {
         switch (opt) {
         case 'c':
             quit_when_synced = false;
@@ -190,6 +249,10 @@ int main(int argc, char* argv[])
             break;
         case 'm':
             maxnodes = (int)strtol(optarg, (char**)NULL, 10);
+            break;
+        case 'p':
+            port = (int)strtol(optarg, (char**)NULL, 0);
+                fprintf(stderr,"set port to %u\n",port);
             break;
         case 'f':
             dbfile = optarg;
