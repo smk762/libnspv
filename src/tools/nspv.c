@@ -159,6 +159,11 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
             }
             free(array);
         }
+        else
+        {
+            fprintf(stderr,"parse error of coins file\n");
+            exit(-1);
+        }
         free(filestr);
     }
     return((const btc_chainparams *)chain);
