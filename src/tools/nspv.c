@@ -124,9 +124,11 @@ void spv_sync_completed(btc_spv_client* client) {
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
 {
-    btc_chainparams *chain = 0; uint8_t *ptr; char *filestr,*name,*seeds,*magic; int32_t i,n; cJSON *array,*coin; long filesize;
+    btc_chainparams *chain = 0; char *filestr,*name,*seeds,*magic; int32_t i,n; cJSON *array,*coin; long filesize;
     chain = calloc(1,sizeof(*chain));
     memcpy(chain,template,sizeof(*chain));
+    chain->default_port = 0;
+    memset(chain->name,0,sizeof(chain->name));
     if ( (filestr= OS_filestr(&filesize,"coins")) != 0 )
     {
         if ( (array= cJSON_Parse(filestr)) != 0 )
@@ -137,11 +139,13 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
                 coin = jitem(array,i);
                 if ( (name= jstr(coin,"name")) != 0 && strcmp(name,symbol) == 0 && jstr(coin,"asset") != 0 )
                 {
+                    fprintf(stderr,"found %s\n",name);
                     if ( (seeds= jstr(coin,"nSPV")) != 0 && strlen(seeds) < sizeof(chain->dnsseeds[0].domain)-1 && (magic= jstr(coin,"magic")) != 0 && strlen(magic) == 8 )
                     {
                         chain->default_port = juint(coin,"p2p");
                         strcpy(chain->dnsseeds[0].domain,seeds);
                         decode_hex((uint8_t *)chain->netmagic,4,magic);
+                        strcpy(chain->name,symbol);
                         fprintf(stderr,"Found (%s) magic.%s, p2p.%u seeds.(%s)\n",symbol,magic,chain->default_port,seeds);
                         break;
                     }
