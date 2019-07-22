@@ -138,6 +138,7 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
             for (i=0; i<n; i++)
             {
                 coin = jitem(array,i);
+                fprintf(stderr,"%s\n",jprint(coin,0));
                 if ( (name= jstr(coin,"name")) != 0 && strcmp(name,symbol) == 0 && jstr(coin,"asset") != 0 )
                 {
                     fprintf(stderr,"found %s\n",name);
