@@ -124,9 +124,9 @@ void spv_sync_completed(btc_spv_client* client) {
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
 {
-    btc_chainparams *chain; char *filestr,*name,*seeds,*magic; int32_t i,n; cJSON *array,*coin; long filesize;
+    btc_chainparams *chain = 0; uint8_t *ptr; char *filestr,*name,*seeds,*magic; int32_t i,n; cJSON *array,*coin; long filesize;
     chain = calloc(1,sizeof(*chain));
-    *(btc_chainparams *)chain = *template;
+    memcpy(chain,template,sizeof(*chain));
     if ( (filestr= OS_filestr(&filesize,"coins")) != 0 )
     {
         if ( (array= cJSON_Parse(filestr)) != 0 )
