@@ -60,7 +60,7 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
-btc_chainparams iln_chainparams_main =
+/*btc_chainparams iln_chainparams_main =
 {
     "ILN",
     60,
@@ -77,7 +77,7 @@ btc_chainparams iln_chainparams_main =
     170007,
     MAX_TX_SIZE_AFTER_SAPLING,
     1,1,0,
-};
+};*/
 
 char *bits256_str(char *buf,bits256 hash)
 {
