@@ -967,16 +967,16 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
                 continue;
             memcpy(script+1,elected[j],33);
             sighash = NSPV_sapling_sighash(tx,vini,10000,script,35);
-            fprintf(stderr,"%s ",bits256_str(str,sighash));
+            //fprintf(stderr,"%s ",bits256_str(str,sighash));
             btc_bits256_to_uint256(hash,sighash);
-            if ( btc_pubkey_verify_sig(&pubkeys[j],sighash.bytes,(uint8_t *)vin->script_sig->str,vin->script_sig->len) > 0 )
+            if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str,vin->script_sig->len-1) > 0 )
             {
                 mask |= (1LL << j);
-                fprintf(stderr,"validated.%llx ",(long long)mask);
+                //fprintf(stderr,"validated.%llx ",(long long)mask);
                 break;
             }
         }
-        fprintf(stderr,"vini.%d\n",vini);
+        fprintf(stderr,"vini.%d numsigs.%d\n",vini);
     }
     return(bitweight(mask));
 }
@@ -991,6 +991,15 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
             *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,(char *)client->chainparams->name,vout->script_pubkey);
             if ( komodo_notaries(client,elected,*ntzheightp) <= 0 )
                 fprintf(stderr,"non-support notary list\n");
+            {
+                int32_t z;
+                for (z=0; z<3; z++)
+                {
+                    for (y=0; y<33; y++)
+                        fprintf(stderr,"%02x",elected[z][y]);
+                    fprintf(stderr," pubkey[%d]\n",z);
+                }
+            }
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )
             {
                 fprintf(stderr,"need to implement fastnotaries count, numsigs.%d error\n",numsigs);
