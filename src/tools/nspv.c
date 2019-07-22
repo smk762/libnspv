@@ -117,11 +117,17 @@ void spv_sync_completed(btc_spv_client* client) {
  Todo:
  
 -merkleproof -> dimxy
- addr message: nSPV mode
+ make some way to add peers dynamically
+ 
  JSON chainparams, maybe use coins repo
  
- need api support for non-nSPV coins
  */
+
+const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
+{
+    btc_chainparams *chain = 0;
+    return((const btc_chainparams *)chain);
+}
 
 int main(int argc, char* argv[])
 {
@@ -139,24 +145,31 @@ int main(int argc, char* argv[])
     portable_mutex_init(&NSPV_netmutex);
     if ( argc > 1 )
     {
-        if ( strcmp(argv[1],"KMD") == 0 )
+        if ( strcmp(argv[1],"BTC") == 0 )
+        {
+            chain = &btc_chainparams_main;
+            argc--;
+            argv++;
+        }
+        else if ( strcmp(argv[1],"KMD") == 0 )
         {
             chain = &kmd_chainparams_main;
             argc--;
             argv++;
         }
+        else if ( (chain= NSPV_coinlist_scan(argv[1],&kmd_chainparams_main)) != 0 )
+        {
+            argc--;
+            argv++;
+        }
+        /*
         else if ( strcmp(argv[1],"ILN") == 0 )
         {
             chain = &iln_chainparams_main;
             argc--;
             argv++;
         }
-        else if ( strcmp(argv[1],"BTC") == 0 )
-        {
-            chain = &btc_chainparams_main;
-            argc--;
-            argv++;
-        }
+        else */
     }
     if (chain->komodo == 0 && (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-'))
     {
