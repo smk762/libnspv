@@ -992,7 +992,7 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
             if ( komodo_notaries(client,elected,*ntzheightp) <= 0 )
                 fprintf(stderr,"non-support notary list\n");
             {
-                int32_t z;
+                int32_t y,z;
                 for (z=0; z<3; z++)
                 {
                     for (y=0; y<33; y++)
