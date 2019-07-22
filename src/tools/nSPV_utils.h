@@ -60,7 +60,7 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
-btc_chainparams iln_chainparams_main =
+/*btc_chainparams iln_chainparams_main =
 {
     "ILN",
     60,
@@ -77,7 +77,7 @@ btc_chainparams iln_chainparams_main =
     170007,
     MAX_TX_SIZE_AFTER_SAPLING,
     1,1,0,
-};
+};*/
 
 char *bits256_str(char *buf,bits256 hash)
 {
@@ -946,13 +946,13 @@ int32_t bitweight(uint64_t x)
 
 int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
 {
-    int32_t vini,j; btc_pubkey pubkeys[64]; uint64_t mask = 0; btc_tx_in *vin; bits256 sighash; uint256 hash; uint8_t script[35];
+    int32_t vini,j; btc_pubkey pubkeys[64]; uint64_t mask = 0; btc_tx_in *vin; bits256 sighash; uint256 hash; uint8_t script[35]; char str[65];
     if ( tx == 0 || tx->vin == 0 )
         return(-1);
     memset(pubkeys,0,sizeof(pubkeys));
     for (j=0; j<64; j++)
     {
-        memcpy(pubkeys[j].pubkey,elected[j],BTC_ECKEY_COMPRESSED_LENGTH);
+        memcpy(pubkeys[j].pubkey,elected[j],33);
         pubkeys[j].compressed = true;
     }
     script[0] = 33;
@@ -961,19 +961,25 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
     {
         if ( (vin= btc_tx_vin(tx,vini)) == 0 )
             return(-vini-2);
+        //for (j=0; j<vin->script_sig->len; j++)
+        //    fprintf(stderr,"%02x",vin->script_sig->str[j]&0xff);
+        //fprintf(stderr," sig.%d\n",vini);
         for (j=0; j<64; j++)
         {
             if ( ((1LL << j) & mask) != 0 )
                 continue;
             memcpy(script+1,elected[j],33);
             sighash = NSPV_sapling_sighash(tx,vini,10000,script,35);
+            //fprintf(stderr,"%s ",bits256_str(str,sighash));
             btc_bits256_to_uint256(hash,sighash);
-            if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str,vin->script_sig->len) > 0 )
+            if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str+1,vin->script_sig->len-2) > 0 )
             {
                 mask |= (1LL << j);
+                //fprintf(stderr,"validated.%llx ",(long long)mask);
                 break;
             }
         }
+        //fprintf(stderr,"vini.%d numsigs.%d\n",vini,bitweight(mask));
     }
     return(bitweight(mask));
 }
@@ -991,7 +997,7 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )
             {
                 fprintf(stderr,"need to implement fastnotaries count, numsigs.%d error\n",numsigs);
-                return(13);
+                return(-3);
             }
             return(0);
         }

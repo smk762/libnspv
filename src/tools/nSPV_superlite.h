@@ -206,7 +206,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
         cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getaddr",NULL,0);
         btc_node_send(node,request);
         cstr_free(request, true);
-        fprintf(stderr,"request addrs\n");
+        //fprintf(stderr,"request addrs\n");
     }
     if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
     {
