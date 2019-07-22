@@ -131,6 +131,7 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
     memset(chain->name,0,sizeof(chain->name));
     if ( (filestr= OS_filestr(&filesize,"coins")) != 0 )
     {
+        fprintf(stderr,"loaded %ld\n",filesize);
         if ( (array= cJSON_Parse(filestr)) != 0 )
         {
             n = cJSON_GetArraySize(array);
