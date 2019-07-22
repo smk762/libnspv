@@ -141,10 +141,10 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
                 //fprintf(stderr,"%s\n",jprint(coin,0));
                 if ( (name= jstr(coin,"coin")) != 0 && strcmp(name,symbol) == 0 && jstr(coin,"asset") != 0 )
                 {
-                    fprintf(stderr,"found %s\n",name);
                     if ( (seeds= jstr(coin,"nSPV")) != 0 && strlen(seeds) < sizeof(chain->dnsseeds[0].domain)-1 && (magic= jstr(coin,"magic")) != 0 && strlen(magic) == 8 )
                     {
                         chain->default_port = juint(coin,"p2p");
+                        chain->rpcport = juint(coin,"rpcport");
                         strcpy(chain->dnsseeds[0].domain,seeds);
                         decode_hex((uint8_t *)chain->netmagic,4,magic);
                         strcpy(chain->name,symbol);
