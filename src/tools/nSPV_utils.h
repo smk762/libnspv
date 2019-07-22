@@ -976,7 +976,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
                 break;
             }
         }
-        fprintf(stderr,"vini.%d numsigs.%d\n",vini);
+        fprintf(stderr,"vini.%d numsigs.%d\n",vini,numsigs);
     }
     return(bitweight(mask));
 }
