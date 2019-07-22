@@ -30,3 +30,5 @@ curl --url "http://127.0.0.1:20267" --data "{\"userpass\":\"$userpass\",\"method
 curl --url "http://127.0.0.1:20267" --data "{\"userpass\":\"$userpass\",\"method\":\"mempool\",\"memfunc\":4,\"evalcode\":1,\"CCfunc\":2}"
 
 curl --url "http://127.0.0.1:20267" --data "{\"userpass\":\"$userpass\",\"method\":\"spend\",\"address\":\"RU2DWyE381JB6YUk15dMngGgi8TLRZpT3u\",\"amount\":0.1}"
+curl --url "http://127.0.0.1:20267" --data "{\"userpass\":\"$userpass\",\"method\":\"getnewaddress\"}"
+
