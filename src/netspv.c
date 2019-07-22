@@ -366,6 +366,8 @@ void btc_net_spv_node_handshake_done(btc_node *node)
     btc_net_spv_request_headers((btc_spv_client*)node->nodegroup->ctx);
 }
 
+void expand_ipbits(char *ipaddr,uint64_t ipbits);
+
 void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buffer *buf)
 {
     btc_spv_client *client = (btc_spv_client *)node->nodegroup->ctx;
@@ -382,7 +384,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
         else if ( strcmp(hdr->command,"addr") == 0 )
         {
             int32_t i; uint32_t timestamp; char ipaddr[64]; uint64_t services; uint8_t ipdata[16]; uint16_t port;
-            for (i=0; i<varlen; i++)
+            for (i=0; i<(int32_t)varlen; i++)
             {
                 deser_u32(&timestamp,buf);
                 deser_u64(&services,buf);
