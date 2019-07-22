@@ -250,6 +250,9 @@ int main(int argc, char* argv[])
         case 'm':
             maxnodes = (int)strtol(optarg, (char**)NULL, 10);
             break;
+        case 'p':
+            port = (int)strtol(optarg, (char**)NULL, 0);
+            break;
         case 'f':
             dbfile = optarg;
             break;
