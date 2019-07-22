@@ -196,7 +196,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump)
 {
     struct NSPV_txproof *ptr; btc_tx_out *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t i,offset; int64_t rewards = 0; uint32_t nLockTime; cstring *proof = 0; bits256 proofroot = zeroid;
-    *retvalp = -1;
+    *retvalp = skipvalidation != 0 ? 0 : -1;
     if ( (ptr= NSPV_txproof_find(client->chainparams,txid,height)) == 0 )
     {
         NSPV_txproof(client,v,txid,height);
