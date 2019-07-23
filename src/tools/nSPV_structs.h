@@ -375,7 +375,7 @@ int32_t NSPV_rwtxproof(int32_t rwflag,uint8_t *serialized,struct NSPV_txproof *p
 void NSPV_txproof_copy(struct NSPV_txproof *dest,struct NSPV_txproof *ptr)
 {
     *dest = *ptr;
-    if ( ptr->tx != 0 && ptr->txlen < coin->maxtxsize )
+    if ( ptr->tx != 0 && ptr->txlen < MAX_TX_SIZE_AFTER_SAPLING )//coin->maxtxsize )
     {
         dest->tx = (uint8_t *)malloc(ptr->txlen);
         memcpy(dest->tx,ptr->tx,ptr->txlen);
