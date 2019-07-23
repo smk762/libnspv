@@ -197,7 +197,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
 {
     struct NSPV_txproof *ptr; btc_tx_out *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t i,offset; int64_t rewards = 0; uint32_t nLockTime; cstring *proof = 0; bits256 proofroot = zeroid;
     *retvalp = skipvalidation != 0 ? 0 : -1;
-    if ( (ptr= NSPV_txproof_find(client->chainparams,txid,height)) == 0 )
+    if ( (ptr= NSPV_txproof_find(txid,height)) == 0 )
     {
         NSPV_txproof(client,v,txid,height);
         ptr = &NSPV_txproofresult;
