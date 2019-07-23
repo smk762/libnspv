@@ -15,8 +15,8 @@
 // TODO: do we need call the real function MAX_BLOCK_SIZE()?
 #define MAX_BLOCK_SIZE(h) 2000000
 
-#define BEGIN(a)            ((char*)&(a))
-#define END(a)              ((char*)&((&(a))[1]))
+#define BEGIN(a)            ((uint8_t*)&(a))
+#define END(a)              ((uint8_t*)&((&(a))[1]))
 
 
 /** Data structure that represents a partial merkle tree.
@@ -105,7 +105,7 @@ static int deserialize_proof(uint8_t *proof, int prooflen, merkle_block *pmblock
     }
 
     /* deserialize tx number */
-    if (!deser_s32(&pmblock->tree.txcount, &proofbuf)) {
+    if (!deser_u32(&pmblock->tree.txcount, &proofbuf)) {
         fprintf(stderr, "could not deserialize txcount from proof\n");
         return false;
     }
@@ -166,7 +166,7 @@ static int TraverseAndExtract(merkle_block *pMblock, int height, unsigned int po
         if (*pHashUsed >= pMblock->tree.hashcount) {
             // overflowed the hash array - failure
             pMblock->tree.fBad = true;
-            memset(mroot, '\0', sizeof(mroot));
+            memset(mroot, '\0', sizeof(uint256));
             return false;
         }
         uint8_t *phash = pMblock->tree.hashes[(*pHashUsed)++];
