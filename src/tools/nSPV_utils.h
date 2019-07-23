@@ -332,7 +332,7 @@ char *clonestr(char *str)
     char *clone;
     if ( str == 0 || str[0] == 0 )
     {
-        printf("warning cloning nullstr.%p\n",str);
+        printf("warning cloning nullstr.%p\n",(void *)str);
 #ifdef __APPLE__
         while ( 1 ) sleep(1);
 #endif
@@ -918,7 +918,7 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
     return(-1);
 }
 
-bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char *symbol,cstring *opret)
+bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,cstring *opret)
 {
     bits256 desttxid; int32_t i,offset=3; char str[65];
     if ( opret != 0 )
@@ -991,7 +991,7 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
     {
         if ( vout->script_pubkey != 0 && vout->script_pubkey->len >= 2+32*2+4 && vout->script_pubkey->str[0] == OP_RETURN )
         {
-            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,(char *)client->chainparams->name,vout->script_pubkey);
+            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,vout->script_pubkey);
             if ( komodo_notaries(client,elected,*ntzheightp) <= 0 )
                 fprintf(stderr,"non-support notary list\n");
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )
