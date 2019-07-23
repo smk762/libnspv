@@ -15,6 +15,7 @@ include_HEADERS = \
     include/btc/base58.h \
     include/btc/bip32.h \
     include/btc/block.h \
+    include/btc/block_kmd.h \
     include/btc/btc.h \
     include/btc/buffer.h \
     include/btc/chainparams.h \
@@ -33,6 +34,7 @@ include_HEADERS = \
     include/btc/tool.h \
     include/btc/tx.h \
     include/btc/utils.h \
+    include/btc/merkle_c.h \
     include/btc/vector.h
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -43,6 +45,7 @@ libbtc_la_SOURCES = \
     src/base58.c \
     src/bip32.c \
     src/block.c \
+    src/block_kmd.c \
     src/buffer.c \
     src/chainparams.c \
     src/commontools.c \
@@ -60,6 +63,7 @@ libbtc_la_SOURCES = \
     src/sha2.c \
     src/tx.c \
     src/utils.c \
+    src/merkle_c.c \
     src/vector.c
 
 libbtc_la_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src/logdb/include -O2
