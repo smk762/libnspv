@@ -83,9 +83,9 @@ void init_mblock(merkle_block *pmblock)
 void free_mblock_data(merkle_block *pmblock)
 {
     if (pmblock->tree.bits)
-        free(pmblock->tree.bits);
+        btc_free(pmblock->tree.bits);
     if (pmblock->tree.hashes)
-        free(pmblock->tree.hashes);
+        btc_free(pmblock->tree.hashes);
     if (pmblock->tree.bytes)
         cstr_free(pmblock->tree.bytes, 1);
 }
@@ -116,7 +116,7 @@ static int deserialize_proof(uint8_t *proof, int prooflen, merkle_block *pmblock
         return false;
     }
 
-    pmblock->tree.hashes = calloc(pmblock->tree.hashcount, sizeof(*pmblock->tree.hashes));  // alloc mem
+    pmblock->tree.hashes = btc_malloc(pmblock->tree.hashcount * sizeof(*pmblock->tree.hashes));  // alloc mem
     if (pmblock->tree.hashes == NULL) {
         fprintf(stderr, "could not alloc mem for hashes\n");
         return false;
@@ -137,7 +137,7 @@ static int deserialize_proof(uint8_t *proof, int prooflen, merkle_block *pmblock
 
     /* parse bits */
     pmblock->tree.bitscount = pmblock->tree.bytes->len * 8;
-    pmblock->tree.bits = calloc(1, pmblock->tree.bitscount);
+    pmblock->tree.bits = btc_malloc(pmblock->tree.bitscount);
     for (unsigned int p = 0; p < pmblock->tree.bitscount; p++)
         pmblock->tree.bits[p] = ((uint8_t)(pmblock->tree.bytes->str[p / 8]) & (1 << (p % 8))) != 0;
 
