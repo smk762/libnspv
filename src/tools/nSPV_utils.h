@@ -17,8 +17,6 @@
 #ifndef NSPV_UTILS_H
 #define NSPV_UTILS_H
 
-#define MAX_TX_SIZE_BEFORE_SAPLING 100000
-#define MAX_TX_SIZE_AFTER_SAPLING (2 * MAX_TX_SIZE_BEFORE_SAPLING)
 static const bits256 zeroid;
 portable_mutex_t NSPV_netmutex;
 

@@ -131,7 +131,7 @@ int32_t iguana_rwuint8vec(int32_t rwflag,uint8_t *serialized,int32_t *biglenp,ui
 {
     int32_t vsize,len = 0;
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(*biglenp),biglenp);
-    if ( (vsize= *biglenp) > 0 && vsize < coin->maxtxsize )
+    if ( (vsize= *biglenp) > 0 && vsize < MAX_TX_SIZE_AFTER_SAPLING )//coin->maxtxsize )
     {
         if ( *ptrp == 0 )
             *ptrp = (uint8_t *)calloc(1,vsize);
@@ -160,7 +160,7 @@ int32_t NSPV_rwutxosresp(int32_t rwflag,uint8_t *serialized,struct NSPV_utxosres
         if ( ptr->utxos == 0 )
             ptr->utxos = (struct NSPV_utxoresp *)calloc(sizeof(*ptr->utxos),ptr->numutxos); // relies on uint16_t being "small" to prevent mem exhaustion
         for (i=0; i<ptr->numutxos; i++)
-            len += NSPV_rwutxoresp(coin,rwflag,&serialized[len],&ptr->utxos[i]);
+            len += NSPV_rwutxoresp(rwflag,&serialized[len],&ptr->utxos[i]);
     }
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->total),&ptr->total);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->interest),&ptr->interest);
@@ -220,7 +220,7 @@ int32_t NSPV_rwtxidsresp(int32_t rwflag,uint8_t *serialized,struct NSPV_txidsres
         if ( ptr->txids == 0 )
             ptr->txids = (struct NSPV_txidresp *)calloc(sizeof(*ptr->txids),ptr->numtxids);
         for (i=0; i<ptr->numtxids; i++)
-            len += NSPV_rwtxidresp(coin,rwflag,&serialized[len],&ptr->txids[i]);
+            len += NSPV_rwtxidresp(rwflag,&serialized[len],&ptr->txids[i]);
     }
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->nodeheight),&ptr->nodeheight);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->pad32),&ptr->pad32);
@@ -325,8 +325,8 @@ int32_t NSPV_rwntz(int32_t rwflag,uint8_t *serialized,struct NSPV_ntz *ptr)
 int32_t NSPV_rwntzsresp(int32_t rwflag,uint8_t *serialized,struct NSPV_ntzsresp *ptr)
 {
     int32_t len = 0;
-    len += NSPV_rwntz(coin,rwflag,&serialized[len],&ptr->prevntz);
-    len += NSPV_rwntz(coin,rwflag,&serialized[len],&ptr->nextntz);
+    len += NSPV_rwntz(rwflag,&serialized[len],&ptr->prevntz);
+    len += NSPV_rwntz(rwflag,&serialized[len],&ptr->nextntz);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->reqheight),&ptr->reqheight);
     return(len);
 }
@@ -473,7 +473,7 @@ void NSPV_spentinfo_purge(struct NSPV_spentinfo *ptr)
 {
     if ( ptr != 0 )
     {
-        NSPV_txproof_purge(coin,&ptr->spent);
+        NSPV_txproof_purge(&ptr->spent);
         memset(ptr,0,sizeof(*ptr));
     }
 }
