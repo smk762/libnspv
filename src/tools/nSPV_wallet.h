@@ -256,15 +256,19 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 fprintf(stderr,"call validate\n");
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
+                    uint256 mroot; merkle_block *pMblock; vector *vmatch;
+                    pMblock = init_mblock();
+                    vmatch = vector_new(sizeof(bits256));
+                    GetProofMerkleRoot(uint8_t *)proof->str,(int32_t)proof->len,pMblock,vmatch,mroot);
+                    proofroot = btc_uint256_to_bits256(mroot);
                     fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);
-                    //proofroot = BitcoinGetProofMerkleRoot(proof,txids);
-                    bits256 *txids = calloc(1,proof->len); // upper bound
                     if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 || bits256_cmp(txid,txids[0]) != 0 )
                     {
                         fprintf(stderr,"prooflen.%d proofroot.%s vs %s\n",(int32_t)proof->len,bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
                         *retvalp = -2003;
                     } else *retvalp = 0;
-                    free(txids);
+                    free_mblock_data(pMblock);
+                    vector_free(vmatch);
                 }
             } else *retvalp = -2005;
         } else *retvalp = -2004;
