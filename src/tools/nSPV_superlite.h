@@ -707,7 +707,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
-    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag,memfunc; cJSON *array;
+    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight,numargs; uint8_t CCflag,memfunc; cJSON *array;
     if ( (method= jstr(argjson,"method")) == 0 )
         return(cJSON_Parse("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
