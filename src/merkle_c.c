@@ -1,3 +1,23 @@
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2014 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+/******************************************************************************
+* Copyright © 2014-2019 The SuperNET Developers.                             *
+*                                                                            *
+* See the AUTHORS, DEVELOPER-AGREEMENT and LICENSE files at                  *
+* the top-level directory of this distribution for the individual copyright  *
+* holder information and the developer policies on copyright and licensing.  *
+*                                                                            *
+* Unless otherwise agreed in a custom licensing agreement, no part of the    *
+* SuperNET software, including this file may be copied, modified, propagated *
+* or distributed except according to the terms contained in the LICENSE file *
+*                                                                            *
+* Removal or modification of this copyright notice is prohibited.            *
+*                                                                            *
+******************************************************************************/
+
 //
 // merkle_c.c : calculates the root of partial merkle tree (returned by txoutproof) 
 //
@@ -19,7 +39,10 @@
 #define END(a)              ((uint8_t*)&((&(a))[1]))
 
 
-/** Data structure that represents a partial merkle tree.
+/** 
+* Copied from komodo src merkleblock.cpp
+*
+* Data structure that represents a partial merkle tree.
 *
 * It represents a subset of the txid's of a known block, in a way that
 * allows recovery of the list of txid's and the merkle root, in an
@@ -74,6 +97,7 @@ static void hash_of_concat(uint8_t *begin1, uint8_t *end1, uint8_t *begin2, uint
 void init_mblock(merkle_block *pmblock)
 {
     memset(pmblock, 0, sizeof(*pmblock));
+    pmblock->pheader = kmd_block_header_new();
     pmblock->tree.fBad = true;
 }
 
@@ -82,6 +106,8 @@ void init_mblock(merkle_block *pmblock)
 */
 void free_mblock_data(merkle_block *pmblock)
 {
+    if (pmblock->pheader)
+        kmd_block_header_free(pmblock->pheader);
     if (pmblock->tree.bits)
         btc_free(pmblock->tree.bits);
     if (pmblock->tree.hashes)
@@ -99,7 +125,7 @@ static int deserialize_proof(uint8_t *proof, int prooflen, merkle_block *pmblock
         return false;
 
     /* deserialize block */
-    if (!kmd_block_header_deserialize(&pmblock->header, &proofbuf)) {
+    if (!kmd_block_header_deserialize(pmblock->pheader, &proofbuf)) {
         fprintf(stderr, "could not deserialize block header from proof\n");
         return false;
     }
@@ -307,7 +333,7 @@ int main()
 
         fprintf(stderr, "header mroot: ");
         for (int i = 0; i < sizeof(uint256); i++)
-            printf("%02x ", mblock.header.merkle_root[i]);
+            printf("%02x ", mblock.pheader->merkle_root[i]);
         printf("\n");
 
         fprintf(stderr, "calced mroot: ");
