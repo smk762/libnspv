@@ -239,6 +239,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
         {
             proof = cstr_new_sz(ptr->txprooflen);
             memcpy(proof->str,ptr->txproof,ptr->txprooflen);
+            proof->len = ptr->txprooflen;
         }
         NSPV_notarizations(client,height); // gets the prev and next notarizations
         if ( NSPV_inforesult.notarization.height >= height && (NSPV_ntzsresult.prevntz.height == 0 || NSPV_ntzsresult.prevntz.height >= NSPV_ntzsresult.nextntz.height) )
@@ -257,7 +258,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
                 NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
-                fprintf(stderr,"call validate\n");
+                fprintf(stderr,"call validate prooflen.%d\n",(int32_t)proof->len);
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
                     uint256 mroot; merkle_block MB; vector *vmatch;
@@ -265,6 +266,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                     vmatch = vector_new(sizeof(bits256),free);
                     GetProofMerkleRoot((uint8_t *)proof->str,(int32_t)proof->len,&MB,vmatch,mroot);
                     proofroot = btc_uint256_to_bits256(mroot);
+                    memset(mroot,0,sizeof(mroot));
                     fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);
                     if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0)// || bits256_cmp(txid,txids[0]) != 0 )
                     {
