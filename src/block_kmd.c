@@ -65,28 +65,20 @@ void kmd_block_header_free(kmd_block_header* header)
 
 int kmd_block_header_deserialize(kmd_block_header* header, struct const_buffer* buf)
 {
-    fprintf(stderr,"deser 0\n");
     if (!deser_s32(&header->version, buf))
         return false;
-    fprintf(stderr,"deser 1\n");
     if (!deser_u256(header->prev_block, buf))
         return false;
-    fprintf(stderr,"deser 2\n");
     if (!deser_u256(header->merkle_root, buf))
         return false;
-    fprintf(stderr,"deser 3\n");
     if (!deser_u256(header->final_sapling_root, buf))
         return false;
-    fprintf(stderr,"deser 4\n");
     if (!deser_u32(&header->timestamp, buf))
         return false;
-    fprintf(stderr,"deser 5\n");
     if (!deser_u32(&header->bits, buf))
         return false;
-    fprintf(stderr,"deser 6\n");
     if (!deser_u256(header->nonce, buf))
         return false;
-    fprintf(stderr,"var str?\n");
     if (!deser_varstr(&header->solution, buf))
         return false;
 
