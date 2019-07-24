@@ -116,10 +116,10 @@ void spv_sync_completed(btc_spv_client* client) {
 /*
  Todo:
  new apis: getpeerinfo
- 
--merkleproof -> dimxy
  make some way to add peers dynamically
-  
+ params:[] array -> map to fields
+-merkleproof -> dimxy
+ 
  */
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
