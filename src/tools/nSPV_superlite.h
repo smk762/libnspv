@@ -338,7 +338,7 @@ uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight)
     return(0);
 }
 
-cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount)
+cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
 {
     cJSON *result = cJSON_CreateObject(); uint8_t msg[512]; int32_t i,iter,slen,len = 1; size_t sz;
     //fprintf(stderr,"utxos %s NSPV addr %s\n",coinaddr,NSPV_address.c_str());
@@ -362,6 +362,7 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     memcpy(&msg[len],coinaddr,slen), len += slen;
     msg[len++] = (CCflag != 0);
     len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
+    len += iguana_rwnum(1,&msg[len],sizeof(filter),&filter);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_ADDRINDEX,msg[1]>>1) != 0 )
     {
@@ -378,7 +379,7 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     return(result);
 }
 
-cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount)
+cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; int32_t i,iter,slen,len = 1;
     if ( NSPV_txidsresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag && skipcount == NSPV_txidsresult.skipcount )
@@ -402,6 +403,7 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     memcpy(&msg[len],coinaddr,slen), len += slen;
     msg[len++] = (CCflag != 0);
     len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
+    len += iguana_rwnum(1,&msg[len],sizeof(filter),&filter);
     //fprintf(stderr,"skipcount.%d\n",skipcount);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_ADDRINDEX,msg[1]>>1) != 0 )
@@ -707,7 +709,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
-    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight; uint8_t CCflag,memfunc;
+    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight,numargs; uint8_t CCflag,memfunc; cJSON *params;
     if ( (method= jstr(argjson,"method")) == 0 )
         return(cJSON_Parse("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
@@ -718,6 +720,10 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         btc_node_group_shutdown(NSPV_client->nodegroup);
         fprintf(stderr,"shutdown started\n");
         return(cJSON_Parse("{\"result\":\"success\"}"));
+    }
+    if ( (params= jarray(&numargs,argjson,"params")) != 0 )
+    {
+        
     }
     txid = jbits256(argjson,"txid");
     vout = jint(argjson,"vout");
@@ -757,13 +763,13 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount)); // need non-nSPV
+        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount,0)); // need non-nSPV
     }
     else if ( strcmp(method,"listtransactions") == 0 )
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount)); // need non-nSPV
+        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount,0)); // need non-nSPV
     }
     else if ( strcmp(method,"notarizations") == 0 )
     {

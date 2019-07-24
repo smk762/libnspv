@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 /******************************************************************************
-* Copyright © 2014-2019 The SuperNET Developers.                             *
+* Copyright ï¿½ 2014-2019 The SuperNET Developers.                             *
 *                                                                            *
 * See the AUTHORS, DEVELOPER-AGREEMENT and LICENSE files at                  *
 * the top-level directory of this distribution for the individual copyright  *
@@ -33,7 +33,7 @@
 #include <btc/merkle_c.h>
 
 // TODO: do we need call the real function MAX_BLOCK_SIZE()?
-#define MAX_BLOCK_SIZE(h) 2000000
+#define MAX_BLOCK_SIZE(h) (4096 * 1024)
 
 #define BEGIN(a)            ((uint8_t*)&(a))
 #define END(a)              ((uint8_t*)&((&(a))[1]))

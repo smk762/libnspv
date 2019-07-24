@@ -25,8 +25,8 @@
 
 */
 
-#ifndef __LIBBTC_BLOCK_H__
-#define __LIBBTC_BLOCK_H__
+#ifndef __LIBBTC_BLOCKKMD_H__
+#define __LIBBTC_BLOCKKMD_H__
 
 #include "btc.h"
 #include "buffer.h"

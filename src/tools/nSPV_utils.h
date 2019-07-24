@@ -478,7 +478,7 @@ bits256 btc_uint256_to_bits256(uint256 hash256)
     return(hash);
 }
 
-void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
+void btc_bits256_to_uint256(bits256 hash,uint256 hash256)
 {
     iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
 }
@@ -486,7 +486,7 @@ void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
 void btc_tx_add_txin(btc_tx *mtx,bits256 txid,int32_t vout)
 {
     btc_tx_in *vin = btc_tx_in_new();
-    btc_bits256_to_uint256(vin->prevout.hash,txid);
+    btc_bits256_to_uint256(txid,vin->prevout.hash);
     vin->prevout.n = vout;
     vector_add(mtx->vin,vin);
 }
@@ -969,7 +969,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
             memcpy(script+1,elected[j],33);
             sighash = NSPV_sapling_sighash(tx,vini,10000,script,35);
             //fprintf(stderr,"%s ",bits256_str(str,sighash));
-            btc_bits256_to_uint256(hash,sighash);
+            btc_bits256_to_uint256(sighash,hash);
             if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str+1,vin->script_sig->len-2) > 0 )
             {
                 mask |= (1LL << j);

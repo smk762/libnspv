@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 /******************************************************************************
-* Copyright © 2014-2019 The SuperNET Developers.                             *
+* Copyright ï¿½ 2014-2019 The SuperNET Developers.                             *
 *                                                                            *
 * See the AUTHORS, DEVELOPER-AGREEMENT and LICENSE files at                  *
 * the top-level directory of this distribution for the individual copyright  *
@@ -24,6 +24,8 @@
 
 #ifndef __MERKLE_C_H__
 #define __MERKLE_C_H__
+
+#include "block_kmd.h"
 
 typedef struct partial_merkel_tree_ {
     uint32_t hashcount;
