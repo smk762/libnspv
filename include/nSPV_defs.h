@@ -28,7 +28,6 @@
 #include <time.h>
 #include <pthread.h>
 #include <btc/netspv.h>
-#include <btc/block_kmd.h>
 #include <btc/merkle_c.h>
 
 union _bits256 { uint8_t bytes[32]; uint16_t ushorts[16]; uint32_t uints[8]; uint64_t ulongs[4]; uint64_t txid; };
