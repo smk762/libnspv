@@ -79,6 +79,7 @@ int kmd_block_header_deserialize(kmd_block_header* header, struct const_buffer* 
         return false;
     if (!deser_u256(header->nonce, buf))
         return false;
+    fprintf(stderr,"var str?\n");
     if (!deser_varstr(&header->solution, buf))
         return false;
 
