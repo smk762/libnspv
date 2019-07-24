@@ -312,7 +312,7 @@ btc_node_group* btc_node_group_new(const btc_chainparams* chainparams)
     node_group->should_connect_to_more_nodes_cb = NULL;
     node_group->handshake_done_cb = NULL;
     node_group->log_write_cb = net_write_log_null;
-    node_group->desired_amount_connected_nodes = 3;
+    node_group->desired_amount_connected_nodes = 8;
 
     return node_group;
 }
@@ -346,9 +346,18 @@ void btc_node_group_event_loop(btc_node_group* group)
 
 void btc_node_group_add_node(btc_node_group* group, btc_node* node)
 {
-    vector_add(group->nodes, node);
-    node->nodegroup = group;
-    node->nodeid = group->nodes->len;
+    size_t j;
+    for ( j = 0; j < group->nodes->len; j++) {
+        btc_node* existing_node = vector_idx(group->nodes, j);
+        if ( memcmp(&((struct sockaddr_in*)&existing_node->addr)->sin_addr, &((struct sockaddr_in*)&node->addr)->sin_addr, sizeof(&((struct sockaddr_in*)&existing_node->addr)->sin_addr)) == 0 ) 
+            break;
+    }
+    if ( j == group->nodes->len )
+    {
+        vector_add(group->nodes, node);
+        node->nodegroup = group;
+        node->nodeid = group->nodes->len;
+    }
 }
 
 int btc_node_group_amount_of_connected_nodes(btc_node_group* group, enum NODE_STATE state)
@@ -368,7 +377,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
     int connect_amount = group->desired_amount_connected_nodes - btc_node_group_amount_of_connected_nodes(group, NODE_CONNECTED);
     if (connect_amount <= 0)
         return true;
-
+     
     connect_amount = connect_amount*3;
     /* search for a potential node that has not errored and is not connected or in connecting state */
     for (size_t i = 0; i < group->nodes->len; i++) {
