@@ -35,6 +35,9 @@ const unsigned char ZCASH_SIG_HASH_SAPLING_PERSONALIZATION[16] =
 const unsigned char ZCASH_SIG_HASH_OVERWINTER_PERSONALIZATION[16] =
 { 'Z','c','a','s','h','S','i','g','H','a','s','h', '\x19', '\x1B', '\xA8', '\x5B' };
 
+#include <btc/merkle_c.h>
+int GetProofMerkleRoot(uint8_t *proof, int prooflen, merkle_block *pMblock, vector *vmatch, uint256 mroot);
+
 bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen)
 {
     // sapling tx sighash preimage
