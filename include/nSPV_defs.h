@@ -19,6 +19,8 @@
 
 #define NSPV_MAXPACKETSIZE (4096 * 1024)
 #define NSPV_MAXSCRIPTSIZE 10000
+#define MAX_TX_SIZE_BEFORE_SAPLING 100000
+#define MAX_TX_SIZE_AFTER_SAPLING (2 * MAX_TX_SIZE_BEFORE_SAPLING)
 #define NSPV_LOCKTIME_THRESHOLD 500000000
 #define NSPV_KOMODO_ENDOFERA 7777777
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
@@ -112,7 +114,7 @@ struct NSPV_utxosresp
     struct NSPV_utxoresp *utxos;
     char coinaddr[64];
     int64_t total,interest;
-    int32_t nodeheight,skipcount,pad32;
+    int32_t nodeheight,skipcount,filter;
     uint16_t numutxos,CCflag;
 };
 
@@ -127,7 +129,7 @@ struct NSPV_txidsresp
 {
     struct NSPV_txidresp *txids;
     char coinaddr[64];
-    int32_t nodeheight,skipcount,pad32;
+    int32_t nodeheight,skipcount,filter;
     uint16_t numtxids,CCflag;
 };
 
@@ -166,6 +168,7 @@ struct NSPV_txproof
     int64_t unspentvalue;
     int32_t height,vout,txlen,txprooflen;
     uint8_t *tx,*txproof;
+    uint256 hashblock;
 };
 
 struct NSPV_ntzproofshared
