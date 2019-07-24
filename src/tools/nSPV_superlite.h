@@ -320,6 +320,34 @@ cJSON *NSPV_getinfo_req(btc_spv_client *client,int32_t reqht)
     return(NSPV_getinfo_json(&NSPV_inforesult));
 }
 
+void expand_ipbits(char *ipaddr,uint64_t ipbits);
+
+cJSON *NSPV_getpeerinfo(btc_spv_client *client)
+{
+    cJSON *result = cJSON_CreateArray();
+    
+    size_t j;
+    for ( j = 0; j < client->nodegroup->nodes->len; j++) {
+        btc_node* node = vector_idx(client->nodegroup->nodes, j);
+        if ( (node->state & NODE_CONNECTED) == NODE_CONNECTED )
+        {
+            char ipaddr[64]; cJSON *node_json = cJSON_CreateObject();
+            expand_ipbits(ipaddr, (uint64_t)((struct sockaddr_in*)&node->addr)->sin_addr.s_addr );
+            jaddnum(node_json,"nodeid",(int64_t)node->nodeid);
+            jaddstr(node_json,"ipaddress",ipaddr);
+            jaddnum(node_json,"port", (int64_t)node->nodegroup->chainparams->default_port);
+            jaddnum(node_json,"lastping",(int64_t)node->lastping);
+            jaddnum(node_json,"time_started_con",(int64_t)node->time_started_con);
+            jaddnum(node_json,"time_last_request",(int64_t)node->time_last_request);
+            jaddnum(node_json,"services",(int64_t)node->services);
+            jaddnum(node_json,"missbehavescore",(int64_t)node->missbehavescore);
+            jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight);
+            jaddi(result,node_json);     
+        }
+    }
+    return(result);
+}
+
 uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight)
 {
     uint32_t timestamp; struct NSPV_inforesp old = NSPV_inforesult;
@@ -734,6 +762,8 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     satoshis = jdouble(argjson,"amount")*COIN + 0.0000000049;
     if ( strcmp(method,"getinfo") == 0 )
         return(NSPV_getinfo_req(NSPV_client,hdrheight));
+    else if ( strcmp(method, "getpeerinfo") == 0 )
+        return(NSPV_getpeerinfo(NSPV_client));
     else if ( strcmp(method,"logout") == 0 )
     {
         NSPV_logout();
