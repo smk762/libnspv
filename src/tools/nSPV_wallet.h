@@ -401,7 +401,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     if ( branchid != 0 )
     {
         sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
-        btc_bits256_to_uint256(hash,sighash);
+        btc_bits256_to_uint256(sighash,hash);
     }
     else
     {
