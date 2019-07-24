@@ -261,17 +261,18 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 //fprintf(stderr,"call validate prooflen.%d\n",(int32_t)proof->len);
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
-                    uint256 mroot; merkle_block MB; vector *vmatch;
+                    uint256 mroot,revtxid; merkle_block MB; vector *vmatch;
                     init_mblock(&MB);
                     vmatch = vector_new(sizeof(bits256),free);
                     GetProofMerkleRoot((uint8_t *)proof->str,(int32_t)proof->len,&MB,vmatch,mroot);
                     proofroot = btc_uint256_to_bits256(mroot);
                     memset(mroot,0,sizeof(mroot));
-                    if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 || memcmp(&txid,vmatch->data[0],32) != 0 )
+                    btc_bits256_to_uint256(txid,revtxid);
+                    if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 || memcmp(revtxid,vmatch->data[0],32) != 0 )
                     {
                         int32_t i;
                         for (i=0; i<32; i++)
-                            fprintf(stderr,"%02x",txid.bytes[i]);
+                            fprintf(stderr,"%02x",revtxid[i]);
                         fprintf(stderr," vs. ");
                         for (i=0; i<32; i++)
                             fprintf(stderr,"%02x",((uint8_t *)vmatch->data[0])[i]);
