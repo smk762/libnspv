@@ -114,7 +114,7 @@ struct NSPV_utxosresp
     struct NSPV_utxoresp *utxos;
     char coinaddr[64];
     int64_t total,interest;
-    int32_t nodeheight,skipcount,filer;
+    int32_t nodeheight,skipcount,filter;
     uint16_t numutxos,CCflag;
 };
 
