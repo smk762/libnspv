@@ -261,8 +261,8 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
                     uint256 mroot; merkle_block MB; vector *vmatch;
-                    pMblock = init_mblock(&MB);
-                    vmatch = vector_new(sizeof(bits256));
+                    init_mblock(&MB);
+                    vmatch = vector_new(sizeof(bits256),free);
                     GetProofMerkleRoot(uint8_t *)proof->str,(int32_t)proof->len,pMblock,vmatch,mroot);
                     proofroot = btc_uint256_to_bits256(mroot);
                     fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);
