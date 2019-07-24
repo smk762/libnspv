@@ -35,6 +35,10 @@ const unsigned char ZCASH_SIG_HASH_SAPLING_PERSONALIZATION[16] =
 const unsigned char ZCASH_SIG_HASH_OVERWINTER_PERSONALIZATION[16] =
 { 'Z','c','a','s','h','S','i','g','H','a','s','h', '\x19', '\x1B', '\xA8', '\x5B' };
 
+#include <btc/block_kmd.h>
+#include <btc/merkle_c.h>
+int GetProofMerkleRoot(uint8_t *proof, int prooflen, merkle_block *pMblock, vector *vmatch, uint256 mroot);
+
 bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen)
 {
     // sapling tx sighash preimage
@@ -195,7 +199,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
 
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump)
 {
-    struct NSPV_txproof *ptr; btc_tx_out *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t i,offset; int64_t rewards = 0; uint32_t nLockTime; cstring *proof = 0; bits256 proofroot = zeroid;
+    struct NSPV_txproof *ptr; btc_tx_out *vout; btc_tx *tx = 0; char str[65],str2[65]; int32_t offset; int64_t rewards = 0; uint32_t nLockTime; cstring *proof = 0; bits256 proofroot = zeroid;
     *retvalp = skipvalidation != 0 ? 0 : -1;
     if ( (ptr= NSPV_txproof_find(txid,height)) == 0 )
     {
@@ -235,6 +239,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
         {
             proof = cstr_new_sz(ptr->txprooflen);
             memcpy(proof->str,ptr->txproof,ptr->txprooflen);
+            proof->len = ptr->txprooflen;
         }
         NSPV_notarizations(client,height); // gets the prev and next notarizations
         if ( NSPV_inforesult.notarization.height >= height && (NSPV_ntzsresult.prevntz.height == 0 || NSPV_ntzsresult.prevntz.height >= NSPV_ntzsresult.nextntz.height) )
@@ -250,21 +255,38 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
             offset = (height - NSPV_ntzsresult.prevntz.height);
             if ( offset >= 0 && height <= NSPV_ntzsresult.nextntz.height )
             {
-                fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
+                //fprintf(stderr,"call NSPV_txidhdrsproof %s %s\n",bits256_str(str,NSPV_ntzsresult.prevntz.txid),bits256_str(str2,NSPV_ntzsresult.nextntz.txid));
                 NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
-                fprintf(stderr,"call validate\n");
+                //fprintf(stderr,"call validate prooflen.%d\n",(int32_t)proof->len);
                 if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
                 {
-                    fprintf(stderr,"calculate merkleproofroot with proof len.%d\n",(int32_t)proof->len);
-                    //proofroot = BitcoinGetProofMerkleRoot(proof,txids);
-                    bits256 *txids = calloc(1,proof->len); // upper bound
-                    if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 || bits256_cmp(txid,txids[0]) != 0 )
+                    uint256 mroot,revtxid; merkle_block MB; vector *vmatch;
+                    init_mblock(&MB);
+                    vmatch = vector_new(sizeof(bits256),free);
+                    GetProofMerkleRoot((uint8_t *)proof->str,(int32_t)proof->len,&MB,vmatch,mroot);
+                    proofroot = btc_uint256_to_bits256(mroot);
+                    memset(mroot,0,sizeof(mroot));
+                    btc_bits256_to_uint256(txid,revtxid);
+                    if ( bits256_cmp(proofroot,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot) != 0 || memcmp(revtxid,vmatch->data[0],32) != 0 )
                     {
-                        fprintf(stderr,"prooflen.%d proofroot.%s vs %s\n",(int32_t)proof->len,bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
+                        int32_t i;
+                        for (i=0; i<32; i++)
+                            fprintf(stderr,"%02x",revtxid[i]);
+                        fprintf(stderr," vs. ");
+                        for (i=0; i<32; i++)
+                            fprintf(stderr,"%02x",((uint8_t *)vmatch->data[0])[i]);
+
+                        fprintf(stderr," prooflen.%d proofroot.%s vs %s\n",(int32_t)proof->len,bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
                         *retvalp = -2003;
-                    } else *retvalp = 0;
-                    free(txids);
+                    }
+                    else
+                    {
+                        *retvalp = 0;
+                        fprintf(stderr,"%s merkleproof validated!\n",bits256_str(str,txid));
+                    }
+                    free_mblock_data(&MB);
+                    vector_free(vmatch,1);
                 }
             } else *retvalp = -2005;
         } else *retvalp = -2004;
@@ -384,7 +406,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
     if ( branchid != 0 )
     {
         sighash = NSPV_sapling_sighash(mtx,vini,utxovalue,(uint8_t *)scriptPubKey->str,scriptPubKey->len);
-        btc_bits256_to_uint256(hash,sighash);
+        btc_bits256_to_uint256(sighash,hash);
     }
     else
     {
@@ -517,7 +539,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         return(result);
     }
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
-        NSPV_addressutxos(client,srcaddr,0,0);
+        NSPV_addressutxos(client,srcaddr,0,0,0);
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
     {
         jaddstr(result,"result","error");
@@ -636,7 +658,7 @@ int64_t NSPV_AddNormalinputs(CMutableTransaction &mtx,CPubKey mypk,int64_t total
         Getscriptaddress(coinaddr,CScript() << ParseHex(HexStr(mypk)) << OP_CHECKSIG);
         if ( strcmp(ptr->U.coinaddr,coinaddr) != 0 )
         {
-            NSPV_addressutxos(coinaddr,CCflag,0);
+            NSPV_addressutxos(coinaddr,CCflag,0,0);
             NSPV_utxosresp_purge(&ptr->U);
             NSPV_utxosresp_copy(&ptr->U,&NSPV_utxosresult);
         }
@@ -696,13 +718,13 @@ void NSPV_txids2CCtxids(struct NSPV_txidsresp *ptr,std::vector<std::pair<CAddres
 
 void NSPV_CCunspents(std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &outputs,char *coinaddr,bool ccflag)
 {
-    NSPV_addressutxos(coinaddr,ccflag,0);
+    NSPV_addressutxos(coinaddr,ccflag,0,0);
     NSPV_utxos2CCunspents(&NSPV_utxosresult,outputs);
 }
 
 void NSPV_CCtxids(std::vector<std::pair<CAddressIndexKey, CAmount> > &txids,char *coinaddr,bool ccflag)
 {
-    NSPV_addresstxids(coinaddr,ccflag,0);
+    NSPV_addresstxids(coinaddr,ccflag,0,0);
     NSPV_txids2CCtxids(&NSPV_txidsresult,txids);
 }
 #endif
