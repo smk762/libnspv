@@ -279,7 +279,12 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
 
                         fprintf(stderr," prooflen.%d proofroot.%s vs %s\n",(int32_t)proof->len,bits256_str(str,proofroot),bits256_str(str2,NSPV_ntzsproofresult.common.hdrs[offset].hashMerkleRoot));
                         *retvalp = -2003;
-                    } else *retvalp = 0;
+                    }
+                    else
+                    {
+                        *retvalp = 0;
+                        fprintf(stderr,"%s merkleproof validated!\n",bits256_str(str,txid));
+                    }
                     free_mblock_data(&MB);
                     vector_free(vmatch,1);
                 }
