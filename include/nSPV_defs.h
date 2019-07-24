@@ -114,7 +114,7 @@ struct NSPV_utxosresp
     struct NSPV_utxoresp *utxos;
     char coinaddr[64];
     int64_t total,interest;
-    int32_t nodeheight,skipcount,pad32;
+    int32_t nodeheight,skipcount,filer;
     uint16_t numutxos,CCflag;
 };
 
@@ -129,7 +129,7 @@ struct NSPV_txidsresp
 {
     struct NSPV_txidresp *txids;
     char coinaddr[64];
-    int32_t nodeheight,skipcount,pad32;
+    int32_t nodeheight,skipcount,filter;
     uint16_t numtxids,CCflag;
 };
 
@@ -168,6 +168,7 @@ struct NSPV_txproof
     int64_t unspentvalue;
     int32_t height,vout,txlen,txprooflen;
     uint8_t *tx,*txproof;
+    uint256 hashblock;
 };
 
 struct NSPV_ntzproofshared
