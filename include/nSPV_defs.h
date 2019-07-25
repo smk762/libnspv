@@ -17,6 +17,7 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
+#define NSPV_PROTOCOL_VERSION 0x0001
 #define NSPV_MAXPACKETSIZE (4096 * 1024)
 #define NSPV_MAXSCRIPTSIZE 10000
 #define MAX_TX_SIZE_BEFORE_SAPLING 100000
@@ -26,7 +27,9 @@
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
 
 #include <time.h>
+#ifndef __MINGW
 #include <pthread.h>
+#endif
 #include <btc/netspv.h>
 
 union _bits256 { uint8_t bytes[32]; uint16_t ushorts[16]; uint32_t uints[8]; uint64_t ulongs[4]; uint64_t txid; };
@@ -160,6 +163,7 @@ struct NSPV_inforesp
     bits256 blockhash;
     int32_t height,hdrheight;
     struct NSPV_equihdr H;
+    uint32_t version;
 };
 
 struct NSPV_txproof
