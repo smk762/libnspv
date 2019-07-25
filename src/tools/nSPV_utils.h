@@ -39,7 +39,7 @@ btc_chainparams kmd_chainparams_main =
     1,1,0,
 };
 
-btc_chainparams nspv_chainparams_main =
+/*btc_chainparams nspv_chainparams_main =
 {
     "NSPV",
     60,
@@ -58,7 +58,7 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
-/*btc_chainparams iln_chainparams_main =
+btc_chainparams iln_chainparams_main =
 {
     "ILN",
     60,
@@ -916,19 +916,20 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
     return(-1);
 }
 
-bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,cstring *opret)
+bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char* opret)
 {
-    bits256 desttxid; int32_t i,offset=3; char str[65];
+    bits256 desttxid; int32_t i,offset=2; char str[65];
     if ( opret != 0 )
     {
-        iguana_rwnum(0,(uint8_t *)&opret->str[offset + 32],sizeof(*heightp),heightp);
-        for (i=0; i<32; i++)
-            ((uint8_t *)blockhashp)[31 - i] = opret->str[offset + i];
-        for (i=0; i<32; i++)
-            ((uint8_t *)&desttxid)[31 - i] = opret->str[offset + 4 + 32 + i];
         //for (i=0; i<opret->len; i++)
         //    fprintf(stderr,"%02x",opret->str[i]&0xff);
-        fprintf(stderr," ntzht.%d %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)opret->len);
+        iguana_rwnum(0,(uint8_t *)&opret[offset+32],sizeof(*heightp),heightp);
+        for (i=0; i<32; i++)
+            ((uint8_t *)blockhashp)[31 - i] = opret[offset + i];
+        for (i=0; i<32; i++)
+            ((uint8_t *)&desttxid)[31 - i] = opret[offset + 4 + 32 + i];
+        
+        fprintf(stderr," ntzht.%i %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)(strlen(opret)*2));
         return(desttxid);
     } else return(zeroid);
 }
@@ -989,7 +990,7 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
     {
         if ( vout->script_pubkey != 0 && vout->script_pubkey->len >= 2+32*2+4 && vout->script_pubkey->str[0] == OP_RETURN )
         {
-            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,vout->script_pubkey);
+            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,vout->script_pubkey->str);
             if ( komodo_notaries(client,elected,*ntzheightp) <= 0 )
                 fprintf(stderr,"non-support notary list\n");
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )

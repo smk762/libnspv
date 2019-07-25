@@ -554,6 +554,8 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     return(n);
 }
 
+char *htmlfiles[] = { "/bootstrap.min.css", "/wallet.html", "/login.html", "/favicon.ico" };
+
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
     int32_t i,n,totallen,datalen,len = 0; cJSON *json,*array; char key[8192],*data;
@@ -613,9 +615,27 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     if ( strcmp(&url[i],"/") == 0 && strcmp(urlmethod,"GET") == 0 )
     {
         *jsonflagp = 1;
-        if ( (filestr= OS_filestr(&filesize,"index.html")) == 0 )
+        if ( (filestr= OS_filestr(&filesize,"html/index.html")) == 0 )
             return(clonestr("{\"error\":\"cant find index.html\"}"));
         else return(filestr);
+    }
+    else
+    {
+        int32_t f; char fname[512],cmpstr[8192];
+        for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
+        {
+            *jsonflagp = 1;
+            strcpy(cmpstr,&url[i]);
+            if ( cmpstr[strlen(cmpstr)-1] == '?' )
+                cmpstr[strlen(cmpstr)-1] = 0;
+            if ( strcmp(cmpstr,htmlfiles[f]) == 0 )
+            {
+                sprintf(fname,"html/%s",htmlfiles[f]+1);
+                if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                else return(filestr);
+            }
+        }
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
@@ -781,7 +801,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     //printf("after urlconv.(%s) argjson.(%s)\n",jprint(json,0),jprint(argjson,0));
                     if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(argjson) > 0 )
                     {
-                        if ( (retstr= NSPV_JSON("127.0.0.1",argjson,remoteaddr,port)) != 0 )
+                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port)) != 0 )
                         {
                             if ( (retitem= cJSON_Parse(retstr)) != 0 )
                                 jaddi(retarray,retitem);
@@ -808,7 +828,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
                 {
                     portable_mutex_lock(&NSPV_commandmutex);
-                    retstr = NSPV_JSON("127.0.0.1",arg,remoteaddr,port);
+                    retstr = NSPV_JSON(arg,remoteaddr,port);
                     portable_mutex_unlock(&NSPV_commandmutex);
                 } else retstr = clonestr("{\"error\":\"invalid remote method\"}");
             }
@@ -828,7 +848,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     return(clonestr("{\"error\":\"couldnt process packet\"}"));
 }
 
-int32_t iguana_getcontentlen(char *buf,int32_t recvlen)
+int32_t iguana_getcontentlen(char *buf) //,int32_t recvlen)
 {
     char *str,*clenstr = "Content-Length: ",*clenstr2 = "content-length: "; int32_t len = -1;
     if ( (str= strstr(buf,clenstr)) != 0 || (str= strstr(buf,clenstr2)) != 0 )
@@ -892,7 +912,7 @@ void *LP_rpc_processreq(void *_ptr)
                 buf[len] = 0;
                 if ( recvlen == 0 )
                 {
-                    if ( (contentlen= iguana_getcontentlen(buf,recvlen)) > 0 )
+                    if ( (contentlen= iguana_getcontentlen(buf)) > 0 )
                     {
                         hdrsize = iguana_getheadersize(buf,recvlen);
                         if ( hdrsize > 0 )
