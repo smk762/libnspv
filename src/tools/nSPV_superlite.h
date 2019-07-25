@@ -234,7 +234,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 I = NSPV_inforesult;
                 NSPV_inforesp_purge(&NSPV_inforesult);
                 NSPV_rwinforesp(0,&response[1],&NSPV_inforesult,len);
-                fprintf(stderr,"got info version.%d response %u from.%d size.%d height.%d\n",NSPV_inforesult.version,timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
+                //fprintf(stderr,"got info version.%d response %u from.%d size.%d height.%d\n",NSPV_inforesult.version,timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
                 if ( NSPV_inforesult.height < I.height )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
