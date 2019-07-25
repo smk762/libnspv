@@ -790,12 +790,12 @@ void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
                     case NSPV_INT:
                         if ( j >= m )
                             jaddnum(argjson,NSPV_methods[i].args[j].field,0);
-                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jint(params,j));
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jinti(params,j));
                         break;
                    case NSPV_UINT:
                         if ( j >= m )
                             jaddnum(argjson,NSPV_methods[i].args[j].field,0);
-                        else jaddnum(argjson,NSPV_methods[i].args[j].field,juint(params,j));
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,juinti(params,j));
                         break;
                     case NSPV_HASH:
                         if ( j >= m )
@@ -805,13 +805,13 @@ void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
                     case NSPV_FLOAT:
                         if ( j >= m )
                             jaddnum(argjson,NSPV_methods[i].args[j].field,0);
-                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jdouble(params,j));
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jdoublei(params,j));
                         break;
                 }
             }
         }
     }
-    fprintf(stderr,"new argsjson.(%s)\n",jprint(argsjson,0));
+    fprintf(stderr,"new argjson.(%s)\n",jprint(argjson,0));
 }
 
 cJSON *_NSPV_JSON(cJSON *argjson)
