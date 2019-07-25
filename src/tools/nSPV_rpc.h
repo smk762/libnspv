@@ -88,13 +88,14 @@ int32_t LP_valid_remotemethod(cJSON *argjson)
     return(-1);
 }
 
-/*#ifdef _WIN32
+#ifdef _WIN32
 #define in6_addr sockaddr
 #define in_addr_t struct sockaddr_storage
 #ifndef NATIVE_WINDOWS
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
-#endif*/
+#endif
 
+#else
 struct sockaddr_in6 {
     short   sin6_family;
     u_short sin6_port;
@@ -102,7 +103,6 @@ struct sockaddr_in6 {
     struct  in6_addr sin6_addr;
     u_long  sin6_scope_id;
 };
-#else
 #endif
 
 #ifdef _WIN32
