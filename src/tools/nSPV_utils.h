@@ -39,7 +39,7 @@ btc_chainparams kmd_chainparams_main =
     1,1,0,
 };
 
-btc_chainparams nspv_chainparams_main =
+/*btc_chainparams nspv_chainparams_main =
 {
     "NSPV",
     60,
@@ -58,7 +58,7 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
-/*btc_chainparams iln_chainparams_main =
+btc_chainparams iln_chainparams_main =
 {
     "ILN",
     60,

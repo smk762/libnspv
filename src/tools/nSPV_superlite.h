@@ -745,14 +745,19 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 
 struct NSPV_arginfo { char field[63]; uint8_t type; };
 
-struct NSPV_methodargs
+struct NSPV_methodarg
 {
     char method[64];
     struct NSPV_arginfo args[8];
 };
 
-struct NSPV_methodargs NSPV_methods[] =
+struct NSPV_methodarg NSPV_methods[] =
 {
+    { "stop", { } },
+    { "help", { } },
+    { "logout", { } },
+    { "getnewaddress", { } },
+    { "getpeerinfo", { } },
     { "login", { { "wif", NSPV_STR } } },
     { "broadcast", { { "hex", NSPV_STR } } },
     { "listunspent", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
@@ -765,6 +770,50 @@ struct NSPV_methodargs NSPV_methods[] =
     { "spend", { { "address", NSPV_STR }, { "amount", NSPV_FLOAT } } },
     { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_STR }, { "CCfunc", NSPV_STR }, } },
 };
+
+cJSON *NSPV_helpitem(struct NSPV_methodarg *ptr)
+{
+    int32_t i; char *str; cJSON *item = cJSON_CreateObject(),*obj,*array = cJSON_CreateArray();
+    jaddstr(item,"method",ptr->method);
+    for (i=0; i<(int32_t)(sizeof(ptr->args)/sizeof(*ptr->args)); i++)
+    {
+        if ( ptr->args[i].field[0] == 0 )
+            break;
+        obj = cJSON_CreateObject();
+        switch ( ptr->args[i].type )
+        {
+            case NSPV_STR:
+                jaddstr(obj,ptr->args[i].field,"string");
+                break;
+            case NSPV_INT:
+                jaddstr(obj,ptr->args[i].field,"int32_t");
+                break;
+            case NSPV_UINT:
+                jaddstr(obj,ptr->args[i].field,"uint32_t");
+                break;
+            case NSPV_HASH:
+                jaddstr(obj,ptr->args[i].field,"hash");
+                break;
+            case NSPV_FLOAT:
+                jaddstr(obj,ptr->args[i].field,"float");
+                break;
+        }
+        jaddi(array,obj);
+    }
+    jadd(item,"fields",array);
+    return(item);
+}
+
+cJSON *NSPV_help()
+{
+    int32_t i; cJSON *retjson = cJSON_CreateObject(),*array = cJSON_CreateArray();
+    jaddstr(retjson,"result","success");
+    for (i=0; i<(int32_t)(sizeof(NSPV_methods)/sizeof(*NSPV_methods)); i++)
+        jaddi(array,NSPV_helpitem(&NSPV_methods[i]));
+    jadd(retjson,"methods",array);
+    jaddnum(retjson,"num",sizeof(NSPV_methods)/sizeof(*NSPV_methods));
+    return(retjson);
+}
 
 void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
 {
@@ -828,6 +877,8 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         fprintf(stderr,"shutdown started\n");
         return(cJSON_Parse("{\"result\":\"success\"}"));
     }
+    else if ( strcmp("help",method) == 0 )
+        return(NSPV_help());
     if ( (params= jarray(&numargs,argjson,"params")) != 0 )
         NSPV_argjson_addfields(method,argjson,params);
     txid = jbits256(argjson,"txid");
