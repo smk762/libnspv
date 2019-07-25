@@ -621,11 +621,14 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     }
     else
     {
-        int32_t f; char fname[512];
+        int32_t f; char fname[512],cmpstr[8192];
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             *jsonflagp = 1;
-            if ( strcmp(&url[i],htmlfiles[f]) == 0 )
+            strcpy(cmpstr,&url[i]);
+            if ( cmpstr[strlen(cmpstr)-1] == '?' )
+                cmpstr[strlen(cmpstr)-1] = 0;
+            if ( strcmp(cmpstr,htmlfiles[f]) == 0 )
             {
                 sprintf(fname,"html/%s",htmlfiles[f]+1);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
