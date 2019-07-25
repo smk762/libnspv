@@ -115,7 +115,6 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
- params:[] array -> map to fields -> jl777
  dynamically generated localhost browser wallet
  
  enhance cc/funcid filter in listtransactions/listunspent -> mihailo
