@@ -768,7 +768,7 @@ struct NSPV_methodarg NSPV_methods[] =
     { "txproof", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "height", NSPV_UINT } } },
     { "spentinfo", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT } } },
     { "spend", { { "address", NSPV_STR }, { "amount", NSPV_FLOAT } } },
-    { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_STR }, { "CCfunc", NSPV_STR }, } },
+    { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_UINT }, { "CCfunc", NSPV_UINT }, } },
 };
 
 cJSON *NSPV_helpitem(struct NSPV_methodarg *ptr)
