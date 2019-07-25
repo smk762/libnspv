@@ -980,7 +980,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
 char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
 {
     char *retstr; cJSON *retjson;
-    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port != RPC_port )
+    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
         fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
     if ( (retjson= _NSPV_JSON(argjson)) != 0 )
         retstr = jprint(retjson,1);

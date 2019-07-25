@@ -828,7 +828,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     return(clonestr("{\"error\":\"couldnt process packet\"}"));
 }
 
-int32_t iguana_getcontentlen(char *buf,int32_t recvlen)
+int32_t iguana_getcontentlen(char *buf) //,int32_t recvlen)
 {
     char *str,*clenstr = "Content-Length: ",*clenstr2 = "content-length: "; int32_t len = -1;
     if ( (str= strstr(buf,clenstr)) != 0 || (str= strstr(buf,clenstr2)) != 0 )
@@ -892,7 +892,7 @@ void *LP_rpc_processreq(void *_ptr)
                 buf[len] = 0;
                 if ( recvlen == 0 )
                 {
-                    if ( (contentlen= iguana_getcontentlen(buf,recvlen)) > 0 )
+                    if ( (contentlen= iguana_getcontentlen(buf)) > 0 )
                     {
                         hdrsize = iguana_getheadersize(buf,recvlen);
                         if ( hdrsize > 0 )
