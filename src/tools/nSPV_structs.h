@@ -583,7 +583,7 @@ cJSON *NSPV_utxoresp_json(struct NSPV_utxoresp *utxos,int32_t numutxos)
         jaddbits256(item,"txid",utxos[i].txid);
         jaddnum(item,"vout",utxos[i].vout);
         jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
-        jaddnum(item,"rewards",(double)utxos[i].interest/COIN);
+        jaddnum(item,"rewards",(double)utxos[i].extradata/COIN);
         jaddi(array,item);
     }
     return(array);
