@@ -554,6 +554,8 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     return(n);
 }
 
+char *htmlfiles[] = { "/bootstrap.min.css", "/wallet.html", "/login.html" };
+
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
     int32_t i,n,totallen,datalen,len = 0; cJSON *json,*array; char key[8192],*data;
@@ -616,6 +618,21 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
         if ( (filestr= OS_filestr(&filesize,"html/index.html")) == 0 )
             return(clonestr("{\"error\":\"cant find index.html\"}"));
         else return(filestr);
+    }
+    else
+    {
+        int32_t f; char fname[512];
+        for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
+        {
+            *jsonflagp = 1;
+            if ( strcmp(&url[i],htmlfiles[f]) == 0 )
+            {
+                sprintf(fname,"html/%s",htmlfiles[f]+1);
+                if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                else return(filestr);
+            }
+        }
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
