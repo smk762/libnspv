@@ -177,17 +177,18 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
     if ( node != 0 )
     {
         if ( len >= 0xfd )
-            fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
-        else
         {
-            msg[0] = len - 1;
-            cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
-            btc_node_send(node,request);
-            cstr_free(request, true);
-            //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
-            node->prevtimes[ind] = timestamp;
-            return(node);
-        }
+            fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
+            msg[0] = 0xfd;
+            msg[1] = (len - 3) & 0xff;
+            msg[2] = ((len - 1) >> 8) & 0xff;
+        } else msg[0] = len - 1;
+        cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
+        btc_node_send(node,request);
+        cstr_free(request, true);
+        //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
+        node->prevtimes[ind] = timestamp;
+        return(node);
     } else fprintf(stderr,"no nodes\n");
     return(0);
 }
@@ -649,20 +650,21 @@ cJSON *NSPV_spentinfo(btc_spv_client *client,bits256 txid,int32_t vout)
 
 cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 {
-    uint8_t *msg,*data; bits256 txid; int32_t i,n,iter,len = 1; struct NSPV_broadcastresp B;
+    uint8_t *msg,*data; bits256 txid; int32_t i,n,iter,len = 3; struct NSPV_broadcastresp B;
     NSPV_broadcast_purge(&NSPV_broadcastresult);
     n = (int32_t)strlen(hex) >> 1;
     data = (uint8_t *)malloc(n);
     decode_hex(data,n,hex);
     txid = bits256_doublesha256(data,n);
-    msg = (uint8_t *)malloc(1 + sizeof(txid) + sizeof(n) + n);
+    msg = (uint8_t *)malloc(3 + sizeof(txid) + sizeof(n) + n);
+    msg[0] = msg[1] = msg[2] = 0;
     msg[len++] = NSPV_BROADCAST;
     len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     len += iguana_rwnum(1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
     for (iter=0; iter<3; iter++)
-    if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[1]>>1) != 0 )
+    if ( NSPV_req(client,0,msg,len,NODE_NSPV,NSPV_BROADCAST>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
         {
@@ -735,6 +737,40 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
     return(result);
 }
 
+#define NSPV_STR 1
+#define NSPV_INT 2
+#define NSPV_UINT 3
+#define NSPV_HASH 4
+#define NSPV_FLOAT 5
+
+struct NSPV_arginfo { char field[63]; uint8_t type; };
+
+struct NSPV_methodargs
+{
+    char method[64];
+    struct NSPV_arginfo args[8];
+};
+
+struct NSPV_methodargs NSPV_methods[] =
+{
+    { "login", { { "wif", NSPV_STR } } },
+    { "broadcast", { { "hex", NSPV_STR } } },
+    { "listunspent", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
+    { "listtransactions", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
+    { "notarizations", { { "height", NSPV_UINT } } },
+    { "hdrsproof", { { "prevheight", NSPV_UINT }, { "nextheight", NSPV_UINT } } },
+    { "getinfo", { { "hdrheight", NSPV_UINT } } },
+    { "txproof", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "height", NSPV_UINT } } },
+    { "spentinfo", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT } } },
+    { "spend", { { "address", NSPV_STR }, { "amount", NSPV_FLOAT } } },
+    { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_STR }, { "CCfunc", NSPV_STR }, } },
+};
+
+void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
+{
+    
+}
+
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
     char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight,numargs; uint8_t CCflag,memfunc; cJSON *params;
@@ -750,9 +786,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         return(cJSON_Parse("{\"result\":\"success\"}"));
     }
     if ( (params= jarray(&numargs,argjson,"params")) != 0 )
-    {
-        
-    }
+        NSPV_argjson_addfields(method,argjson,params);
     txid = jbits256(argjson,"txid");
     vout = jint(argjson,"vout");
     height = jint(argjson,"height");
@@ -829,7 +863,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( satoshis < 1000 || coinaddr == 0 )
             return(cJSON_Parse("{\"error\":\"invalid address or amount too small\"}"));
-        else return(NSPV_spend(NSPV_client,NSPV_address,coinaddr,satoshis)); // need non-nSPV
+        else return(NSPV_spend(NSPV_client,NSPV_address,coinaddr,satoshis));
     }
     else if ( strcmp(method,"mempool") == 0 )
     {

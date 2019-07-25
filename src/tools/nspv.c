@@ -120,9 +120,6 @@ void spv_sync_completed(btc_spv_client* client) {
  
  enhance cc/funcid filter in listtransactions/listunspent -> mihailo
  
- make some way to add peers dynamically -> blackjok3r
- new apis: getpeerinfo -> blackjok3r
-
  */
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
