@@ -35,7 +35,7 @@
 
 #ifdef _WIN32
 #define PTW32_STATIC_LIB
-#include "OSlibs/win/pthread.h"
+#include "pthread.h"
 
 #ifndef NATIVE_WINDOWS
 #define EADDRINUSE WSAEADDRINUSE
