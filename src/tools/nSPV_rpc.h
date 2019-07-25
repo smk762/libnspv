@@ -781,7 +781,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     //printf("after urlconv.(%s) argjson.(%s)\n",jprint(json,0),jprint(argjson,0));
                     if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(argjson) > 0 )
                     {
-                        if ( (retstr= NSPV_JSON("127.0.0.1",argjson,remoteaddr,port)) != 0 )
+                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port)) != 0 )
                         {
                             if ( (retitem= cJSON_Parse(retstr)) != 0 )
                                 jaddi(retarray,retitem);
@@ -808,7 +808,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
                 {
                     portable_mutex_lock(&NSPV_commandmutex);
-                    retstr = NSPV_JSON("127.0.0.1",arg,remoteaddr,port);
+                    retstr = NSPV_JSON(arg,remoteaddr,port);
                     portable_mutex_unlock(&NSPV_commandmutex);
                 } else retstr = clonestr("{\"error\":\"invalid remote method\"}");
             }

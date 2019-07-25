@@ -496,6 +496,10 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == CCflag )
     {
         fprintf(stderr,"found (%s) vout in mempool\n",coinaddr);
+        if ( logcategory != 0 )
+        {
+            // add to logfile
+        }
         return(true);
     } else return(false);
 }
@@ -973,9 +977,11 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
-char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
+char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
 {
     char *retstr; cJSON *retjson;
+    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port != RPC_port )
+        fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
     if ( (retjson= _NSPV_JSON(argjson)) != 0 )
         retstr = jprint(retjson,1);
     else retstr = clonestr("{\"error\":\"unparseable retjson\"}");
