@@ -27,10 +27,10 @@
  */
 #if defined(_M_X64)
 #define WIN32_LEAN_AND_MEAN
-#include <WinSock2.h>
+#include <winsock2.h>
 #endif
 #ifdef _WIN32
-#include <WinSock2.h>
+#include <winsock2.h>
 #endif
 
 #ifdef _WIN32
