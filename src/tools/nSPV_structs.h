@@ -600,6 +600,8 @@ cJSON *NSPV_utxosresp_json(struct NSPV_utxosresp *ptr)
     jaddnum(result,"numutxos",ptr->numutxos);
     jaddnum(result,"balance",(double)ptr->total/COIN);
     jaddnum(result,"interest",(double)ptr->interest/COIN);
+    jaddnum(result,"skipcount",ptr->skipcount);
+    jaddnum(result,"filter",ptr->filter);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
@@ -630,6 +632,8 @@ cJSON *NSPV_txidsresp_json(struct NSPV_txidsresp *ptr)
     jaddnum(result,"isCC",ptr->CCflag);
     jaddnum(result,"height",ptr->nodeheight);
     jaddnum(result,"numtxids",ptr->numtxids);
+    jaddnum(result,"skipcount",ptr->skipcount);
+    jaddnum(result,"filter",ptr->filter);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
