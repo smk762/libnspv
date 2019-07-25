@@ -583,7 +583,7 @@ cJSON *NSPV_utxoresp_json(struct NSPV_utxoresp *utxos,int32_t numutxos)
         jaddbits256(item,"txid",utxos[i].txid);
         jaddnum(item,"vout",utxos[i].vout);
         jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
-        jaddnum(item,"interest",(double)utxos[i].extradata/COIN);
+        jaddnum(item,"rewards",(double)utxos[i].extradata/COIN);
         jaddi(array,item);
     }
     return(array);
@@ -599,7 +599,7 @@ cJSON *NSPV_utxosresp_json(struct NSPV_utxosresp *ptr)
     jaddnum(result,"height",ptr->nodeheight);
     jaddnum(result,"numutxos",ptr->numutxos);
     jaddnum(result,"balance",(double)ptr->total/COIN);
-    jaddnum(result,"interest",(double)ptr->interest/COIN);
+    jaddnum(result,"rewards",(double)ptr->interest/COIN);
     jaddnum(result,"skipcount",ptr->skipcount);
     jaddnum(result,"filter",ptr->filter);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
@@ -615,7 +615,7 @@ cJSON *NSPV_txidresp_json(struct NSPV_txidresp *utxos,int32_t numutxos)
         jaddnum(item,"height",utxos[i].height);
         jaddbits256(item,"txid",utxos[i].txid);
         jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
-        jaddnum(item,"interest",(double)utxos[i].extradata/COIN);
+        jaddnum(item,"rewards",(double)utxos[i].extradata/COIN);
         if ( utxos[i].satoshis > 0 )
             jaddnum(item,"vout",utxos[i].vout);
         else jaddnum(item,"vin",utxos[i].vout);
