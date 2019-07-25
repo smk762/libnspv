@@ -88,7 +88,7 @@ int32_t LP_valid_remotemethod(cJSON *argjson)
     return(-1);
 }
 
-#ifndef _WIN32
+#ifdef _WIN32
 #define in6_addr sockaddr
 #define in_addr_t struct sockaddr_storage
 #ifndef NATIVE_WINDOWS
