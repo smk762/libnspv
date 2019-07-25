@@ -569,6 +569,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     jaddbits256(result,"chaintip",ptr->blockhash);
     jadd(result,"notarization",NSPV_ntz_json(&ptr->notarization));
     jadd(result,"header",NSPV_header_json(&ptr->H,ptr->hdrheight));
+    jaddstr(result,"protocolversion",ptr->version);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
