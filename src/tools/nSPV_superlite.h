@@ -768,7 +768,50 @@ struct NSPV_methodargs NSPV_methods[] =
 
 void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
 {
-    
+    int32_t i,j,n,m;
+    for (i=0; i<(int32_t)(sizeof(NSPV_methods)/sizeof(*NSPV_methods)); i++)
+    {
+        if ( strcmp(method,NSPV_methods[i].method) == 0 )
+        {
+            for (j=0; j<(int32_t)(sizeof(NSPV_methods[i].args)/sizeof(*NSPV_methods[i].args)); j++)
+                if ( NSPV_methods[i].args[j].field[0] == 0 )
+                    break;
+            n = j;
+            m = cJSON_GetArraySize(params);
+            for (j=0; j<n; j++)
+            {
+                switch ( NSPV_methods[i].args[j].type )
+                {
+                    case NSPV_STR:
+                        if ( j >= m )
+                            jaddstr(argjson,NSPV_methods[i].args[j].field,"");
+                        else jaddstr(argjson,NSPV_methods[i].args[j].field,jstri(params,j));
+                        break;
+                    case NSPV_INT:
+                        if ( j >= m )
+                            jaddnum(argjson,NSPV_methods[i].args[j].field,0);
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jint(params,j));
+                        break;
+                   case NSPV_UINT:
+                        if ( j >= m )
+                            jaddnum(argjson,NSPV_methods[i].args[j].field,0);
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,juint(params,j));
+                        break;
+                    case NSPV_HASH:
+                        if ( j >= m )
+                            jaddbits256(argjson,NSPV_methods[i].args[j].field,zeroid);
+                        else jaddbits256(argjson,NSPV_methods[i].args[j].field,jbits256i(params,j));
+                        break;
+                    case NSPV_FLOAT:
+                        if ( j >= m )
+                            jaddnum(argjson,NSPV_methods[i].args[j].field,0);
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jdouble(params,j));
+                        break;
+                }
+            }
+        }
+    }
+    fprintf(stderr,"new argsjson.(%s)\n",jprint(argsjson,0));
 }
 
 cJSON *_NSPV_JSON(cJSON *argjson)
