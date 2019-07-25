@@ -350,7 +350,7 @@ int32_t NSPV_rwinforesp(int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp 
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->hdrheight),&ptr->hdrheight);
     len += NSPV_rwequihdr(rwflag,&serialized[len],&ptr->H,0);
-    //fprintf(stderr,"hdr rwlen.%d\n",len);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->version),&ptr->version);
     return(len);
 }
 
