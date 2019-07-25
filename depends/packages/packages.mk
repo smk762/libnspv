@@ -1,4 +1,5 @@
-packages:=libevent
+packages:=libevent libsodium
+
 native_packages := native_ccache
 
 wallet_packages=
