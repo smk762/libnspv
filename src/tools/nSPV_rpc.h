@@ -626,8 +626,8 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
             strcpy(cmpstr,&url[i]);
             if ( cmpstr[strlen(cmpstr)-1] == '?' )
                 cmpstr[strlen(cmpstr)-1] = 0;
-            sprintf(cmpstr2,":7771%s",cmpstr);
-            fprintf(stderr,"cmp.(%s) and cmp2.(%s)\n",cmpstr,cmpstr2);
+            sprintf(cmpstr2,":%u%s",port,cmpstr);
+            fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
             {
                 for (i=(int32_t)strlen(url)-1; i>0; i--)
