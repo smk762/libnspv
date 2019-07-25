@@ -554,7 +554,7 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     return(n);
 }
 
-char *htmlfiles[] = { "/bootstrap.min.css", "/wallet.html", "/login.html" };
+char *htmlfiles[] = { "/bootstrap.min.css", "/wallet.html", "/login.html", "/favicon.ico" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
