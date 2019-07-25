@@ -26,11 +26,13 @@
         <div class="col-8" style="padding-left: 7.5px;">
           <div class="card"> <!-- wallet buttons card start -->
             <div class="card-body text-right"> <!-- wallet buttons body start -->
-              <button class="btn btn-info btn-lg">Info</button>
-              <button class="btn btn-secondary btn-lg">Transactions</button>
-              <button class="btn btn-warning btn-lg">Send</button>
-              <button class="btn btn-success btn-lg">Receive</button>
-              <button class="btn btn-danger btn-lg">Logout</button>
+              <form> <!-- coin info buttons form start -->
+                <button class="btn btn-info btn-lg" formaction="info">Info</button>
+                <button class="btn btn-secondary btn-lg" formaction="wallet.html">Transactions</button>
+                <button class="btn btn-warning btn-lg" formaction="send">Send</button>
+                <button class="btn btn-success btn-lg" formaction="receive">Receive</button>
+                <button class="btn btn-danger btn-lg" formaction="login.html">Logout</button>
+              </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
           </div> <!-- wallet buttons card start -->
         </div>
@@ -45,81 +47,86 @@
                   <h5 class="card-title" style="vertical-align: ">Transaction History</h5>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
-                  <button class="btn btn-outline-secondary btn-sm">Refresh</button>
+                  <form> <!-- tx history reresh button form start -->
+                    <button class="btn btn-outline-secondary btn-sm" formaction="wallet.html">Refresh</button>
+                  </form> <!-- tx history reresh button form end -->
                 </div>
               </div>
             </div> <!-- wallet card header end -->
             <div class="card-body" style="padding: 0;"> <!-- wallet card body start -->
-              <table class="table table-striped" style="margin-bottom: 0;">
-              <thead>
-                <tr>
-                  <th scope="col-md">Type</th>
-                  <th scope="col-md">Direction</th>
-                  <th scope="col-md">Confirmations</th>
-                  <th scope="col-md">Amount</th>
-                  <th scope="col-md">Time</th>
-                  <th scope="col-md">Dest. Address</th>
-                  <th scope="col-md">Tx Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">
-                    <span class="badge badge-secondary">public</span>
-                  </th>
-                  <td>
-                    <span class="badge badge-light">Minted</span>
-                  </td>
-                  <td>2146</td>
-                  <td>23.43508747</td>
-                  <td>24 Jul 2019 07:00</td>
-                  <td>RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
-                  <td><button class="btn btn-primary btn-sm">Details</button></td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <span class="badge badge-dark">private</span>
-                  </th>
-                  <td>
-                    <span class="badge badge-danger">OUT</span>
-                    <span class="badge badge-info">dPoW Secured</span>
-                  </td>
-                  <td>3077</td>
-                  <td>-35.99944884</td>
-                  <td>23 Jul 2019 15:08</td>
-                  <td>
-                    <span class="badge badge-dark">Address not listed by wallet</span>
-                  </td>
-                  <td><button class="btn btn-primary btn-sm">Details</button></td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <span class="badge badge-secondary">public</span>
-                  </th>
-                  <td>
-                    <span class="badge badge-success">IN</span>
-                    <span class="badge badge-info">dPoW Secured</span>
-                  </td>
-                  <td>3751</td>
-                  <td>387.86723540</td>
-                  <td>21 Jul 2019 20:24</td>
-                  <td>RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
-                  <td><button class="btn btn-primary btn-sm">Details</button></td>
-                </tr>
-                
-              </tbody>
-            </table>
+              <form> <!-- tx history table form start -->
+                <table class="table table-striped" style="margin-bottom: 0;">
+                  <thead>
+                    <tr>
+                      <th scope="col-md">Type</th>
+                      <th scope="col-md">Direction</th>
+                      <th scope="col-md">Confirmations</th>
+                      <th scope="col-md">Amount</th>
+                      <th scope="col-md">Time</th>
+                      <th scope="col-md">Dest. Address</th>
+                      <th scope="col-md">Tx Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">
+                        <span class="badge badge-secondary">public</span>
+                      </th>
+                      <td>
+                        <span class="badge badge-light">Minted</span>
+                      </td>
+                      <td>2146</td>
+                      <td>23.43508747</td>
+                      <td>24 Jul 2019 07:00</td>
+                      <td>RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
+                      <td><button class="btn btn-primary btn-sm" formaction="action_one">Details</button></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        <span class="badge badge-dark">private</span>
+                      </th>
+                      <td>
+                        <span class="badge badge-danger">OUT</span>
+                        <span class="badge badge-info">dPoW Secured</span>
+                      </td>
+                      <td>3077</td>
+                      <td>-35.99944884</td>
+                      <td>23 Jul 2019 15:08</td>
+                      <td>
+                        <span class="badge badge-dark">Address not listed by wallet</span>
+                      </td>
+                      <td><button class="btn btn-primary btn-sm" formaction="action_two">Details</button></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        <span class="badge badge-secondary">public</span>
+                      </th>
+                      <td>
+                        <span class="badge badge-success">IN</span>
+                        <span class="badge badge-info">dPoW Secured</span>
+                      </td>
+                      <td>3751</td>
+                      <td>387.86723540</td>
+                      <td>21 Jul 2019 20:24</td>
+                      <td>RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
+                      <td><button class="btn btn-primary btn-sm" formaction="action_three">Details</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </form> <!-- tx history table form end -->
             </div> <!-- wallet card body end -->
             <div class="card-footer"> <!-- wallet card footer start -->
-              <div class="row">
-                <div class="col-md-4 col-sm-4 col-xs-4">
-                  <button class="btn btn-outline-secondary">Previous Page</button>
+              <form>
+                <div class="row">
+                  <div class="col-md-4 col-sm-4 col-xs-4">
+                    <button class="btn btn-outline-secondary" formaction="priv_page_1">Previous Page</button>
+                  </div>
+                  <div class="col-md-4 col-sm-4 col-xs-4 text-center">Page 1 of 1</div>
+                  <div class="col-md-4 col-sm-4 col-xs-4 text-right">
+                    <button class="btn btn-outline-secondary" formaction="next_page_2">Next Page</button>
+                  </div>
                 </div>
-                <div class="col-md-4 col-sm-4 col-xs-4 text-center">Page 1 of 1</div>
-                <div class="col-md-4 col-sm-4 col-xs-4 text-right">
-                  <button class="btn btn-outline-secondary">Next Page</button>
-                </div>
-              </div>
+              </form>
             </div> <!-- wallet card footer end -->
           </div> <!-- wallet card end -->
         </div> <!-- wallet transactions history column end -->
