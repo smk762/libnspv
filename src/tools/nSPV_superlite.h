@@ -753,11 +753,11 @@ struct NSPV_methodarg
 
 struct NSPV_methodarg NSPV_methods[] =
 {
-    { "stop", { 0, 0 } },
-    { "help", { 0, 0 } },
-    { "logout", { 0, 0 } },
-    { "getnewaddress", { 0, 0 } },
-    { "getpeerinfo", { 0, 0 } },
+    { "stop", { "", 0 } },
+    { "help", { "", 0 } },
+    { "logout", { "", 0 } },
+    { "getnewaddress", { "", 0 } },
+    { "getpeerinfo", { "", 0 } },
     { "login", { { "wif", NSPV_STR } } },
     { "broadcast", { { "hex", NSPV_STR } } },
     { "listunspent", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
