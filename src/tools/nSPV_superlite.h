@@ -178,7 +178,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
     {
         if ( len >= 0xfd )
         {
-            fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
+            //fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
             msg[0] = 0xfd;
             msg[1] = (len - 3) & 0xff;
             msg[2] = ((len - 1) >> 8) & 0xff;
