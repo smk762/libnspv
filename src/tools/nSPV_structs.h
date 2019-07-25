@@ -614,7 +614,8 @@ cJSON *NSPV_txidresp_json(struct NSPV_txidresp *utxos,int32_t numutxos)
         item = cJSON_CreateObject();
         jaddnum(item,"height",utxos[i].height);
         jaddbits256(item,"txid",utxos[i].txid);
-        jaddnum(item,"interest",(double)utxos[i].satoshis/COIN);
+        jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
+        jaddnum(item,"interest",(double)utxos[i].extradata/COIN);
         if ( utxos[i].satoshis > 0 )
             jaddnum(item,"vout",utxos[i].vout);
         else jaddnum(item,"vin",utxos[i].vout);
