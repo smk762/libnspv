@@ -115,7 +115,10 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
- dynamically generated localhost browser wallet
+ dynamically generated localhost browser wallet refinement
+ latest height/notarization validation
+ 
+ cross chain superwallet -> blackjok3r
  
  enhance cc/funcid filter in listtransactions/listunspent -> mihailo
  

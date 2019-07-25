@@ -342,7 +342,7 @@ void NSPV_ntzsresp_purge(struct NSPV_ntzsresp *ptr)
         memset(ptr,0,sizeof(*ptr));
 }
 
-int32_t NSPV_rwinforesp(int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp *ptr)
+int32_t NSPV_rwinforesp(int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp *ptr,int32_t maxlen)
 {
     int32_t len = 0;
     len += NSPV_rwntz(rwflag,&serialized[len],&ptr->notarization);
@@ -350,7 +350,11 @@ int32_t NSPV_rwinforesp(int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp 
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->hdrheight),&ptr->hdrheight);
     len += NSPV_rwequihdr(rwflag,&serialized[len],&ptr->H,0);
-    //fprintf(stderr,"hdr rwlen.%d\n",len);
+    if ( (int32_t)(len+sizeof(ptr->version)) > maxlen )
+    {
+        if ( rwflag == 0 )
+            ptr->version = 0;
+    } else len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->version),&ptr->version);
     return(len);
 }
 
@@ -569,6 +573,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     jaddbits256(result,"chaintip",ptr->blockhash);
     jadd(result,"notarization",NSPV_ntz_json(&ptr->notarization));
     jadd(result,"header",NSPV_header_json(&ptr->H,ptr->hdrheight));
+    jaddnum(result,"protocolversion",ptr->version);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }

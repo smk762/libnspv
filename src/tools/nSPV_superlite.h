@@ -233,8 +233,8 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_INFORESP:
                 I = NSPV_inforesult;
                 NSPV_inforesp_purge(&NSPV_inforesult);
-                NSPV_rwinforesp(0,&response[1],&NSPV_inforesult);
-                fprintf(stderr,"got info response %u from.%d size.%d height.%d\n",timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
+                NSPV_rwinforesp(0,&response[1],&NSPV_inforesult,len);
+                //fprintf(stderr,"got info version.%d response %u from.%d size.%d height.%d\n",NSPV_inforesult.version,timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
                 if ( NSPV_inforesult.height < I.height )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
@@ -919,19 +919,19 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( hex == 0 )
             return(cJSON_Parse("{\"error\":\"no hex\"}"));
-        else return(NSPV_broadcast(NSPV_client,hex)); // need non-nSPV
+        else return(NSPV_broadcast(NSPV_client,hex));
     }
     else if ( strcmp(method,"listunspent") == 0 )
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount,0)); // need non-nSPV
+        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount,0));
     }
     else if ( strcmp(method,"listtransactions") == 0 )
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount,0)); // need non-nSPV
+        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount,0));
     }
     else if ( strcmp(method,"notarizations") == 0 )
     {
@@ -972,7 +972,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
             f = juint(argjson,"CCfunc");
             vout = ((uint16_t)f << 8) | e;
         }
-        return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,memfunc,txid,vout)); // need non-nSPV
+        return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,memfunc,txid,vout));
     }
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
