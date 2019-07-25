@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+
+    <title>nSPV SuperLite Client</title>
+  </head>
+  <body>
+
+    <h1 class="text-center">nSPV SuperLite Client</h1>
+    <div class="container-fluid">
+      <div class="row justify-content-md-center">
+        <div class="col-md-auto">
+            <!-- login form start -->
+            <form action="wallet.html">
+              <div class="form-group">
+                <label for="nspv_userpass">Userpass</label>
+                <input type="email" class="form-control" id="nspv_userpass" aria-describedby="nspvUserpassHelp" placeholder="Userpass" readonly>
+                <small id="nspvUserpassHelp" class="form-text text-muted">Userpass (any random string) is used for session login. (disabled for now in debug versions)</small>
+              </div>
+              <div class="form-group">
+                <label for="nspv_wif">Passphrase or Wif Key</label>
+                <input type="password" class="form-control" id="nspv_wif" aria-describedby="nspvWifHelp" placeholder="Passphrase or WIF Key">
+                <small id="nspvWifHelp" class="form-text text-muted">Enter passphrase or WIF key (private key) of an address.</small>
+              </div>
+              <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <!-- login form end -->
+        </div>
+      </div>
+    </div>
+  
+  </body>
+</html>
