@@ -115,11 +115,9 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
- new apis: getpeerinfo
- make some way to add peers dynamically
- params:[] array -> map to fields
- cc/funcid filter in listtransactions/listunspent
--merkleproof -> dimxy
+ dynamically generated localhost browser wallet
+ 
+ enhance cc/funcid filter in listtransactions/listunspent -> mihailo
  
  */
 
