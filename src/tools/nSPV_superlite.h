@@ -177,17 +177,18 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
     if ( node != 0 )
     {
         if ( len >= 0xfd )
-            fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
-        else
         {
-            msg[0] = len - 1;
-            cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
-            btc_node_send(node,request);
-            cstr_free(request, true);
-            //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
-            node->prevtimes[ind] = timestamp;
-            return(node);
-        }
+            //fprintf(stderr,"len.%d overflow for 1 byte varint\n",len);
+            msg[0] = 0xfd;
+            msg[1] = (len - 3) & 0xff;
+            msg[2] = ((len - 1) >> 8) & 0xff;
+        } else msg[0] = len - 1;
+        cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getnSPV",msg,len);
+        btc_node_send(node,request);
+        cstr_free(request, true);
+        //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
+        node->prevtimes[ind] = timestamp;
+        return(node);
     } else fprintf(stderr,"no nodes\n");
     return(0);
 }
@@ -232,8 +233,8 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_INFORESP:
                 I = NSPV_inforesult;
                 NSPV_inforesp_purge(&NSPV_inforesult);
-                NSPV_rwinforesp(0,&response[1],&NSPV_inforesult);
-                fprintf(stderr,"got info response %u from.%d size.%d height.%d\n",timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
+                NSPV_rwinforesp(0,&response[1],&NSPV_inforesult,len);
+                //fprintf(stderr,"got info version.%d response %u from.%d size.%d height.%d\n",NSPV_inforesult.version,timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
                 if ( NSPV_inforesult.height < I.height )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
@@ -495,6 +496,10 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == CCflag )
     {
         fprintf(stderr,"found (%s) vout in mempool\n",coinaddr);
+        if ( logcategory != 0 )
+        {
+            // add to logfile
+        }
         return(true);
     } else return(false);
 }
@@ -649,20 +654,21 @@ cJSON *NSPV_spentinfo(btc_spv_client *client,bits256 txid,int32_t vout)
 
 cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 {
-    uint8_t *msg,*data; bits256 txid; int32_t i,n,iter,len = 1; struct NSPV_broadcastresp B;
+    uint8_t *msg,*data; bits256 txid; int32_t i,n,iter,len = 3; struct NSPV_broadcastresp B;
     NSPV_broadcast_purge(&NSPV_broadcastresult);
     n = (int32_t)strlen(hex) >> 1;
     data = (uint8_t *)malloc(n);
     decode_hex(data,n,hex);
     txid = bits256_doublesha256(data,n);
-    msg = (uint8_t *)malloc(1 + sizeof(txid) + sizeof(n) + n);
+    msg = (uint8_t *)malloc(3 + sizeof(txid) + sizeof(n) + n);
+    msg[0] = msg[1] = msg[2] = 0;
     msg[len++] = NSPV_BROADCAST;
     len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     len += iguana_rwnum(1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
     for (iter=0; iter<3; iter++)
-    if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[1]>>1) != 0 )
+    if ( NSPV_req(client,0,msg,len,NODE_NSPV,NSPV_BROADCAST>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
         {
@@ -735,6 +741,132 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
     return(result);
 }
 
+#define NSPV_STR 1
+#define NSPV_INT 2
+#define NSPV_UINT 3
+#define NSPV_HASH 4
+#define NSPV_FLOAT 5
+
+struct NSPV_arginfo { char field[63]; uint8_t type; };
+
+struct NSPV_methodarg
+{
+    char method[64];
+    struct NSPV_arginfo args[8];
+};
+
+struct NSPV_methodarg NSPV_methods[] =
+{
+    { "stop", { "", 0 } },
+    { "help", { "", 0 } },
+    { "logout", { "", 0 } },
+    { "getnewaddress", { "", 0 } },
+    { "getpeerinfo", { "", 0 } },
+    { "login", { { "wif", NSPV_STR } } },
+    { "broadcast", { { "hex", NSPV_STR } } },
+    { "listunspent", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
+    { "listtransactions", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
+    { "notarizations", { { "height", NSPV_UINT } } },
+    { "hdrsproof", { { "prevheight", NSPV_UINT }, { "nextheight", NSPV_UINT } } },
+    { "getinfo", { { "hdrheight", NSPV_UINT } } },
+    { "txproof", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "height", NSPV_UINT } } },
+    { "spentinfo", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT } } },
+    { "spend", { { "address", NSPV_STR }, { "amount", NSPV_FLOAT } } },
+    { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_UINT }, { "CCfunc", NSPV_UINT }, } },
+};
+
+cJSON *NSPV_helpitem(struct NSPV_methodarg *ptr)
+{
+    int32_t i; char *str; cJSON *item = cJSON_CreateObject(),*obj,*array = cJSON_CreateArray();
+    jaddstr(item,"method",ptr->method);
+    for (i=0; i<(int32_t)(sizeof(ptr->args)/sizeof(*ptr->args)); i++)
+    {
+        if ( ptr->args[i].field[0] == 0 )
+            break;
+        obj = cJSON_CreateObject();
+        switch ( ptr->args[i].type )
+        {
+            case NSPV_STR:
+                jaddstr(obj,ptr->args[i].field,"string");
+                break;
+            case NSPV_INT:
+                jaddstr(obj,ptr->args[i].field,"int32_t");
+                break;
+            case NSPV_UINT:
+                jaddstr(obj,ptr->args[i].field,"uint32_t");
+                break;
+            case NSPV_HASH:
+                jaddstr(obj,ptr->args[i].field,"hash");
+                break;
+            case NSPV_FLOAT:
+                jaddstr(obj,ptr->args[i].field,"float");
+                break;
+        }
+        jaddi(array,obj);
+    }
+    jadd(item,"fields",array);
+    return(item);
+}
+
+cJSON *NSPV_help()
+{
+    int32_t i; cJSON *retjson = cJSON_CreateObject(),*array = cJSON_CreateArray();
+    jaddstr(retjson,"result","success");
+    for (i=0; i<(int32_t)(sizeof(NSPV_methods)/sizeof(*NSPV_methods)); i++)
+        jaddi(array,NSPV_helpitem(&NSPV_methods[i]));
+    jadd(retjson,"methods",array);
+    jaddnum(retjson,"num",sizeof(NSPV_methods)/sizeof(*NSPV_methods));
+    return(retjson);
+}
+
+void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
+{
+    int32_t i,j,n,m;
+    for (i=0; i<(int32_t)(sizeof(NSPV_methods)/sizeof(*NSPV_methods)); i++)
+    {
+        if ( strcmp(method,NSPV_methods[i].method) == 0 )
+        {
+            for (j=0; j<(int32_t)(sizeof(NSPV_methods[i].args)/sizeof(*NSPV_methods[i].args)); j++)
+                if ( NSPV_methods[i].args[j].field[0] == 0 )
+                    break;
+            n = j;
+            m = cJSON_GetArraySize(params);
+            for (j=0; j<n; j++)
+            {
+                switch ( NSPV_methods[i].args[j].type )
+                {
+                    case NSPV_STR:
+                        if ( j >= m )
+                            jaddstr(argjson,NSPV_methods[i].args[j].field,"");
+                        else jaddstr(argjson,NSPV_methods[i].args[j].field,jstri(params,j));
+                        break;
+                    case NSPV_INT:
+                        if ( j >= m )
+                            jaddnum(argjson,NSPV_methods[i].args[j].field,0);
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jinti(params,j));
+                        break;
+                   case NSPV_UINT:
+                        if ( j >= m )
+                            jaddnum(argjson,NSPV_methods[i].args[j].field,0);
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,juinti(params,j));
+                        break;
+                    case NSPV_HASH:
+                        if ( j >= m )
+                            jaddbits256(argjson,NSPV_methods[i].args[j].field,zeroid);
+                        else jaddbits256(argjson,NSPV_methods[i].args[j].field,jbits256i(params,j));
+                        break;
+                    case NSPV_FLOAT:
+                        if ( j >= m )
+                            jaddnum(argjson,NSPV_methods[i].args[j].field,0);
+                        else jaddnum(argjson,NSPV_methods[i].args[j].field,jdoublei(params,j));
+                        break;
+                }
+            }
+        }
+    }
+    fprintf(stderr,"new argjson.(%s)\n",jprint(argjson,0));
+}
+
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
     char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight,numargs; uint8_t CCflag,memfunc; cJSON *params;
@@ -749,10 +881,10 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         fprintf(stderr,"shutdown started\n");
         return(cJSON_Parse("{\"result\":\"success\"}"));
     }
+    else if ( strcmp("help",method) == 0 )
+        return(NSPV_help());
     if ( (params= jarray(&numargs,argjson,"params")) != 0 )
-    {
-        
-    }
+        NSPV_argjson_addfields(method,argjson,params);
     txid = jbits256(argjson,"txid");
     vout = jint(argjson,"vout");
     height = jint(argjson,"height");
@@ -787,19 +919,19 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( hex == 0 )
             return(cJSON_Parse("{\"error\":\"no hex\"}"));
-        else return(NSPV_broadcast(NSPV_client,hex)); // need non-nSPV
+        else return(NSPV_broadcast(NSPV_client,hex));
     }
     else if ( strcmp(method,"listunspent") == 0 )
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount,0)); // need non-nSPV
+        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount,0));
     }
     else if ( strcmp(method,"listtransactions") == 0 )
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount,0)); // need non-nSPV
+        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount,0));
     }
     else if ( strcmp(method,"notarizations") == 0 )
     {
@@ -829,7 +961,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( satoshis < 1000 || coinaddr == 0 )
             return(cJSON_Parse("{\"error\":\"invalid address or amount too small\"}"));
-        else return(NSPV_spend(NSPV_client,NSPV_address,coinaddr,satoshis)); // need non-nSPV
+        else return(NSPV_spend(NSPV_client,NSPV_address,coinaddr,satoshis));
     }
     else if ( strcmp(method,"mempool") == 0 )
     {
@@ -840,14 +972,16 @@ cJSON *_NSPV_JSON(cJSON *argjson)
             f = juint(argjson,"CCfunc");
             vout = ((uint16_t)f << 8) | e;
         }
-        return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,memfunc,txid,vout)); // need non-nSPV
+        return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,memfunc,txid,vout));
     }
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
-char *NSPV_JSON(char *myipaddr,cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
+char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
 {
     char *retstr; cJSON *retjson;
+    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
+        fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
     if ( (retjson= _NSPV_JSON(argjson)) != 0 )
         retstr = jprint(retjson,1);
     else retstr = clonestr("{\"error\":\"unparseable retjson\"}");

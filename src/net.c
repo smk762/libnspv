@@ -626,7 +626,7 @@ btc_bool btc_node_group_add_peers_by_ip_or_seed(btc_node_group *group, const cha
                 btc_node* node = btc_node_new();
                 
                 sprintf(ipaddr,"%s:%u",working_str,group->chainparams->default_port);
-                fprintf(stderr,"setnode.(%s) -> %s\n",working_str,ipaddr);
+                //fprintf(stderr,"setnode.(%s) -> %s\n",working_str,ipaddr);
                 if (btc_node_set_ipport(node, ipaddr) > 0) {
                     btc_node_group_add_node(group, node);
                 }
