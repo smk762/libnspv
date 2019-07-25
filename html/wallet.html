@@ -14,11 +14,42 @@
 
     <h1 class="text-center">nSPV SuperLite Client <span class="fas fa-camera"></span></h1>
     <div class="container-fluid">
-      <div class="row justify-content-center">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body" style="padding: 0;">
-              <h5 class="card-title" style="margin: 0.75em 0 0.75em 0.75em;">Transaction History</h5>
+      <div class="row" style="margin-bottom: 1em;">
+        <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
+            <div class="card"> <!-- coin info card start -->
+              <div class="card-body"> <!-- coin info body start -->
+                <span>Coin/Asset: KMD</span><br>
+                <span>Balance: 1235.22335454 KMD</span>
+              </div> <!-- coin info body end -->
+            </div> <!-- coin info card end -->
+        </div> <!-- coin info div end -->
+        <div class="col-8" style="padding-left: 7.5px;">
+          <div class="card"> <!-- wallet buttons card start -->
+            <div class="card-body text-right"> <!-- wallet buttons body start -->
+              <button class="btn btn-info btn-lg">Info</button>
+              <button class="btn btn-secondary btn-lg">Transactions</button>
+              <button class="btn btn-warning btn-lg">Send</button>
+              <button class="btn btn-success btn-lg">Receive</button>
+              <button class="btn btn-danger btn-lg">Logout</button>
+            </div> <!-- wallet buttons body end -->
+          </div> <!-- wallet buttons card start -->
+        </div>
+      </div>
+
+      <div class="row justify-content-center"> <!-- wallet transactions history section start -->
+        <div class="col-12"> <!-- wallet transactions history column start -->
+          <div class="card"> <!-- wallet card start -->
+            <div class="card-header"> <!-- wallet card header start -->
+              <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                  <h5 class="card-title" style="vertical-align: ">Transaction History</h5>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                  <button class="btn btn-outline-secondary btn-sm">Refresh</button>
+                </div>
+              </div>
+            </div> <!-- wallet card header end -->
+            <div class="card-body" style="padding: 0;"> <!-- wallet card body start -->
               <table class="table table-striped" style="margin-bottom: 0;">
               <thead>
                 <tr>
@@ -51,6 +82,7 @@
                   </th>
                   <td>
                     <span class="badge badge-danger">OUT</span>
+                    <span class="badge badge-info">dPoW Secured</span>
                   </td>
                   <td>3077</td>
                   <td>-35.99944884</td>
@@ -66,6 +98,7 @@
                   </th>
                   <td>
                     <span class="badge badge-success">IN</span>
+                    <span class="badge badge-info">dPoW Secured</span>
                   </td>
                   <td>3751</td>
                   <td>387.86723540</td>
@@ -76,13 +109,21 @@
                 
               </tbody>
             </table>
-            </div>
-          </div>
-            <!-- wallet transactions history section start -->
-            
-            <!-- wallet transactions history section end -->
-        </div>
-      </div>
+            </div> <!-- wallet card body end -->
+            <div class="card-footer"> <!-- wallet card footer start -->
+              <div class="row">
+                <div class="col-md-4 col-sm-4 col-xs-4">
+                  <button class="btn btn-outline-secondary">Previous Page</button>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-4 text-center">Page 1 of 1</div>
+                <div class="col-md-4 col-sm-4 col-xs-4 text-right">
+                  <button class="btn btn-outline-secondary">Next Page</button>
+                </div>
+              </div>
+            </div> <!-- wallet card footer end -->
+          </div> <!-- wallet card end -->
+        </div> <!-- wallet transactions history column end -->
+      </div> <!-- wallet transactions history section end -->
     </div>
   
   </body>
