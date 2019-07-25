@@ -630,6 +630,12 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 cmpstr[strlen(cmpstr)-1] = 0;
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 )
             {
+                for (i=(int32_t)strlen(url)-1; i>0; i--)
+                    if ( url[i] == '.' || url[i] == '/' )
+                        break;
+                if ( url[i] == '.' )
+                    strcpy(filetype,url+i+1);
+                printf("return filetype.(%s) size.%ld\n",filetype,filesize);
                 sprintf(fname,"html/%s",htmlfiles[f]+1);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                     return(clonestr("{\"error\":\"cant find htmlfile\"}"));
