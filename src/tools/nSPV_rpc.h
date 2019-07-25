@@ -1201,6 +1201,10 @@ int32_t iguana_socket(int32_t bindflag,char *hostname,uint16_t port)
 void *NSPV_rpcloop(void *args)
 {
     uint16_t port; int32_t retval,sock=-1,bindsock=-1; socklen_t clilen; struct sockaddr_in cli_addr; uint32_t ipbits,localhostbits; struct rpcrequest_info *req;
+#ifdef _WIN32
+    WSADATA wsa_data;
+    WSAStartup(MAKEWORD(1,1),&wsa_data);
+#endif
     if ( (port= *(uint16_t *)args) == 0 )
         port = 7889;
     printf("Start NSPV_rpcloop.%u\n",port);
