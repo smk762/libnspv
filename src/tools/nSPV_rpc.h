@@ -27,15 +27,15 @@
  */
 #if defined(_M_X64)
 #define WIN32_LEAN_AND_MEAN
-#include <WinSock2.h>
+#include <winsock2.h>
 #endif
 #ifdef _WIN32
-#include <WinSock2.h>
+#include <winsock2.h>
 #endif
 
 #ifdef _WIN32
 #define PTW32_STATIC_LIB
-#include "OSlibs/win/pthread.h"
+#include "pthread.h"
 
 #ifndef NATIVE_WINDOWS
 #define EADDRINUSE WSAEADDRINUSE
@@ -88,7 +88,7 @@ int32_t LP_valid_remotemethod(cJSON *argjson)
     return(-1);
 }
 
-#ifdef _WIN32
+#ifndef _WIN32
 #define in6_addr sockaddr
 #define in_addr_t struct sockaddr_storage
 #ifndef NATIVE_WINDOWS
@@ -103,9 +103,6 @@ struct sockaddr_in6 {
     u_long  sin6_scope_id;
 };
 #else
-#ifndef __MINGW
-#include <arpa/inet.h>
-#endif
 #endif
 
 #ifdef _WIN32
