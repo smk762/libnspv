@@ -222,7 +222,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
 
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
-    struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
+    struct NSPV_inforesp I; char str[128],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
     const btc_chainparams *chain = from->nodegroup->chainparams;
     sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     if ( len > 0 )
@@ -233,6 +233,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 I = NSPV_inforesult;
                 NSPV_inforesp_purge(chain,&NSPV_inforesult);
                 NSPV_rwinforesp(chain,0,&response[1],&NSPV_inforesult);
+                fprintf(stderr,"TOP:  blockhash.%s height.%i hdr.hashPrevBlock.%s\n", bits256_str(str,NSPV_inforesult.blockhash),  NSPV_inforesult.height, bits256_str(str2, NSPV_inforesult.H.hashPrevBlock));
                 fprintf(stderr,"got info response %u from.%d size.%d height.%d\n",timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
                 if ( NSPV_inforesult.height < I.height )
                 {

@@ -82,6 +82,7 @@ btc_chainparams nspv_chainparams_main =
 char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;
+    memset(buf,0,sizeof(*buf));
     for (i=0; i<32; i++)
         sprintf(&buf[i<<1],"%02x",hash.bytes[i]);
     buf[i<<1] = 0;
