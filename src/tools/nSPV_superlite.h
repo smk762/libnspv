@@ -773,6 +773,7 @@ struct NSPV_methodarg NSPV_methods[] =
     { "spentinfo", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT } } },
     { "spend", { { "address", NSPV_STR }, { "amount", NSPV_FLOAT } } },
     { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_UINT }, { "CCfunc", NSPV_UINT }, } },
+    { "faucetget", { "", 0 } },
 };
 
 cJSON *NSPV_helpitem(struct NSPV_methodarg *ptr)
@@ -974,6 +975,8 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         }
         return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,memfunc,txid,vout));
     }
+    else if ( strcmp(method,"faucetget") == 0 )
+        return(NSPV_CC_faucetget());
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
