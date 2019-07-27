@@ -136,3 +136,5 @@ finally, the "nSPV" field is a list of one or more ip addresses of a nSPV fullno
 the JSON api is very simple and almost a direct mapping of the nSPV=1 rpc commands in the komodod, the testvectors
 file at ~/libnspv/src/tools/testvectors will show specifically how to call it using curl. any other method to post the JSON
 to the rpc port will suffice.
+
+https://docs.komodoplatform.com/nSPV has initial docs 

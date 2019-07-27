@@ -108,6 +108,7 @@ void spv_sync_completed(btc_spv_client* client) {
 
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
+#include "nSPV_CCtx.h"
 #include "nSPV_superlite.h"
 #include "nSPV_wallet.h"
 #include "komodo_cJSON.c"
@@ -115,11 +116,13 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
- new apis: getpeerinfo
+ dynamically generated localhost browser wallet refinement
+ latest height/notarization validation
  
--merkleproof -> dimxy
- make some way to add peers dynamically
-  
+ cross chain superwallet -> blackjok3r
+ 
+ enhance cc/funcid filter in listtransactions/listunspent -> mihailo
+ 
  */
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
@@ -181,7 +184,7 @@ int main(int argc, char* argv[])
     int timeout = 15;
     int maxnodes = 10;
     char* dbfile = 0;
-    const btc_chainparams *chain = &nspv_chainparams_main;
+    const btc_chainparams *chain = &kmd_chainparams_main;
     portable_mutex_init(&NSPV_commandmutex);
     portable_mutex_init(&NSPV_netmutex);
     if ( argc > 1 )
@@ -214,8 +217,8 @@ int main(int argc, char* argv[])
     }
     if ( chain == 0 )
     {
-        chain = &nspv_chainparams_main;
-        fprintf(stderr,"couldnt match coin, defaulting to NSPV chain\n");
+        chain = &kmd_chainparams_main;
+        fprintf(stderr,"couldnt match coin, defaulting to KMD chain\n");
     }
     if (chain->komodo == 0 && (argc <= 1 || strlen(argv[argc - 1]) == 0 || argv[argc - 1][0] == '-'))
     {
