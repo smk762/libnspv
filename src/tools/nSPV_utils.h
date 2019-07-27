@@ -17,8 +17,6 @@
 #ifndef NSPV_UTILS_H
 #define NSPV_UTILS_H
 
-#define MAX_TX_SIZE_BEFORE_SAPLING 100000
-#define MAX_TX_SIZE_AFTER_SAPLING (2 * MAX_TX_SIZE_BEFORE_SAPLING)
 static const bits256 zeroid;
 portable_mutex_t NSPV_netmutex;
 
@@ -41,7 +39,7 @@ btc_chainparams kmd_chainparams_main =
     1,1,0,
 };
 
-btc_chainparams nspv_chainparams_main =
+/*btc_chainparams nspv_chainparams_main =
 {
     "NSPV",
     60,
@@ -60,7 +58,7 @@ btc_chainparams nspv_chainparams_main =
     1,1,0,
 };
 
-/*btc_chainparams iln_chainparams_main =
+btc_chainparams iln_chainparams_main =
 {
     "ILN",
     60,
@@ -333,7 +331,7 @@ char *clonestr(char *str)
     char *clone;
     if ( str == 0 || str[0] == 0 )
     {
-        printf("warning cloning nullstr.%p\n",str);
+        printf("warning cloning nullstr.%p\n",(void *)str);
 #ifdef __APPLE__
         while ( 1 ) sleep(1);
 #endif
@@ -481,7 +479,7 @@ bits256 btc_uint256_to_bits256(uint256 hash256)
     return(hash);
 }
 
-void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
+void btc_bits256_to_uint256(bits256 hash,uint256 hash256)
 {
     iguana_rwbignum(0,hash.bytes,sizeof(hash),(uint8_t *)hash256);
 }
@@ -489,7 +487,7 @@ void btc_bits256_to_uint256(uint256 hash256,bits256 hash)
 void btc_tx_add_txin(btc_tx *mtx,bits256 txid,int32_t vout)
 {
     btc_tx_in *vin = btc_tx_in_new();
-    btc_bits256_to_uint256(vin->prevout.hash,txid);
+    btc_bits256_to_uint256(txid,vin->prevout.hash);
     vin->prevout.n = vout;
     vector_add(mtx->vin,vin);
 }
@@ -919,19 +917,20 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
     return(-1);
 }
 
-bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char *symbol,cstring *opret)
+bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char* opret)
 {
-    bits256 desttxid; int32_t i,offset=3; char str[65];
+    bits256 desttxid; int32_t i,offset=2; char str[65];
     if ( opret != 0 )
     {
-        iguana_rwnum(0,(uint8_t *)&opret->str[offset + 32],sizeof(*heightp),heightp);
-        for (i=0; i<32; i++)
-            ((uint8_t *)blockhashp)[31 - i] = opret->str[offset + i];
-        for (i=0; i<32; i++)
-            ((uint8_t *)&desttxid)[31 - i] = opret->str[offset + 4 + 32 + i];
         //for (i=0; i<opret->len; i++)
         //    fprintf(stderr,"%02x",opret->str[i]&0xff);
-        fprintf(stderr," ntzht.%d %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)opret->len);
+        iguana_rwnum(0,(uint8_t *)&opret[offset+32],sizeof(*heightp),heightp);
+        for (i=0; i<32; i++)
+            ((uint8_t *)blockhashp)[31 - i] = opret[offset + i];
+        for (i=0; i<32; i++)
+            ((uint8_t *)&desttxid)[31 - i] = opret[offset + 4 + 32 + i];
+        
+        fprintf(stderr," ntzht.%i %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)(strlen(opret)*2));
         return(desttxid);
     } else return(zeroid);
 }
@@ -972,7 +971,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
             memcpy(script+1,elected[j],33);
             sighash = NSPV_sapling_sighash(tx,vini,10000,script,35);
             //fprintf(stderr,"%s ",bits256_str(str,sighash));
-            btc_bits256_to_uint256(hash,sighash);
+            btc_bits256_to_uint256(sighash,hash);
             if ( btc_pubkey_verify_sig(&pubkeys[j],hash,(uint8_t *)vin->script_sig->str+1,vin->script_sig->len-2) > 0 )
             {
                 mask |= (1LL << j);
@@ -992,7 +991,7 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
     {
         if ( vout->script_pubkey != 0 && vout->script_pubkey->len >= 2+32*2+4 && vout->script_pubkey->str[0] == OP_RETURN )
         {
-            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,(char *)client->chainparams->name,vout->script_pubkey);
+            *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,vout->script_pubkey->str);
             if ( komodo_notaries(client,elected,*ntzheightp) <= 0 )
                 fprintf(stderr,"non-support notary list\n");
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )
