@@ -29,6 +29,32 @@
 #include <btc/utils.h>
 #include <btc/base58.h>
 
+/*
+// Add the notarized blocks header as position 0. 
+if ( NSPV_num_headers == 0 && bits256_cmp(NSPV_hdrhash(&(NSPV_inforesult.H)),NSPV_lastntz.blockhash) == 0 )
+{
+    fprintf(stderr, " insert notarized height %i\n", NSPV_inforesult.hdrheight);
+    NSPV_blockheaders[NSPV_num_headers].height = NSPV_inforesult.hdrheight;
+    NSPV_blockheaders[NSPV_num_headers].blockhash = NSPV_hdrhash(&(NSPV_inforesult.H));
+    NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
+    NSPV_num_headers++;
+    //NSPV_hdrheight_counter++;
+} 
+else if ( NSPV_inforesult.hdrheight == NSPV_blockheaders[NSPV_num_headers-1].height+1 )
+{
+    fprintf(stderr, "hdrheight.%i last head needed.%i\n", NSPV_inforesult.hdrheight, NSPV_blockheaders[NSPV_num_headers-1].height+1);
+    NSPV_blockheaders[NSPV_num_headers].height = NSPV_inforesult.hdrheight;
+    NSPV_blockheaders[NSPV_num_headers].blockhash = NSPV_hdrhash(&(NSPV_inforesult.H));
+    NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
+    NSPV_num_headers++;
+    // should check this to stop requesting block headers past the tip once we have them all. 
+    {
+        if ( NSPV_hdrheight_counter > NSPV_inforesult.height )
+            NSPV_hdrheight_counter = NSPV_lastntz.height;
+        else NSPV_hdrheight_counter++;
+    } 
+}     */
+
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
@@ -51,6 +77,14 @@ struct NSPV_broadcastresp NSPV_broadcastresult;
 struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
 struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
 struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+
+// validation stuffs
+struct NSPV_ntz NSPV_lastntz;
+struct NSPV_header NSPV_blockheaders[128]; // just incase there is no nota for a while.
+int32_t NSPV_num_headers = 0;
+int32_t NSPV_hdrheight_counter;
+int32_t nodes_seen_count = 0;
+struct NSPV_nodesagree nodes_seen[16];
 
 struct NSPV_ntzsresp *NSPV_ntzsresp_find(int32_t reqheight)
 {
@@ -193,6 +227,39 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
     return(0);
 }
 
+int32_t havehdr(bits256 blockhash)
+{
+    for (int32_t i = 0; i < NSPV_num_headers; i++) 
+        if ( bits256_cmp(NSPV_blockheaders[i].blockhash, blockhash) == 0 )
+            return(i);
+    return(-1);
+}
+
+int32_t validate_headers(bits256 fromblockhash)
+{
+    int32_t index, bestindex = 0, counted = 0; char str[65];
+    bits256 lastblock = fromblockhash;
+    fprintf(stderr, "looking for blocks.%i\n", NSPV_num_headers);
+    while ( counted <= NSPV_num_headers )
+    {
+        if ( (index= havehdr(lastblock)) != -1 )
+        {
+            lastblock = NSPV_blockheaders[index].hashPrevBlock;
+            bestindex = index;
+            counted++;
+        }
+        else break;
+    }
+    return ( bits256_cmp(NSPV_blockheaders[bestindex].blockhash, NSPV_lastntz.blockhash) == 0 );
+}
+
+int32_t check_headers()
+{
+    if ( NSPV_num_headers >= NSPV_inforesult.height-NSPV_lastntz.height )
+        return(1);
+    return(0);
+}
+
 int32_t NSPV_periodic(btc_node *node) // called periodically
 {
     uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
@@ -212,13 +279,48 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
     if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
     {
         int32_t reqht;
-        reqht = 0;
+        /*if ( check_headers() == 0 )
+        {
+            fprintf(stderr, "dont have enough headers yet\n");
+        }
+        else if ( validate_headers(NSPV_hdrhash(&(NSPV_inforesult.H))) )
+        {
+            fprintf(stderr, "have valid headers\n");
+        }
+        else fprintf(stderr, "dont have valid headers\n"); */
+        reqht = NSPV_hdrheight_counter;
         msg[len++] = NSPV_INFO;
         len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
-        //fprintf(stderr,"issue getinfo\n");
+        fprintf(stderr,"issue getinfo for block %i\n", NSPV_hdrheight_counter);
+        
+        if ( NSPV_hdrheight_counter > NSPV_inforesult.height )
+            NSPV_hdrheight_counter = NSPV_lastntz.height;
+        else NSPV_hdrheight_counter++;
+        
         return(NSPV_req(client,node,msg,len,NODE_NSPV,NSPV_INFO>>1) != 0);
     }
     return(0);
+}
+
+int32_t node_seen(int32_t newnode)
+{
+    for (int32_t i = 0; i < nodes_seen_count; i++) 
+    {
+        if ( nodes_seen[i].nodeid == newnode )
+            return(1);
+    }
+    return(0);
+}
+
+int32_t nodes_agree(struct NSPV_ntz *nota)
+{
+    int32_t agree = 0;
+    for (int32_t i = 0; i < nodes_seen_count; i++) 
+    {
+        if ( memcmp(&nodes_seen[i].notarization,nota,sizeof(nota)) == 0 )
+            agree++;
+    }
+    return(agree);
 }
 
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
@@ -234,19 +336,55 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 I = NSPV_inforesult;
                 NSPV_inforesp_purge(&NSPV_inforesult);
                 NSPV_rwinforesp(0,&response[1],&NSPV_inforesult,len);
-                //fprintf(stderr,"got info version.%d response %u from.%d size.%d height.%d\n",NSPV_inforesult.version,timestamp,from->nodeid,len,NSPV_inforesult.height); // update current height and ntrz status
+                //fprintf(stderr,"got info version.%d response %u from.%d size.%d hdrheight.%d \n",NSPV_inforesult.version,timestamp,from->nodeid,len,NSPV_inforesult.hdrheight); // update current height and ntrz status
+                bits256 hdrhash = NSPV_hdrhash(&(NSPV_inforesult.H));
                 if ( NSPV_inforesult.height < I.height )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height); // update current height and ntrz status
                     NSPV_inforesp_purge(&NSPV_inforesult);
                     NSPV_inforesult = I;
                 }
-                else if ( NSPV_inforesult.height > I.height )
+                else
                 {
-                    NSPV_lastinfo = timestamp - chain->blocktime/4;
-                    // need to validate new header to make sure it is valid mainchain
-                    if ( NSPV_inforesult.height == NSPV_inforesult.hdrheight )
+                    fprintf(stderr, "last ntz.%i currentht.%i hdrheight.%i\n", NSPV_lastntz.height, NSPV_inforesult.height, NSPV_inforesult.hdrheight );
+                    // count X diffrent nodes have same notarization before updating notarized height. 
+                    if ( NSPV_lastntz.height < NSPV_inforesult.notarization.height )
+                    {
+                        if ( nodes_agree(&NSPV_inforesult.notarization) < 4 )
+                        {
+                            if ( node_seen(from->nodeid) == 0 )
+                            {
+                                nodes_seen[nodes_seen_count].nodeid = from->nodeid;
+                                nodes_seen[nodes_seen_count].notarization = NSPV_inforesult.notarization;
+                                nodes_seen_count++; 
+                            }
+                        }
+                        else 
+                        {
+                            NSPV_lastntz = NSPV_inforesult.notarization;
+                            NSPV_hdrheight_counter = NSPV_lastntz.height;
+                            memset(NSPV_blockheaders,0,sizeof(*NSPV_blockheaders));
+                            NSPV_num_headers = 0;
+                            memset(nodes_seen,0,sizeof(*nodes_seen));
+                            nodes_seen_count = 0;
+                        }
+                    }
+                    // insert block header into array 
+                    if ( NSPV_inforesult.hdrheight >= NSPV_lastntz.height && havehdr(hdrhash) == -1 )
+                    {
+                        fprintf(stderr, " insert height %i\n", NSPV_inforesult.hdrheight);
+                        NSPV_blockheaders[NSPV_num_headers].height = NSPV_inforesult.hdrheight;
+                        NSPV_blockheaders[NSPV_num_headers].blockhash = hdrhash;
+                        NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
+                        NSPV_num_headers++;
+                    }
+                    // if we have enough headers and they validate back to the last notarization update the tiptime/valid chain status
+                    if ( check_headers() != 0 && validate_headers(NSPV_inforesult.blockhash) != 0 )
+                    {
+                        fprintf(stderr, "valid chain found updateing tiptime to %u\n", NSPV_inforesult.H.nTime);
+                        NSPV_lastinfo = timestamp - chain->blocktime/4;
                         NSPV_tiptime = NSPV_inforesult.H.nTime;
+                    }
                 }
                 break;
             case NSPV_UTXOSRESP:

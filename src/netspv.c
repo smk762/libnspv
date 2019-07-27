@@ -152,6 +152,10 @@ btc_bool btc_spv_client_load(btc_spv_client *client, const char *file_path)
 
 }
 
+extern struct NSPV_ntz NSPV_lastntz;
+extern int32_t NSPV_hdrheight_counter;
+extern struct NSPV_inforesp NSPV_inforesult;
+
 void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
 {
     /* statecheck logic */
