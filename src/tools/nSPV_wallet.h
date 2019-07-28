@@ -147,7 +147,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-4);
     }
-    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,0) < 0 )
     {
         btc_tx_free(tx);
         return(-5);
@@ -178,7 +178,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-9);
     }
-    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,0) < 0 )
     {
         btc_tx_free(tx);
         return(-10);

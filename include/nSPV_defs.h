@@ -149,6 +149,7 @@ struct NSPV_ntz
 {
     bits256 blockhash,txid,othertxid;
     int32_t height,txidheight;
+    uint32_t timestamp;
 };
 
 struct NSPV_ntzsresp
