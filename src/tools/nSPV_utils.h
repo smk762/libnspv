@@ -890,7 +890,7 @@ int32_t getacseason(uint32_t timestamp)
 
 int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t height, uint32_t timestamp)
 {
-    static uint8_t kmd_pubkeys[NUM_KMD_SEASONS][64][33],didinit[NUM_KMD_SEASONS];
+    static uint8_t kmd_pubkeys[NUM_KMD_SEASONS][64][33],didinit[NUM_KMD_SEASONS]; 
     int32_t i,isKMD,n,kmd_season = 0; uint64_t mask = 0;
     isKMD = (strcmp(client->chainparams->name,"KMD") == 0);
     if ( isKMD != 0 )
@@ -900,14 +900,9 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
     }
     else
     {
-        fprintf(stderr,"timestamp.%u -> ",timestamp);
-        if ( timestamp == 0 )
-            timestamp = NSPV_blocktime(client,height);
-        else 
-            timestamp = timestamp;
         kmd_season = getacseason(timestamp);
     }
-    fprintf(stderr, "timestamp.%u kmd season %d\n",timestamp,(int32_t)kmd_season);
+    //fprintf(stderr, "kmd season %i\n", kmd_season);
     if ( kmd_season != 0 )
     {
         if ( didinit[kmd_season-1] == 0 )
@@ -924,7 +919,7 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
 
 bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char* opret)
 {
-    bits256 desttxid; int32_t i,offset=2; char str[65];
+    bits256 desttxid; int32_t i,offset=3; char str[65];
     if ( opret != 0 )
     {
         //for (i=0; i<opret->len; i++)
@@ -935,7 +930,7 @@ bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char* opret)
         for (i=0; i<32; i++)
             ((uint8_t *)&desttxid)[31 - i] = opret[offset + 4 + 32 + i];
         
-        //fprintf(stderr," ntzht.%i %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)(strlen(opret)*2));
+        fprintf(stderr," ntzht.%i %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)(strlen(opret)*2));
         return(desttxid);
     } else return(zeroid);
 }

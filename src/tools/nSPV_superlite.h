@@ -32,6 +32,7 @@
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
 cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t height);
 void expand_ipbits(char *ipaddr,uint64_t ipbits);
+btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump);
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
@@ -499,6 +500,23 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
     return(result);
 }
 
+cJSON *NSPV_gettransaction2(btc_spv_client *client,bits256 txid,int32_t v,int32_t height)
+{
+    int32_t retval = 0, isKMD, skipvalidation = 0; int64_t extradata = 0; int64_t rewardsum = 0; 
+    cJSON *result = cJSON_CreateObject();
+    isKMD = (strcmp(client->chainparams->name,"KMD") == 0);
+    if ( height < 1 )
+        height = NSPV_inforesult.height;
+    v = 0;
+    btc_tx* tx = NSPV_gettransaction(client,&retval,isKMD,skipvalidation,v,txid,height,extradata,NSPV_tiptime,&rewardsum);
+    cstring *txhex = btc_tx_to_cstr(tx);
+    jaddstr(result, "hex", txhex->str);
+    jaddnum(result, "retcode", (int64_t)retval);
+    if (rewardsum > 0 )
+        jaddnum(result, "rewards", (int64_t)rewardsum);
+    return(result);
+}
+
 uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight)
 {
     uint32_t timestamp; struct NSPV_inforesp old = NSPV_inforesult;
@@ -929,6 +947,7 @@ struct NSPV_methodarg NSPV_methods[] =
     { "spend", { { "address", NSPV_STR }, { "amount", NSPV_FLOAT } } },
     { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_UINT }, { "CCfunc", NSPV_UINT }, } },
     { "faucetget", { "", 0 } },
+    { "gettransaction", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "height", NSPV_UINT } } },
 };
 
 cJSON *NSPV_helpitem(struct NSPV_methodarg *ptr)
@@ -1058,6 +1077,12 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         return(NSPV_getinfo_req(NSPV_client,hdrheight));
     else if ( strcmp(method, "getpeerinfo") == 0 )
         return(NSPV_getpeerinfo(NSPV_client));
+    else if ( strcmp(method, "gettransaction") == 0 )
+    {
+        if ( vout < 0 || memcmp(&zeroid,&txid,sizeof(txid)) == 0 )
+            return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
+        return(NSPV_gettransaction2(NSPV_client, txid, vout, height));
+    }
     else if ( strcmp(method,"logout") == 0 )
     {
         NSPV_logout();

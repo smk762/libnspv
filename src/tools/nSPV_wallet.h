@@ -132,7 +132,7 @@ bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t
     return(bits256_rev(sigtxid));
 }
 
-int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
+int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr, struct NSPV_ntzsresp *notarizations)
 {
     int32_t i,height,txidht; btc_tx *tx; bits256 blockhash,txid,desttxid;
     if ( (ptr->common.nextht-ptr->common.prevht+1) != ptr->common.numhdrs )
@@ -147,7 +147,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-4);
     }
-    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,0) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,notarizations->nextntz.timestamp) < 0 )
     {
         btc_tx_free(tx);
         return(-5);
@@ -178,7 +178,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
         btc_tx_free(tx);
         return(-9);
     }
-    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,0) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,notarizations->prevntz.timestamp) < 0 )
     {
         btc_tx_free(tx);
         return(-10);
@@ -241,6 +241,12 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
             memcpy(proof->str,ptr->txproof,ptr->txprooflen);
             proof->len = ptr->txprooflen;
         }
+        if ( proof == NULL )
+        {
+            fprintf(stderr, "proof is missing, try a higher block height\n");
+            *retvalp = -2006;
+            return(tx);
+        }
         NSPV_notarizations(client,height); // gets the prev and next notarizations
         if ( NSPV_inforesult.notarization.height >= height && (NSPV_ntzsresult.prevntz.height == 0 || NSPV_ntzsresult.prevntz.height >= NSPV_ntzsresult.nextntz.height) )
         {
@@ -259,7 +265,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
                 //fprintf(stderr,"call validate prooflen.%d\n",(int32_t)proof->len);
-                if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
+                if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult, &NSPV_ntzsresult)) == 0 )
                 {
                     uint256 mroot,revtxid; merkle_block MB; vector *vmatch;
                     init_mblock(&MB);
