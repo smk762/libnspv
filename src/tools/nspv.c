@@ -116,8 +116,8 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
+ return rawhex in txproof: "hex" and "proof"
  dynamically generated localhost browser wallet refinement
- latest height/notarization validation
  
  cross chain superwallet -> blackjok3r
  
