@@ -906,7 +906,7 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
             timestamp = timestamp;
         kmd_season = getacseason(timestamp);
     }
-    fprintf(stderr, "kmd season %d\n",(int32_t)kmd_season);
+    fprintf(stderr, "timestamp.%d kmd season %d\n",timestamp,(int32_t)kmd_season);
     if ( kmd_season != 0 )
     {
         if ( didinit[kmd_season-1] == 0 )
