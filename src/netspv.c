@@ -152,10 +152,6 @@ btc_bool btc_spv_client_load(btc_spv_client *client, const char *file_path)
 
 }
 
-extern struct NSPV_ntz NSPV_lastntz;
-extern int32_t NSPV_hdrheight_counter;
-extern struct NSPV_inforesp NSPV_inforesult;
-
 void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
 {
     /* statecheck logic */
@@ -168,12 +164,14 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
         NSPV_periodic(node);
         // force new connections. 
         btc_node_group_connect_next_nodes(node->nodegroup);
-        return;
+        // ban missbehaving nodes. 
+        if ( node->banscore > 10 )
+            btc_node_missbehave(node);
     }
     client->nodegroup->log_write_cb("Statecheck: amount of connected nodes: %d\n", btc_node_group_amount_of_connected_nodes(client->nodegroup, NODE_CONNECTED));
 
     /* check if the node chosen for NODE_HEADERSYNC during SPV_HEADER_SYNC has stalled */
-    if (client->last_headersrequest_time > 0 && *now > client->last_headersrequest_time)
+    if (client->chainparams->nSPV == 0 && client->last_headersrequest_time > 0 && *now > client->last_headersrequest_time)
     {
         int64_t timedetla = *now - client->last_headersrequest_time;
         if (timedetla > HEADERS_MAX_RESPONSE_TIME)
@@ -197,12 +195,13 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
             /* disconnect the node if a blockdownload has stalled */
             btc_node_disconnect(node);
             node->time_last_request = 0;
-            btc_net_spv_request_headers(client);
+            if ( client->chainparams->nSPV == 0 )
+                btc_net_spv_request_headers(client);
         }
     }
 
     /* check if we need to sync headers from a different peer */
-    if ((client->stateflags & SPV_HEADER_SYNC_FLAG) == SPV_HEADER_SYNC_FLAG)
+    if ((client->chainparams->nSPV == 0 && client->stateflags & SPV_HEADER_SYNC_FLAG) == SPV_HEADER_SYNC_FLAG)
     {
         btc_net_spv_request_headers(client);
     }
@@ -211,8 +210,9 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
         /* headers sync should be done at this point */
 
     }
-
-    client->last_statecheck_time = *now;
+    // if we use this, it only fetches one peer at a time, too slow to keep sync. 
+    if ( client->chainparams->nSPV == 0 )
+        client->last_statecheck_time = *now;
 }
 
 static btc_bool btc_net_spv_node_timer_callback(btc_node *node, uint64_t *now)
@@ -411,6 +411,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
             node->gotaddrs = (uint32_t)time(NULL);
             //fprintf(stderr," need to process addr message [%d]\n",varlen);
         }
+        node->time_last_request = time(NULL);
         return;
     }
     if (strcmp(hdr->command, BTC_MSG_INV) == 0 && (node->state & NODE_BLOCKSYNC) == NODE_BLOCKSYNC)
