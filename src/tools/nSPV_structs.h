@@ -17,6 +17,8 @@
 #ifndef NSPV_SERDES_H
 #define NSPV_SERDES_H
 
+#include <nSPV_defs.h>
+
 int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
 {
     int32_t i; uint64_t x;
@@ -319,6 +321,7 @@ int32_t NSPV_rwntz(int32_t rwflag,uint8_t *serialized,struct NSPV_ntz *ptr)
     len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->othertxid),(uint8_t *)&ptr->othertxid);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->txidheight),&ptr->txidheight);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->timestamp),&ptr->timestamp);
     return(len);
 }
 
@@ -575,6 +578,14 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     jadd(result,"header",NSPV_header_json(&ptr->H,ptr->hdrheight));
     jaddnum(result,"protocolversion",ptr->version);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
+    if ( IS_IN_SYNC == 1 )
+        jaddstr(result,"sync_status", "synced");
+    else 
+    {
+        jaddstr(result,"sync_status", "not_synced");
+        jaddnum(result,"estimated_headers_left", (int64_t)NSPV_inforesult.height-NSPV_lastntz.height-NSPV_num_headers);
+    }
+    
     return(result);
 }
 

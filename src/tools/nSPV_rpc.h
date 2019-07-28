@@ -27,15 +27,15 @@
  */
 #if defined(_M_X64)
 #define WIN32_LEAN_AND_MEAN
-#include <WinSock2.h>
+#include <winsock2.h>
 #endif
 #ifdef _WIN32
-#include <WinSock2.h>
+#include <winsock2.h>
 #endif
 
 #ifdef _WIN32
 #define PTW32_STATIC_LIB
-#include "OSlibs/win/pthread.h"
+#include "pthread.h"
 
 #ifndef NATIVE_WINDOWS
 #define EADDRINUSE WSAEADDRINUSE
@@ -91,21 +91,19 @@ int32_t LP_valid_remotemethod(cJSON *argjson)
 #ifdef _WIN32
 #define in6_addr sockaddr
 #define in_addr_t struct sockaddr_storage
+
 #ifndef NATIVE_WINDOWS
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
-struct sockaddr_in6 {
+/*struct sockaddr_in6 {
     short   sin6_family;
     u_short sin6_port;
     u_long  sin6_flowinfo;
     struct  in6_addr sin6_addr;
     u_long  sin6_scope_id;
-};
+};*/
 #else
-#ifndef __MINGW
-#include <arpa/inet.h>
-#endif
 #endif
 
 #ifdef _WIN32
@@ -621,15 +619,23 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     }
     else
     {
-        int32_t f; char fname[512],cmpstr[8192];
+        int32_t f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             *jsonflagp = 1;
             strcpy(cmpstr,&url[i]);
             if ( cmpstr[strlen(cmpstr)-1] == '?' )
                 cmpstr[strlen(cmpstr)-1] = 0;
-            if ( strcmp(cmpstr,htmlfiles[f]) == 0 )
+            sprintf(cmpstr2,":%u%s",port,cmpstr);
+            //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
+            if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
             {
+                for (i=(int32_t)strlen(url)-1; i>0; i--)
+                    if ( url[i] == '.' || url[i] == '/' )
+                        break;
+                if ( url[i] == '.' )
+                    strcpy(filetype,url+i+1);
+                //printf("return filetype.(%s) size.%ld\n",filetype,filesize);
                 sprintf(fname,"html/%s",htmlfiles[f]+1);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                     return(clonestr("{\"error\":\"cant find htmlfile\"}"));
@@ -1201,6 +1207,10 @@ int32_t iguana_socket(int32_t bindflag,char *hostname,uint16_t port)
 void *NSPV_rpcloop(void *args)
 {
     uint16_t port; int32_t retval,sock=-1,bindsock=-1; socklen_t clilen; struct sockaddr_in cli_addr; uint32_t ipbits,localhostbits; struct rpcrequest_info *req;
+#ifdef _WIN32
+    WSADATA wsa_data;
+    WSAStartup(MAKEWORD(1,1),&wsa_data);
+#endif
     if ( (port= *(uint16_t *)args) == 0 )
         port = 7889;
     printf("Start NSPV_rpcloop.%u\n",port);
