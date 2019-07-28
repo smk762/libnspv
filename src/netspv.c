@@ -164,6 +164,9 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
         NSPV_periodic(node);
         // force new connections. 
         btc_node_group_connect_next_nodes(node->nodegroup);
+        // ban missbehaving nodes. 
+        if ( node->banscore > 10 )
+            btc_node_missbehave(node);
         return;
     }
     client->nodegroup->log_write_cb("Statecheck: amount of connected nodes: %d\n", btc_node_group_amount_of_connected_nodes(client->nodegroup, NODE_CONNECTED));
@@ -193,7 +196,8 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
             /* disconnect the node if a blockdownload has stalled */
             btc_node_disconnect(node);
             node->time_last_request = 0;
-            btc_net_spv_request_headers(client);
+            if ( client->chainparams->nSPV == 0 )
+                btc_net_spv_request_headers(client);
         }
     }
 
@@ -207,7 +211,6 @@ void btc_net_spv_periodic_statecheck(btc_node *node, uint64_t *now)
         /* headers sync should be done at this point */
 
     }
-
     client->last_statecheck_time = *now;
 }
 
@@ -407,6 +410,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
             node->gotaddrs = (uint32_t)time(NULL);
             //fprintf(stderr," need to process addr message [%d]\n",varlen);
         }
+        node->time_last_request = time(NULL);
         return;
     }
     if (strcmp(hdr->command, BTC_MSG_INV) == 0 && (node->state & NODE_BLOCKSYNC) == NODE_BLOCKSYNC)

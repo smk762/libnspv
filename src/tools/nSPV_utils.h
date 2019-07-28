@@ -80,6 +80,7 @@ btc_chainparams iln_chainparams_main =
 char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;
+    memset(buf,0,sizeof(*buf));
     for (i=0; i<32; i++)
         sprintf(&buf[i<<1],"%02x",hash.bytes[i]);
     buf[i<<1] = 0;
@@ -887,10 +888,10 @@ int32_t getacseason(uint32_t timestamp)
     return(0);
 }
 
-int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t height)
+int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t height, uint32_t timestamp)
 {
-    static uint8_t kmd_pubkeys[NUM_KMD_SEASONS][64][33],didinit[NUM_KMD_SEASONS];
-    int32_t i,isKMD,n,kmd_season = 0; uint64_t mask = 0; uint32_t timestamp = 0;
+    static uint8_t kmd_pubkeys[NUM_KMD_SEASONS][64][33],didinit[NUM_KMD_SEASONS]; 
+    int32_t i,isKMD,n,kmd_season = 0; uint64_t mask = 0;
     isKMD = (strcmp(client->chainparams->name,"KMD") == 0);
     if ( isKMD != 0 )
     {
@@ -899,9 +900,9 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
     }
     else
     {
-        timestamp = NSPV_blocktime(client,height);
         kmd_season = getacseason(timestamp);
     }
+    //fprintf(stderr, "kmd season %i\n", kmd_season);
     if ( kmd_season != 0 )
     {
         if ( didinit[kmd_season-1] == 0 )
@@ -918,7 +919,7 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
 
 bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char* opret)
 {
-    bits256 desttxid; int32_t i,offset=2; char str[65];
+    bits256 desttxid; int32_t i,offset=3; char str[65];
     if ( opret != 0 )
     {
         //for (i=0; i<opret->len; i++)
@@ -983,7 +984,7 @@ int32_t NSPV_fastnotariescount(btc_tx *tx,uint8_t elected[64][33])
     return(bitweight(mask));
 }
 
-int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_t *ntzheightp,bits256 *blockhashp,bits256 *desttxidp,btc_tx *tx)
+int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_t *ntzheightp,bits256 *blockhashp,bits256 *desttxidp,btc_tx *tx, uint32_t timestamp)
 {
     int32_t numsigs=0; btc_tx_out *vout; uint8_t elected[64][33];
     if ( tx->vout != 0 && tx->vout->len >= 2 && (vout= btc_tx_vout(tx,1)) != 0 )
@@ -991,7 +992,7 @@ int32_t NSPV_notarizationextract(btc_spv_client *client,int32_t verifyntz,int32_
         if ( vout->script_pubkey != 0 && vout->script_pubkey->len >= 2+32*2+4 && vout->script_pubkey->str[0] == OP_RETURN )
         {
             *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,vout->script_pubkey->str);
-            if ( komodo_notaries(client,elected,*ntzheightp) <= 0 )
+            if ( komodo_notaries(client,elected,*ntzheightp,timestamp) <= 0 )
                 fprintf(stderr,"non-support notary list\n");
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected)) < 12 )
             {
