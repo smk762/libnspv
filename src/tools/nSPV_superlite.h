@@ -287,7 +287,7 @@ void reset_headers(int32_t new_ntz_height)
     }
 }
 
-int32_t validate_notarization(bits256 notarization)
+int32_t validate_notarization(bits256 notarization, uint32_t timestamp)
 {
     int32_t height; bits256 blockhash,desttxid;
     if ( NSPV_txproofresult.txlen == 0 )
@@ -297,7 +297,7 @@ int32_t validate_notarization(bits256 notarization)
         return(0);
     if ( bits256_cmp(NSPV_tx_hash(tx),NSPV_inforesult.notarization.txid) != 0 )
         return(0);
-    if ( NSPV_notarizationextract(NSPV_client,1,&height,&blockhash,&desttxid,tx) == 0 )
+    if ( NSPV_notarizationextract(NSPV_client,1,&height,&blockhash,&desttxid,tx, timestamp) == 0 )
     {
         btc_tx_free(tx);
         return(1);
@@ -421,7 +421,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 // validate the notarization transaction that was fetched. 
                 if ( bits256_cmp(NSPV_txproofresult.txid, NSPV_inforesult.notarization.txid) == 0 ) 
                 {
-                    if ( validate_notarization(NSPV_inforesult.notarization.txid) != 0 )
+                    if ( validate_notarization(NSPV_inforesult.notarization.txid, NSPV_inforesult.notarization.timestamp) != 0 )
                     {
                         NSPV_lastntz = NSPV_inforesult.notarization;
                         NSPV_hdrheight_counter = NSPV_lastntz.height;

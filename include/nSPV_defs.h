@@ -17,7 +17,7 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
-#define NSPV_PROTOCOL_VERSION 0x0001
+#define NSPV_PROTOCOL_VERSION 0x0002
 #define NSPV_MAXPACKETSIZE (4096 * 1024)
 #define NSPV_MAXSCRIPTSIZE 10000
 #define MAX_TX_SIZE_BEFORE_SAPLING 100000
@@ -149,6 +149,7 @@ struct NSPV_ntz
 {
     bits256 blockhash,txid,othertxid;
     int32_t height,txidheight;
+    uint32_t timestamp;
 };
 
 struct NSPV_ntzsresp
