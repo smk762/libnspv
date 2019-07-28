@@ -140,7 +140,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
         fprintf(stderr,"next.%d prev.%d -> %d vs %d\n",ptr->common.nextht,ptr->common.prevht,ptr->common.nextht-ptr->common.prevht+1,ptr->common.numhdrs);
         return(-2);
     }
-    else if ( (tx= NSPV_txextract(ptr->nextntz,ptr->nexttxlen)) == 0 )
+    else if ( ptr->nexttxlen == 0 || (tx= NSPV_txextract(ptr->nextntz,ptr->nexttxlen)) == 0 )
         return(-3);
     else if ( bits256_cmp(NSPV_tx_hash(tx),ptr->nexttxid) != 0 )
     {
@@ -171,7 +171,7 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
             return(-i-13);
     }
     sleep(1); // need this to get past the once per second rate limiter per message
-    if ( (tx= NSPV_txextract(ptr->prevntz,ptr->prevtxlen)) == 0 )
+    if (  ptr->prevtxlen == 0 || (tx= NSPV_txextract(ptr->prevntz,ptr->prevtxlen)) == 0 )
         return(-8);
     else if ( bits256_cmp(NSPV_tx_hash(tx),ptr->prevtxid) )
     {
@@ -211,7 +211,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
         fprintf(stderr,"txproof error %s != %s\n",bits256_str(str,ptr->txid),bits256_str(str2,txid));
         return(0);
     }
-    else if ( (tx= NSPV_txextract(ptr->tx,ptr->txlen)) == 0 )
+    else if ( ptr->txlen == 0 || (tx= NSPV_txextract(ptr->tx,ptr->txlen)) == 0 )
         return(0);
     else if ( bits256_cmp(NSPV_tx_hash(tx),txid) != 0 )
     {

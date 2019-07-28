@@ -9,6 +9,7 @@ bitcointool
 bitcoin-send-tx
 bitcoin-spv
 bitcoin-txref
+nspv
 
 Makefile
 configure

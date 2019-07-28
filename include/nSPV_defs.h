@@ -215,6 +215,13 @@ struct NSPV_CCmtxinfo
     struct NSPV_utxoresp used[NSPV_MAXVINS];
 };
 
+struct NSPV_header
+{
+    int32_t height;
+    bits256 blockhash;
+    bits256 hashPrevBlock;
+};
+
 extern portable_mutex_t NSPV_netmutex;
 extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime,NSPV_lastinfo;
 extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
@@ -229,5 +236,34 @@ extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 extern int32_t is_hexstr(char *str,int32_t n);
 extern int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr,int32_t addlenflag);
 extern bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen);
+
+extern int32_t IS_IN_SYNC;
+extern uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
+extern char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
+extern btc_spv_client *NSPV_client;
+extern const btc_chainparams *NSPV_chain;
+
+extern btc_key NSPV_key;
+extern btc_pubkey NSPV_pubkey;
+extern struct NSPV_inforesp NSPV_inforesult;
+extern struct NSPV_utxosresp NSPV_utxosresult;
+extern struct NSPV_txidsresp NSPV_txidsresult;
+extern struct NSPV_mempoolresp NSPV_mempoolresult;
+extern struct NSPV_spentinfo NSPV_spentresult;
+extern struct NSPV_ntzsresp NSPV_ntzsresult;
+extern struct NSPV_ntzsproofresp NSPV_ntzsproofresult;
+extern struct NSPV_txproof NSPV_txproofresult;
+extern struct NSPV_broadcastresp NSPV_broadcastresult;
+
+extern struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
+extern struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
+extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+
+// validation 
+extern struct NSPV_ntz NSPV_lastntz;
+extern struct NSPV_header NSPV_blockheaders[128]; // limitation here is that 100 block history is maximum. no nota for 100 blocks and we cant sync back to the notarizatio, we can wait for the next one. 
+extern int32_t NSPV_num_headers;
+extern int32_t NSPV_hdrheight_counter;
+extern int32_t IS_IN_SYNC;
 
 #endif // KOMODO_NSPV_DEFSH

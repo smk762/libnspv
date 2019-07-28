@@ -80,6 +80,7 @@ btc_chainparams iln_chainparams_main =
 char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;
+    memset(buf,0,sizeof(*buf));
     for (i=0; i<32; i++)
         sprintf(&buf[i<<1],"%02x",hash.bytes[i]);
     buf[i<<1] = 0;
@@ -929,7 +930,7 @@ bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char* opret)
         for (i=0; i<32; i++)
             ((uint8_t *)&desttxid)[31 - i] = opret[offset + 4 + 32 + i];
         
-        fprintf(stderr," ntzht.%i %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)(strlen(opret)*2));
+        //fprintf(stderr," ntzht.%i %s <- size.%d\n",*heightp,bits256_str(str,(*blockhashp)),(int32_t)(strlen(opret)*2));
         return(desttxid);
     } else return(zeroid);
 }
