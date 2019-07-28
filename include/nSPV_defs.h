@@ -222,12 +222,6 @@ struct NSPV_header
     bits256 hashPrevBlock;
 };
 
-struct NSPV_nodesagree
-{
-    struct NSPV_ntz notarization;
-    int32_t nodeid;
-};
-
 extern portable_mutex_t NSPV_netmutex;
 extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime,NSPV_lastinfo;
 extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
