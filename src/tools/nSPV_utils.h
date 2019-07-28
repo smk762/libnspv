@@ -900,7 +900,10 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
     }
     else
     {
-        timestamp = timestamp; //NSPV_blocktime(client,height);
+        if ( timestamp == 0 )
+            timestamp = NSPV_blocktime(client,height);
+        else 
+            timestamp = timestamp;
         kmd_season = getacseason(timestamp);
     }
     //fprintf(stderr, "kmd season %i\n", kmd_season);
