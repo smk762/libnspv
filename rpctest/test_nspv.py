@@ -72,7 +72,7 @@ def main():
     rpc_call = tf.nspv_getnewaddress()
     tf.asert_success(rpc_call)
     rep = tf.type_convert(rpc_call)
-    wif = rep.
+    wif = rep.get['wif']
 
 
 if __name__ == "__main__":
