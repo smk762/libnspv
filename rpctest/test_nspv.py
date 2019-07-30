@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-import itertools
-import time
 import test_framework.nspvlib as tf
+
 
 def main():
     url = "http://127.0.0.1:7771"
