@@ -110,8 +110,47 @@ def main():
     if address != addr:
         raise Exception("addr missmatch: ", addr, address)
 
-
-    # 
+    # listtransactions call
+    # Successful response should contain txids and same address ass requested
+    address = [False, 'RSjpS8bYqQh395cTaWpjDXq5ZuAM6Kdxmj', addr]
+    isCCno = [False, 0, 0]
+    isCCyes = [False, 1, 1]
+    skipcount = [False, 2, 2]
+    # Case 1 - False data
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[1], isCCno[1], skipcount[1])
+    tf.assert_error(rpc_call)
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[1], isCCyes[1], skipcount[1])
+    tf.assert_error(rpc_call)
+    # Case 2 - known data
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[2], isCCno[2], skipcount[2])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "txids")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[2]:
+        raise Exception("addr missmatch: ", addr_response, address[2])
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[2], isCCyes[2], skipcount[2])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "txids")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[2]:
+        raise Exception("addr missmatch: ", addr_response, address[2])
+    # Case 3 - fresh generated data
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[3], isCCno[3], skipcount[3])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "txids")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[3]:
+        raise Exception("addr missmatch: ", addr_response, address[3])
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[3], isCCyes[3], skipcount[3])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "txids")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[2]:
+        raise Exception("addr missmatch: ", addr_response, address[3])
 
 
 if __name__ == "__main__":
