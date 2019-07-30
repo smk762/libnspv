@@ -3,6 +3,9 @@ import requests
 import json
 import ast
 import time
+import os.path
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__)))
 from util import assert_equal
 
 
@@ -11,11 +14,23 @@ def assert_success(result):
     assert_equal(result_d.get('result'), 'success')
 
 
-def assert_contains(result, key): # expected_data):
+def assert_contains(result, key):
     """assert key contains expected data"""
     result_d = type_convert(result)
     content = result_d.get(key)
+    print(content)
     if content:
+        pass
+    else:
+        raise Exception("Unexpected response, missing param: ", key)
+
+
+def assert_not_contains(result, key):
+    """assert key contains expected data"""
+    result_d = type_convert(result)
+    content = result_d.get(key)
+    print(content)
+    if not content:
         pass
     else:
         raise Exception("Unexpected response, missing param: ", key)
@@ -26,7 +41,9 @@ def assert_error(result):
     error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error',
                  'couldnt get addressutxos',]
     result_d = type_convert(result)
+    print(result_d)
     error = result_d.get('error')
+    print(error)
     if error:
         if error in error_msg:
             pass
