@@ -11,10 +11,18 @@ def assert_success(result):
     assert_equal(result_d.get('result'), 'success')
 
 
-def assert_noterror(reult):
+def assert_contain(result, key, expected_data):
     """assert success for a few special cases
        WIP"""
-    pass
+    result_d = type_convert(result)
+    content = result_d.get(key)
+    if content:
+        if content == expected_data:
+            pass
+        else:
+            raise Exception("Unexpected response")
+    else:
+        raise Exception("Unexpected response")
 
 
 def assert_error(result):

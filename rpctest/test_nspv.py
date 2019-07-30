@@ -73,6 +73,9 @@ def main():
     tf.asert_success(rpc_call)
     rep = tf.type_convert(rpc_call)
     wif = rep.get['wif']
+    addr = rep.get['address']
+    pkey = rep.get['pubkey']
+
 
 
 if __name__ == "__main__":
