@@ -119,7 +119,9 @@ void spv_sync_completed(btc_spv_client* client) {
  return rawhex in txproof: "hex" and "proof"
  dynamically generated localhost browser wallet refinement
  
- cross chain superwallet -> blackjok3r
+ mempool based pruning of utxos
+ 
+ cross chain superwallet (jaragua) -> blackjok3r
  
  enhance cc/funcid filter in listtransactions/listunspent -> mihailo
  

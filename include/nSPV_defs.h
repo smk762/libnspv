@@ -59,8 +59,8 @@ struct rpcrequest_info
 #define NODE_ADDRINDEX (1 << 29)
 #define NODE_SPENTINDEX (1 << 28)
 
-#define NSPV_POLLITERS 100
-#define NSPV_POLLMICROS 30000
+#define NSPV_POLLITERS 200
+#define NSPV_POLLMICROS 50000
 #define NSPV_MAXVINS 64
 #define NSPV_AUTOLOGOUT 777
 #define NSPV_BRANCHID 0x76b809bb

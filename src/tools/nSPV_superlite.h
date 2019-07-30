@@ -359,7 +359,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     // if we have enough headers and they validate back to the last notarization update the tiptime/synced chain status
                     if ( check_headers() != 0 && validate_headers(NSPV_inforesult.blockhash) != 0 )
                     {
-                        fprintf(stderr, "[%i]: synced at height.%i \n",from->nodeid, NSPV_inforesult.height);
+                        //fprintf(stderr, "[%i]: synced at height.%i \n",from->nodeid, NSPV_inforesult.height);
                         NSPV_lastinfo = timestamp - chain->blocktime/4;
                         NSPV_tiptime = NSPV_inforesult.H.nTime;
                         from->synced = 1;
@@ -539,8 +539,8 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
 {
     cJSON *result = cJSON_CreateObject(); uint8_t msg[512]; int32_t i,iter,slen,len = 1; size_t sz;
     //fprintf(stderr,"utxos %s NSPV addr %s\n",coinaddr,NSPV_address.c_str());
-    if ( NSPV_utxosresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_utxosresult.coinaddr) == 0 && CCflag == NSPV_utxosresult.CCflag  && skipcount == NSPV_utxosresult.skipcount )
-        return(NSPV_utxosresp_json(&NSPV_utxosresult));
+    //if ( NSPV_utxosresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_utxosresult.coinaddr) == 0 && CCflag == NSPV_utxosresult.CCflag && skipcount == NSPV_utxosresult.skipcount && filter == NSPV_utxosresult.filter )
+    //    return(NSPV_utxosresp_json(&NSPV_utxosresult));
     if ( skipcount < 0 )
         skipcount = 0;
     NSPV_utxosresp_purge(&NSPV_utxosresult);
