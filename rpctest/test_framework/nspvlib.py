@@ -3,7 +3,7 @@ import requests
 import json
 import ast
 import time
-from .util import assert_true, assert_false, assert_equal
+from .util import assert_equal
 
 
 def assert_success(result):
@@ -11,26 +11,32 @@ def assert_success(result):
     assert_equal(result_d.get('result'), 'success')
 
 
-def assert_contain(result, key, expected_data):
-    """assert success for a few special cases
-       WIP"""
+def assert_contains(result, key): # expected_data):
+    """assert key contains expected data"""
     result_d = type_convert(result)
     content = result_d.get(key)
     if content:
-        if content == expected_data:
-            pass
-        else:
-            raise Exception("Unexpected response")
+        pass
+        #if content == expected_data:
+        #    pass
+        #else:
+        #    raise Exception("Unexpected response data")
     else:
-        raise Exception("Unexpected response")
+        raise Exception("Unexpected response data")
 
 
 def assert_error(result):
-    """ WIP """
-    #result = json.load(result_json)
-    #if reult[1] == "error"
-    #assert_true(result['1'], 'Unexpected result')
-    pass
+    """ assert there is an error with known error message """
+    error_msg = ['no height', ]
+    result_d = type_convert(result)
+    error = result_d.get('error')
+    if error:
+        if error in error_msg:
+            pass
+        else:
+            raise Exception("Unknown error message")
+    else:
+        raise Exception("Unexpected response data")
 
 
 def type_convert(bytez):

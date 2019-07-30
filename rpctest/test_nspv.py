@@ -9,9 +9,7 @@ def main():
 
     #  params list format [no value (false), good value, bad value]
     wif = [False, 'UrJUbSqsb1chYxmQvScdnNhVc2tEJEBDUPMcxCCtgoUYuvyvLKvB', 'thiswontwork']
-    height = [False, 777, 'notnum']
-    prevheight = [False, 765, 'notnum']
-    nextheight = [False, 785, 'notnum']
+    # height = [False, 777, 'notnum']
     address = [False, 'RYPzyuLXdT9JYn7pemYaX3ytsY3btyaATY', 'not_an_addr']
     isCCno = [False, 0, 'notnum']
     isCCyes = [False, 1, 'notnum']
@@ -41,18 +39,29 @@ def main():
 #    }
 
     # help call
-    rpc_call = tf.nspv.help(url, userpass)
+    # Response should contain "result": "success"
+    # Response should contain actual help data
+    rpc_call = tf.nspv_help(url, userpass)
     tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "methods")
 
     # getinfo call
+    # Response should contain "result": "success"
+    # Response should contain actual data
     rpc_call = tf.nspv_getinfo(url, userpass)
     tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "notarization")
+    tf.assert_contains(rpc_call, "header")
+    tf.assert_contains(rpc_call, "protocolversion")
 
-    # getpeerinfo call
-    rpc_call = tf.nspv_getpeerinfo(url, userpass)
-    tf.assert_noterror(rpc_call)
+    # getpeerinfo call     -- needs it's own assertion and expected results WIP
+    #rpc_call = tf.nspv_getpeerinfo(url, userpass)
+    #tf.assert_success(rpc_call)
 
     # hdrsproof call
+    # Response should be successful for case 2 and fail for others
+    prevheight = [False, 1457769, 'notnum']
+    nextheight = [False, 1457791, 'notnum']
     rpc_call = tf.nspv_hdrsproof(url, userpass, prevheight[1], nextheight[1])
     tf.assert_error(rpc_call)
     rpc_call = tf.nspv_hdrsproof(url, userpass, prevheight[2], nextheight[2])
@@ -61,10 +70,14 @@ def main():
     tf.assert_error(rpc_call)
 
     # notarization call
+    # Response should be successful for case 2
+    # Successful response should contain prev and next notarizations data
+    height = [False, 1457780, 'notnum']
     rpc_call = tf.nspv_notarizations(url, userpass, height[1])
     tf.assert_error(rpc_call)
     rpc_call = tf.nspv_notarizations(url, userpass, height[2])
     tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "prev", "next")
     rpc_call = tf.nspv_notarizations(url, userpass, height[3])
     tf.assert_error(rpc_call)
 
