@@ -27,7 +27,7 @@ def assert_contains(result, key): # expected_data):
 
 def assert_error(result):
     """ assert there is an error with known error message """
-    error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error',]
+    error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error', 'couldnt get addressutxos',]
     result_d = type_convert(result)
     error = result_d.get('error')
     if error:

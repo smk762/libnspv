@@ -8,35 +8,17 @@ def main():
     userpass = "userpass"
 
     #  params list format [no value (false), good value, bad value]
-    wif = [False, 'UrJUbSqsb1chYxmQvScdnNhVc2tEJEBDUPMcxCCtgoUYuvyvLKvB', 'thiswontwork']
+    # wif = [False, 'UrJUbSqsb1chYxmQvScdnNhVc2tEJEBDUPMcxCCtgoUYuvyvLKvB', 'thiswontwork']
     # height = [False, 777, 'notnum']
-    address = [False, 'RYPzyuLXdT9JYn7pemYaX3ytsY3btyaATY', 'not_an_addr']
-    isCCno = [False, 0, 'notnum']
-    isCCyes = [False, 1, 'notnum']
-    skipcount = [False, 2, 'notnum']
-    txfilter = ['not implemented yet']
-    amount = [False, 2, 'notnum']
-    txid = [False, 'f261773a389445100d8dfe4fc0b2d9daeaf90ef6264435e739fbd698624b77d6', 'not_txid']
-    vout = [False, 1,'d']
-    rawhex = [False, '', 'nothex']
-
-    #  methods-to-param dic
-#    nspv_methods = {#'broadcast': [rawhex],
-                    #'getnewaddress': [],                                       V
-                    #'getpeerinfo': [],                                         V
-                    #'hdrsproof': [prevheight,nextheight],                      V
-                    #'help': [],                                                V
-                    #'listtransactions1': [address, isCCno, skipcount],
-                    #'listtransactions2': [address, isCCyes, skipcount],
-                    #'listunspent1': [address, isCCno, skipcount],
-                    #'listunspent2': [address, isCCyes, skipcount],
-                    #'login': [wif], 'logout': [], 'mempool': [],
-                    #'notarizations': [height],                                 V
-                    #'spend': [address, amount],
-                    #'spentinfo': [txid, vout],
-                    #'txproof': [txid, height],
-                    #'stop': []
-#    }
+    # address = [False, 'RYPzyuLXdT9JYn7pemYaX3ytsY3btyaATY', 'not_an_addr']
+    # isCCno = [False, 0, 'notnum']
+    # isCCyes = [False, 1, 'notnum']
+    # skipcount = [False, 2, 'notnum']
+    # txfilter = ['not implemented yet']
+    # amount = [False, 2, 'notnum']
+    # txid = [False, 'f261773a389445100d8dfe4fc0b2d9daeaf90ef6264435e739fbd698624b77d6', 'not_txid']
+    # vout = [False, 1,'d']
+    # rawhex = [False, '', 'nothex']
 
     # help call
     # Response should contain "result": "success"
@@ -110,6 +92,8 @@ def main():
     if address != addr:
         raise Exception("addr missmatch: ", addr, address)
 
+    # TODO: different cases for loggid in and logged out users
+
     # listtransactions call
     # Successful response should contain txids and same address ass requested
     address = [False, 'RSjpS8bYqQh395cTaWpjDXq5ZuAM6Kdxmj', addr]
@@ -117,11 +101,26 @@ def main():
     isCCyes = [False, 1, 1]
     skipcount = [False, 2, 2]
     # Case 1 - False data
-    rpc_call = tf.nspv_listtransactions(url, userpass, address[1], isCCno[1], skipcount[1])
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[0], isCCno[0], skipcount[0])
     tf.assert_error(rpc_call)
-    rpc_call = tf.nspv_listtransactions(url, userpass, address[1], isCCyes[1], skipcount[1])
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[0], isCCyes[0], skipcount[0])
     tf.assert_error(rpc_call)
     # Case 2 - known data
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[1], isCCno[1], skipcount[1])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "txids")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[1]:
+        raise Exception("addr missmatch: ", addr_response, address[1])
+    rpc_call = tf.nspv_listtransactions(url, userpass, address[1], isCCyes[1], skipcount[1])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "txids")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[1]:
+        raise Exception("addr missmatch: ", addr_response, address[1])
+    # Case 3 - fresh generated data
     rpc_call = tf.nspv_listtransactions(url, userpass, address[2], isCCno[2], skipcount[2])
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "txids")
@@ -134,23 +133,8 @@ def main():
     tf.assert_contains(rpc_call, "txids")
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get['address']
-    if addr_response != address[2]:
+    if addr_response != address[1]:
         raise Exception("addr missmatch: ", addr_response, address[2])
-    # Case 3 - fresh generated data
-    rpc_call = tf.nspv_listtransactions(url, userpass, address[3], isCCno[3], skipcount[3])
-    tf.assert_success(rpc_call)
-    tf.assert_contains(rpc_call, "txids")
-    rep = tf.type_convert(rpc_call)
-    addr_response = rep.get['address']
-    if addr_response != address[3]:
-        raise Exception("addr missmatch: ", addr_response, address[3])
-    rpc_call = tf.nspv_listtransactions(url, userpass, address[3], isCCyes[3], skipcount[3])
-    tf.assert_success(rpc_call)
-    tf.assert_contains(rpc_call, "txids")
-    rep = tf.type_convert(rpc_call)
-    addr_response = rep.get['address']
-    if addr_response != address[2]:
-        raise Exception("addr missmatch: ", addr_response, address[3])
 
     # litunspent call
     # Successful response should contain utxos and same address as requested
@@ -159,11 +143,26 @@ def main():
     isCCyes = [False, 1, 1]
     skipcount = [False, 2, 2]
     # Case 1 - False data
-    rpc_call = tf.nspv_listunspent(url, userpass, address[1], isCCno[1], skipcount[1])
+    rpc_call = tf.nspv_listunspent(url, userpass, address[0], isCCno[0], skipcount[0])
     tf.assert_error(rpc_call)
-    rpc_call = tf.nspv_listunspent(url, userpass, address[1], isCCyes[1], skipcount[1])
+    rpc_call = tf.nspv_listunspent(url, userpass, address[0], isCCyes[0], skipcount[0])
     tf.assert_error(rpc_call)
     # Case 2 - known data
+    rpc_call = tf.nspv_listunspent(url, userpass, address[1], isCCno[1], skipcount[1])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "utxos")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[1]:
+        raise Exception("addr missmatch: ", addr_response, address[1])
+    rpc_call = tf.nspv_listunspent(url, userpass, address[1], isCCyes[1], skipcount[1])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "utxos")
+    rep = tf.type_convert(rpc_call)
+    addr_response = rep.get['address']
+    if addr_response != address[1]:
+        raise Exception("addr missmatch: ", addr_response, address[1])
+    # Case 3 - fresh generated data
     rpc_call = tf.nspv_listunspent(url, userpass, address[2], isCCno[2], skipcount[2])
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "utxos")
@@ -176,25 +175,63 @@ def main():
     tf.assert_contains(rpc_call, "utxos")
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get['address']
-    if addr_response != address[2]:
+    if addr_response != address[1]:
         raise Exception("addr missmatch: ", addr_response, address[2])
-    # Case 3 - fresh generated data
-    rpc_call = tf.nspv_listunspent(url, userpass, address[3], isCCno[3], skipcount[3])
-    tf.assert_success(rpc_call)
-    tf.assert_contains(rpc_call, "utxos")
-    rep = tf.type_convert(rpc_call)
-    addr_response = rep.get['address']
-    if addr_response != address[3]:
-        raise Exception("addr missmatch: ", addr_response, address[3])
-    rpc_call = tf.nspv_listunspent(url, userpass, address[3], isCCyes[3], skipcount[3])
-    tf.assert_success(rpc_call)
-    tf.assert_contains(rpc_call, "utxos")
-    rep = tf.type_convert(rpc_call)
-    addr_response = rep.get['address']
-    if addr_response != address[2]:
-        raise Exception("addr missmatch: ", addr_response, address[3])
 
-    
+    # spend call
+    # Successful response should contain tx and transaction hex
+    amount = [False, 0.001]
+    address = [False, 'RSjpS8bYqQh395cTaWpjDXq5ZuAM6Kdxmj']
+    # Case 1 - false data
+    rpc_call = tf.nspv_spend(url, userpass, address[0], amount[0])
+    tf.assert_error(rpc_call)
+    rpc_call = tf.nspv_spend(url, userpass, address[1], amount[0])
+    tf.assert_error(rpc_call)
+    # Case 2 - known data
+    rpc_call = tf.nspv_spend(url, userpass, address[1], amount[1])
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "tx")
+    tf.assert_contains(rpc_call, "hex")
+    # save hex for future broadcast
+    rep = tf.type_convert(rpc_call)
+    hex_res = rep.get("hex")
+
+
+    # broadcast call
+    # Successful broadcasst should have equal hex broadcasted and expected
+    hex = [False, hex_res]
+    rpc_call = tf.nspv_broadcast(url, userpass, hex[0])
+    tf.assert_error(rpc_call)
+    rpc_call = tf.nspv_broadcast(url, userpass, hex[1])
+    tf.assert_success(rpc_call)
+    rep = tf.type_convert(rpc_call)
+    broadcast_res = rep.get("broadcast")
+    expected = rep.get("expected")
+    if broadcast_res == expected:
+        pass
+    else:
+        raise Exception("Unxepected braodcast: ", broadcast_res, expected)
+
+    # spentinfo call
+    # Successful response sould contain same txid and same vout
+    r_txids = [False, "224c0b2bd80983f44a638d6ae14aab39acc898771ebe5101dd567b13cd5fff78"]
+    r_vouts = [False, 1]
+    rpc_call = tf.nspv_spentinfo(url, userpass, r_txids[0], r_vouts[0])
+    tf.assert_error(rpc_call)
+    rpc_call = tf.nspv_spentinfo(url, userpass, r_txids[1], r_vouts[1])
+    tf.assert_success(rpc_call)
+    rep = tf.type_convert(rpc_call)
+    txid_resp = rep.get("txid")
+    if r_txids[1] != txid_resp:
+        raise Exception("Unexpected txid: ", r_txids[1], txid_resp)
+    vout_resp = rep.get("vout")
+    if r_vouts[1] != vout_resp:
+        raise Exception("Unxepected vout: ", r_vouts[1], vout_resp)
+
+    # logout call
+    rpc_call = tf.nspv_logout(url, userpass)
+    tf.assert_success(rpc_call)
+
 
 if __name__ == "__main__":
     main()
