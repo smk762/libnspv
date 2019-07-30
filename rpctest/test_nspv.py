@@ -77,7 +77,10 @@ def main():
     wait()
 
     # mempool call
-    #
+    # Response should contain txids
+    rpc_call = tf.nspv_mempool(url, userpass)
+    tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "txids")
 
     # getnewaddress call
     # Get a new address, save it for latter calls

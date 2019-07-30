@@ -3,7 +3,7 @@ import requests
 import json
 import ast
 import time
-from .util import assert_equal
+from util import assert_equal
 
 
 def assert_success(result):
@@ -17,10 +17,6 @@ def assert_contains(result, key): # expected_data):
     content = result_d.get(key)
     if content:
         pass
-        #if content == expected_data:
-        #    pass
-        #else:
-        #    raise Exception("Unexpected response data")
     else:
         raise Exception("Unexpected response, missing param: ", key)
 
