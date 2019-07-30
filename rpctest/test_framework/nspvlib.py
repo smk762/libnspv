@@ -27,7 +27,7 @@ def assert_contains(result, key): # expected_data):
 
 def assert_error(result):
     """ assert there is an error with known error message """
-    error_msg = ['no height', 'invalid height range', 'invalid method', ]
+    error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error',]
     result_d = type_convert(result)
     error = result_d.get('error')
     if error:
@@ -115,13 +115,13 @@ def nspv_listtransactions(node_ip, user_pass, address=False, isCC=False, skipcou
 def nspv_listunspent(node_ip, user_pass, address=False, isCC=False, skipcount=False, txfilter=False):
     params = {'userpass': user_pass,
               'method': 'listunspent'}
-    if address is not False:
+    if address:
         params.update({'address': address})
-    if isCC is not False:
+    if isCC:
         params.update({'isCC': isCC})
-    if skipcount is not False:
+    if skipcount:
         params.update({'skipcount': skipcount})
-    if txfilter is not False:
+    if txfilter:
         params.update({'filter': txfilter})
     r = requests.post(node_ip, json=params)
     return r.content
@@ -130,8 +130,8 @@ def nspv_listunspent(node_ip, user_pass, address=False, isCC=False, skipcount=Fa
 def nspv_login(node_ip, user_pass, wif=False):
     params = {'userpass': user_pass,
               'method': 'login'}
-    if wif is not False:
-      params.update({'wif': wif})
+    if wif:
+        params.update({'wif': wif})
     r = requests.post(node_ip, json=params)
     print(r.json())
     return r.content

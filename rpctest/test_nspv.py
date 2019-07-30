@@ -86,7 +86,8 @@ def main():
     tf.assert_error(rpc_call)
 
     # getnewaddress call
-    rpc_call = tf.nspv_getnewaddress()
+    # Get a new address, save it for latter calls
+    rpc_call = tf.nspv_getnewaddress(url, userpass)
     tf.asert_success(rpc_call)
     tf.assert_contains(rpc_call, "wifprefix")
     tf.assert_contains(rpc_call, "wif")
@@ -97,6 +98,20 @@ def main():
     addr = rep.get['address']
     pkey = rep.get['pubkey']
 
+    # login call
+    # login with fresh credentials
+    # Response should contain address, address should be equal to generated earlier one
+    rpc_call = tf.nspv_login(url, userpass, wif)
+    tf.asert_success(rpc_call)
+    tf.assert_contains(rpc_call, "status")
+    tf.assert_contains(rpc_call, "address")
+    rep = tf.type_convert(rpc_call)
+    address = rep.get['address']
+    if address != addr:
+        raise Exception("addr missmatch: ", addr, address)
+
+
+    # 
 
 
 if __name__ == "__main__":
