@@ -3,7 +3,7 @@ import requests
 import json
 import ast
 import time
-from .util import assert_true, assert_false, assert_equal
+from .util import assert_equal
 
 
 def assert_success(result):
@@ -11,22 +11,37 @@ def assert_success(result):
     assert_equal(result_d.get('result'), 'success')
 
 
-def assert_noterror(reult):
-    """assert success for a few special cases
-       WIP"""
-    pass
+def assert_contains(result, key): # expected_data):
+    """assert key contains expected data"""
+    result_d = type_convert(result)
+    content = result_d.get(key)
+    if content:
+        pass
+        #if content == expected_data:
+        #    pass
+        #else:
+        #    raise Exception("Unexpected response data")
+    else:
+        raise Exception("Unexpected response, missing param: ", key)
 
 
 def assert_error(result):
-    """ WIP """
-    #result = json.load(result_json)
-    #if reult[1] == "error"
-    #assert_true(result['1'], 'Unexpected result')
-    pass
+    """ assert there is an error with known error message """
+    error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error',
+                 'couldnt get addressutxos',]
+    result_d = type_convert(result)
+    error = result_d.get('error')
+    if error:
+        if error in error_msg:
+            pass
+        else:
+            raise Exception("Unknown error message")
+    else:
+        raise Exception("Unexpected response data")
 
 
 def type_convert(bytez):
-    """WIP"""
+    """Wraps nspv_call response"""
     # r = json.loads(bytes.decode("utf-8"))
     r = ast.literal_eval(bytez.decode("utf-8"))
     return r
@@ -35,7 +50,7 @@ def type_convert(bytez):
 def nspv_broadcast(node_ip, user_pass, rawhex):
     params = {'userpass': user_pass,
               'method': 'broadcast'}
-    if rawhex is not False:
+    if rawhex:
         params.update({'hex': rawhex})
     r = requests.post(node_ip, json=params)
     return r.content
@@ -44,7 +59,7 @@ def nspv_broadcast(node_ip, user_pass, rawhex):
 def nspv_getinfo(node_ip, user_pass, height=False):
     params = {'userpass': user_pass,
               'method': 'getinfo'}
-    if height is not False:
+    if height:
         params.update({'height':height})
     r = requests.post(node_ip, json=params)
     print(r.json())
@@ -68,9 +83,9 @@ def nspv_getpeerinfo(node_ip, user_pass):
 def nspv_hdrsproof(node_ip, user_pass, prevheight, nextheight):
     params = {'userpass': user_pass,
               'method': 'hdrsproof'}
-    if prevheight is not False:
+    if prevheight:
         params.update({'prevheight':prevheight})
-    if nextheight is not False:
+    if nextheight:
         params.update({'nextheight':nextheight})
     r = requests.post(node_ip, json=params)
     return r.content
@@ -86,13 +101,13 @@ def nspv_help(node_ip, user_pass):
 def nspv_listtransactions(node_ip, user_pass, address=False, isCC=False, skipcount=False, txfilter=False):
     params = {'userpass': user_pass,
               'method': 'listtransactions'}
-    if address is not False:
+    if address:
         params.update({'address': address})
-    if isCC is not False:
+    if isCC:
         params.update({'isCC': isCC})
-    if skipcount is not False:
+    if skipcount:
         params.update({'skipcount': skipcount})
-    if txfilter is not False:
+    if txfilter:
         params.update({'filter': txfilter})
     r = requests.post(node_ip, json=params)
     return r.content
@@ -101,13 +116,13 @@ def nspv_listtransactions(node_ip, user_pass, address=False, isCC=False, skipcou
 def nspv_listunspent(node_ip, user_pass, address=False, isCC=False, skipcount=False, txfilter=False):
     params = {'userpass': user_pass,
               'method': 'listunspent'}
-    if address is not False:
+    if address:
         params.update({'address': address})
-    if isCC is not False:
+    if isCC:
         params.update({'isCC': isCC})
-    if skipcount is not False:
+    if skipcount:
         params.update({'skipcount': skipcount})
-    if txfilter is not False:
+    if txfilter:
         params.update({'filter': txfilter})
     r = requests.post(node_ip, json=params)
     return r.content
@@ -116,8 +131,8 @@ def nspv_listunspent(node_ip, user_pass, address=False, isCC=False, skipcount=Fa
 def nspv_login(node_ip, user_pass, wif=False):
     params = {'userpass': user_pass,
               'method': 'login'}
-    if wif is not False:
-      params.update({'wif': wif})
+    if wif:
+        params.update({'wif': wif})
     r = requests.post(node_ip, json=params)
     print(r.json())
     return r.content
@@ -140,7 +155,7 @@ def nspv_mempool(node_ip, user_pass):
 def nspv_notarizations(node_ip, user_pass, height):
     params = {'userpass': user_pass,
               'method': 'notarizations'}
-    if height is not False:
+    if height:
         params.update({'height': height})
     r = requests.post(node_ip, json=params)
     return r.content
@@ -149,9 +164,9 @@ def nspv_notarizations(node_ip, user_pass, height):
 def nspv_spend(node_ip, user_pass, address, amount):
     params = {'userpass': user_pass,
               'method': 'spend'}
-    if address is not False:
+    if address:
         params.update({'address': address})
-    if amount is not False:
+    if amount:
         params.update({'amount': amount})
     r = requests.post(node_ip, json=params)
     time.sleep(1)
@@ -161,9 +176,9 @@ def nspv_spend(node_ip, user_pass, address, amount):
 def nspv_spentinfo(node_ip, user_pass, txid, vout):
     params = {'userpass': user_pass,
               'method': 'spend'}
-    if txid is not False:
+    if txid:
         params.update({'txid': txid})
-    if vout is not False:
+    if vout:
         params.update({'vout': vout})
     r = requests.post(node_ip, json=params)
     time.sleep(1)
@@ -180,9 +195,9 @@ def nspv_stop(node_ip, user_pass):
 def nspv_txproof(node_ip, user_pass, txid, height):
     params = {'userpass': user_pass,
               'method': 'txproof'}
-    if txid is not False:
+    if txid:
         params.update({'txid': txid})
-    if height is not False:
+    if height:
         params.update({'height': height})
     r = requests.post(node_ip, json=params)
     return r.content
