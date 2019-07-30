@@ -22,12 +22,12 @@ def assert_contains(result, key): # expected_data):
         #else:
         #    raise Exception("Unexpected response data")
     else:
-        raise Exception("Unexpected response data")
+        raise Exception("Unexpected response, missing param: ", key)
 
 
 def assert_error(result):
     """ assert there is an error with known error message """
-    error_msg = ['no height', ]
+    error_msg = ['no height', 'invalid height range', 'invalid method', ]
     result_d = type_convert(result)
     error = result_d.get('error')
     if error:
@@ -40,7 +40,7 @@ def assert_error(result):
 
 
 def type_convert(bytez):
-    """WIP"""
+    """Wraps nspv_call response"""
     # r = json.loads(bytes.decode("utf-8"))
     r = ast.literal_eval(bytez.decode("utf-8"))
     return r

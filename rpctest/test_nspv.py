@@ -60,12 +60,16 @@ def main():
 
     # hdrsproof call
     # Response should be successful for case 2 and fail for others
+    # Response should contain actual headers
     prevheight = [False, 1457769, 'notnum']
     nextheight = [False, 1457791, 'notnum']
     rpc_call = tf.nspv_hdrsproof(url, userpass, prevheight[1], nextheight[1])
     tf.assert_error(rpc_call)
     rpc_call = tf.nspv_hdrsproof(url, userpass, prevheight[2], nextheight[2])
     tf.assert_success(rpc_call)
+    tf.assert_contains(rpc_call, "prevht")
+    tf.assert_contains(rpc_call, "nextht")
+    tf.assert_contains(rpc_call, "headers")
     rpc_call = tf.nspv_hdrsproof(url, userpass, prevheight[3], nextheight[3])
     tf.assert_error(rpc_call)
 
@@ -84,6 +88,10 @@ def main():
     # getnewaddress call
     rpc_call = tf.nspv_getnewaddress()
     tf.asert_success(rpc_call)
+    tf.assert_contains(rpc_call, "wifprefix")
+    tf.assert_contains(rpc_call, "wif")
+    tf.assert_contains(rpc_call, "address")
+    tf.assert_contains(rpc_call, "pubkey")
     rep = tf.type_convert(rpc_call)
     wif = rep.get['wif']
     addr = rep.get['address']
