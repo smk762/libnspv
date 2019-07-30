@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
+import time
 import test_framework.nspvlib as tf
+
+
+def wait():
+    time.sleep(1)
 
 
 def main():
@@ -25,6 +30,7 @@ def main():
     rpc_call = tf.nspv_help(url, userpass)
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "methods")
+    wait()
 
     # getinfo call
     # Response should contain "result": "success"
@@ -34,10 +40,12 @@ def main():
     tf.assert_contains(rpc_call, "notarization")
     tf.assert_contains(rpc_call, "header")
     tf.assert_contains(rpc_call, "protocolversion")
+    wait()
 
     # getpeerinfo call     -- needs it's own assertion and expected results WIP
     #rpc_call = tf.nspv_getpeerinfo(url, userpass)
     #tf.assert_success(rpc_call)
+    wait()
 
     # hdrsproof call
     # Response should be successful for case 2 and fail for others
@@ -53,6 +61,7 @@ def main():
     tf.assert_contains(rpc_call, "headers")
     rpc_call = tf.nspv_hdrsproof(url, userpass, prevheight[3], nextheight[3])
     tf.assert_error(rpc_call)
+    wait()
 
     # notarization call
     # Response should be successful for case 2
@@ -65,6 +74,10 @@ def main():
     tf.assert_contains(rpc_call, "prev", "next")
     rpc_call = tf.nspv_notarizations(url, userpass, height[3])
     tf.assert_error(rpc_call)
+    wait()
+
+    # mempool call
+    #
 
     # getnewaddress call
     # Get a new address, save it for latter calls
@@ -78,6 +91,7 @@ def main():
     wif = rep.get['wif']
     addr = rep.get['address']
     pkey = rep.get['pubkey']
+    wait()
 
     # login call
     # login with fresh credentials
@@ -90,6 +104,7 @@ def main():
     address = rep.get['address']
     if address != addr:
         raise Exception("addr missmatch: ", addr, address)
+    wait()
 
     # TODO: different cases for loggid in and logged out users
 
@@ -134,6 +149,7 @@ def main():
     addr_response = rep.get['address']
     if addr_response != address[1]:
         raise Exception("addr missmatch: ", addr_response, address[2])
+    wait()
 
     # litunspent call
     # Successful response should contain utxos and same address as requested
@@ -176,6 +192,7 @@ def main():
     addr_response = rep.get['address']
     if addr_response != address[1]:
         raise Exception("addr missmatch: ", addr_response, address[2])
+    wait()
 
     # spend call
     # Successful response should contain tx and transaction hex
@@ -194,7 +211,7 @@ def main():
     # save hex for future broadcast
     rep = tf.type_convert(rpc_call)
     hex_res = rep.get("hex")
-
+    wait()
 
     # broadcast call
     # Successful broadcasst should have equal hex broadcasted and expected
@@ -210,6 +227,7 @@ def main():
         pass
     else:
         raise Exception("Unxepected braodcast: ", broadcast_res, expected)
+    wait()
 
     # spentinfo call
     # Successful response sould contain same txid and same vout
@@ -226,6 +244,7 @@ def main():
     vout_resp = rep.get("vout")
     if r_vouts[1] != vout_resp:
         raise Exception("Unxepected vout: ", r_vouts[1], vout_resp)
+    wait()
 
     # logout call
     rpc_call = tf.nspv_logout(url, userpass)
