@@ -30,7 +30,6 @@
                 <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
                 <button class="btn btn-secondary btn-sm" formaction="http://127.0.0.1:7771/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
                 <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:7771/method/send?nexturl=send" formmethod="get">Send</button>
-                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:7771/method/receive?nexturl=receive" formmethod="get">Receive</button>
                 <button class="btn btn-danger btn-sm" formaction="http://127.0.0.1:7771/method/logout?nexturl=login" formmethod="get">Logout</button>
               </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
@@ -44,10 +43,11 @@
             <div class="card-header"> <!-- wallet card header start -->
               <div class="row">
                 <div class="col-md-6 col-sm-6 col-xs-6">
-                  <h5 class="card-title" style="vertical-align: ">Transaction History</h5>
+                  <h6 class="card-title">Transaction History</h6>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- tx history reresh button form start -->
+                    Your Address: <span class="badge badge-secondary" style="margin-right: 15px;">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</span>
                     <button class="btn btn-outline-secondary btn-sm" formaction="http://127.0.0.1:7771/method/wallet?nexturl=wallet" formmethod="get">Refresh</button>
                   </form> <!-- tx history reresh button form end -->
                 </div>
