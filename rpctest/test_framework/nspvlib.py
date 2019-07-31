@@ -90,7 +90,7 @@ def nspv_getinfo(node_ip, user_pass, height=False):
 def nspv_getnewaddress(node_ip, user_pass):
     params = {'userpass': user_pass,
               'method': 'getnewaddress'}
-    r = requests.post(node_ip, json=params
+    r = requests.post(node_ip, json=params)
     time.sleep(1)
     return r.content
 
