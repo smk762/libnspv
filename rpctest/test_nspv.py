@@ -110,7 +110,7 @@ def main():
     # listtransactions call
     real_addr = "RSjpS8bYqQh395cTaWpjDXq5ZuAM6Kdxmj"
 
-    time.sleep(5)
+    time.sleep(1)
 
     # Successful response should [not] contain txids and same address ass requested
     # Case 1 - False data, user is logged in - should not print txids for new address
@@ -120,7 +120,7 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != addr:
-        raise Exception("addr missmatch: ", addr_response, addr)
+        raise AssertionError("addr missmatch: ", addr_response, addr)
 
     # Case 2 - known data
     rpc_call = tf.nspv_listtransactions(url, userpass, real_addr, 0, 1)
@@ -129,7 +129,7 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != real_addr:
-        raise Exception("addr missmatch: ", addr_response, real_addr)
+        raise AssertionError("addr missmatch: ", addr_response, real_addr)
 
     # Case 3 - known data, isCC = 1 is not valid for KMD chain, should not include txids
     rpc_call = tf.nspv_listtransactions(url, userpass, real_addr, 1, 1)
@@ -138,7 +138,7 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != real_addr:
-        raise Exception("addr missmatch: ", addr_response, real_addr)
+        raise AssertionError("addr missmatch: ", addr_response, real_addr)
 
     # Case 4 - fresh generated data, should be no transactions yet
     rpc_call = tf.nspv_listtransactions(url, userpass, addr, 0, 0)
@@ -147,9 +147,9 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != addr:
-        raise Exception("addr missmatch: ", addr_response, addr)
+        raise AssertionError("addr missmatch: ", addr_response, addr)
 
-    time.sleep(5)
+    time.sleep(1)
 
     # litunspent call
     # Successful response should [not] contain utxos and same address as requested
@@ -161,7 +161,7 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != addr:
-        raise Exception("addr missmatch: ", addr_response, addr)
+        raise AssertionError("addr missmatch: ", addr_response, addr)
 
     # Case 2 - known data
     rpc_call = tf.nspv_listunspent(url, userpass, real_addr, 0, 0)
@@ -170,7 +170,7 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != real_addr:
-        raise Exception("addr missmatch: ", addr_response, real_addr)
+        raise AssertionError("addr missmatch: ", addr_response, real_addr)
 
     # Case 3 - known data, isCC = 1, should not return utxos on KMD chain
     rpc_call = tf.nspv_listunspent(url, userpass, real_addr, 1, 0)
@@ -179,7 +179,7 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != real_addr:
-        raise Exception("addr missmatch: ", addr_response, real_addr)
+        raise AssertionError("addr missmatch: ", addr_response, real_addr)
 
     # Case 4 - fresh generated data, similar to case 1
     rpc_call = tf.nspv_listunspent(url, userpass, addr, 0, 0)
@@ -188,9 +188,9 @@ def main():
     rep = tf.type_convert(rpc_call)
     addr_response = rep.get('address')
     if addr_response != addr:
-        raise Exception("addr missmatch: ", addr_response, addr)
+        raise AssertionError("addr missmatch: ", addr_response, addr)
 
-    time.sleep(5)
+    time.sleep(1)
 
     # spend call
 
@@ -246,7 +246,7 @@ def main():
     else:
         raise AssertionError("Aseert equal braodcast: ", broadcast_res, expected)
 
-    time.sleep(5)
+    time.sleep(1)
 
     # spentinfo call
     # Successful response sould contain same txid and same vout
@@ -263,10 +263,10 @@ def main():
     rep = tf.type_convert(rpc_call)
     txid_resp = rep.get("txid")
     if r_txids[1] != txid_resp:
-        raise Exception("Unexpected txid: ", r_txids[1], txid_resp)
+        raise AssertionError("Unexpected txid: ", r_txids[1], txid_resp)
     vout_resp = rep.get("vout")
     if r_vouts[1] != vout_resp:
-        raise Exception("Unxepected vout: ", r_vouts[1], vout_resp)
+        raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
 
 
 if __name__ == "__main__":

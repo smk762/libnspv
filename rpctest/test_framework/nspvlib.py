@@ -20,7 +20,7 @@ def assert_in(result, key, compare_list):
     if content in compare_list:
         pass
     else:
-        raise Exception("Assertion Error:", content, "not in", compare_list)
+        raise AssertionError("Error:", content, "not in", compare_list)
 
 
 def assert_contains(result, key):
@@ -30,7 +30,7 @@ def assert_contains(result, key):
     if content:
         pass
     else:
-        raise Exception("Unexpected response, missing param: ", key)
+        raise AssertionError("Unexpected response, missing param: ", key)
 
 
 def assert_not_contains(result, key):
@@ -40,7 +40,7 @@ def assert_not_contains(result, key):
     if not content:
         pass
     else:
-        raise Exception("Unexpected response, missing param: ", key)
+        raise AssertionError("Unexpected response, missing param: ", key)
 
 
 def assert_error(result):
@@ -54,15 +54,16 @@ def assert_error(result):
         if error in error_msg:
             pass
         else:
-            raise Exception("Unknown error message")
+            raise AssertionError("Unknown error message")
     else:
-        raise Exception("Unexpected response data")
+        raise AssertionError("Unexpected response")
 
 
 def type_convert(bytez):
     """Wraps nspv_call response"""
     # r = json.loads(bytes.decode("utf-8"))
     r = ast.literal_eval(bytez.decode("utf-8"))
+    time.sleep(1)
     return r
 
 
@@ -72,6 +73,7 @@ def nspv_broadcast(node_ip, user_pass, rawhex):
     if rawhex:
         params.update({'hex': rawhex})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -81,13 +83,15 @@ def nspv_getinfo(node_ip, user_pass, height=False):
     if height:
         params.update({'height':height})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
 def nspv_getnewaddress(node_ip, user_pass):
     params = {'userpass': user_pass,
               'method': 'getnewaddress'}
-    r = requests.post(node_ip, json=params)
+    r = requests.post(node_ip, json=params
+    time.sleep(1)
     return r.content
 
 
@@ -95,6 +99,7 @@ def nspv_getpeerinfo(node_ip, user_pass):
     params = {'userpass': user_pass,
               'method': 'getpeerinfo'}
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -106,6 +111,7 @@ def nspv_hdrsproof(node_ip, user_pass, prevheight, nextheight):
     if nextheight:
         params.update({'nextheight':nextheight})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -113,6 +119,7 @@ def nspv_help(node_ip, user_pass):
     params = {'userpass': user_pass,
               'method': 'help'}
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -128,6 +135,7 @@ def nspv_listtransactions(node_ip, user_pass, address=False, isCC=False, skipcou
     if txfilter:
         params.update({'filter': txfilter})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -143,6 +151,7 @@ def nspv_listunspent(node_ip, user_pass, address=False, isCC=False, skipcount=Fa
     if txfilter:
         params.update({'filter': txfilter})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -152,6 +161,7 @@ def nspv_login(node_ip, user_pass, wif=False):
     if wif:
         params.update({'wif': wif})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -159,6 +169,7 @@ def nspv_logout(node_ip, user_pass):
     params = {'userpass': user_pass,
               'method': 'logout'}
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -166,6 +177,7 @@ def nspv_mempool(node_ip, user_pass):
     params = {'userpass': user_pass,
               'method': 'mempool'}
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -175,6 +187,7 @@ def nspv_notarizations(node_ip, user_pass, height):
     if height:
         params.update({'height': height})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -206,6 +219,7 @@ def nspv_stop(node_ip, user_pass):
     params = {'userpass': user_pass,
               'method': 'stop'}
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
 
 
@@ -217,4 +231,5 @@ def nspv_txproof(node_ip, user_pass, txid, height):
     if height:
         params.update({'height': height})
     r = requests.post(node_ip, json=params)
+    time.sleep(1)
     return r.content
