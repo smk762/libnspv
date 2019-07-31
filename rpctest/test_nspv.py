@@ -105,10 +105,12 @@ def main():
     rep = tf.type_convert(rpc_call)
     address = rep.get('address')
     if address != addr:
-        raise Exception("addr missmatch: ", addr, address)
+        raise AssertionError("addr missmatch: ", addr, address)
 
     # listtransactions call
-    real_addr = "RSjpS8bYqQh395cTaWpjDXq5ZuAM6Kdxmj"
+    real_addr = ""
+    if not real_addr:
+        raise Exception("Add valid address l_111")
 
     time.sleep(1)
 
@@ -195,8 +197,11 @@ def main():
     # spend call
 
     # Successful response should contain tx and transaction hex
+    addr_send = ""
+    if not addr_send:
+        raise Exception("Add real address to send to l_201")
     amount = [False, 0.001]
-    address = [False, 'RSjpS8bYqQh395cTaWpjDXq5ZuAM6Kdxmj']
+    address = [False, addr_send]
 
     # Case 1 - false data
     rpc_call = tf.nspv_spend(url, userpass, address[0], amount[0])
@@ -209,7 +214,9 @@ def main():
     tf.assert_error(rpc_call)
 
     # Case 3 - login with wif, create a valid transaction
-    wif = "Up8zUDNAHjTWQHfdx1UhrsZArtLevcQee9Zi7ZDHCHu1HqL9Fhjn"
+    wif = ""
+    if not wif:
+        raise Exception("Add valid wif l_213")
     rpc_call = tf.nspv_logout(url, userpass)
     rpc_call = tf.nspv_login(url, userpass, wif)
     rpc_call = tf.nspv_spend(url, userpass, address[1], amount[1])
