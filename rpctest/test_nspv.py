@@ -4,6 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 import test_framework.nspvlib as tf
+import time
 
 
 def main():
@@ -109,6 +110,8 @@ def main():
     # listtransactions call
     real_addr = "RSjpS8bYqQh395cTaWpjDXq5ZuAM6Kdxmj"
 
+    time.sleep(5)
+
     # Successful response should [not] contain txids and same address ass requested
     # Case 1 - False data, user is logged in - should not print txids for new address
     rpc_call = tf.nspv_listtransactions(url, userpass, False, False, False)
@@ -146,6 +149,8 @@ def main():
     if addr_response != addr:
         raise Exception("addr missmatch: ", addr_response, addr)
 
+    time.sleep(5)
+
     # litunspent call
     # Successful response should [not] contain utxos and same address as requested
 
@@ -176,7 +181,7 @@ def main():
     if addr_response != real_addr:
         raise Exception("addr missmatch: ", addr_response, real_addr)
 
-    # Case 3 - fresh generated data, similar to case 1
+    # Case 4 - fresh generated data, similar to case 1
     rpc_call = tf.nspv_listunspent(url, userpass, addr, 0, 0)
     tf.assert_success(rpc_call)
     tf.assert_not_contains(rpc_call, "utxos")
@@ -184,6 +189,8 @@ def main():
     addr_response = rep.get('address')
     if addr_response != addr:
         raise Exception("addr missmatch: ", addr_response, addr)
+
+    time.sleep(5)
 
     # spend call
 
@@ -197,7 +204,14 @@ def main():
     rpc_call = tf.nspv_spend(url, userpass, address[1], amount[0])
     tf.assert_error(rpc_call)
 
-    # Case 2 - known data
+    # Case 2 - known data, not enough balance
+    rpc_call = tf.nspv_spend(url, userpass, address[1], amount[1])
+    tf.assert_error(rpc_call)
+
+    # Case 3 - login with wif, create a valid transaction
+    wif = "Up8zUDNAHjTWQHfdx1UhrsZArtLevcQee9Zi7ZDHCHu1HqL9Fhjn"
+    rpc_call = tf.nspv_logout(url, userpass)
+    rpc_call = tf.nspv_login(url, userpass, wif)
     rpc_call = tf.nspv_spend(url, userpass, address[1], amount[1])
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "tx")
@@ -210,10 +224,19 @@ def main():
     # broadcast call
 
     # Successful broadcasst should have equal hex broadcasted and expected
-    hex = [False, hex_res]
+    hex = [False, "norealhexhere", hex_res]
+    retcode_failed = [-1, -2, -3]
+
+    # Cae 1 - No hex given
     rpc_call = tf.nspv_broadcast(url, userpass, hex[0])
     tf.assert_error(rpc_call)
+
+    # Case 2 - Non-valid hex, failed broadcast should contain appropriate retcode
     rpc_call = tf.nspv_broadcast(url, userpass, hex[1])
+    tf.assert_in(rpc_call, "retcode", retcode_failed)
+
+    # Case 3 - Hex of previous transaction
+    rpc_call = tf.nspv_broadcast(url, userpass, hex[2])
     tf.assert_success(rpc_call)
     rep = tf.type_convert(rpc_call)
     broadcast_res = rep.get("broadcast")
@@ -223,6 +246,8 @@ def main():
     else:
         raise Exception("Unxepected braodcast: ", broadcast_res, expected)
 
+    time.sleep(5)
+
     # spentinfo call
     # Successful response sould contain same txid and same vout
     r_txids = [False, "224c0b2bd80983f44a638d6ae14aab39acc898771ebe5101dd567b13cd5fff78"]
@@ -231,7 +256,7 @@ def main():
     # Case 1 - False data
     rpc_call = tf.nspv_spentinfo(url, userpass, r_txids[0], r_vouts[0])
     tf.assert_error(rpc_call)
-    
+
     # Case 2 - known data
     rpc_call = tf.nspv_spentinfo(url, userpass, r_txids[1], r_vouts[1])
     tf.assert_success(rpc_call)
