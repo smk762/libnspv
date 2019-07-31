@@ -14,11 +14,19 @@ def assert_success(result):
     assert_equal(result_d.get('result'), 'success')
 
 
+def assert_in(result, key, compare_list):
+    result_d = type_convert(result)
+    content = result_d.get(key)
+    if content in compare_list:
+        pass
+    else:
+        raise Exception("Assertion Error:", content, "not in", compare_list)
+
+
 def assert_contains(result, key):
     """assert key contains expected data"""
     result_d = type_convert(result)
     content = result_d.get(key)
-    print(content)
     if content:
         pass
     else:
@@ -29,7 +37,6 @@ def assert_not_contains(result, key):
     """assert key contains expected data"""
     result_d = type_convert(result)
     content = result_d.get(key)
-    print(content)
     if not content:
         pass
     else:
@@ -38,12 +45,11 @@ def assert_not_contains(result, key):
 
 def assert_error(result):
     """ assert there is an error with known error message """
-    error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error',
-                 'couldnt get addressutxos',]
+    error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error', 'no hex',
+                 'couldnt get addressutxos', 'invalid address or amount too small', 'not enough funds',
+                 'invalid address or amount too small', 'invalid utxo']
     result_d = type_convert(result)
-    print(result_d)
     error = result_d.get('error')
-    print(error)
     if error:
         if error in error_msg:
             pass
@@ -75,7 +81,6 @@ def nspv_getinfo(node_ip, user_pass, height=False):
     if height:
         params.update({'height':height})
     r = requests.post(node_ip, json=params)
-    print(r.json())
     return r.content
 
 
@@ -147,7 +152,6 @@ def nspv_login(node_ip, user_pass, wif=False):
     if wif:
         params.update({'wif': wif})
     r = requests.post(node_ip, json=params)
-    print(r.json())
     return r.content
 
 
@@ -188,7 +192,7 @@ def nspv_spend(node_ip, user_pass, address, amount):
 
 def nspv_spentinfo(node_ip, user_pass, txid, vout):
     params = {'userpass': user_pass,
-              'method': 'spend'}
+              'method': 'spentinfo'}
     if txid:
         params.update({'txid': txid})
     if vout:

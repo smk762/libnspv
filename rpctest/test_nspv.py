@@ -244,7 +244,7 @@ def main():
     if broadcast_res == expected:
         pass
     else:
-        raise Exception("Unxepected braodcast: ", broadcast_res, expected)
+        raise AssertionError("Aseert equal braodcast: ", broadcast_res, expected)
 
     time.sleep(5)
 
