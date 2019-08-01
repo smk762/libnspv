@@ -23,10 +23,13 @@
             <form action="http://127.0.0.1:7771/method/login" method="get">
               <div class="form-group">
                 <h4>To continue, log in to your account.</h4>
-                Select a .jpg image file: <input type="file" name="password_image" accept=".jpg">
-                <input type="password" class="form-control" id="nspv_password" aria-describedby="nspvUserpassHelp" placeholder="Password" readonly>
+                Select a .jpg image file: <input type="file" name="jpg_image" accept=".jpg">
+                <input type="password" class="form-control" id="nspv_password" name="jpg_password" aria-describedby="nspvUserpassHelp" placeholder="Password" readonly>
                 <small id="nspvPasswordHelp" class="form-text text-muted">Password (any random string) is used for session login. (disabled for now in debug versions)</small>
               </div>
+              <button type="submit" class="btn btn-primary">Login with image + password</button>
+            </form>
+            <form action="http://127.0.0.1:7771/method/login" method="get">
               <div class="divider">
                 <strong class="divider-title">or</strong>
               </div>
@@ -34,7 +37,7 @@
                 <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key">
                 <small id="nspvWifHelp" class="form-text text-muted">Enter WIF key (private key) of an address.</small>
               </div>
-              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="submit" class="btn btn-primary">Login with WIF key</button>
               <div class="divider"></div>
               <h4>Don't have an account?</h4>
               <button class="btn btn-info" formaction="http://127.0.0.1:7771/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
