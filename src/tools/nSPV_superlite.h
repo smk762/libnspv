@@ -502,13 +502,17 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
 
 cJSON *NSPV_gettransaction2(btc_spv_client *client,bits256 txid,int32_t v,int32_t height)
 {
-    int32_t retval = 0, isKMD, skipvalidation = 0; int64_t extradata = 0; int64_t rewardsum = 0; 
+    int32_t retval = 0, isKMD, skipvalidation = 0; int64_t extradata = 0; int64_t rewardsum = 0; btc_tx* tx = NULL;
     cJSON *result = cJSON_CreateObject();
     isKMD = (strcmp(client->chainparams->name,"KMD") == 0);
-    if ( height < 1 )
-        height = NSPV_inforesult.height;
-    v = 0;
-    btc_tx* tx = NSPV_gettransaction(client,&retval,isKMD,skipvalidation,v,txid,height,extradata,NSPV_tiptime,&rewardsum);
+    if ( height == 0 )
+        height = NSPV_lastntz.height;
+    tx = NSPV_gettransaction(client,&retval,isKMD,skipvalidation,v,txid,height,extradata,NSPV_tiptime,&rewardsum);
+    if ( tx == NULL )
+    {
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","could not get tx.");
+    }
     cstring *txhex = btc_tx_to_cstr(tx);
     jaddstr(result, "hex", txhex->str);
     jaddnum(result, "retcode", (int64_t)retval);
