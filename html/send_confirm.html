@@ -7,23 +7,25 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="custom.css">
+    <link rel="stylesheet" href="font/rubik.css">
 
-    <title>nSPV SuperLite Client</title>
+    <title>Antara Superlite</title>
   </head>
   <body>
 
-    <h1 class="text-center">nSPV SuperLite Client</h1>
+    <h1 class="text-center"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</h1>
     <div class="container-fluid">
       <div class="row" style="margin-bottom: 1em;">
         <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
-            <div class="card"> <!-- coin info card start -->
+            <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body"> <!-- coin info body start -->
                 <span>Coin/Asset: KMD</span><br>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
         <div class="col-8" style="padding-left: 7.5px;">
-          <div class="card"> <!-- wallet buttons card start -->
+          <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
                 <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
@@ -38,7 +40,7 @@
 
       <div class="row" style="margin-bottom: 1em;">
         <div class="col-12" style="padding-right: 7.5px; margin-bottom: 10px;"> <!-- Send page div start -->
-            <div class="card"> <!-- Send page card start -->
+            <div class="card text-white bg-dark"> <!-- Send page card start -->
               <div class="card-header"> <!-- Send page header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
@@ -48,7 +50,7 @@
               </div> <!-- Send page header end -->
               <form action="http://127.0.0.1:7771/method/spend?hex=0400008085202f890155c894ada147bf184bb7dff790ca429e6860775d3bb471dc0f69a28f080977e0010000006a47304402206774ff903a8a4b73bcd5a79fe5c744f34d2263160cd8877c198c2228c66a8a42022063e1d2d6403c395e3472a6a509f01cbff0b90e3413bc6f7bc492649302a4a64001210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ffffffff0200e1f505000000001976a9144726f2838fc4d6ac66615e10604e18926e9b556e88ac48f804060000000023210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ace77e395d000000000000000000000000000000&nexturl=broadcast" method="get"> <!-- Send form start -->
                 <div class="card-body" style="padding: 0;"> <!-- Send page body start -->
-                  <table class="table table-striped">
+                  <table class="table table-striped table-dark">
                     <tbody>
                       <tr>
                         <th style="width: 220px;">Result</th>
@@ -100,7 +102,7 @@
                       <tr>
                         <th>hex</th>
                         <td>
-                          <pre class="text-break text-wrap">0400008085202f890155c894ada147bf184bb7dff790ca429e6860775d3bb471dc0f69a28f080977e0010000006a47304402206774ff903a8a4b73bcd5a79fe5c744f34d2263160cd8877c198c2228c66a8a42022063e1d2d6403c395e3472a6a509f01cbff0b90e3413bc6f7bc492649302a4a64001210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ffffffff0200e1f505000000001976a9144726f2838fc4d6ac66615e10604e18926e9b556e88ac48f804060000000023210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ace77e395d000000000000000000000000000000</pre>
+                          <pre class="text-break text-wrap text-white">0400008085202f890155c894ada147bf184bb7dff790ca429e6860775d3bb471dc0f69a28f080977e0010000006a47304402206774ff903a8a4b73bcd5a79fe5c744f34d2263160cd8877c198c2228c66a8a42022063e1d2d6403c395e3472a6a509f01cbff0b90e3413bc6f7bc492649302a4a64001210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ffffffff0200e1f505000000001976a9144726f2838fc4d6ac66615e10604e18926e9b556e88ac48f804060000000023210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ace77e395d000000000000000000000000000000</pre>
                           <small id="broadcastHexHelp" class="form-text text-muted">You can also just copy this hex string and broadcast through another computer if you wish.</small>
                         </td>
                       </tr>
@@ -117,12 +119,12 @@
 
       <div class="row">
         <div class="col-12" style="margin-bottom: 1em;">
-          <div class="card">
+          <div class="card text-white bg-dark">
             <div class="card-header">
               <h5>Other Advanced Details</h5>
             </div>
             <div class="card-body" style="padding: 0;">
-              <table class="table table-striped" style="margin-bottom: 0;">
+              <table class="table table-striped table-dark" style="margin-bottom: 0;">
                 <thead>
                   <th>nVersion</th>
                   <th>nLockTime</th>
@@ -143,12 +145,12 @@
         </div>
 
         <div class="col-6" style="margin-bottom: 1em; padding-right: 5px;">
-          <div class="card">
+          <div class="card text-white bg-dark">
             <div class="card-header">
               <h5>Tx - vin</h5>
             </div>
             <div class="card-body" style="padding: 0;">
-              <table class="table table-striped" style="margin-bottom: 0;">
+              <table class="table table-striped table-dark" style="margin-bottom: 0;">
                 <tbody>
                   <!-- vin array object 0 start -->
                   <tr>
@@ -180,12 +182,12 @@
         </div>
 
         <div class="col-6" style="margin-bottom: 1em; padding-left: 5px;">
-          <div class="card">
+          <div class="card text-white bg-dark">
             <div class="card-header">
               <h5>Tx - vout</h5>
             </div>
             <div class="card-body" style="padding: 0;">
-              <table class="table table-striped" style="margin-bottom: 0;">
+              <table class="table table-striped table-dark" style="margin-bottom: 0;">
                 <tbody>
                   <!-- vout array object 0 start -->
                   <tr>

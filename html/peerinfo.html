@@ -7,23 +7,25 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="custom.css">
+    <link rel="stylesheet" href="font/rubik.css">
 
-    <title>nSPV SuperLite Client</title>
+    <title>Antara Superlite</title>
   </head>
   <body>
 
-    <h1 class="text-center">nSPV SuperLite Client</h1>
+    <h1 class="text-center"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</h1>
     <div class="container-fluid">
       <div class="row" style="margin-bottom: 1em;">
         <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
-            <div class="card"> <!-- coin info card start -->
+            <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body"> <!-- coin info body start -->
                 <span>Coin/Asset: KMD</span><br>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
         <div class="col-8" style="padding-left: 7.5px;">
-          <div class="card"> <!-- wallet buttons card start -->
+          <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
                 <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
@@ -38,7 +40,7 @@
 
       <div class="row" style="margin-bottom: 1em;">
         <div class="col-12" style="padding-right: 7.5px; margin-bottom: 10px;"> <!-- GetPeerInfo div start -->
-            <div class="card"> <!-- GetPeerInfo card start -->
+            <div class="card text-white bg-dark"> <!-- GetPeerInfo card start -->
               <div class="card-header"> <!-- GetPeerInfo header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
@@ -46,13 +48,13 @@
                   </div>
                   <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                     <form> <!-- GetPeerInfo reresh button form start -->
-                      <button class="btn btn-outline-secondary btn-sm" formaction="http://127.0.0.1:7771/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Refresh</button>
+                      <button class="btn btn-outline-light btn-sm" formaction="http://127.0.0.1:7771/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Refresh</button>
                     </form> <!-- GetPeerInfo reresh button form end -->
                   </div>
                 </div>
               </div> <!-- GetPeerInfo header end -->
               <div class="card-body" style="padding: 0;"> <!-- GetPeerInfo body start -->
-                <table class="table table-striped" style="margin-bottom: 0;">
+                <table class="table table-striped table-dark" style="margin-bottom: 0;">
                   <thead>
                     <tr>
                       <th scope="col">nodeid</th>
