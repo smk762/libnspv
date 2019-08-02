@@ -622,7 +622,6 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     else
     {
         int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
-        fprintf(stderr,"parsing.(%s)\n,",&url[i]);
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             *jsonflagp = 1;
@@ -652,6 +651,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 else return(filestr);
             }
         }
+        fprintf(stderr,"cant find (%s)\n,",&url[i]);
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
