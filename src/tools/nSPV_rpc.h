@@ -619,7 +619,8 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     }
     else
     {
-        int32_t f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
+        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
+        fprintf(stderr,"parsing.(%s)\n,",&url[i]);
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             *jsonflagp = 1;
@@ -630,12 +631,12 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
             //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
             {
-                for (i=(int32_t)strlen(url)-1; i>0; i--)
-                    if ( url[i] == '.' || url[i] == '/' )
+                for (j=(int32_t)strlen(url)-1; j>0; j--)
+                    if ( url[j] == '.' || url[j] == '/' )
                         break;
-                if ( url[i] == '.' )
-                    strcpy(filetype,url+i+1);
-                //printf("return filetype.(%s) size.%ld\n",filetype,filesize);
+                if ( url[j] == '.' )
+                    strcpy(filetype,url+j+1);
+                printf("return filetype.(%s) size.%ld\n",filetype,filesize);
                 sprintf(fname,"html/%s",htmlfiles[f]+1);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                     return(clonestr("{\"error\":\"cant find htmlfile\"}"));
