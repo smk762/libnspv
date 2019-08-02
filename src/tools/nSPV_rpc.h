@@ -552,7 +552,9 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     return(n);
 }
 
-char *htmlfiles[] = { "/bootstrap.min.css", "/custom.css", "/wallet", "/login", "/favicon.ico", "/broadcast", "/info", "/receive", "/getnewaddress", "/index", "/peerinfo", "/send_confirm", "/send", "/txidinfo" };
+char *htmlfiles[] = { "/bootstrap.min.css", "/custom.css", "/favicon.ico", "/font/rubik.css", "/images/antara150x150.png", "/images/sub-header-logo-min.png" };
+
+char *methodfiles[] = { "/wallet", "/login", "/broadcast", "/info", "/receive", "/getnewaddress", "/index", "/peerinfo", "/send_confirm", "/send", "/txidinfo" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
