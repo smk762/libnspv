@@ -29,64 +29,66 @@
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
                 <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
-                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:7771/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
-                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:7771/method/login?nexturl=login" formmethod="get">Login</button>
+                <button class="btn btn-secondary btn-sm" formaction="http://127.0.0.1:7771/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
+                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:7771/method/send?nexturl=send" formmethod="get">Send</button>
+                <button class="btn btn-danger btn-sm" formaction="http://127.0.0.1:7771/method/logout?nexturl=login" formmethod="get">Logout</button>
               </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
           </div> <!-- wallet buttons card start -->
         </div>
       </div>
-      
+
       <div class="row" style="margin-bottom: 1em;">
-        <div class="col-12" style="padding-right: 7.5px;"> <!-- GetInfo div start -->
-            <div class="card text-white bg-dark"> <!-- GetInfo card start -->
-              <div class="card-header"> <!-- GetInfo header start -->
+        <div class="col-12" style="padding-right: 7.5px; margin-bottom: 10px;"> <!-- TxidInfo div start -->
+            <div class="card text-white bg-dark"> <!-- TxidInfo card start -->
+              <div class="card-header"> <!-- TxidInfo header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
-                    <h6 class="card-title" style="vertical-align: ">Broadcasted Transaction Info</h6>
+                    <h6 class="card-title" style="vertical-align: ">Transaction ID Info</h6>
                   </div>
                 </div>
-              </div> <!-- GetInfo header end -->
-              <div class="card-body" style="padding: 0;"> <!-- GetInfo body start -->
+              </div> <!-- TxidInfo header end -->
+              <div class="card-body" style="padding: 0;"> <!-- TxidInfo body start -->
                 <table class="table table-striped table-dark" style="margin-bottom: 0;">
-                  <!--<thead>
-                    <tr>
-                      <th scope="col">First</th>
-                      <th scope="col">Last</th>
-                    </tr>
-                  </thead> -->
                   <tbody>
                     <tr>
-                      <td scope="row">Result</td>
-                      <td>success</td>
+                      <td>Transaction ID</td>
+                      <td class="text-break text-wrap">e07709088fa2690fdc71b43b5d7760689e42ca90f7dfb74b18bf47a1ad94c855</td>
                     </tr>
                     <tr>
-                      <td scope="row">Expected</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
-                    </tr>
-                    <tr>
-                      <td scope="row">Broadcast</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
-                    </tr>
-                    <tr>
-                      <td scope="row">Returned Code</td>
+                      <td>vout</td>
                       <td>1</td>
                     </tr>
                     <tr>
-                      <td scope="row">Type</td>
-                      <td>broadcast and mempool</td>
+                      <td>Spent Height</td>
+                      <td>1458037</td>
                     </tr>
                     <tr>
-                      <td scope="row">Last Peer</td>
+                      <td>Spent Transaction ID</td>
+                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
+                    </tr>
+                    <tr>
+                      <td>Spent vini</td>
+                      <td>0</td>
+                    </tr>
+                    <tr>
+                      <td>Spent Transaction Length</td>
+                      <td>254</td>
+                    </tr>
+                    <tr>
+                      <td>Spent Transaction Proof Length</td>
+                      <td>1655</td>
+                    </tr>
+                    <tr>
+                      <td>Last Peer</td>
                       <td>nodeid.1</td>
                     </tr>
                   </tbody>
                 </table>
-              </div> <!-- GetInfo body end -->
-            </div> <!-- GetInfo card end -->
-        </div> <!-- GetInfo div end -->
+              </div> <!-- TxidInfo body end -->
+            </div> <!-- TxidInfo card end -->
+        </div> <!-- TxidInfo div end -->
       </div>
-
     </div>
   
   </body>
