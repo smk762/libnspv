@@ -554,7 +554,7 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
 
 char *htmlfiles[] = { "/bootstrap.min.css", "/custom.css", "/wallet", "/login", "/favicon.ico", "/broadcast", "/info", "/receive", "/getnewaddress", "/index", "/peerinfo", "/send_confirm", "/send", "/txidinfo" };
 
-cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
+cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr) 
 {
     int32_t i,n,totallen,datalen,len = 0; cJSON *json,*array; char key[8192],*data;
     json = cJSON_CreateObject();
