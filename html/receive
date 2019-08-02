@@ -38,22 +38,27 @@
       </div>
       
       <div class="row" style="margin-bottom: 1em;">
-        <div class="col-12" style="padding-right: 7.5px;"> <!-- Get New Address div start -->
-            <div class="card"> <!-- Get New Address card start -->
-              <div class="card-body"> <!-- Get New Address card body start -->
-                <div class="alert alert-danger" role="alert"><b>IMPORTANT NOTICE: </b>Please take backup of the "Private Key" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing WIF/Private key. You HAVE to use this address's Private key to login, view transactions and use it's funds.</div>
-                <dl class="row" style="margin-bottom: 0;">
-                  <dt class="col-sm-3">Here is your new address:</dt>
-                  <dd class="col-sm-9"><pre>RIUgfgXG2ceaB6C5hfJcN4fvmLH2C45knhB</pre></dd>
-                  
-                  <dt class="col-sm-3">Private Key (WIF Key) <span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
-                  <dd class="col-sm-9"><pre>Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre></dd>
-
-                  <dt class="col-sm-3" style="margin-bottom: 0;">Public Key</dt>
-                  <dd class="col-sm-9" style="margin-bottom: 0;"><pre style="margin-bottom: 0;">03xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre></dd>
-                </dl>
-              </div> <!-- Get New Address card body end -->
-              <div class="card-footer"> <!-- Get New Address header start -->
+        <div class="col-12" style="padding-right: 7.5px;"> <!-- Receving Address div start -->
+            <div class="card"> <!-- Receving Address card start -->
+              <div class="card-body" style="padding: 0;"> <!-- Receving Address card body start -->
+                <table class="table table-striped" style="margin-bottom: 0;">
+                  <thead>
+                    <tr>
+                      <th scope="col">Receiving Address</th>
+                      <th scope="col">Public Key</th>
+                      <th scope="col">Wif Expiry</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td scope="row" class="text-break text-wrap">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
+                      <td class="text-break text-wrap">03xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</td>
+                      <td>wif will expire in 777 seconds</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div> <!-- Receving Address card body end -->
+              <div class="card-footer"> <!-- Receving Address header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
                     <form>
@@ -61,9 +66,9 @@
                     </form>
                   </div>
                 </div>
-              </div> <!-- Get New Address header end -->
-            </div> <!-- Get New Address card end -->
-        </div> <!-- Get New Address div end -->
+              </div> <!-- Receving Address header end -->
+            </div> <!-- Receving Address card end -->
+        </div> <!-- Receving Address div end -->
       </div>
 
     </div>

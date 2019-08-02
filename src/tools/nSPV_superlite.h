@@ -371,7 +371,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     // if we have enough headers and they validate back to the last notarization update the tiptime/synced chain status
                     if ( check_headers() != 0 && validate_headers(NSPV_inforesult.blockhash) != 0 )
                     {
-                        fprintf(stderr, "[%i]: synced at height.%i \n",from->nodeid, NSPV_inforesult.height);
+                        //fprintf(stderr, "[%i]: synced at height.%i \n",from->nodeid, NSPV_inforesult.height);
                         NSPV_lastinfo = timestamp - chain->blocktime/4;
                         NSPV_tiptime = NSPV_inforesult.H.nTime;
                         from->synced = 1;

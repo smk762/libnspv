@@ -552,7 +552,9 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     return(n);
 }
 
-char *htmlfiles[] = { "/bootstrap.min.css", "/wallet.html", "/login.html", "/favicon.ico", "/broadcast.html", "/info.html", "/receive.html", "/getnewaddress.html" };
+char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/custom.css", "/favicon.ico", "/font/rubik.css", "/images/antara150x150.png", "/images/sub-header-logo-min.png" };
+
+char *methodfiles[] = { "/wallet", "/login", "/broadcast", "/info", "/receive", "/getnewaddress", "/index", "/peerinfo", "/send_confirm", "/send", "/txidinfo" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
@@ -613,13 +615,14 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     if ( strcmp(&url[i],"/") == 0 && strcmp(urlmethod,"GET") == 0 )
     {
         *jsonflagp = 1;
-        if ( (filestr= OS_filestr(&filesize,"html/index.html")) == 0 )
-            return(clonestr("{\"error\":\"cant find index.html\"}"));
+        if ( (filestr= OS_filestr(&filesize,"html/index")) == 0 )
+            return(clonestr("{\"error\":\"cant find index\"}"));
         else return(filestr);
     }
     else
     {
-        int32_t f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
+        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
+        fprintf(stderr,"parsing.(%s)\n,",&url[i]);
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             *jsonflagp = 1;
@@ -630,13 +633,20 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
             //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
             {
-                for (i=(int32_t)strlen(url)-1; i>0; i--)
-                    if ( url[i] == '.' || url[i] == '/' )
+                for (j=(int32_t)strlen(url)-1; j>0; j--)
+                    if ( url[j] == '.' || url[j] == '/' )
                         break;
-                if ( url[i] == '.' )
-                    strcpy(filetype,url+i+1);
-                //printf("return filetype.(%s) size.%ld\n",filetype,filesize);
-                sprintf(fname,"html/%s",htmlfiles[f]+1);
+                if ( url[j] == '.' )
+                {
+                    sprintf(fname,"html/%s",htmlfiles[f]+1);
+                    strcpy(filetype,url+j+1);
+                }
+                else
+                {
+                    strcpy(filetype,"html");
+                    sprintf(fname,"html/%s",htmlfiles[f]+1);
+                }
+                printf("return (%s) filetype.(%s)\n",fname,filetype);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                     return(clonestr("{\"error\":\"cant find htmlfile\"}"));
                 else return(filestr);
