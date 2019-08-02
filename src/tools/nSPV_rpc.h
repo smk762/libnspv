@@ -552,7 +552,7 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     return(n);
 }
 
-char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/custom.css", "/favicon.ico", "/font/rubik.css", "/images/antara150x150.png", "/images/sub-header-logo-min.png" };
+char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/custom.css", "/favicon.ico", "/font/rubik.css", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
 
 char *methodfiles[] = { "/wallet", "/login", "/broadcast", "/info", "/receive", "/getnewaddress", "/index", "/peerinfo", "/send_confirm", "/send", "/txidinfo" };
 
@@ -616,7 +616,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     {
         *jsonflagp = 1;
         if ( (filestr= OS_filestr(&filesize,"html/index")) == 0 )
-            return(clonestr("{\"error\":\"cant find index\"}"));
+            return(clonestr("{\"error\":\"cant find indexƒ\"}"));
         else return(filestr);
     }
     else
