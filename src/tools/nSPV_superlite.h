@@ -309,7 +309,7 @@ int32_t validate_notarization(bits256 notarization, uint32_t timestamp)
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
     struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
-    const btc_chainparams *chain = from->nodegroup->chainparams;
+    const btc_chainparams *chain = from->nodegroup->chainparams; int32_t lag;
     sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     if ( len > 0 )
     {
@@ -321,11 +321,38 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 NSPV_rwinforesp(0,&response[1],&NSPV_inforesult,len);
                 //fprintf(stderr,"got info version.%d response %u from.%d size.%d hdrheight.%d \n",NSPV_inforesult.version,timestamp,from->nodeid,len,NSPV_inforesult.hdrheight); // update current height and ntrz status
                 bits256 hdrhash = NSPV_hdrhash(&(NSPV_inforesult.H));
-                if ( NSPV_inforesult.height < I.height )
+                // update node version. 
+                from->version = NSPV_inforesult.version;
+                if  ( from->version < NSPV_PROTOCOL_VERSION )
                 {
-                    fprintf(stderr,"got old info response %u size.%d height.%d\n",timestamp,len,NSPV_inforesult.height);
+                    from->banscore += 11;
+                    fprintf(stderr,"[%i] is old version.%d < %d \n",NSPV_inforesult.height,from->version, NSPV_PROTOCOL_VERSION);
+                }
+                // insert block header into array 
+                if ( NSPV_inforesult.hdrheight >= NSPV_lastntz.height && havehdr(hdrhash) == -1 )
+                {
+                    // empty half the array to prevent trying to over fill it. 
+                    if ( NSPV_num_headers == 128 )
+                    {
+                        fprintf(stderr, "array of headers is full, emptying blocks before height.%i\n", I.height-64);
+                        reset_headers(I.height-64);
+                    }
+                    //fprintf(stderr, "added  block.%i\n",  NSPV_inforesult.hdrheight);
+                    NSPV_blockheaders[NSPV_num_headers].height = NSPV_inforesult.hdrheight;
+                    NSPV_blockheaders[NSPV_num_headers].blockhash = hdrhash;
+                    NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
+                    NSPV_num_headers++;
+                }
+                if ( (lag= I.height-NSPV_inforesult.height) > 0 )
+                {
+                    fprintf(stderr,"got old info response %u size.%d height.%d lag.%i\n",timestamp,len,NSPV_inforesult.height,lag);
                     NSPV_inforesp_purge(&NSPV_inforesult);
                     NSPV_inforesult = I;
+                    if ( lag > 2 )
+                    {
+                        from->banscore += lag;
+                        fprintf(stderr, "[%i] is not in sync lag.%i, banscore.%i\n",from->nodeid, lag, from->banscore);
+                    }
                 }
                 else
                 {
@@ -341,25 +368,10 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                         if ( counter > 5 ) 
                             counter = 0;
                     }
-                    // insert block header into array 
-                    if ( NSPV_inforesult.hdrheight >= NSPV_lastntz.height && havehdr(hdrhash) == -1 )
-                    {
-                        // empty half the array to prevent trying to over fill it. 
-                        if ( NSPV_num_headers == 128 )
-                        {
-                            fprintf(stderr, "array of headers is full, emptying blocks before height.%i\n", I.height-64);
-                            reset_headers(I.height-64);
-                        }
-                        //fprintf(stderr, "added  block.%i\n",  NSPV_inforesult.hdrheight);
-                        NSPV_blockheaders[NSPV_num_headers].height = NSPV_inforesult.hdrheight;
-                        NSPV_blockheaders[NSPV_num_headers].blockhash = hdrhash;
-                        NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
-                        NSPV_num_headers++;
-                    }
                     // if we have enough headers and they validate back to the last notarization update the tiptime/synced chain status
                     if ( check_headers() != 0 && validate_headers(NSPV_inforesult.blockhash) != 0 )
                     {
-                        //fprintf(stderr, "[%i]: synced at height.%i \n",from->nodeid, NSPV_inforesult.height);
+                        fprintf(stderr, "[%i]: synced at height.%i \n",from->nodeid, NSPV_inforesult.height);
                         NSPV_lastinfo = timestamp - chain->blocktime/4;
                         NSPV_tiptime = NSPV_inforesult.H.nTime;
                         from->synced = 1;
@@ -482,6 +494,7 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
             char ipaddr[64]; cJSON *node_json = cJSON_CreateObject();
             expand_ipbits(ipaddr, (uint64_t)((struct sockaddr_in*)&node->addr)->sin_addr.s_addr );
             jaddnum(node_json,"nodeid",(int64_t)node->nodeid);
+            jaddnum(node_json,"protocolversion",(uint32_t)node->version);
             jaddstr(node_json,"ipaddress",ipaddr);
             jaddnum(node_json,"port", (int64_t)node->nodegroup->chainparams->default_port);
             jaddnum(node_json,"lastping",(int64_t)node->lastping);
@@ -502,13 +515,17 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
 
 cJSON *NSPV_gettransaction2(btc_spv_client *client,bits256 txid,int32_t v,int32_t height)
 {
-    int32_t retval = 0, isKMD, skipvalidation = 0; int64_t extradata = 0; int64_t rewardsum = 0; 
+    int32_t retval = 0, isKMD, skipvalidation = 0; int64_t extradata = 0; int64_t rewardsum = 0; btc_tx* tx = NULL;
     cJSON *result = cJSON_CreateObject();
     isKMD = (strcmp(client->chainparams->name,"KMD") == 0);
-    if ( height < 1 )
-        height = NSPV_inforesult.height;
-    v = 0;
-    btc_tx* tx = NSPV_gettransaction(client,&retval,isKMD,skipvalidation,v,txid,height,extradata,NSPV_tiptime,&rewardsum);
+    if ( height == 0 )
+        height = NSPV_lastntz.height;
+    tx = NSPV_gettransaction(client,&retval,isKMD,skipvalidation,v,txid,height,extradata,NSPV_tiptime,&rewardsum);
+    if ( tx == NULL )
+    {
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","could not get tx.");
+    }
     cstring *txhex = btc_tx_to_cstr(tx);
     jaddstr(result, "hex", txhex->str);
     jaddnum(result, "retcode", (int64_t)retval);
