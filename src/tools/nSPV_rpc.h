@@ -642,7 +642,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 else
                 {
                     strcpy(filetype,"html");
-                    sprintf(fname,"html/%s.html",htmlfiles[f]+1);
+                    sprintf(fname,"html/%s",htmlfiles[f]+1);
                 }
                 printf("return (%s) filetype.(%s)\n",fname,filetype);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
