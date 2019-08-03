@@ -6,23 +6,35 @@
 import test_framework.nspvlib as tf
 import time
 
+real_addr = ""
+if not real_addr:
+    raise Exception("Add valid address l")
+addr_send = ""
+if not addr_send:
+    raise Exception("Add real address to send to l")
+wif_real = ""
+if not wif_real:
+    raise Exception("Add valid wif")
+
+url = "http://127.0.0.1:12986"
+userpass = "userpass"
+
 
 def main():
-    url = "http://127.0.0.1:7771"
-    userpass = "userpass"
 
     # help call
 
     # Response should contain "result": "success"
     # Response should contain actual help data
+    print("testing help call")
     rpc_call = tf.nspv_help(url, userpass)
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "methods")
-
     # getinfo call
 
     # Response should contain "result": "success"
     # Response should contain actual data
+    print("testing getinfo call")
     rpc_call = tf.nspv_getinfo(url, userpass)
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "notarization")
@@ -37,8 +49,11 @@ def main():
 
     # Response should be successful for case 2 and fail for others
     # Response should contain actual headers
-    prevheight = [False, 1457769]
-    nextheight = [False, 1457791]
+    print("testing hdrsproof call")
+    #prevheight = [False, 1457769]
+    #nextheight = [False, 1457791]
+    prevheight = [False, 2000]
+    nextheight = [False, 2100]
 
     # Case 1 - False data
     rpc_call = tf.nspv_hdrsproof(url, userpass, prevheight[0], nextheight[0])
@@ -50,12 +65,17 @@ def main():
     tf.assert_contains(rpc_call, "prevht")
     tf.assert_contains(rpc_call, "nextht")
     tf.assert_contains(rpc_call, "headers")
+    rep = tf.type_convert(rpc_call)
+    hdrs_resp = rep.get('numhdrs')
+    tf.assert_equal(hdrs_resp, 113)
 
     # notarization call
 
     # Response should be successful for case 2
     # Successful response should contain prev and next notarizations data
-    height = [False, 1457780]
+    print("testing notarization call")
+    # height = [False, 1457780]
+    height = [False, 2000]
 
     # Case 1 - False data
     rpc_call = tf.nspv_notarizations(url, userpass, height[0])
@@ -70,6 +90,7 @@ def main():
     # mempool call
 
     # Response should contain txids
+    print("testing mempool call")
     rpc_call = tf.nspv_mempool(url, userpass)
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "txids")
@@ -82,6 +103,7 @@ def main():
     # getnewaddress call
 
     # Get a new address, save it for latter calls
+    print("testing getnewaddr call")
     rpc_call = tf.nspv_getnewaddress(url, userpass)
     tf.assert_contains(rpc_call, "wifprefix")
     tf.assert_contains(rpc_call, "wif")
@@ -98,6 +120,7 @@ def main():
 
     # login with fresh credentials
     # Response should contain address, address should be equal to generated earlier one
+    print("testing log in call")
     rpc_call = tf.nspv_login(url, userpass, wif)
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "status")
@@ -108,10 +131,7 @@ def main():
         raise AssertionError("addr missmatch: ", addr, address)
 
     # listtransactions call
-    real_addr = ""
-    if not real_addr:
-        raise Exception("Add valid address l_111")
-
+    print("testing listtransactions call")
     time.sleep(1)
 
     # Successful response should [not] contain txids and same address ass requested
@@ -155,7 +175,7 @@ def main():
 
     # litunspent call
     # Successful response should [not] contain utxos and same address as requested
-
+    print("testing listunspent call")
     # Case 1 - False data, user is logged in - should pas, print no utxos for fresh address
     rpc_call = tf.nspv_listunspent(url, userpass, False, False, False)
     tf.assert_success(rpc_call)
@@ -197,10 +217,8 @@ def main():
     # spend call
 
     # Successful response should contain tx and transaction hex
-    addr_send = ""
-    if not addr_send:
-        raise Exception("Add real address to send to l_201")
-    amount = [False, 0.001]
+    print("testing spend call")
+    amount = [False, 0.0001]
     address = [False, addr_send]
 
     # Case 1 - false data
@@ -214,11 +232,8 @@ def main():
     tf.assert_error(rpc_call)
 
     # Case 3 - login with wif, create a valid transaction
-    wif = ""
-    if not wif:
-        raise Exception("Add valid wif l_213")
-    rpc_call = tf.nspv_logout(url, userpass)
-    rpc_call = tf.nspv_login(url, userpass, wif)
+    tf.nspv_logout(url, userpass)
+    tf.nspv_login(url, userpass, wif_real)
     rpc_call = tf.nspv_spend(url, userpass, address[1], amount[1])
     tf.assert_success(rpc_call)
     tf.assert_contains(rpc_call, "tx")
@@ -229,7 +244,7 @@ def main():
     hex_res = rep.get("hex")
 
     # broadcast call
-
+    print("testing broadcast call")
     # Successful broadcasst should have equal hex broadcasted and expected
     hex = [False, "norealhexhere", hex_res]
     retcode_failed = [-1, -2, -3]
@@ -256,8 +271,10 @@ def main():
     time.sleep(1)
 
     # spentinfo call
+    print("testing spentinfo call")
     # Successful response sould contain same txid and same vout
-    r_txids = [False, "224c0b2bd80983f44a638d6ae14aab39acc898771ebe5101dd567b13cd5fff78"]
+    #r_txids = [False, "224c0b2bd80983f44a638d6ae14aab39acc898771ebe5101dd567b13cd5fff78"]
+    r_txids = [False, "67ffe0eaecd6081de04675c492a59090b573ee78955c4e8a85b8ac0be0e8e418"]
     r_vouts = [False, 1]
 
     # Case 1 - False data
@@ -274,6 +291,8 @@ def main():
     vout_resp = rep.get("vout")
     if r_vouts[1] != vout_resp:
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
+
+    print("all tests passed")
 
 
 if __name__ == "__main__":
