@@ -11,7 +11,7 @@ from util import assert_equal
 
 class NspvRpcCalls:
 
-    def __init___(self, node_ip="", user_pass=""):
+    def __init__(self, node_ip="", user_pass=""):
         self.node_ip = node_ip
         self.user_pass = user_pass
 
