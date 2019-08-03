@@ -3,21 +3,50 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-import test_framework.nspvlib as tf
+from test_framework.nspvlib import NspvRpcCalls as tf
 import time
+import pytest
 
-real_addr = ""
-if not real_addr:
-    raise Exception("Add valid address l")
-addr_send = ""
-if not addr_send:
-    raise Exception("Add real address to send to l")
-wif_real = ""
-if not wif_real:
-    raise Exception("Add valid wif")
 
-url = "http://127.0.0.1:12986"
-userpass = "userpass"
+def setup_module():
+    real_addr = "RUp3xudmdTtxvaRnt3oq78FJBjotXy55uu"
+    addr_send = "RNvAWip4DuFrZf8WhqdTBEcAg1bWjd4rKr"
+    wif_real = "UsJgUBrmcsthJEGbyBBfD77tZ1FuRMkB68jqkP8E3PEE88eXesEH"
+
+    if not real_addr or not addr_send or not wif_real:
+        raise Exception("Please fill test parameters: ", real_addr, addr_send, wif_real)
+
+    url = "http://127.0.0.1:12986"
+    userpass = "userpass"
+    coin = "ILN"
+
+    chain_params = {"KMD": {
+                            'tx_list_address': 'RGShWG446Pv24CKzzxjA23obrzYwNbs1kA',
+                            'min_chain_height': 1468080,
+                            'notarization_height': '1468000',
+                            'prev_notarization_h': 1467980,
+                            'next_notarization_h': 1468020,
+                            'hdrs_proof_low': '1468100',
+                            'hdrs_proof_high': '1468200',
+                            'numhdrs_expected': 151,
+                            'tx_proof_id': 'f7beb36a65bc5bcbc9c8f398345aab7948160493955eb4a1f05da08c4ac3784f',
+                            'tx_spent_height': 1456212,
+                            'tx_proof_height': '1468520',
+                           },
+                    "ILN": {
+                            'tx_list_address': 'RUp3xudmdTtxvaRnt3oq78FJBjotXy55uu',
+                            'min_chain_height': 3689,
+                            'notarization_height': '2000',
+                            'prev_notarization_h': 1998,
+                            'next_notarization_h': 2008,
+                            'hdrs_proof_low': '2000',
+                            'hdrs_proof_high': '2100',
+                            'numhdrs_expected': 113,
+                            'tx_proof_id': '67ffe0eaecd6081de04675c492a59090b573ee78955c4e8a85b8ac0be0e8e418',
+                            'tx_spent_height': 2681,
+                            'tx_proof_height': '2690',
+                           }
+                    }
 
 
 def main():
