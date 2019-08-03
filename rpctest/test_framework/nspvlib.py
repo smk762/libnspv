@@ -21,7 +21,7 @@ class NspvRpcCalls:
 
     def assert_success(self, result):
         result_d = self.type_convert(result)
-        assert_equal(result_d.get('result'), 'success')
+        self.assert_equal(result_d.get('result'), 'success')
 
     def assert_in(self, result, key, compare_list):
         result_d = self.type_convert(result)
