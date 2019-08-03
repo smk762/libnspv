@@ -6,7 +6,6 @@ import time
 import os.path
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__)))
-from util import assert_equal
 
 
 class NspvRpcCalls:
@@ -14,6 +13,11 @@ class NspvRpcCalls:
     def __init__(self, node_ip="", user_pass=""):
         self.node_ip = node_ip
         self.user_pass = user_pass
+
+    @ staticmethod
+    def assert_equal(first, second):
+        if first != second:
+            raise AssertionError(first, "not equal to", second)
 
     def assert_success(self, result):
         result_d = self.type_convert(result)
