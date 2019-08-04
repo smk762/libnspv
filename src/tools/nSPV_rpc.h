@@ -656,7 +656,6 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
         }
         if ( strncmp("/method/",cmpstr,8) == 0 )
         {
-            fprintf(stderr,"search methods (%s)\n,",cmpstr+8);
             for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
                 if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
@@ -666,7 +665,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     sprintf(fname,"html/%s",methodfiles[f]);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
-                    fprintf(stderr,"[%s] filestr.%p\n",methodfiles[f],filestr);
+                    return(filestr);
                     break;
                 }
             }
