@@ -1186,9 +1186,9 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // 
     if ( (retjson= _NSPV_JSON(argjson)) != 0 )
         retstr = jprint(retjson,0);
     else retstr = clonestr("{\"error\":\"unparseable retjson\"}");
-    fprintf(stderr,"NSPV filestr.%p\n",filestr);
     if ( filestr != 0 )
     {
+        fprintf(stderr,"NSPV filestr.%s\n",filestr);
         // extract data from retjson and put into filestr template
         return(filestr);
     }
