@@ -612,6 +612,11 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     filetype[0] = 0;
     //printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
     snprintf(furl,sizeof(furl),"%s",url+1);
+    if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
+    {
+        *jsonflagp = 1;
+        i += strlen("/api");
+    } else *jsonflagp = 0;
     if ( strcmp(&url[i],"/") == 0 && strcmp(urlmethod,"GET") == 0 )
     {
         *jsonflagp = 1;
@@ -621,7 +626,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     }
     else
     {
-        int32_t j,f,matches,realfile=0; char fname[512],cmpstr[8192],cmpstr2[8192];
+        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
         strcpy(cmpstr,&url[i]);
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
@@ -639,19 +644,11 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 {
                     sprintf(fname,"html/%s",htmlfiles[f]+1);
                     strcpy(filetype,url+j+1);
-                    realfile = 1;
+                    printf("set (%s) filetype.(%s)\n",fname,filetype);
+                    if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                        return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                    else return(filestr);
                 }
-                else
-                {
-                    strcpy(filetype,"html");
-                    sprintf(fname,"html/%s",htmlfiles[f]+1);
-                }
-                printf("set (%s) filetype.(%s)\n",fname,filetype);
-                if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
-                    return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                else if ( realfile != 0 )
-                    return(filestr);
-                else break;
             }
         }
         if ( strncmp("/method/",cmpstr,8) == 0 )
@@ -665,8 +662,34 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     sprintf(fname,"html/%s",methodfiles[f]);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
-                    return(filestr);
                     break;
+                }
+            }
+            if ( filestr == 0 )
+            {
+                sprintf(cmpstr,"/method%s",&url[i]);
+                if ( cmpstr[strlen(cmpstr)-1] == '?' )
+                    cmpstr[strlen(cmpstr)-1] = 0;
+                sprintf(cmpstr2,":%u%s",port,cmpstr);
+                for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
+                {
+                    //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
+                    if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
+                    {
+                        *jsonflagp = 1;
+                        for (j=(int32_t)strlen(url)-1; j>0; j--)
+                            if ( url[j] == '.' || url[j] == '/' )
+                                break;
+                        if ( url[j] == '.' )
+                        {
+                            sprintf(fname,"html/%s",htmlfiles[f]+1);
+                            strcpy(filetype,url+j+1);
+                            printf("set2 (%s) filetype.(%s)\n",fname,filetype);
+                            if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                                return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                            else return(filestr);
+                        }
+                    }
                 }
             }
         }
@@ -682,11 +705,6 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
      //printf("return filetype.(%s) size.%ld\n",filetype,filesize);
      return(filestr);
      }*/
-    if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
-    {
-        *jsonflagp = 1;
-        i += strlen("/api");
-    } else *jsonflagp = 0;
     if ( strcmp(url,"/favicon.ico") == 0 )
     {
         *jsonflagp = 1;
