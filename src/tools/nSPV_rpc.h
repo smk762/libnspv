@@ -667,14 +667,10 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
             }
             if ( filestr == 0 )
             {
-                sprintf(cmpstr,"/method%s",&url[i]);
-                if ( cmpstr[strlen(cmpstr)-1] == '?' )
-                    cmpstr[strlen(cmpstr)-1] = 0;
-                sprintf(cmpstr2,":%u%s",port,cmpstr);
                 for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
                 {
-                    fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
-                    if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
+                    //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
+                    if ( strcmp(cmpstr+7,htmlfiles[f]) == 0 || strcmp(cmpstr2+7,htmlfiles[f]) == 0 )
                     {
                         *jsonflagp = 1;
                         for (j=(int32_t)strlen(url)-1; j>0; j--)
