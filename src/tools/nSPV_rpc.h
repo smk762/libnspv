@@ -662,6 +662,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
                 {
                     *jsonflagp = 1;
+                    strcpy(filetype,"html");
                     sprintf(fname,"html/%s",methodfiles[f]);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
@@ -871,7 +872,6 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
         free_json(json);
         if ( tmpjson != 0 )
             free(tmpjson);
-        fprintf(stderr,"retstr.%p\n",retstr);
         return(retstr);
     }
     free_json(argjson);
