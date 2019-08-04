@@ -621,7 +621,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     }
     else
     {
-        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
+        int32_t j,f,matches,realfile=0; char fname[512],cmpstr[8192],cmpstr2[8192];
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             *jsonflagp = 1;
@@ -639,6 +639,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 {
                     sprintf(fname,"html/%s",htmlfiles[f]+1);
                     strcpy(filetype,url+j+1);
+                    realfile = 1;
                 }
                 else
                 {
@@ -648,7 +649,9 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 printf("set (%s) filetype.(%s)\n",fname,filetype);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                     return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                else break; //return(filestr);
+                else if ( realfile != 0 )
+                    return(filestr);
+                else break;
             }
         }
         //fprintf(stderr,"cant find (%s)\n,",&url[i]);
@@ -817,7 +820,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     //printf("after urlconv.(%s) argjson.(%s)\n",jprint(json,0),jprint(argjson,0));
                     if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(argjson) > 0 )
                     {
-                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port)) != 0 )
+                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port,filestr)) != 0 )
                         {
                             if ( (retitem= cJSON_Parse(retstr)) != 0 )
                                 jaddi(retarray,retitem);
@@ -844,7 +847,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
                 {
                     portable_mutex_lock(&NSPV_commandmutex);
-                    retstr = NSPV_JSON(arg,remoteaddr,port);
+                    retstr = NSPV_JSON(arg,remoteaddr,port,filestr);
                     portable_mutex_unlock(&NSPV_commandmutex);
                 } else retstr = clonestr("{\"error\":\"invalid remote method\"}");
             }

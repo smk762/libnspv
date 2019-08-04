@@ -1178,14 +1178,21 @@ fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
-char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port) // from rpc port
+char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // from rpc port
 {
-    char *retstr; cJSON *retjson;
+    char *retstr; cJSON *retjson = 0;
     if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
         fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
     if ( (retjson= _NSPV_JSON(argjson)) != 0 )
-        retstr = jprint(retjson,1);
+        retstr = jprint(retjson,0);
     else retstr = clonestr("{\"error\":\"unparseable retjson\"}");
+    if ( filestr != 0 )
+    {
+        // extract data from retjson and put into filestr template
+        return(filestr);
+    }
+    if ( retjson != 0 )
+        free_json(retjson);
     return(retstr);
 }
 
