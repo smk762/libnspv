@@ -1181,17 +1181,17 @@ fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
 char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // from rpc port
 {
     char *retstr; cJSON *retjson = 0;
-    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
-        fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
-    if ( (retjson= _NSPV_JSON(argjson)) != 0 )
-        retstr = jprint(retjson,0);
-    else retstr = clonestr("{\"error\":\"unparseable retjson\"}");
     if ( filestr != 0 )
     {
         //fprintf(stderr,"NSPV filestr.%s\n",filestr);
         // extract data from retjson and put into filestr template
         return(filestr);
     }
+    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
+        fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
+    if ( (retjson= _NSPV_JSON(argjson)) != 0 )
+        retstr = jprint(retjson,0);
+    else retstr = clonestr("{\"error\":\"unparseable retjson\"}");
     if ( retjson != 0 )
         free_json(retjson);
     return(retstr);
