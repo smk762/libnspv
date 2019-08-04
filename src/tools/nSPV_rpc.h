@@ -871,6 +871,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
         free_json(json);
         if ( tmpjson != 0 )
             free(tmpjson);
+        fprintf(stderr,"retstr.%p\n",retstr);
         return(retstr);
     }
     free_json(argjson);
