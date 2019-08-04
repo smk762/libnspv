@@ -596,7 +596,7 @@ cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 
 char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
 {
-    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr,*token = 0; int32_t i,j,n,num=0; uint32_t queueid;
+    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr=0,*token = 0; int32_t i,j,n,num=0; uint32_t queueid;
     for (i=0; i<(int32_t)sizeof(urlmethod)-1&&urlstr[i]!=0&&urlstr[i]!=' '; i++)
         urlmethod[i] = urlstr[i];
     urlmethod[i++] = 0;
@@ -645,13 +645,13 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     strcpy(filetype,"html");
                     sprintf(fname,"html/%s",htmlfiles[f]+1);
                 }
-                printf("return (%s) filetype.(%s)\n",fname,filetype);
+                printf("set (%s) filetype.(%s)\n",fname,filetype);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                     return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                else return(filestr);
+                else break; //return(filestr);
             }
         }
-        fprintf(stderr,"cant find (%s)\n,",&url[i]);
+        //fprintf(stderr,"cant find (%s)\n,",&url[i]);
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
