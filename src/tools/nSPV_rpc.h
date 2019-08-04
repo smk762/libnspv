@@ -654,7 +654,17 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 else break;
             }
         }
-        //fprintf(stderr,"cant find (%s)\n,",&url[i]);
+        fprintf(stderr,"search methods (%s)\n,",&url[i]);
+        for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
+        {
+            if ( strcmp(cmpstr,methodfiles[f]) == 0 || strcmp(cmpstr2,methodfiles[f]) == 0 )
+            {
+                *jsonflagp = 1;
+                if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                else break;
+            }
+        }
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
