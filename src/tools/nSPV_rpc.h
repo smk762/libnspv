@@ -659,7 +659,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
             fprintf(stderr,"search methods (%s)\n,",&url[i]);
             for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
-                if ( strcmp(cmpstr+8,methodfiles[f]) == 0 || strcmp(cmpstr2+8,methodfiles[f]) == 0 )
+                if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
                 {
                     *jsonflagp = 1;
                     sprintf(fname,"html/%s",methodfiles[f]);
