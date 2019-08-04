@@ -614,7 +614,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     snprintf(furl,sizeof(furl),"%s",url+1);
     if ( strcmp(&url[i],"/") == 0 && strcmp(urlmethod,"GET") == 0 )
     {
-        //*jsonflagp = 1;
+        *jsonflagp = 1;
         if ( (filestr= OS_filestr(&filesize,"html/index")) == 0 )
             return(clonestr("{\"error\":\"cant find indexƒ\"}"));
         else return(filestr);
