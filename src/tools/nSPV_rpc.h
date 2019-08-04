@@ -554,7 +554,7 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
 
 char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/custom.css", "/favicon.ico", "/font/rubik.css", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
 
-char *methodfiles[] = { "wallet", "login", "broadcast", "info", "receive", "getnewaddress", "index", "peerinfo", "send_confirm", "send", "txidinfo" };
+char *methodfiles[] = { "wallet", "login", "broadcast", "getinfo", "receive", "getnewaddress", "index", "peerinfo", "send_confirm", "send", "txidinfo" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
@@ -644,7 +644,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 {
                     sprintf(fname,"html/%s",htmlfiles[f]+1);
                     strcpy(filetype,url+j+1);
-                    printf("set (%s) filetype.(%s)\n",fname,filetype);
+                    //printf("set (%s) filetype.(%s)\n",fname,filetype);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find htmlfile\"}"));
                     else return(filestr);
@@ -680,7 +680,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                         {
                             sprintf(fname,"html/%s",htmlfiles[f]+1);
                             strcpy(filetype,url+j+1);
-                            printf("set2 (%s) filetype.(%s)\n",fname,filetype);
+                            //printf("set2 (%s) filetype.(%s)\n",fname,filetype);
                             if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                                 return(clonestr("{\"error\":\"cant find htmlfile\"}"));
                             else return(filestr);
