@@ -554,7 +554,7 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
 
 char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/custom.css", "/favicon.ico", "/font/rubik.css", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
 
-char *methodfiles[] = { "/wallet", "/login", "/broadcast", "/info", "/receive", "/getnewaddress", "/index", "/peerinfo", "/send_confirm", "/send", "/txidinfo" };
+char *methodfiles[] = { "wallet", "login", "broadcast", "info", "receive", "getnewaddress", "index", "peerinfo", "send_confirm", "send", "txidinfo" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
@@ -654,15 +654,19 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                 else break;
             }
         }
-        fprintf(stderr,"search methods (%s)\n,",&url[i]);
-        for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
+        if ( strncmp("/method/",cmpstr,8) == 0 )
         {
-            if ( strcmp(cmpstr,methodfiles[f]) == 0 || strcmp(cmpstr2,methodfiles[f]) == 0 )
+            fprintf(stderr,"search methods (%s)\n,",&url[i]);
+            for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
-                *jsonflagp = 1;
-                if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
-                    return(clonestr("{\"error\":\"cant find methodfile\"}"));
-                else break;
+                if ( strcmp(cmpstr+8,methodfiles[f]) == 0 || strcmp(cmpstr2+8,methodfiles[f]) == 0 )
+                {
+                    *jsonflagp = 1;
+                    sprintf(fname,"html/%s",methodfiles[f]);
+                    if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                        return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                    else break;
+                }
             }
         }
     }
