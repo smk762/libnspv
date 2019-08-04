@@ -29,10 +29,10 @@
           <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
-                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
-                <button class="btn btn-secondary btn-sm" formaction="http://127.0.0.1:7771/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
-                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:7771/method/send?nexturl=send" formmethod="get">Send</button>
-                <button class="btn btn-danger btn-sm" formaction="http://127.0.0.1:7771/method/logout?nexturl=login" formmethod="get">Logout</button>
+                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:12986/method/getinfo?nexturl=info" formmethod="get">Info</button>
+                <button class="btn btn-secondary btn-sm" formaction="http://127.0.0.1:12986/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
+                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:12986/method/send?nexturl=send" formmethod="get">Send</button>
+                <button class="btn btn-danger btn-sm" formaction="http://127.0.0.1:12986/method/logout?nexturl=login" formmethod="get">Logout</button>
               </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
           </div> <!-- wallet buttons card start -->
@@ -50,7 +50,7 @@
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- tx history reresh button form start -->
                     Your Address: <span class="badge badge-secondary" style="margin-right: 15px;">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</span>
-                    <button class="btn btn-outline-light btn-sm" formaction="http://127.0.0.1:7771/method/wallet?nexturl=wallet" formmethod="get">Refresh</button>
+                    <button class="btn btn-outline-light btn-sm" formaction="http://127.0.0.1:12986/method/wallet?nexturl=wallet" formmethod="get">Refresh</button>
                   </form> <!-- tx history reresh button form end -->
                 </div>
               </div>
@@ -81,7 +81,7 @@
                       <td>23.43508747</td>
                       <td>24 Jul 2019 07:00</td>
                       <td class="text-break text-wrap">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
-                      <td><button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
+                      <td><button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:12986/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row">
@@ -97,7 +97,7 @@
                       <td>
                         <span class="badge badge-dark">Address not listed by wallet</span>
                       </td>
-                      <td><button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
+                      <td><button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:12986/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row">
@@ -111,7 +111,7 @@
                       <td>387.86723540</td>
                       <td>21 Jul 2019 20:24</td>
                       <td class="text-break text-wrap">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
-                      <td><button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
+                      <td><button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:12986/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -121,11 +121,11 @@
               <form>
                 <div class="row">
                   <div class="col-md-4 col-sm-4 col-xs-4">
-                    <button class="btn btn-outline-light" formaction="http://127.0.0.1:7771/method/wallet?tx_list_page=1&nexturl=wallet" formmethod="get">Previous Page</button>
+                    <button class="btn btn-outline-light" formaction="http://127.0.0.1:12986/method/wallet?tx_list_page=1&nexturl=wallet" formmethod="get">Previous Page</button>
                   </div>
                   <div class="col-md-4 col-sm-4 col-xs-4 text-center">Page 1 of 1</div>
                   <div class="col-md-4 col-sm-4 col-xs-4 text-right">
-                    <button class="btn btn-outline-light" formaction="http://127.0.0.1:7771/method/wallet?tx_list_page=2&nexturl=wallet" formmethod="get">Next Page</button>
+                    <button class="btn btn-outline-light" formaction="http://127.0.0.1:12986/method/wallet?tx_list_page=2&nexturl=wallet" formmethod="get">Next Page</button>
                   </div>
                 </div>
               </form>

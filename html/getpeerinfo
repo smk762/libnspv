@@ -28,10 +28,10 @@
           <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
-                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
-                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:7771/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
-                <button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:7771/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
-                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:7771/method/login?nexturl=login" formmethod="get">Login</button>
+                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:12986/method/getinfo?nexturl=info" formmethod="get">Info</button>
+                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:12986/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
+                <button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:12986/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
+                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:12986/method/login?nexturl=login" formmethod="get">Login</button>
               </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
           </div> <!-- wallet buttons card start -->
@@ -48,7 +48,7 @@
                   </div>
                   <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                     <form> <!-- GetPeerInfo reresh button form start -->
-                      <button class="btn btn-outline-light btn-sm" formaction="http://127.0.0.1:7771/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Refresh</button>
+                      <button class="btn btn-outline-light btn-sm" formaction="http://127.0.0.1:12986/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Refresh</button>
                     </form> <!-- GetPeerInfo reresh button form end -->
                   </div>
                 </div>

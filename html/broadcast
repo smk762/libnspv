@@ -28,9 +28,9 @@
           <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
-                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
-                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:7771/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
-                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:7771/method/login?nexturl=login" formmethod="get">Login</button>
+                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:12986/method/getinfo?nexturl=info" formmethod="get">Info</button>
+                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:12986/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
+                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:12986/method/login?nexturl=login" formmethod="get">Login</button>
               </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
           </div> <!-- wallet buttons card start -->
@@ -62,11 +62,11 @@
                     </tr>
                     <tr>
                       <td scope="row">Expected</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
+                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Broadcast</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
+                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Returned Code</td>

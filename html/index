@@ -20,7 +20,7 @@
       <div class="row justify-content-md-center">
         <div class="col-md-auto">
             <!-- login form start -->
-            <form action="http://127.0.0.1:7771/method/login" method="get">
+            <form action="http://127.0.0.1:12986/method/login" method="get">
               <div class="form-group">
                 <h4>To continue, log in to your account.</h4>
                 Select a .jpg image file: <input type="file" name="jpg_image" accept=".jpg">
@@ -29,7 +29,7 @@
               </div>
               <button type="submit" class="btn btn-primary">Login with image + password</button>
             </form>
-            <form action="http://127.0.0.1:7771/method/login" method="get">
+            <form action="http://127.0.0.1:12986/method/login" method="get">
               <div class="divider">
                 <strong class="divider-title">or</strong>
               </div>
@@ -40,7 +40,7 @@
               <button type="submit" class="btn btn-primary">Login with WIF key</button>
               <div class="divider"></div>
               <h4>Don't have an account?</h4>
-              <button class="btn btn-info" formaction="http://127.0.0.1:7771/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
+              <button class="btn btn-info" formaction="http://127.0.0.1:12986/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
             </form>
             <!-- login form end -->
         </div>
