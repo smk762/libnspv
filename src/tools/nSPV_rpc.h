@@ -594,7 +594,7 @@ cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
     return(json);
 }
 
-char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
+char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
 {
     cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr=0,*token = 0; int32_t i,j,n,num=0; uint32_t queueid;
     for (i=0; i<(int32_t)sizeof(urlmethod)-1&&urlstr[i]!=0&&urlstr[i]!=' '; i++)
@@ -647,7 +647,9 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     //printf("set (%s) filetype.(%s)\n",fname,filetype);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                    else return(filestr);
+                    if ( strcmp(filetype,"html") != 0 )
+                        *contentlenp = (int32_t)filesize;
+                    return(filestr);
                 }
             }
         }
@@ -683,7 +685,9 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                             //printf("set2 (%s) filetype.(%s)\n",fname,filetype);
                             if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                                 return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                            else return(filestr);
+                            if ( strcmp(filetype,"html") != 0 )
+                                *contentlenp = (int32_t)filesize;
+                            return(filestr);
                         }
                     }
                 }
@@ -920,7 +924,7 @@ int32_t iguana_getheadersize(char *buf,int32_t recvlen)
 void *LP_rpc_processreq(void *_ptr)
 {
     char filetype[128],content_type[128];
-    int32_t recvlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
+    int32_t recvlen,contentlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
     char helpname[512],remoteaddr[64],*buf,*retstr,space[8192],space2[32786],*jsonbuf; struct rpcrequest_info *req = _ptr;
     uint32_t ipbits,i,size = NSPV_MAXPACKETSIZE + 512;
     ipbits = req->ipbits;;
@@ -994,8 +998,8 @@ void *LP_rpc_processreq(void *_ptr)
     content_type[0] = 0;
     if ( recvlen > 0 )
     {
-        jsonflag = postflag = 0;
-        retstr = NSPV_rpcparse(space,size,&jsonflag,&postflag,jsonbuf,remoteaddr,filetype,req->port);
+        contentlen = jsonflag = postflag = 0;
+        retstr = NSPV_rpcparse(&contentlen,space,size,&jsonflag,&postflag,jsonbuf,remoteaddr,filetype,req->port);
         if ( filetype[0] != 0 )
         {
             static cJSON *mimejson; char *tmp,*typestr=0; long tmpsize;
@@ -1026,7 +1030,9 @@ void *LP_rpc_processreq(void *_ptr)
                 response = malloc(strlen(retstr)+1024+1+1);
                 //printf("alloc response.%p\n",response);
             }
-            sprintf(hdrs,"HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",content_type,(int32_t)strlen(retstr)+1);
+            if ( contentlen == 0 )
+                contentlen = (int32_t)strlen(retstr)+1;
+            sprintf(hdrs,"HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",content_type,contentlen);
             response[0] = '\0';
             strcat(response,hdrs);
             strcat(response,retstr);
