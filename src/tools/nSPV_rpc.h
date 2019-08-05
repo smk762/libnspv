@@ -1020,7 +1020,7 @@ void *LP_rpc_processreq(void *_ptr)
     }
     if ( retstr != 0 )
     {
-        char *response,*acceptstr="",hdrs[1024];
+        char *response,*acceptstr="",hdrs[1024]; int32_t crflag = 1;
         //printf("RETURN.(%s) jsonflag.%d postflag.%d\n",retstr,jsonflag,postflag);
         if ( jsonflag != 0 || postflag != 0 )
         {
@@ -1032,19 +1032,18 @@ void *LP_rpc_processreq(void *_ptr)
                 //printf("alloc response.%p\n",response);
             }
             if ( retlen == 0 )
-            {
                 retlen = (int32_t)strlen(retstr)+1;
-                sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
-            }
             else
             {
                 acceptstr = "Accept-Ranges: bytes\r\n";
-                sprintf(hdrs,"HTTP/1.1 200 OK\r\n%s%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
+                crflag = 0;
             }
+            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
             response[0] = '\0';
             strcat(response,hdrs);
-            strcat(response,retstr);
-            strcat(response,"\n");
+            memcpy(&response[strlen(response)],retstr,retlen);
+            if ( crflag != 0 )
+                strcat(response,"\n");
             if ( retstr != space )
             {
                 //printf("free retstr0.%p\n",retstr);
@@ -1053,7 +1052,7 @@ void *LP_rpc_processreq(void *_ptr)
             retstr = response;
             //printf("RET.(%s)\n",retstr);
         }
-        remains = (int32_t)strlen(retstr);
+        remains = (int32_t)strlen(hdrs) + retlen;
         i = 0;
         while ( remains > 0 )
         {
