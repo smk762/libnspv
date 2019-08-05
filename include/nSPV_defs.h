@@ -17,6 +17,7 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
+#define NSPV_PROTOCOL_VERSION 0x00000002
 #define NSPV_MAXPACKETSIZE (4096 * 1024)
 #define NSPV_MAXSCRIPTSIZE 10000
 #define MAX_TX_SIZE_BEFORE_SAPLING 100000
@@ -26,7 +27,9 @@
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
 
 #include <time.h>
+#ifndef __MINGW
 #include <pthread.h>
+#endif
 #include <btc/netspv.h>
 
 union _bits256 { uint8_t bytes[32]; uint16_t ushorts[16]; uint32_t uints[8]; uint64_t ulongs[4]; uint64_t txid; };
@@ -56,8 +59,8 @@ struct rpcrequest_info
 #define NODE_ADDRINDEX (1 << 29)
 #define NODE_SPENTINDEX (1 << 28)
 
-#define NSPV_POLLITERS 100
-#define NSPV_POLLMICROS 30000
+#define NSPV_POLLITERS 200
+#define NSPV_POLLMICROS 50000
 #define NSPV_MAXVINS 64
 #define NSPV_AUTOLOGOUT 777
 #define NSPV_BRANCHID 0x76b809bb
@@ -146,6 +149,7 @@ struct NSPV_ntz
 {
     bits256 blockhash,txid,othertxid;
     int32_t height,txidheight;
+    uint32_t timestamp;
 };
 
 struct NSPV_ntzsresp
@@ -160,6 +164,7 @@ struct NSPV_inforesp
     bits256 blockhash;
     int32_t height,hdrheight;
     struct NSPV_equihdr H;
+    uint32_t version;
 };
 
 struct NSPV_txproof
@@ -211,6 +216,13 @@ struct NSPV_CCmtxinfo
     struct NSPV_utxoresp used[NSPV_MAXVINS];
 };
 
+struct NSPV_header
+{
+    int32_t height;
+    bits256 blockhash;
+    bits256 hashPrevBlock;
+};
+
 extern portable_mutex_t NSPV_netmutex;
 extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime,NSPV_lastinfo;
 extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
@@ -225,5 +237,34 @@ extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 extern int32_t is_hexstr(char *str,int32_t n);
 extern int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equihdr *ptr,int32_t addlenflag);
 extern bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen);
+
+extern int32_t IS_IN_SYNC;
+extern uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
+extern char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
+extern btc_spv_client *NSPV_client;
+extern const btc_chainparams *NSPV_chain;
+
+extern btc_key NSPV_key;
+extern btc_pubkey NSPV_pubkey;
+extern struct NSPV_inforesp NSPV_inforesult;
+extern struct NSPV_utxosresp NSPV_utxosresult;
+extern struct NSPV_txidsresp NSPV_txidsresult;
+extern struct NSPV_mempoolresp NSPV_mempoolresult;
+extern struct NSPV_spentinfo NSPV_spentresult;
+extern struct NSPV_ntzsresp NSPV_ntzsresult;
+extern struct NSPV_ntzsproofresp NSPV_ntzsproofresult;
+extern struct NSPV_txproof NSPV_txproofresult;
+extern struct NSPV_broadcastresp NSPV_broadcastresult;
+
+extern struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
+extern struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
+extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+
+// validation 
+extern struct NSPV_ntz NSPV_lastntz;
+extern struct NSPV_header NSPV_blockheaders[128]; // limitation here is that 100 block history is maximum. no nota for 100 blocks and we cant sync back to the notarizatio, we can wait for the next one. 
+extern int32_t NSPV_num_headers;
+extern int32_t NSPV_hdrheight_counter;
+extern int32_t IS_IN_SYNC;
 
 #endif // KOMODO_NSPV_DEFSH

@@ -132,7 +132,7 @@ bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t
     return(bits256_rev(sigtxid));
 }
 
-int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
+int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr, struct NSPV_ntzsresp *notarizations)
 {
     int32_t i,height,txidht; btc_tx *tx; bits256 blockhash,txid,desttxid;
     if ( (ptr->common.nextht-ptr->common.prevht+1) != ptr->common.numhdrs )
@@ -140,14 +140,14 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
         fprintf(stderr,"next.%d prev.%d -> %d vs %d\n",ptr->common.nextht,ptr->common.prevht,ptr->common.nextht-ptr->common.prevht+1,ptr->common.numhdrs);
         return(-2);
     }
-    else if ( (tx= NSPV_txextract(ptr->nextntz,ptr->nexttxlen)) == 0 )
+    else if ( ptr->nexttxlen == 0 || (tx= NSPV_txextract(ptr->nextntz,ptr->nexttxlen)) == 0 )
         return(-3);
     else if ( bits256_cmp(NSPV_tx_hash(tx),ptr->nexttxid) != 0 )
     {
         btc_tx_free(tx);
         return(-4);
     }
-    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,notarizations->nextntz.timestamp) < 0 )
     {
         btc_tx_free(tx);
         return(-5);
@@ -171,14 +171,14 @@ int32_t NSPV_validatehdrs(btc_spv_client *client,struct NSPV_ntzsproofresp *ptr)
             return(-i-13);
     }
     sleep(1); // need this to get past the once per second rate limiter per message
-    if ( (tx= NSPV_txextract(ptr->prevntz,ptr->prevtxlen)) == 0 )
+    if (  ptr->prevtxlen == 0 || (tx= NSPV_txextract(ptr->prevntz,ptr->prevtxlen)) == 0 )
         return(-8);
     else if ( bits256_cmp(NSPV_tx_hash(tx),ptr->prevtxid) )
     {
         btc_tx_free(tx);
         return(-9);
     }
-    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx) < 0 )
+    else if ( NSPV_notarizationextract(client,1,&height,&blockhash,&desttxid,tx,notarizations->prevntz.timestamp) < 0 )
     {
         btc_tx_free(tx);
         return(-10);
@@ -211,7 +211,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
         fprintf(stderr,"txproof error %s != %s\n",bits256_str(str,ptr->txid),bits256_str(str2,txid));
         return(0);
     }
-    else if ( (tx= NSPV_txextract(ptr->tx,ptr->txlen)) == 0 )
+    else if ( ptr->txlen == 0 || (tx= NSPV_txextract(ptr->tx,ptr->txlen)) == 0 )
         return(0);
     else if ( bits256_cmp(NSPV_tx_hash(tx),txid) != 0 )
     {
@@ -241,6 +241,12 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
             memcpy(proof->str,ptr->txproof,ptr->txprooflen);
             proof->len = ptr->txprooflen;
         }
+        if ( proof == NULL )
+        {
+            fprintf(stderr, "proof is missing, try a higher block height\n");
+            *retvalp = -2006;
+            return(tx);
+        }
         NSPV_notarizations(client,height); // gets the prev and next notarizations
         if ( NSPV_inforesult.notarization.height >= height && (NSPV_ntzsresult.prevntz.height == 0 || NSPV_ntzsresult.prevntz.height >= NSPV_ntzsresult.nextntz.height) )
         {
@@ -259,7 +265,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
                 NSPV_txidhdrsproof(client,NSPV_ntzsresult.prevntz.txid,NSPV_ntzsresult.nextntz.txid);
                 usleep(10000);
                 //fprintf(stderr,"call validate prooflen.%d\n",(int32_t)proof->len);
-                if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult)) == 0 )
+                if ( (*retvalp= NSPV_validatehdrs(client,&NSPV_ntzsproofresult, &NSPV_ntzsresult)) == 0 )
                 {
                     uint256 mroot,revtxid; merkle_block MB; vector *vmatch;
                     init_mblock(&MB);

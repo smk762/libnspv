@@ -224,6 +224,8 @@ btc_node* btc_node_new()
     node->lastping = 0;
     node->time_started_con = 0;
     node->time_last_request = 0;
+    node->synced = 0;
+    node->banscore = 0;
     btc_hash_clear(node->last_requested_inv);
 
     node->recvBuffer = cstr_new_sz(BTC_P2P_MESSAGE_CHUNK_SIZE);
@@ -626,7 +628,7 @@ btc_bool btc_node_group_add_peers_by_ip_or_seed(btc_node_group *group, const cha
                 btc_node* node = btc_node_new();
                 
                 sprintf(ipaddr,"%s:%u",working_str,group->chainparams->default_port);
-                fprintf(stderr,"setnode.(%s) -> %s\n",working_str,ipaddr);
+                //fprintf(stderr,"setnode.(%s) -> %s\n",working_str,ipaddr);
                 if (btc_node_set_ipport(node, ipaddr) > 0) {
                     btc_node_group_add_node(group, node);
                 }

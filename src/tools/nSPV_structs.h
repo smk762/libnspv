@@ -17,6 +17,8 @@
 #ifndef NSPV_SERDES_H
 #define NSPV_SERDES_H
 
+#include <nSPV_defs.h>
+
 int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
 {
     int32_t i; uint64_t x;
@@ -319,6 +321,7 @@ int32_t NSPV_rwntz(int32_t rwflag,uint8_t *serialized,struct NSPV_ntz *ptr)
     len += iguana_rwbignum(rwflag,&serialized[len],sizeof(ptr->othertxid),(uint8_t *)&ptr->othertxid);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->txidheight),&ptr->txidheight);
+    len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->timestamp),&ptr->timestamp);
     return(len);
 }
 
@@ -342,7 +345,7 @@ void NSPV_ntzsresp_purge(struct NSPV_ntzsresp *ptr)
         memset(ptr,0,sizeof(*ptr));
 }
 
-int32_t NSPV_rwinforesp(int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp *ptr)
+int32_t NSPV_rwinforesp(int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp *ptr,int32_t maxlen)
 {
     int32_t len = 0;
     len += NSPV_rwntz(rwflag,&serialized[len],&ptr->notarization);
@@ -350,7 +353,11 @@ int32_t NSPV_rwinforesp(int32_t rwflag,uint8_t *serialized,struct NSPV_inforesp 
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->height),&ptr->height);
     len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->hdrheight),&ptr->hdrheight);
     len += NSPV_rwequihdr(rwflag,&serialized[len],&ptr->H,0);
-    //fprintf(stderr,"hdr rwlen.%d\n",len);
+    if ( (int32_t)(len+sizeof(ptr->version)) > maxlen )
+    {
+        if ( rwflag == 0 )
+            ptr->version = 0;
+    } else len += iguana_rwnum(rwflag,&serialized[len],sizeof(ptr->version),&ptr->version);
     return(len);
 }
 
@@ -569,7 +576,16 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     jaddbits256(result,"chaintip",ptr->blockhash);
     jadd(result,"notarization",NSPV_ntz_json(&ptr->notarization));
     jadd(result,"header",NSPV_header_json(&ptr->H,ptr->hdrheight));
+    jaddnum(result,"protocolversion",ptr->version);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
+    if ( IS_IN_SYNC == 1 )
+        jaddstr(result,"sync_status", "synced");
+    else 
+    {
+        jaddstr(result,"sync_status", "not_synced");
+        jaddnum(result,"estimated_headers_left", (int64_t)NSPV_inforesult.height-NSPV_lastntz.height-NSPV_num_headers);
+    }
+    
     return(result);
 }
 
@@ -583,7 +599,7 @@ cJSON *NSPV_utxoresp_json(struct NSPV_utxoresp *utxos,int32_t numutxos)
         jaddbits256(item,"txid",utxos[i].txid);
         jaddnum(item,"vout",utxos[i].vout);
         jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
-        jaddnum(item,"interest",(double)utxos[i].extradata/COIN);
+        jaddnum(item,"rewards",(double)utxos[i].extradata/COIN);
         jaddi(array,item);
     }
     return(array);
@@ -599,7 +615,9 @@ cJSON *NSPV_utxosresp_json(struct NSPV_utxosresp *ptr)
     jaddnum(result,"height",ptr->nodeheight);
     jaddnum(result,"numutxos",ptr->numutxos);
     jaddnum(result,"balance",(double)ptr->total/COIN);
-    jaddnum(result,"interest",(double)ptr->interest/COIN);
+    jaddnum(result,"rewards",(double)ptr->interest/COIN);
+    jaddnum(result,"skipcount",ptr->skipcount);
+    jaddnum(result,"filter",ptr->filter);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
@@ -612,7 +630,7 @@ cJSON *NSPV_txidresp_json(struct NSPV_txidresp *utxos,int32_t numutxos)
         item = cJSON_CreateObject();
         jaddnum(item,"height",utxos[i].height);
         jaddbits256(item,"txid",utxos[i].txid);
-        jaddnum(item,"interest",(double)utxos[i].satoshis/COIN);
+        jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
         if ( utxos[i].satoshis > 0 )
             jaddnum(item,"vout",utxos[i].vout);
         else jaddnum(item,"vin",utxos[i].vout);
@@ -630,6 +648,8 @@ cJSON *NSPV_txidsresp_json(struct NSPV_txidsresp *ptr)
     jaddnum(result,"isCC",ptr->CCflag);
     jaddnum(result,"height",ptr->nodeheight);
     jaddnum(result,"numtxids",ptr->numtxids);
+    jaddnum(result,"skipcount",ptr->skipcount);
+    jaddnum(result,"filter",ptr->filter);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }

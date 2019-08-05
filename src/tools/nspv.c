@@ -108,6 +108,7 @@ void spv_sync_completed(btc_spv_client* client) {
 
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
+#include "nSPV_CCtx.h"
 #include "nSPV_superlite.h"
 #include "nSPV_wallet.h"
 #include "komodo_cJSON.c"
@@ -115,14 +116,15 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
- params:[] array -> map to fields -> jl777
- dynamically generated localhost browser wallet
+ return rawhex in txproof: "hex" and "proof"
+ dynamically generated localhost browser wallet refinement
+ 
+ mempool based pruning of utxos
+ 
+ cross chain superwallet (jaragua) -> blackjok3r
  
  enhance cc/funcid filter in listtransactions/listunspent -> mihailo
  
- make some way to add peers dynamically -> blackjok3r
- new apis: getpeerinfo -> blackjok3r
-
  */
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
