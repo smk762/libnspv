@@ -924,7 +924,7 @@ int32_t iguana_getheadersize(char *buf,int32_t recvlen)
 void *LP_rpc_processreq(void *_ptr)
 {
     char filetype[128],content_type[128];
-    int32_t recvlen,contentlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
+    int32_t recvlen,retlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
     char helpname[512],remoteaddr[64],*buf,*retstr,space[8192],space2[32786],*jsonbuf; struct rpcrequest_info *req = _ptr;
     uint32_t ipbits,i,size = NSPV_MAXPACKETSIZE + 512;
     ipbits = req->ipbits;;
@@ -996,10 +996,11 @@ void *LP_rpc_processreq(void *_ptr)
         }
     }
     content_type[0] = 0;
+    retlen = 0;
     if ( recvlen > 0 )
     {
-        contentlen = jsonflag = postflag = 0;
-        retstr = NSPV_rpcparse(&contentlen,space,size,&jsonflag,&postflag,jsonbuf,remoteaddr,filetype,req->port);
+        jsonflag = postflag = 0;
+        retstr = NSPV_rpcparse(&retlen,space,size,&jsonflag,&postflag,jsonbuf,remoteaddr,filetype,req->port);
         if ( filetype[0] != 0 )
         {
             static cJSON *mimejson; char *tmp,*typestr=0; long tmpsize;
@@ -1030,9 +1031,9 @@ void *LP_rpc_processreq(void *_ptr)
                 response = malloc(strlen(retstr)+1024+1+1);
                 //printf("alloc response.%p\n",response);
             }
-            if ( contentlen == 0 )
-                contentlen = (int32_t)strlen(retstr)+1;
-            sprintf(hdrs,"HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",content_type,contentlen);
+            if ( retlen == 0 )
+                retlen = (int32_t)strlen(retstr)+1;
+            sprintf(hdrs,"HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",content_type,retlen);
             response[0] = '\0';
             strcat(response,hdrs);
             strcat(response,retstr);
