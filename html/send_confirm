@@ -28,9 +28,12 @@
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
                 <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:12986/method/getinfo?nexturl=info" formmethod="get">Info</button>
+                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:12986/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
+                <button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:12986/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
                 <button class="btn btn-secondary btn-sm" formaction="http://127.0.0.1:12986/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
                 <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:12986/method/send?nexturl=send" formmethod="get">Send</button>
                 <button class="btn btn-danger btn-sm" formaction="http://127.0.0.1:12986/method/logout?nexturl=login" formmethod="get">Logout</button>
+                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:12986/method/login?nexturl=login" formmethod="get">Login</button>
               </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
           </div> <!-- wallet buttons card start -->
