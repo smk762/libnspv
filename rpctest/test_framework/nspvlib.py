@@ -33,8 +33,9 @@ class NspvRpcCalls:
 
     def assert_contains(self, result, key):
         """assert key contains expected data"""
-        result_d = self.type_convert(result)
-        content = result_d.get(key)
+        if type(result) == bytes:
+            result = self.type_convert(result)
+        content = result.get(key)
         if content:
             pass
         else:

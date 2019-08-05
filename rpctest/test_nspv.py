@@ -64,8 +64,41 @@ def test_help_call():
         Response should contain actual help data"""
     print("testing help call")
     rpc_call = call.nspv_help()
+    if not rpc_call:
+        pytest.exit("Can't connect daemon")
     call.assert_success(rpc_call)
     call.assert_contains(rpc_call, "methods")
+
+
+def test_getpeerinfo_call():
+    """Response should not be empty, at least one node should be in sync"""
+    print("testing peerinfo call, checking peers statuss")
+    rpc_call = call.type_convert(call.nspv_getpeerinfo())
+    if not rpc_call[1]:
+        raise Exception("Empty response :", rpc_call)
+    call.assert_contains(rpc_call[1], "nodeid")
+    call.assert_contains(rpc_call[1], "ipaddress")
+    i = 0  # add integer iterator for len can not be one
+    node_status = []
+    for len in rpc_call:
+        node_status.append(rpc_call[i].get("in_sync"))  # Returns in_sync value for i-th node in response
+        i += i
+    if "synced" in node_status:
+        pass
+    else:
+        pytest.exit("No active nodes found")
+
+
+def test_check_balance():
+    """Check if wif given has actual balance to perform further tests"""
+    print("Checking wif balance")
+    call.nspv_login(wif_real)
+    res = call.type_convert(call.nspv_listunspent())
+    amount = res.get("balance")
+    if amount > 0.001:
+        pass
+    else:
+        pytest.exit("Not enough balance, please use another wif")
 
 
 def test_getinfo_call():
@@ -76,13 +109,6 @@ def test_getinfo_call():
     call.assert_success(rpc_call)
     call.assert_contains(rpc_call, "notarization")
     call.assert_contains(rpc_call, "header")
-
-# call.assert_contains(rpc_call, "protocolversion")
-
-
-# getpeerinfo call     -- needs it's own assertion and expected results WIP
-# rpc_call = call.nspv_getpeerinfo(url, userpass)
-# call.assert_success(rpc_call)
 
 
 def test_hdrsproof_call():
@@ -310,7 +336,7 @@ def test_spentinfo_call():
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
 
 
-def test_logout_call():
+def test_autologout():
     """Wif should expeire in 777 seconds"""
     print("testing auto logout")
     rpc_call = call.nspv_getnewaddress()
@@ -321,4 +347,4 @@ def test_logout_call():
     time.sleep(778)
     rpc_call = call.nspv_spend(addr_send, 0.001)
     call.assert_error(rpc_call)
-    print("The last test is finished")
+    print("all tests are finished")
