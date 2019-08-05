@@ -647,7 +647,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     //printf("set (%s) filetype.(%s)\n",fname,filetype);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                    if ( strcmp(filetype,"html") != 0 )
+                    if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                         *contentlenp = (int32_t)filesize;
                     return(filestr);
                 }
@@ -685,7 +685,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                             //printf("set2 (%s) filetype.(%s)\n",fname,filetype);
                             if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                                 return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                            if ( strcmp(filetype,"html") != 0 )
+                            if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                                 *contentlenp = (int32_t)filesize;
                             return(filestr);
                         }
