@@ -19,8 +19,8 @@ import time
 
 def setup_module():
     global addr_send, wif_real, coin, call, chain_params
-    addr_send = "RNvAWip4DuFrZf8WhqdTBEcAg1bWjd4rKr"
-    wif_real = "UsJgUBrmcsthJEGbyBBfD77tZ1FuRMkB68jqkP8E3PEE88eXesEH"
+    addr_send = ""
+    wif_real = ""
 
     if not addr_send or not wif_real:
         raise Exception("Please fill test parameters: ", addr_send, wif_real)
