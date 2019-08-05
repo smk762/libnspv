@@ -308,7 +308,6 @@ def test_spentinfo_call():
     vout_resp = rep.get("vout")
     if r_vouts[1] != vout_resp:
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
-    print("all tests passed")
 
 
 def test_logout_call():
@@ -322,3 +321,4 @@ def test_logout_call():
     time.sleep(778)
     rpc_call = call.nspv_spend(addr_send, 0.001)
     call.assert_error(rpc_call)
+    print("The last test is finished")
