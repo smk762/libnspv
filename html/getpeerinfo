@@ -5,10 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- favicon -->
+    <link rel="shortcut icon" type="image/png" href="images/KMD_Mark_Color.png"/>
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="custom.css">
-    <link rel="stylesheet" href="font/rubik.css">
 
     <title>Antara Superlite</title>
   </head>
@@ -20,7 +22,7 @@
         <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body"> <!-- coin info body start -->
-                <span>Coin/Asset: KMD</span><br>
+                <span>Coin: KMD</span><br>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
