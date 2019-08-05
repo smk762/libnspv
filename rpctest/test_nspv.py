@@ -3,8 +3,18 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-from test_framework.nspvlib import NspvRpcCalls as tf
+from test_framework.nspvlib import NspvRpcCalls as NRC
 import pytest
+import time
+
+"""
+   Simple unittest based ob pytest dramework for libnspv
+   Make sure you have installed framework: pip3 install pytest
+   Set wif to spend form and address to spend to
+   Default coin is ILN
+   You can add any new coins to test, please set coin_pramras dict entry
+   To run tests do: python3 -m pytest test_nspv.py from rpctest directory
+"""
 
 
 def setup_module():
@@ -18,7 +28,7 @@ def setup_module():
     url = "http://127.0.0.1:12986"
     userpass = "userpass"
     coin = "ILN"
-    call = tf(url, userpass)
+    call = NRC(url, userpass)
     chain_params = {"KMD": {
                             'tx_list_address': 'RGShWG446Pv24CKzzxjA23obrzYwNbs1kA',
                             'min_chain_height': 1468080,
@@ -110,22 +120,6 @@ def test_notarization_call():
     call.assert_contains(rpc_call, "next")
 
 
-def test_mempool_call():
-    """ Response should contain txids"""
-    print("testing mempool call")
-    rpc_call = call.nspv_mempool()
-    call.assert_success(rpc_call)
-    call.assert_contains(rpc_call, "txids")
-
-# TODO: set long autologout call
-
-
-def test_logout_call():
-    """ Runs here as fixture in case someone was already logged in"""
-    rpc_call = call.nspv_logout()
-    call.assert_success(rpc_call)
-
-
 def getnewaddress_call():
     """ Get a new address, save it for latter calls"""
     print("testing getnewaddr call")
@@ -140,6 +134,7 @@ def test_login_call():
     """"login with fresh credentials
         Response should contain address, address should be equal to generated earlier one"""
     print("testing log in call")
+    global logged_address
     rpc_call = call.nspv_getnewaddress()
     rep = call.type_convert(rpc_call)
     wif = rep.get('wif')
@@ -149,28 +144,29 @@ def test_login_call():
     call.assert_contains(rpc_call, "status")
     call.assert_contains(rpc_call, "address")
     rep = call.type_convert(rpc_call)
-    address = rep.get('address')
-    if address != addr:
-        raise AssertionError("addr missmatch: ", addr, address)
+    logged_address = rep.get('address')
+    if logged_address != addr:
+        raise AssertionError("addr missmatch: ", addr, logged_address)
 
 
 def test_listtransactions_call():
-    """"Successful response should [not] contain txids and same address ass requested
+    """"Successful response should [not] contain txids and same address as requested
         Case 1 - False data, user is logged in - should not print txids for new address"""
     print("testing listtransactions call")
     #rpc_call = call.nspv_getnewaddress()
     #rep = call.type_convert(rpc_call)
     #addr = rep.get('address')
+    call.nspv_logout()
     real_addr = chain_params.get(coin).get("tx_list_address")
 
     # Case 1 - False Data
     rpc_call = call.nspv_listtransactions(False, False, False)
-    call.assert_error(rpc_call)
-    #call.assert_not_contains(rpc_call, "txids")
-    #rep = call.type_convert(rpc_call)
-    #addr_response = rep.get('address')
-    #if addr_response != addr:
-    #    raise AssertionError("addr missmatch: ", addr_response, addr)
+    call.assert_success(rpc_call)
+    call.assert_not_contains(rpc_call, "txids")
+    rep = call.type_convert(rpc_call)
+    addr_response = rep.get('address')
+    if addr_response != logged_address:
+        raise AssertionError("addr missmatch: ", addr_response, logged_address)
 
     # Case 2 - known data
     rpc_call = call.nspv_listtransactions(real_addr, 0, 1)
@@ -197,16 +193,17 @@ def test_litunspent_call():
     #rpc_call = call.nspv_getnewaddress()
     #rep = call.type_convert(rpc_call)
     #addr = rep.get('address')
+    call.nspv_logout()
     real_addr = chain_params.get(coin).get("tx_list_address")
 
-    # Case 1 - False data
+    # Case 1 - False dataf
     rpc_call = call.nspv_listunspent(False, False, False)
-    call.assert_error(rpc_call)
-    #call.assert_not_contains(rpc_call, "utxos")
-    #rep = call.type_convert(rpc_call)
-    #addr_response = rep.get('address')
-    #if addr_response != addr:
-    #    raise AssertionError("addr missmatch: ", addr_response, addr)
+    call.assert_success(rpc_call)
+    call.assert_not_contains(rpc_call, "utxos")
+    rep = call.type_convert(rpc_call)
+    addr_response = rep.get('address')
+    if addr_response != logged_address:
+        raise AssertionError("addr missmatch: ", addr_response, logged_address)
 
     # Case 2 - known data
     rpc_call = call.nspv_listunspent(real_addr, 0, 0)
@@ -239,7 +236,7 @@ def test_spend_call():
     rpc_call = call.nspv_spend(address[1], amount[0])
     call.assert_error(rpc_call)
 
-    # Case 2 - known data, not enough balance
+    # Case 2 - known data, no legged in user
     rpc_call = call.nspv_spend(address[1], amount[1])
     call.assert_error(rpc_call)
 
@@ -283,6 +280,14 @@ def test_broadcast_call():
         raise AssertionError("Aseert equal braodcast: ", broadcast_res, expected)
 
 
+def test_mempool_call():
+    """ Response should contain txids"""
+    print("testing mempool call")
+    rpc_call = call.nspv_mempool()
+    call.assert_success(rpc_call)
+    call.assert_contains(rpc_call, "txids")
+
+
 def test_spentinfo_call():
     """Successful response sould contain same txid and same vout"""
     print("testing spentinfo call")
@@ -304,3 +309,16 @@ def test_spentinfo_call():
     if r_vouts[1] != vout_resp:
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
     print("all tests passed")
+
+
+def test_logout_call():
+    """Wif should expeire in 777 seconds"""
+    print("testing auto logout")
+    rpc_call = call.nspv_getnewaddress()
+    rep = call.type_convert(rpc_call)
+    wif = rep.get('wif')
+    rpc_call = call.nspv_login(wif)
+    call.assert_success(rpc_call)
+    time.sleep(778)
+    rpc_call = call.nspv_spend(addr_send, 0.001)
+    call.assert_error(rpc_call)
