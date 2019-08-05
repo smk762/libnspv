@@ -1032,9 +1032,15 @@ void *LP_rpc_processreq(void *_ptr)
                 //printf("alloc response.%p\n",response);
             }
             if ( retlen == 0 )
+            {
                 retlen = (int32_t)strlen(retstr)+1;
-            else acceptstr = "Accept-Ranges: bytes\r\n";
-            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
+                sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
+            }
+            else
+            {
+                acceptstr = "Accept-Ranges: bytes\r\n";
+                sprintf(hdrs,"HTTP/1.1 200 OK\r\n%s%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
+            }
             response[0] = '\0';
             strcat(response,hdrs);
             strcat(response,retstr);
