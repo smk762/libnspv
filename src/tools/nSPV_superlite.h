@@ -1188,16 +1188,13 @@ int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
         p = strstr(fmt,key);
         if ( p == NULL )
         {
-            fprintf(stderr,"num.%d replaced\n",num);
             strcpy(dest,fmt);
             break;
         }
         num++;
         memcpy(dest,fmt,p - fmt);
         dest += p - fmt;
-        fprintf(stderr,"copy %d to dest\n",(int32_t)(p-fmt));
         memcpy(dest,value,vlen);
-        fprintf(stderr,"copy value %s %d to dest\n",value,vlen);
         dest += vlen;
         fmt = p + keylen;
     }
@@ -1207,7 +1204,6 @@ int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
 void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
 {
     int32_t len;
-    fprintf(stderr,"expand variable %s\n",key);
     if ( NSPV_replace_var(*bigbufp,*filestrp,key,value) != 0 )
     {
         free(*filestrp);
@@ -1220,15 +1216,13 @@ void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
 char *NSPV_expand_variables(char *bigbuf,char *filestr)
 {
     char urlstr[64];
-    fprintf(stderr,"expand variables\n");
     if ( NSPV_chain == 0 )
     {
         free(bigbuf);
         return(filestr);
     }
-    sprintf(urlstr,"127.0.0.1:%u",NSPV_chain->rpcport);
+    sprintf(urlstr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(&bigbuf,&filestr,"$URL",urlstr);
-    fprintf(stderr,"expand $URL -> %s\n",urlstr);
     free(bigbuf);
     return(filestr);
 }

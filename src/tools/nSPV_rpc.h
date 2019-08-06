@@ -631,7 +631,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
-        fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
+        //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
@@ -660,7 +660,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 *jsonflagp = 1;
                 strcpy(filetype,"html");
                 sprintf(fname,"html/%s",methodfiles[f]);
-                fprintf(stderr,"open1 (%s)\n",fname);
+                //fprintf(stderr,"open1 (%s)\n",fname);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                     return(clonestr("{\"error\":\"cant find methodfile\"}"));
                 break;
@@ -675,7 +675,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     *jsonflagp = 1;
                     strcpy(filetype,"html");
                     sprintf(fname,"html/%s",methodfiles[f]);
-                    fprintf(stderr,"open (%s)\n",fname);
+                    //fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
                     break;
@@ -719,7 +719,6 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
      //printf("return filetype.(%s) size.%ld\n",filetype,filesize);
      return(filestr);
      }*/
-    fprintf(stderr,"filestr.%p\n",filestr);
     if ( strcmp(url,"/favicon.ico") == 0 )
     {
         *jsonflagp = 1;
@@ -889,7 +888,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     if ( is_cJSON_Array(arg) != 0 && cJSON_GetArraySize(arg) == 1 )
                         arg = jitem(arg,0);
                 } else arg = argjson;
-                printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
+                //printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
                 if ( userpass != 0 && jstr(arg,"userpass") == 0 )
                     jaddstr(arg,"userpass",userpass);
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
