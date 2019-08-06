@@ -27,13 +27,13 @@
           <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
             <div class="card-body text-right"> <!-- wallet buttons body start -->
               <form> <!-- coin info buttons form start -->
-                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:12986/method/getinfo?nexturl=info" formmethod="get">Info</button>
-                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:12986/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
-                <button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:12986/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
-                <button class="btn btn-secondary btn-sm" formaction="http://127.0.0.1:12986/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
-                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:12986/method/send?nexturl=send" formmethod="get">Send</button>
-                <button class="btn btn-danger btn-sm" formaction="http://127.0.0.1:12986/method/logout?nexturl=login" formmethod="get">Logout</button>
-                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:12986/method/login?nexturl=login" formmethod="get">Login</button>
+                <button class="btn btn-info btn-sm" formaction="$URL/method/getinfo?nexturl=info" formmethod="get">Info</button>
+                <button class="btn btn-warning btn-sm" formaction="$URL/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
+                <button class="btn btn-primary btn-sm" formaction="$URL/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
+                <button class="btn btn-secondary btn-sm" formaction="$URL/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
+                <button class="btn btn-warning btn-sm" formaction="$URL/method/send?nexturl=send" formmethod="get">Send</button>
+                <button class="btn btn-danger btn-sm" formaction="$URL/method/logout?nexturl=login" formmethod="get">Logout</button>
+                <button class="btn btn-success btn-sm" formaction="$URL/method/login?nexturl=login" formmethod="get">Login</button>
               </form> <!-- coin info buttons form end -->
             </div> <!-- wallet buttons body end -->
           </div> <!-- wallet buttons card start -->
@@ -50,7 +50,7 @@
                   </div>
                   <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                     <form> <!-- GetInfo reresh button form start -->
-                      <button class="btn btn-outline-light btn-sm" formaction="http://127.0.0.1:12986/method/getinfo?nexturl=info" formmethod="get">Refresh</button>
+                      <button class="btn btn-outline-light btn-sm" formaction="$URL/method/getinfo?nexturl=info" formmethod="get">Refresh</button>
                     </form> <!-- GetInfo reresh button form end -->
                   </div>
                 </div>
@@ -106,11 +106,11 @@
                     </tr>
                     <tr>
                       <td scope="row">Notarized Blockhash</td>
-                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce&vout=1&nexturl=txidinfo" class="text-break text-wrap">02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce&vout=1&nexturl=txidinfo" class="text-break text-wrap">02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarized Txid</td>
-                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da&vout=1&nexturl=txidinfo" class="text-break text-wrap">3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da&vout=1&nexturl=txidinfo" class="text-break text-wrap">3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarization Txid Height</td>
@@ -118,7 +118,7 @@
                     </tr>
                     <tr>
                       <td scope="row">Notarization Destination Txid</td>
-                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6&vout=1&nexturl=txidinfo" class="text-break text-wrap">500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6&vout=1&nexturl=txidinfo" class="text-break text-wrap">500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6</a></td>
                     </tr>
                   </tbody>
                 </table>
@@ -150,15 +150,15 @@
                     </tr>
                     <tr>
                       <td scope="row">Blockhash</td>
-                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479&vout=1&nexturl=txidinfo" class="text-break text-wrap">09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479&vout=1&nexturl=txidinfo" class="text-break text-wrap">09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Prev. Block Hash</td>
-                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af&vout=1&nexturl=txidinfo" class="text-break text-wrap">08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af&vout=1&nexturl=txidinfo" class="text-break text-wrap">08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Merkle Root Hash</td>
-                      <td><a href="http://127.0.0.1:12986/method/spentinfo?txid=26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16&vout=1&nexturl=txidinfo" class="text-break text-wrap">26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16&vout=1&nexturl=txidinfo" class="text-break text-wrap">26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16</a></td>
                     </tr>
                     <tr>
                       <td scope="row">nTime</td>
@@ -184,7 +184,7 @@
             </div>
             <div class="card-body">
               <!-- login form start -->
-              <form action="http://127.0.0.1:12986/method/broadcast" method="get">
+              <form action="$URL/method/broadcast" method="get">
                 <div class="form-group">
                   <label for="nspv_hexstring">Hex string</label>
                   <input type="password" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
