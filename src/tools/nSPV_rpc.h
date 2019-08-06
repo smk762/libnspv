@@ -621,8 +621,8 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     {
         *jsonflagp = 1;
         if ( (filestr= OS_filestr(&filesize,"html/index")) == 0 )
-            return(clonestr("{\"error\":\"cant find indexƒ\"}"));
-        else return(filestr);
+            return(clonestr("{\"error\":\"cant find index\"}"));
+        //else return(filestr);
     }
     else
     {
