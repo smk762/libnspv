@@ -51,7 +51,7 @@
                 </div>
               </div> <!-- Send page header end -->
               <div class="card-body"> <!-- Send page body start -->
-                <form action="$URL/method/spend" method="get"> <!-- Send form start -->
+                <form action="$URL/method/send_confirm" method="get"> <!-- Send form start -->
                   <div class="form-group"> <!-- Send form to address start -->
                     <label for="sendtoaddr">Send To Address</label>
                     <input type="text" class="form-control" id="sendtoaddr" name="address" aria-describedby="addressHelp" placeholder="Enter address">
