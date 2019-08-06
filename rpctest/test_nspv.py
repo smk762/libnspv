@@ -25,7 +25,7 @@ def setup_module():
     if not addr_send or not wif_real:
         raise Exception("Please fill test parameters: ", addr_send, wif_real)
 
-    url = "http://127.0.0.1:12986"
+    url = "http://127.0.0.1:12986"  # set correct port for chosen chain
     userpass = "userpass"
     coin = "ILN"
     call = NRC(url, userpass)
@@ -115,9 +115,11 @@ def test_hdrsproof_call():
     print("testing hdrsproof call")
     prevheight = [False, chain_params.get(coin).get("hdrs_proof_low")]
     nextheight = [False, chain_params.get(coin).get("hdrs_proof_high")]
+
     # Case 1 - False data
     rpc_call = call.nspv_hdrsproof(prevheight[0], nextheight[0])
     call.assert_error(rpc_call)
+
     # Case 2 - known data
     rpc_call = call.nspv_hdrsproof(prevheight[1], nextheight[1])
     call.assert_success(rpc_call)
@@ -134,9 +136,11 @@ def test_notarization_call():
      Successful response should contain prev and next notarizations data"""
     print("testing notarization call")
     height = [False, chain_params.get(coin).get("notarization_height")]
+
     # Case 1 - False data
     rpc_call = call.nspv_notarizations(height[0])
     call.assert_error(rpc_call)
+
     # Case 2 - known data
     rpc_call = call.nspv_notarizations(height[1])
     call.assert_success(rpc_call)
@@ -177,9 +181,6 @@ def test_listtransactions_call():
     """"Successful response should [not] contain txids and same address as requested
         Case 1 - False data, user is logged in - should not print txids for new address"""
     print("testing listtransactions call")
-    #rpc_call = call.nspv_getnewaddress()
-    #rep = call.type_convert(rpc_call)
-    #addr = rep.get('address')
     call.nspv_logout()
     real_addr = chain_params.get(coin).get("tx_list_address")
 
@@ -214,9 +215,6 @@ def test_listtransactions_call():
 def test_litunspent_call():
     """ Successful response should [not] contain utxos and same address as requested"""
     print("testing listunspent call")
-    #rpc_call = call.nspv_getnewaddress()
-    #rep = call.type_convert(rpc_call)
-    #addr = rep.get('address')
     call.nspv_logout()
     real_addr = chain_params.get(coin).get("tx_list_address")
 
