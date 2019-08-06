@@ -334,15 +334,15 @@ def test_spentinfo_call():
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
 
 
-#def test_autologout():
-#    """Wif should expeire in 777 seconds"""
-#    print("testing auto logout")
-#    rpc_call = call.nspv_getnewaddress()
-#    rep = call.type_convert(rpc_call)
-#    wif = rep.get('wif')
-#    rpc_call = call.nspv_login(wif)
-#    call.assert_success(rpc_call)
-#    time.sleep(778)
-#    rpc_call = call.nspv_spend(addr_send, 0.001)
-#    call.assert_error(rpc_call)
-#    print("all tests are finished")
+def test_autologout():
+    """Wif should expeire in 777 seconds"""
+    print("testing auto logout")
+    rpc_call = call.nspv_getnewaddress()
+    rep = call.type_convert(rpc_call)
+    wif = rep.get('wif')
+    rpc_call = call.nspv_login(wif)
+    call.assert_success(rpc_call)
+    time.sleep(778)
+    rpc_call = call.nspv_spend(addr_send, 0.001)
+    call.assert_error(rpc_call)
+    print("all tests are finished")
