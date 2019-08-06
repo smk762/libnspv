@@ -23,7 +23,7 @@ def setup_module():
     wif_real = ""
 
     if not addr_send or not wif_real:
-        raise Exception("Please fill test parameters: ", addr_send, wif_real)
+        pytest.exit("Please check test wif and address")
 
     url = "http://127.0.0.1:12986"  # set correct port for chosen chain
     userpass = "userpass"
@@ -76,15 +76,7 @@ def test_getpeerinfo_call():
     rpc_call = call.type_convert(call.nspv_getpeerinfo())
     if not rpc_call[0]:
         raise Exception("Empty response :", rpc_call)
-    call.assert_contains(rpc_call[0], "nodeid")
     call.assert_contains(rpc_call[0], "ipaddress")
-    node_status = []
-    for node in rpc_call:
-        node_status.append(node.get("in_sync"))
-    if "synced" in node_status:
-        pass
-    else:
-        pytest.exit("No active nodes found, try again later")
 
 
 def test_check_balance():
