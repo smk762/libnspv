@@ -1180,7 +1180,7 @@ fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
 
 int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
 {
-    int32_t keylen,vlen,num=0; char *p;
+    int32_t keylen,vlen,num=0; char *p = fmt;
     keylen = (int32_t)strlen(key);
     vlen = (int32_t)strlen(value);
     while ( 1 )
@@ -1188,13 +1188,16 @@ int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
         p = strstr(fmt,key);
         if ( p == NULL )
         {
+            fprintf(stderr,"num.%d replaced\n",num);
             strcpy(dest,fmt);
             break;
         }
         num++;
         memcpy(dest,fmt,p - fmt);
         dest += p - fmt;
+        fprintf(stderr,"copy %d to dest\n",(int32_t)(p-fmt));
         memcpy(dest,value,vlen);
+        fprintf(stderr,"copy value %s %d to dest\n",value,vlen);
         dest += vlen;
         fmt = p + keylen;
     }
@@ -1223,6 +1226,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     }
     sprintf(urlstr,"127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(&bigbuf,&filestr,"$URL",urlstr);
+    fprintf(stderr,"expand $URL -> %s\n",urlstr);
     free(bigbuf);
     return(filestr);
 }
