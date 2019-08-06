@@ -72,21 +72,19 @@ def test_help_call():
 
 def test_getpeerinfo_call():
     """Response should not be empty, at least one node should be in sync"""
-    print("testing peerinfo call, checking peers statuss")
+    print("testing peerinfo call, checking peers status")
     rpc_call = call.type_convert(call.nspv_getpeerinfo())
     if not rpc_call[0]:
         raise Exception("Empty response :", rpc_call)
     call.assert_contains(rpc_call[0], "nodeid")
     call.assert_contains(rpc_call[0], "ipaddress")
-    i = 0  # add integer iterator for len can not be one
     node_status = []
-    for len in rpc_call:
-        node_status.append(rpc_call[i].get("in_sync"))  # Returns in_sync value for i-th node in response
-        i += i
+    for node in rpc_call:
+        node_status.append(node.get("in_sync"))
     if "synced" in node_status:
         pass
     else:
-        pytest.exit("No active nodes found")
+        pytest.exit("No active nodes found, try again later")
 
 
 def test_check_balance():
