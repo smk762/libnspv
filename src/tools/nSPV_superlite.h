@@ -1207,6 +1207,7 @@ int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
 void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
 {
     int32_t len;
+    fprintf(stderr,"expand variable %s\n",key);
     if ( NSPV_replace_var(*bigbufp,*filestrp,key,value) != 0 )
     {
         free(*filestrp);
@@ -1219,6 +1220,7 @@ void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
 char *NSPV_expand_variables(char *bigbuf,char *filestr)
 {
     char urlstr[64];
+    fprintf(stderr,"expand variables\n");
     if ( NSPV_chain == 0 )
     {
         free(bigbuf);
