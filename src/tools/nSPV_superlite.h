@@ -1180,7 +1180,7 @@ fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
 
 int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
 {
-    char *insert_point = &dest[0]; int32_t keylen,vlen,num=0; const char *p;
+    int32_t keylen,vlen,num=0; char *p;
     keylen = (int32_t)strlen(key);
     vlen = (int32_t)strlen(value);
     while ( 1 )
