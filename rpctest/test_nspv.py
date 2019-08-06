@@ -74,10 +74,10 @@ def test_getpeerinfo_call():
     """Response should not be empty, at least one node should be in sync"""
     print("testing peerinfo call, checking peers statuss")
     rpc_call = call.type_convert(call.nspv_getpeerinfo())
-    if not rpc_call[1]:
+    if not rpc_call[0]:
         raise Exception("Empty response :", rpc_call)
-    call.assert_contains(rpc_call[1], "nodeid")
-    call.assert_contains(rpc_call[1], "ipaddress")
+    call.assert_contains(rpc_call[0], "nodeid")
+    call.assert_contains(rpc_call[0], "ipaddress")
     i = 0  # add integer iterator for len can not be one
     node_status = []
     for len in rpc_call:
@@ -336,15 +336,15 @@ def test_spentinfo_call():
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
 
 
-def test_autologout():
-    """Wif should expeire in 777 seconds"""
-    print("testing auto logout")
-    rpc_call = call.nspv_getnewaddress()
-    rep = call.type_convert(rpc_call)
-    wif = rep.get('wif')
-    rpc_call = call.nspv_login(wif)
-    call.assert_success(rpc_call)
-    time.sleep(778)
-    rpc_call = call.nspv_spend(addr_send, 0.001)
-    call.assert_error(rpc_call)
-    print("all tests are finished")
+#def test_autologout():
+#    """Wif should expeire in 777 seconds"""
+#    print("testing auto logout")
+#    rpc_call = call.nspv_getnewaddress()
+#    rep = call.type_convert(rpc_call)
+#    wif = rep.get('wif')
+#    rpc_call = call.nspv_login(wif)
+#    call.assert_success(rpc_call)
+#    time.sleep(778)
+#    rpc_call = call.nspv_spend(addr_send, 0.001)
+#    call.assert_error(rpc_call)
+#    print("all tests are finished")
