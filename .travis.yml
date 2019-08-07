@@ -30,5 +30,5 @@ script:
 - "./nspv ILN &"
 - sleep 10
 - cd rpctest
-- python3 travis.py PARAM1 PARAM2 PARAM3
+- python3 travis.py $PARAM1 $PARAM2 $PARAM3
 - python3 -m pytest test_nspv.py
