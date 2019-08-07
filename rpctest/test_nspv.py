@@ -11,10 +11,10 @@ import json
 """
    Simple unittest based ob pytest framework for libnspv
    Make sure you have installed framework: pip3 install pytest
-   Set wif to spend form and address to spend to
+   Set wif to spend form and address to spend to as json in test_setup.txt file
    Default coin is ILN
    You can add any new coins to test, please set coin_params dict entry
-   To run tests do: python3 -m pytest test_nspv.py from rpctest directory
+   To run tests do: "python3 -m pytest test_nspv.py -s" from rpctest directory
 """
 
 
