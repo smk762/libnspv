@@ -19,7 +19,7 @@
         <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body"> <!-- coin info body start -->
-                <span>Coin: KMD</span><br>
+                <span>Coin: $COIN</span><br>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
@@ -78,15 +78,15 @@
                       </tr>
                       <tr>
                         <th>Amount</th>
-                        <td>1.00000000 KMD</td>
+                        <td>1.00000000 $COIN</td>
                       </tr>
                       <tr>
                         <th>Transaction Fees</th>
-                        <td>0.00989000 KMD</td>
+                        <td>0.00989000 $COIN</td>
                       </tr>
                       <tr>
                         <th>Total amount being sent</th>
-                        <td>1.00989000 KMD</td>
+                        <td>1.00989000 $COIN</td>
                       </tr>
                       <tr>
                         <th>retcodes</th>
@@ -166,7 +166,7 @@
                   </tr>
                   <tr>
                     <th>Amount</th>
-                    <td>1.00989 KMD</td>
+                    <td>1.00989 $COIN</td>
                   </tr>
                   <tr>
                     <th>scriptSig</th>

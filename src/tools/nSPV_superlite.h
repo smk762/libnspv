@@ -1223,6 +1223,12 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     }
     sprintf(urlstr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(&bigbuf,&filestr,"$URL",urlstr);
+    
+    char coin_symbol[64];
+    sprintf(coin_symbol,"%s",NSPV_chain->name);
+    //printf("ACTIVE COIN SYMBOL is: %s\n", coin_symbol);
+    NSPV_expand_variable(&bigbuf,&filestr,"$COIN",coin_symbol);
+
     free(bigbuf);
     return(filestr);
 }
