@@ -11,6 +11,8 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install libevent-2.1-6 -y
   - sudo apt-get install libevent-dev -y
+  - sudo apt-get install libsodium -y
+  - sudo apt-get install libsodium-dev -y
   - sudo apt-get install python3 -y
   - sudo apt-get install python3-pip -y
   - sudo apt-get install python3-setuptools -y
