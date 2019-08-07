@@ -70,8 +70,8 @@
                   <tbody>
                     <tr>
                       <td>SuperLite</td>
-                      <td>1458356</td>
-                      <td>1458340</td>
+                      <td>$CURHEIGHT</td>
+                      <td>$NTZHEIGHT</td>
                       <td>7</td>
                       <td>0</td>
                       <td>nodeid.1</td>
@@ -102,11 +102,11 @@
                   <tbody>
                     <tr>
                       <td scope="row">Notarized Height</td>
-                      <td>1458340</td>
+                      <td>$NTZHEIGHT</td>
                     </tr>
                     <tr>
                       <td scope="row">Notarized Blockhash</td>
-                      <td><a href="$URL/method/spentinfo?txid=02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce&vout=1&nexturl=txidinfo" class="text-break text-wrap">02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$NTZBLKHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$NTZBLKHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarized Txid</td>
