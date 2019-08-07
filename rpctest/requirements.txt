@@ -1,5 +1,6 @@
-pycrypto>=2.6.1
-pytest>=5.0.1
+setuptools
+wheel
+pycurl
 python-bitcoinrpc>=1.0
 python-dateutil>=2.6.1
 PyYAML>=3.12
@@ -8,3 +9,5 @@ requests-unixsocket>=0.1.5
 slick-bitcoinrpc>=0.1.4
 ujson>=1.35
 urllib3>=1.22
+pycrypto>=2.6.1
+pytest>=5.0.1
