@@ -6,24 +6,30 @@
 from test_framework.nspvlib import NspvRpcCalls as NRC
 import pytest
 import time
+import json
 
 """
-   Simple unittest based ob pytest dramework for libnspv
+   Simple unittest based ob pytest framework for libnspv
    Make sure you have installed framework: pip3 install pytest
    Set wif to spend form and address to spend to
    Default coin is ILN
-   You can add any new coins to test, please set coin_pramras dict entry
+   You can add any new coins to test, please set coin_params dict entry
    To run tests do: python3 -m pytest test_nspv.py from rpctest directory
 """
 
 
 def setup_module():
     global addr_send, wif_real, coin, call, chain_params
-    addr_send = ""
-    wif_real = ""
+
+    f = open("test_setup.txt", "r")
+    test_setup = json.load(f)
+    f.close()
+
+    wif_real = test_setup.get("wif")
+    addr_send = test_setup.get("address")
 
     if not addr_send or not wif_real:
-        pytest.exit("Please check test wif and address")
+        pytest.exit("Please check test wif and address in test_setup.txt")
 
     url = "http://127.0.0.1:12986"  # set correct port for chosen chain
     userpass = "userpass"
