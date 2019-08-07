@@ -11,7 +11,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install python3
 
-install: "pip3 install --user -r rpctest/requirements.txt"
+install: "pip install --user -r rpctest/requirements.txt"
 
 before_script:
   - ./travis-build.sh
