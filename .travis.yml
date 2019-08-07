@@ -26,6 +26,4 @@ before_script:
 
 script:
   - make
-  - ./nspv ILN
-  - cd rpctest
-  - python3 -m pytest test_nspv.py
+  - ./nspv ILN && sleep 10 && cd rpctest && python3 -m pytest test_nspv.py
