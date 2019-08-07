@@ -1062,7 +1062,7 @@ void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
     char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight,numargs; uint8_t CCflag,memfunc; cJSON *params;
-fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
+//fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
     if ( (method= jstr(argjson,"method")) == 0 )
         return(cJSON_Parse("{\"error\":\"no method\"}"));
     else if ( (symbol= jstr(argjson,"coin")) != 0 && strcmp(symbol,NSPV_symbol) != 0 )
@@ -1178,14 +1178,64 @@ fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
     else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
+int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
+{
+    int32_t keylen,vlen,num=0; char *p = fmt;
+    keylen = (int32_t)strlen(key);
+    vlen = (int32_t)strlen(value);
+    while ( 1 )
+    {
+        p = strstr(fmt,key);
+        if ( p == NULL )
+        {
+            strcpy(dest,fmt);
+            break;
+        }
+        num++;
+        memcpy(dest,fmt,p - fmt);
+        dest += p - fmt;
+        memcpy(dest,value,vlen);
+        dest += vlen;
+        fmt = p + keylen;
+    }
+    return(num);
+}
+
+void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
+{
+    int32_t len;
+    if ( NSPV_replace_var(*bigbufp,*filestrp,key,value) != 0 )
+    {
+        free(*filestrp);
+        len = (int32_t)strlen(*bigbufp);
+        *filestrp = malloc(len+1);
+        strcpy(*filestrp,*bigbufp);
+    }
+}
+
+char *NSPV_expand_variables(char *bigbuf,char *filestr)
+{
+    char urlstr[64];
+    if ( NSPV_chain == 0 )
+    {
+        free(bigbuf);
+        return(filestr);
+    }
+    sprintf(urlstr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
+    NSPV_expand_variable(&bigbuf,&filestr,"$URL",urlstr);
+    free(bigbuf);
+    return(filestr);
+}
+
 char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // from rpc port
 {
     char *retstr; cJSON *retjson = 0;
     if ( filestr != 0 )
     {
+        return(NSPV_expand_variables(calloc(4096,4096),filestr));
         //fprintf(stderr,"NSPV filestr.%s\n",filestr);
         // extract data from retjson and put into filestr template
-        return(filestr);
+        //return(filestr);
     }
     if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
         fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);

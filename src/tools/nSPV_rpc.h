@@ -554,7 +554,7 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
 
 char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/bootstrap.min.css.map", "/custom.css", "/favicon.ico", "/font/rubik.css", "/antara150x150.png", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
 
-char *methodfiles[] = { "wallet", "login", "broadcast", "getinfo", "receive", "getnewaddress", "index", "getpeerinfo", "send_confirm", "send_validate", "send", "txidinfo" };
+char *methodfiles[] = { "wallet", "login", "broadcast", "getinfo", "receive", "getnewaddress", "index", "getpeerinfo", "send_confirm", "send_validate", "send", "txidinfo", "logout" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
@@ -621,8 +621,8 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     {
         *jsonflagp = 1;
         if ( (filestr= OS_filestr(&filesize,"html/index")) == 0 )
-            return(clonestr("{\"error\":\"cant find indexƒ\"}"));
-        else return(filestr);
+            return(clonestr("{\"error\":\"cant find index\"}"));
+        //else return(filestr);
     }
     else
     {
@@ -631,9 +631,9 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
+        //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
-            //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
             {
                 *jsonflagp = 1;
@@ -653,7 +653,20 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 }
             }
         }
-        if ( strncmp("/method/",cmpstr,8) == 0 )
+        for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
+        {
+            if ( strncmp(cmpstr+1,methodfiles[f],strlen(methodfiles[f])) == 0 )
+            {
+                *jsonflagp = 1;
+                strcpy(filetype,"html");
+                sprintf(fname,"html/%s",methodfiles[f]);
+                //fprintf(stderr,"open1 (%s)\n",fname);
+                if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                break;
+            }
+        }
+        if ( filestr == 0 && strncmp("/method/",cmpstr,8) == 0 )
         {
             for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
@@ -662,6 +675,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     *jsonflagp = 1;
                     strcpy(filetype,"html");
                     sprintf(fname,"html/%s",methodfiles[f]);
+                    //fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
                     break;
@@ -874,7 +888,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     if ( is_cJSON_Array(arg) != 0 && cJSON_GetArraySize(arg) == 1 )
                         arg = jitem(arg,0);
                 } else arg = argjson;
-                //printf("ARGJSON.(%s)\n",jprint(arg,0));
+                //printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
                 if ( userpass != 0 && jstr(arg,"userpass") == 0 )
                     jaddstr(arg,"userpass",userpass);
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
