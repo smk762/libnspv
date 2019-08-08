@@ -21,8 +21,8 @@ import re
 import errno
 import logging
 
-from . import coverage
-from .authproxy import AuthServiceProxy, JSONRPCException
+import coverage
+from authproxy import AuthServiceProxy, JSONRPCException
 
 COVERAGE_DIR = None
 

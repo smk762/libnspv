@@ -552,7 +552,9 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     return(n);
 }
 
-char *htmlfiles[] = { "/bootstrap.min.css", "/wallet.html", "/login.html", "/favicon.ico" };
+char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/bootstrap.min.css.map", "/custom.css", "/favicon.ico", "/font/rubik.css", "/antara150x150.png", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
+
+char *methodfiles[] = { "wallet", "login", "broadcast", "getinfo", "receive", "getnewaddress", "index", "getpeerinfo", "send_confirm", "send_validate", "send", "txidinfo", "logout" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {
@@ -592,9 +594,9 @@ cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
     return(json);
 }
 
-char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
+char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
 {
-    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr,*token = 0; int32_t i,j,n,num=0; uint32_t queueid;
+    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr=0,*token = 0; int32_t i,j,n,num=0; uint32_t queueid;
     for (i=0; i<(int32_t)sizeof(urlmethod)-1&&urlstr[i]!=0&&urlstr[i]!=' '; i++)
         urlmethod[i] = urlstr[i];
     urlmethod[i++] = 0;
@@ -610,36 +612,99 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
     filetype[0] = 0;
     //printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
     snprintf(furl,sizeof(furl),"%s",url+1);
+    if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
+    {
+        *jsonflagp = 1;
+        i += strlen("/api");
+    } else *jsonflagp = 0;
     if ( strcmp(&url[i],"/") == 0 && strcmp(urlmethod,"GET") == 0 )
     {
         *jsonflagp = 1;
-        if ( (filestr= OS_filestr(&filesize,"html/index.html")) == 0 )
-            return(clonestr("{\"error\":\"cant find index.html\"}"));
-        else return(filestr);
+        if ( (filestr= OS_filestr(&filesize,"html/index")) == 0 )
+            return(clonestr("{\"error\":\"cant find index\"}"));
+        //else return(filestr);
     }
     else
     {
-        int32_t f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
+        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
+        strcpy(cmpstr,&url[i]);
+        if ( cmpstr[strlen(cmpstr)-1] == '?' )
+            cmpstr[strlen(cmpstr)-1] = 0;
+        sprintf(cmpstr2,":%u%s",port,cmpstr);
+        //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
-            *jsonflagp = 1;
-            strcpy(cmpstr,&url[i]);
-            if ( cmpstr[strlen(cmpstr)-1] == '?' )
-                cmpstr[strlen(cmpstr)-1] = 0;
-            sprintf(cmpstr2,":%u%s",port,cmpstr);
-            //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
             {
-                for (i=(int32_t)strlen(url)-1; i>0; i--)
-                    if ( url[i] == '.' || url[i] == '/' )
+                *jsonflagp = 1;
+                for (j=(int32_t)strlen(url)-1; j>0; j--)
+                    if ( url[j] == '.' || url[j] == '/' )
                         break;
-                if ( url[i] == '.' )
-                    strcpy(filetype,url+i+1);
-                //printf("return filetype.(%s) size.%ld\n",filetype,filesize);
-                sprintf(fname,"html/%s",htmlfiles[f]+1);
+                if ( url[j] == '.' )
+                {
+                    sprintf(fname,"html/%s",htmlfiles[f]+1);
+                    strcpy(filetype,url+j+1);
+                    //printf("set (%s) filetype.(%s)\n",fname,filetype);
+                    if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                        return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                    if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
+                        *contentlenp = (int32_t)filesize;
+                    return(filestr);
+                }
+            }
+        }
+        for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
+        {
+            if ( strncmp(cmpstr+1,methodfiles[f],strlen(methodfiles[f])) == 0 )
+            {
+                *jsonflagp = 1;
+                strcpy(filetype,"html");
+                sprintf(fname,"html/%s",methodfiles[f]);
+                //fprintf(stderr,"open1 (%s)\n",fname);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
-                    return(clonestr("{\"error\":\"cant find htmlfile\"}"));
-                else return(filestr);
+                    return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                break;
+            }
+        }
+        if ( filestr == 0 && strncmp("/method/",cmpstr,8) == 0 )
+        {
+            for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
+            {
+                if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
+                {
+                    *jsonflagp = 1;
+                    strcpy(filetype,"html");
+                    sprintf(fname,"html/%s",methodfiles[f]);
+                    //fprintf(stderr,"open (%s)\n",fname);
+                    if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                        return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                    break;
+                }
+            }
+            if ( filestr == 0 )
+            {
+                for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
+                {
+                    //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
+                    if ( strcmp(cmpstr+7,htmlfiles[f]) == 0 || strcmp(cmpstr2+7,htmlfiles[f]) == 0 )
+                    {
+                        *jsonflagp = 1;
+                        for (j=(int32_t)strlen(url)-1; j>0; j--)
+                            if ( url[j] == '.' || url[j] == '/' )
+                                break;
+                        if ( url[j] == '.' )
+                        {
+                            sprintf(fname,"html/%s",htmlfiles[f]+1);
+                            strcpy(filetype,url+j+1);
+                            //printf("set2 (%s) filetype.(%s)\n",fname,filetype);
+                            if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                                return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                            if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
+                                *contentlenp = (int32_t)filesize;
+                            return(filestr);
+                        }
+                    }
+                }
             }
         }
     }
@@ -654,11 +719,6 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
      //printf("return filetype.(%s) size.%ld\n",filetype,filesize);
      return(filestr);
      }*/
-    if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
-    {
-        *jsonflagp = 1;
-        i += strlen("/api");
-    } else *jsonflagp = 0;
     if ( strcmp(url,"/favicon.ico") == 0 )
     {
         *jsonflagp = 1;
@@ -807,7 +867,7 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     //printf("after urlconv.(%s) argjson.(%s)\n",jprint(json,0),jprint(argjson,0));
                     if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(argjson) > 0 )
                     {
-                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port)) != 0 )
+                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port,filestr)) != 0 )
                         {
                             if ( (retitem= cJSON_Parse(retstr)) != 0 )
                                 jaddi(retarray,retitem);
@@ -828,13 +888,13 @@ char *NSPV_rpcparse(char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *pos
                     if ( is_cJSON_Array(arg) != 0 && cJSON_GetArraySize(arg) == 1 )
                         arg = jitem(arg,0);
                 } else arg = argjson;
-                //printf("ARGJSON.(%s)\n",jprint(arg,0));
+                //printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
                 if ( userpass != 0 && jstr(arg,"userpass") == 0 )
                     jaddstr(arg,"userpass",userpass);
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
                 {
                     portable_mutex_lock(&NSPV_commandmutex);
-                    retstr = NSPV_JSON(arg,remoteaddr,port);
+                    retstr = NSPV_JSON(arg,remoteaddr,port,filestr);
                     portable_mutex_unlock(&NSPV_commandmutex);
                 } else retstr = clonestr("{\"error\":\"invalid remote method\"}");
             }
@@ -878,7 +938,7 @@ int32_t iguana_getheadersize(char *buf,int32_t recvlen)
 void *LP_rpc_processreq(void *_ptr)
 {
     char filetype[128],content_type[128];
-    int32_t recvlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
+    int32_t recvlen,retlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
     char helpname[512],remoteaddr[64],*buf,*retstr,space[8192],space2[32786],*jsonbuf; struct rpcrequest_info *req = _ptr;
     uint32_t ipbits,i,size = NSPV_MAXPACKETSIZE + 512;
     ipbits = req->ipbits;;
@@ -950,10 +1010,11 @@ void *LP_rpc_processreq(void *_ptr)
         }
     }
     content_type[0] = 0;
+    retlen = 0;
     if ( recvlen > 0 )
     {
         jsonflag = postflag = 0;
-        retstr = NSPV_rpcparse(space,size,&jsonflag,&postflag,jsonbuf,remoteaddr,filetype,req->port);
+        retstr = NSPV_rpcparse(&retlen,space,size,&jsonflag,&postflag,jsonbuf,remoteaddr,filetype,req->port);
         if ( filetype[0] != 0 )
         {
             static cJSON *mimejson; char *tmp,*typestr=0; long tmpsize;
@@ -973,7 +1034,7 @@ void *LP_rpc_processreq(void *_ptr)
     }
     if ( retstr != 0 )
     {
-        char *response,hdrs[1024];
+        char *response,*acceptstr="",hdrs[1024]; int32_t crflag = 1;
         //printf("RETURN.(%s) jsonflag.%d postflag.%d\n",retstr,jsonflag,postflag);
         if ( jsonflag != 0 || postflag != 0 )
         {
@@ -984,11 +1045,19 @@ void *LP_rpc_processreq(void *_ptr)
                 response = malloc(strlen(retstr)+1024+1+1);
                 //printf("alloc response.%p\n",response);
             }
-            sprintf(hdrs,"HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",content_type,(int32_t)strlen(retstr)+1);
+            if ( retlen == 0 )
+                retlen = (int32_t)strlen(retstr)+1;
+            else
+            {
+                acceptstr = "Accept-Ranges: bytes\r\n";
+                crflag = 0;
+            }
+            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
             response[0] = '\0';
             strcat(response,hdrs);
-            strcat(response,retstr);
-            strcat(response,"\n");
+            memcpy(&response[strlen(response)],retstr,retlen);
+            if ( crflag != 0 )
+                strcat(response,"\n");
             if ( retstr != space )
             {
                 //printf("free retstr0.%p\n",retstr);
@@ -997,7 +1066,7 @@ void *LP_rpc_processreq(void *_ptr)
             retstr = response;
             //printf("RET.(%s)\n",retstr);
         }
-        remains = (int32_t)strlen(retstr);
+        remains = (int32_t)strlen(hdrs) + retlen;
         i = 0;
         while ( remains > 0 )
         {
