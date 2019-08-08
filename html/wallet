@@ -19,8 +19,8 @@
         <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body"> <!-- coin info body start -->
-                <span>Coin: KMD</span><br>
-                <span>Balance: 1235.22335454 KMD</span>
+                <span>Coin: $COIN</span><br>
+                <span>Balance: 1235.22335454 $COIN</span>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->

@@ -1223,6 +1223,26 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     }
     sprintf(urlstr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(&bigbuf,&filestr,"$URL",urlstr);
+    
+    char coin_symbol[64];
+    sprintf(coin_symbol,"%s",NSPV_chain->name);
+    //printf("ACTIVE COIN SYMBOL is: %s\n", coin_symbol);
+    NSPV_expand_variable(&bigbuf,&filestr,"$COIN",coin_symbol);
+    
+    char current_height[32];
+    sprintf(current_height,"%u", NSPV_inforesult.height);
+    NSPV_expand_variable(&bigbuf,&filestr,"$CURHEIGHT",current_height);
+
+    char ntz_height[32];
+    sprintf(ntz_height,"%u", NSPV_inforesult.notarization.height);
+    NSPV_expand_variable(&bigbuf,&filestr,"$NTZHEIGHT",ntz_height);
+
+    //char ntz_blockhash[32];
+    //sprintf(ntz_blockhash,"%u", NSPV_inforesult.notarization.blockhash);
+    //NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH",NSPV_inforesult.notarization.blockhash);
+    
+    //printf("%s\n", NSPV_inforesult.notarization.height);
+
     free(bigbuf);
     return(filestr);
 }
