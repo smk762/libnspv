@@ -1224,7 +1224,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(&bigbuf,&filestr,"$URL",replacestr);
     
-    NSPV_expand_variable(&bigbuf,&filestr,"$COIN",NSPV_chain->name);
+    NSPV_expand_variable(&bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     
     sprintf(replacestr,"%u", NSPV_inforesult.height);
     NSPV_expand_variable(&bigbuf,&filestr,"$CURHEIGHT",replacestr);
