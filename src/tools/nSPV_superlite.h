@@ -1251,10 +1251,32 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $NTIME - nTime
     // $NBITS - nBits
 
+    // == Get New Address page variables ==
+    // $NEW_WALLETADDR - New wallet address
+    // $NEW_WIFKEY - New wallet address's Private/WIF key
+    // $NEW_PUBKEY - New wallet address's Public key
+
     // == Wallet page variables ==
     // $BALANCE - Coin Balance
     // $WALLETADDR - Logged in wallet's address
     // -- Wallet Address is also used in send_confirm and send_validate page as "From Address"
+
+    // == Transactions detail (txidinfo) page variables - spentinfo API ==
+    // $TXINFO_TXID - Txid
+    // $TXINFO_VOUT - vout
+    // $TXINFO_SPENTHT - spent height
+    // $TXINFO_SPENTTXID - spent txid
+    // $TXINFO_SPENTVINI - spent vini
+    // $TXINFO_SENTTXLEN - spent transaction length
+    // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
+
+    // == Broadcast page variables ==
+    // $BDCAST_RESULT - broadcast API result output
+    // $BDCAST_EXPECTED - expected txid
+    // $BDCAST_TXID - broadcasted txid
+    // $BDCAST_RETCODE - retcode from broadcast API
+    // $BDCAST_TYPE - broadcast type
+    // 
 
     // == Send pages variables ==
     // $REWARDS - Rewards accrued by the logged in wallet address
@@ -1272,7 +1294,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $SENDVALBAL - valueBalance
 
     // == Peer info page array variables ==
-    // $PEER_INFO_ROW_ARRAY - Main Array variable defined in peerinfo page.
+    // $PEER_INFO_ROW_ARRAY - Main array variable defined in peerinfo page.
     // 
     // $PEER_NODEID - nodeid
     // $PEER_IPADDR - IP Address
@@ -1285,7 +1307,62 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $PEER_BESTKNOWNHT - Best Known Height
     // $PEER_INSYNC - In Sync
 
+    // == Send Validate page array variables ==
+    // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
+    // 
+    // $SEND_TXVIN_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+    // $SEND_TXVIN_TXID - txid
+    // $SEND_TXVIN_VOUT - vout
+    // $SEND_TXVIN_AMOUNT - amount
+    // $SEND_TXVIN_SCRIPTSIG - scriptSig
+    // $SEND_TXVIN_SEQID - sequenceid
+    // 
+    // 
+    // $SEND_TXVOUT_ARRAY - Main array variable defined in send_validate page for Tx-Vout table
+    // 
+    // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+    // $SEND_TXVOUT_VALUE - value
+    // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
 
+    // == Wallet page array variables ==
+    // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
+    // 
+    // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
+    // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
+    // $TXHIST_CONFIRMS - Confirmations
+    // $TXHIST_AMOUNT - Amount
+    // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
+    // $TXHIST_DESTADDDR - Destination address
+    // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
+    // $TXHIST_PRIV_BTN_PAGENUM - tx history previous page button link number
+    // $TXHIST_NEXT_BTN_PAGENUM - tx history next page button link number
+    // $TXHIST_CUR_PAGENUM - tx history page bottom text showing on which page number you are out of total
+    // $TXHIST_TOTAL_PAGENUM - tx history total number of pages
+    //
+    // Transactions History table HTML tags variables to use in
+    // conditional logic in displaying table rows and columns
+    // 
+    // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
+    // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
+    // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
+    // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
+    // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
+    // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
+    // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
+
+    // == Menu Buttons array variables ==
+    // $MENU_BUTTON_ARRAY - Main array variable defined in ALL pages to show buttons conditionally
+    // 
+    // Top menu buttons HTML tags variables to use with
+    // conditional logic to show/hide in cases when user is logged in or logged out
+    //
+    // MENU_BTN_INFO="<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button>";
+    // MENU_BTN_PEERINFO="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button>";
+    // MENU_BTN_NEWADDR="<button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button>";
+    // MENU_BTN_WALLET="<button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button>";
+    // MENU_BTN_SEND="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button>";
+    // MENU_BTN_LOGOUT="<button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button>";
+    // MENU_BTN_LOGIN="<button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>";
 
     free(bigbuf);
     return(filestr);
