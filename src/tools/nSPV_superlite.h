@@ -1271,6 +1271,20 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $SENDNEXPIRYHT - nExpiryHeight
     // $SENDVALBAL - valueBalance
 
+    // == Peer info page array variables ==
+    // $PEER_INFO_ROW_ARRAY - Main Array variable defined in peerinfo page.
+    // 
+    // $PEER_NODEID - nodeid
+    // $PEER_IPADDR - IP Address
+    // $PEER_PORT - Port
+    // $PEER_LASTPING - Last Ping
+    // $PEER_TIMECONSTART - Time Started Conn.
+    // $PEER_TIMELASTREQ - Time Last Req.
+    // $PEER_SERVICES - Services
+    // $PEER_MISBEHAVESCORE - Missbehave Score
+    // $PEER_BESTKNOWNHT - Best Known Height
+    // $PEER_INSYNC - In Sync
+
 
 
     free(bigbuf);
