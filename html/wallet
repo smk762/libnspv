@@ -20,7 +20,7 @@
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body"> <!-- coin info body start -->
                 <span>Coin: $COIN</span><br>
-                <span>Balance: 1235.22335454 $COIN</span>
+                <span>Balance: $BALANCE $COIN</span>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
@@ -51,7 +51,7 @@
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- tx history reresh button form start -->
-                    Your Address: <span class="badge badge-secondary" style="margin-right: 15px;">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</span>
+                    Your Address: <span class="badge badge-secondary" style="margin-right: 15px;">$WALLETADDR</span>
                     <button class="btn btn-outline-light btn-sm" formaction="$URL/method/wallet?nexturl=wallet" formmethod="get">Refresh</button>
                   </form> <!-- tx history reresh button form end -->
                 </div>

@@ -1237,6 +1237,25 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     
     //printf("%s\n", NSPV_inforesult.notarization.height);
 
+    // == Getinfo page variabls ==
+    // $PEERSTOTAL - Total Connected Peers
+    // $PROTOVER - Protocol Version
+    // $LASTPEER - Last connected Peers
+    // $NTZTXID - Notarised Txid
+    // $NTZTXIDHT - Notarised Txid Height
+    // $NTZDESTTXID - Notarised Destination Txid
+    // $BLKHDR - Block Header
+    // $BLKHASH - Block Hash
+    // $PRIVBLKHASH - Previous Block Hash
+    // $MRKLRTHASH - Merkle Root Hash
+    // $NTIME - nTime
+    // $NBITS - nBits
+
+    // == Wallet page variables ==
+    // $BALANCE - Coin Balance
+    // $WALLETADDR - Logged in wallet's address
+    // 
+
     free(bigbuf);
     return(filestr);
 }
