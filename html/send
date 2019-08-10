@@ -52,16 +52,21 @@
               </div> <!-- Send page header end -->
               <div class="card-body"> <!-- Send page body start -->
                 <form action="$URL/method/send_confirm" method="get"> <!-- Send form start -->
-                  <div class="form-group"> <!-- Send form to address start -->
+                  <div class="form-group"> <!-- Send form FROM address start -->
+                    <label for="sendfromaddr">From Address</label>
+                    <input type="text" class="form-control-plaintext text-white" id="sendfromaddr" name="sendfromaddr" aria-describedby="sendfromaddrHelp" value="$WALLETADDR" readonly>
+                    <small id="sendfromaddrHelp" class="form-text text-muted">Funds are being sent from the logged in wallet's address.</small>
+                  </div> <!-- Send form FROM address end -->
+                  <div class="form-group"> <!-- Send form TO address start -->
                     <label for="sendtoaddr">Send To Address</label>
                     <input type="text" class="form-control" id="sendtoaddr" name="address" aria-describedby="addressHelp" placeholder="Enter address">
                     <small id="addressHelp" class="form-text text-muted">Enter address to which you want to send funds to.</small>
-                  </div> <!-- Send form to address end -->
-                  <div class="form-group"> <!-- Send form amount start -->
+                  </div> <!-- Send form TO address end -->
+                  <div class="form-group"> <!-- Send form AMOUNT start -->
                     <label for="amount">Amount</label>
                     <input type="text" class="form-control" id="amount" name="amount" aria-describedby="amountHelp" placeholder="e.g. 0.123">
                     <small id="amountHelp" class="form-text text-muted">Enter Amount you want to send.</small>
-                  </div> <!-- Send form amount end -->
+                  </div> <!-- Send form AMOUNT end -->
                   <button type="submit" class="btn btn-primary">Confirm</button>
                 </form> <!-- Send form send -->
               </div> <!-- Send page body end -->
