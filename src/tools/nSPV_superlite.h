@@ -1215,31 +1215,25 @@ void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
 
 char *NSPV_expand_variables(char *bigbuf,char *filestr)
 {
-    char urlstr[64];
+    char replacestr[8192];
     if ( NSPV_chain == 0 )
     {
         free(bigbuf);
         return(filestr);
     }
-    sprintf(urlstr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
-    NSPV_expand_variable(&bigbuf,&filestr,"$URL",urlstr);
+    sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
+    NSPV_expand_variable(&bigbuf,&filestr,"$URL",replacestr);
     
-    char coin_symbol[64];
-    sprintf(coin_symbol,"%s",NSPV_chain->name);
-    //printf("ACTIVE COIN SYMBOL is: %s\n", coin_symbol);
-    NSPV_expand_variable(&bigbuf,&filestr,"$COIN",coin_symbol);
+    NSPV_expand_variable(&bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     
-    char current_height[32];
-    sprintf(current_height,"%u", NSPV_inforesult.height);
-    NSPV_expand_variable(&bigbuf,&filestr,"$CURHEIGHT",current_height);
+    sprintf(replacestr,"%u", NSPV_inforesult.height);
+    NSPV_expand_variable(&bigbuf,&filestr,"$CURHEIGHT",replacestr);
 
-    char ntz_height[32];
-    sprintf(ntz_height,"%u", NSPV_inforesult.notarization.height);
-    NSPV_expand_variable(&bigbuf,&filestr,"$NTZHEIGHT",ntz_height);
+    sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);
+    NSPV_expand_variable(&bigbuf,&filestr,"$NTZHEIGHT",replacestr);
 
-    //char ntz_blockhash[32];
-    //sprintf(ntz_blockhash,"%u", NSPV_inforesult.notarization.blockhash);
-    //NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH",NSPV_inforesult.notarization.blockhash);
+    bits256_str(replacestr,NSPV_inforesult.notarization.blockhash);
+    NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH",replacestr);
     
     //printf("%s\n", NSPV_inforesult.notarization.height);
 
