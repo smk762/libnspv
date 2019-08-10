@@ -72,9 +72,9 @@
                       <td>SuperLite</td>
                       <td>$CURHEIGHT</td>
                       <td>$NTZHEIGHT</td>
-                      <td>7</td>
-                      <td>0</td>
-                      <td>nodeid.1</td>
+                      <td>$PEERSTOTAL</td>
+                      <td>$PROTOVER</td>
+                      <td>$LASTPEER</td>
                     </tr>
                   </tbody>
                 </table>
@@ -110,15 +110,15 @@
                     </tr>
                     <tr>
                       <td scope="row">Notarized Txid</td>
-                      <td><a href="$URL/method/spentinfo?txid=3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da&vout=1&nexturl=txidinfo" class="text-break text-wrap">3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$NTZTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarization Txid Height</td>
-                      <td>1458354</td>
+                      <td>$NTZTXIDHT</td>
                     </tr>
                     <tr>
                       <td scope="row">Notarization Destination Txid</td>
-                      <td><a href="$URL/method/spentinfo?txid=500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6&vout=1&nexturl=txidinfo" class="text-break text-wrap">500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$NTZDESTTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$NTZDESTTXID</a></td>
                     </tr>
                   </tbody>
                 </table>
@@ -146,27 +146,27 @@
                   <tbody>
                     <tr>
                       <td scope="row">Header</td>
-                      <td>1458356</td>
+                      <td>$BLKHDR</td>
                     </tr>
                     <tr>
                       <td scope="row">Blockhash</td>
-                      <td><a href="$URL/method/spentinfo?txid=09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479&vout=1&nexturl=txidinfo" class="text-break text-wrap">09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$BLKHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$BLKHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Prev. Block Hash</td>
-                      <td><a href="$URL/method/spentinfo?txid=08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af&vout=1&nexturl=txidinfo" class="text-break text-wrap">08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$PRIVBLKHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$PRIVBLKHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Merkle Root Hash</td>
-                      <td><a href="$URL/method/spentinfo?txid=26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16&vout=1&nexturl=txidinfo" class="text-break text-wrap">26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$MRKLRTHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$MRKLRTHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">nTime</td>
-                      <td>1564069327</td>
+                      <td>$NTIME</td>
                     </tr>
                     <tr>
                       <td scope="row">nBits</td>
-                      <td>486605795</td>
+                      <td>$NBITS</td>
                     </tr>
                   </tbody>
                 </table>
