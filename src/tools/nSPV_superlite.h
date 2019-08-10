@@ -1350,6 +1350,19 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
     // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
 
+    // == Menu Buttons array variables ==
+    // $MENU_BUTTON_ARRAY - Main array variable defined in ALL pages to show buttons conditionally
+    // 
+    // Top menu buttons HTML tags variables to use with
+    // conditional logic to show/hide in cases when user is logged in or logged out
+    //
+    // MENU_BTN_INFO="<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button>";
+    // MENU_BTN_PEERINFO="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button>";
+    // MENU_BTN_NEWADDR="<button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button>";
+    // MENU_BTN_WALLET="<button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button>";
+    // MENU_BTN_SEND="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button>";
+    // MENU_BTN_LOGOUT="<button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button>";
+    // MENU_BTN_LOGIN="<button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>";
 
     free(bigbuf);
     return(filestr);
