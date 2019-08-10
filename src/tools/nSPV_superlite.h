@@ -1294,7 +1294,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $SENDVALBAL - valueBalance
 
     // == Peer info page array variables ==
-    // $PEER_INFO_ROW_ARRAY - Main Array variable defined in peerinfo page.
+    // $PEER_INFO_ROW_ARRAY - Main array variable defined in peerinfo page.
     // 
     // $PEER_NODEID - nodeid
     // $PEER_IPADDR - IP Address
@@ -1307,6 +1307,22 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $PEER_BESTKNOWNHT - Best Known Height
     // $PEER_INSYNC - In Sync
 
+    // == Send Validate page array variables ==
+    // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
+    // 
+    // $SEND_TXVIN_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+    // $SEND_TXVIN_TXID - txid
+    // $SEND_TXVIN_VOUT - vout
+    // $SEND_TXVIN_AMOUNT - amount
+    // $SEND_TXVIN_SCRIPTSIG - scriptSig
+    // $SEND_TXVIN_SEQID - sequenceid
+    // 
+    // 
+    // $SEND_TXVOUT_ARRAY - Main array variable defined in send_validate page for Tx-Vout table
+    // 
+    // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+    // $SEND_TXVOUT_VALUE - value
+    // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
 
 
     free(bigbuf);
