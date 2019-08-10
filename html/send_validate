@@ -50,7 +50,7 @@
                   </div>
                 </div>
               </div> <!-- Send page header end -->
-              <form action="$URL/method/broadcast?hex=0400008085202f890155c894ada147bf184bb7dff790ca429e6860775d3bb471dc0f69a28f080977e0010000006a47304402206774ff903a8a4b73bcd5a79fe5c744f34d2263160cd8877c198c2228c66a8a42022063e1d2d6403c395e3472a6a509f01cbff0b90e3413bc6f7bc492649302a4a64001210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ffffffff0200e1f505000000001976a9144726f2838fc4d6ac66615e10604e18926e9b556e88ac48f804060000000023210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ace77e395d000000000000000000000000000000&nexturl=broadcast" method="get"> <!-- Send form start -->
+              <form action="$URL/method/broadcast?hex=$SENDHEX&nexturl=broadcast" method="get"> <!-- Send form start -->
                 <div class="card-body" style="padding: 0;"> <!-- Send page body start -->
                   <table class="table table-striped table-dark">
                     <tbody>
@@ -60,51 +60,51 @@
                       </tr>
                       <tr>
                         <th>Rewards</th>
-                        <td>0.00000000</td>
+                        <td>$REWARDS</td>
                       </tr>
                       <tr>
                         <th>Validated</th>
-                        <td>0.00000000
+                        <td>$REWARDSVLD
                           <small id="validatedHelp" class="form-text text-muted">Locally calculated value of rewards to match with the value from network.</small>
                         </td>
                       </tr>
                       <tr>
                         <th>From Address</th>
-                        <td>RFLYiCnCDr9r5ky4fksFKtAcHGpu4N7qRH</td>
+                        <td>$WALLETADDR</td>
                       </tr>
                       <tr>
                         <th>To Address</th>
-                        <td>RRBnGReBxqG6RhdsWivZUV6NeLhXqUF3ut</td>
+                        <td>$TOADDR</td>
                       </tr>
                       <tr>
                         <th>Amount</th>
-                        <td>1.00000000 $COIN</td>
+                        <td>$SENDAMOUNT $COIN</td>
                       </tr>
                       <tr>
                         <th>Transaction Fees</th>
-                        <td>0.00989000 $COIN</td>
+                        <td>$TXFEE $COIN</td>
                       </tr>
                       <tr>
                         <th>Total amount being sent</th>
-                        <td>1.00989000 $COIN</td>
+                        <td>$TOTALAMOUNT $COIN</td>
                       </tr>
                       <tr>
                         <th>retcodes</th>
                         <td>
                           <ul> <!-- Unordered list started for an array of retcodes -->
-                            <li>0</li> <!-- first array value from retcodes array -->
+                            <li>$SPENDRETCODE</li> <!-- first array value from retcodes array -->
                           </ul>
                         </td>
                       </tr>
                       <tr>
                         <th>txid</th>
-                        <td class="text-break text-wrap">e07709088fa2690fdc71b43b5d7760689e42ca90f7dfb74b18bf47a1ad94c855
+                        <td class="text-break text-wrap">$SENDTXID
                           <small id="txidHelp" class="form-text text-muted">This <kbd>txid</kbd> will only be available on blockchain explorers after your broadcast the transaction to network.</small></td>
                       </tr>
                       <tr>
                         <th>hex</th>
                         <td>
-                          <pre class="text-break text-wrap text-white">0400008085202f890155c894ada147bf184bb7dff790ca429e6860775d3bb471dc0f69a28f080977e0010000006a47304402206774ff903a8a4b73bcd5a79fe5c744f34d2263160cd8877c198c2228c66a8a42022063e1d2d6403c395e3472a6a509f01cbff0b90e3413bc6f7bc492649302a4a64001210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ffffffff0200e1f505000000001976a9144726f2838fc4d6ac66615e10604e18926e9b556e88ac48f804060000000023210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ace77e395d000000000000000000000000000000</pre>
+                          <pre class="text-break text-wrap text-white">$SENDHEX</pre>
                           <small id="broadcastHexHelp" class="form-text text-muted">You can also just copy this hex string and broadcast through another computer if you wish.</small>
                         </td>
                       </tr>
@@ -135,10 +135,10 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>4</td>
-                    <td>1564049127</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td>$SENDNVER</td>
+                    <td>$SENDNLOCKTIME</td>
+                    <td>$SENDNEXPIRYHT</td>
+                    <td>$SENDVALBAL</td>
                   </tr>
                 </tbody>
               </table>

@@ -50,25 +50,25 @@
                   </div>
                 </div>
               </div> <!-- Send page header end -->
-              <form action="$URL/method/send_validate?hex=0400008085202f890155c894ada147bf184bb7dff790ca429e6860775d3bb471dc0f69a28f080977e0010000006a47304402206774ff903a8a4b73bcd5a79fe5c744f34d2263160cd8877c198c2228c66a8a42022063e1d2d6403c395e3472a6a509f01cbff0b90e3413bc6f7bc492649302a4a64001210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ffffffff0200e1f505000000001976a9144726f2838fc4d6ac66615e10604e18926e9b556e88ac48f804060000000023210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ace77e395d000000000000000000000000000000&nexturl=broadcast" method="get"> <!-- Send form start -->
+              <form action="$URL/method/send_validate?hex=$SENDHEX&nexturl=broadcast" method="get"> <!-- Send form start -->
                 <div class="card-body" style="padding: 0;"> <!-- Send page body start -->
                   <table class="table table-striped table-dark">
                     <tbody>
                       <tr>
                         <th style="width: 220px;">Rewards</th>
-                        <td>0.00000000</td>
+                        <td>$REWARDS</td>
                       </tr>
                       <tr>
                         <th>From Address</th>
-                        <td>RFLYiCnCDr9r5ky4fksFKtAcHGpu4N7qRH</td>
+                        <td>$WALLETADDR $COIN</td>
                       </tr>
                       <tr>
                         <th>To Address</th>
-                        <td>RRBnGReBxqG6RhdsWivZUV6NeLhXqUF3ut</td>
+                        <td>$TOADDR</td>
                       </tr>
                       <tr>
                         <th>Amount</th>
-                        <td>1.00000000 KMD</td>
+                        <td>$SENDAMOUNT $COIN</td>
                       </tr>
                     </tbody>
                   </table>
