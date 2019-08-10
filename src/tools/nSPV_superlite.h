@@ -1324,6 +1324,32 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $SEND_TXVOUT_VALUE - value
     // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
 
+    // == Wallet page array variables ==
+    // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
+    // 
+    // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
+    // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
+    // $TXHIST_CONFIRMS - Confirmations
+    // $TXHIST_AMOUNT - Amount
+    // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
+    // $TXHIST_DESTADDDR - Destination address
+    // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
+    // $TXHIST_PRIV_BTN_PAGENUM - tx history previous page button link number
+    // $TXHIST_NEXT_BTN_PAGENUM - tx history next page button link number
+    // $TXHIST_CUR_PAGENUM - tx history page bottom text showing on which page number you are out of total
+    // $TXHIST_TOTAL_PAGENUM - tx history total number of pages
+    //
+    // Transactions History table HTML tags variables to use in
+    // conditional logic in displaying table rows and columns
+    // 
+    // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
+    // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
+    // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
+    // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
+    // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
+    // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
+    // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
+
 
     free(bigbuf);
     return(filestr);

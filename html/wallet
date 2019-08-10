@@ -72,49 +72,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">
-                        <span class="badge badge-secondary">public</span>
-                      </th>
-                      <td>
-                        <span class="badge badge-light">Minted</span>
-                      </td>
-                      <td>2146</td>
-                      <td>23.43508747</td>
-                      <td>24 Jul 2019 07:00</td>
-                      <td class="text-break text-wrap">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
-                      <td><button class="btn btn-primary btn-sm" formaction="$URL/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row">
-                        <span class="badge badge-dark">private</span>
-                      </th>
-                      <td>
-                        <span class="badge badge-danger">OUT</span>
-                        <span class="badge badge-info">dPoW Secured</span>
-                      </td>
-                      <td>3077</td>
-                      <td>-35.99944884</td>
-                      <td>23 Jul 2019 15:08</td>
-                      <td>
-                        <span class="badge badge-dark">Address not listed by wallet</span>
-                      </td>
-                      <td><button class="btn btn-primary btn-sm" formaction="$URL/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row">
-                        <span class="badge badge-secondary">public</span>
-                      </th>
-                      <td>
-                        <span class="badge badge-success">IN</span>
-                        <span class="badge badge-info">dPoW Secured</span>
-                      </td>
-                      <td>3751</td>
-                      <td>387.86723540</td>
-                      <td>21 Jul 2019 20:24</td>
-                      <td class="text-break text-wrap">RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA</td>
-                      <td><button class="btn btn-primary btn-sm" formaction="$URL/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" formmethod="get">Details</button></td>
-                    </tr>
+                    $TXHIST_ROW_ARRAY
                   </tbody>
                 </table>
               </form> <!-- tx history table form end -->
@@ -123,11 +81,11 @@
               <form>
                 <div class="row">
                   <div class="col-md-4 col-sm-4 col-xs-4">
-                    <button class="btn btn-outline-light" formaction="$URL/method/wallet?tx_list_page=1&nexturl=wallet" formmethod="get">Previous Page</button>
+                    <button class="btn btn-outline-light" formaction="$URL/method/wallet?tx_list_page=$TXHIST_PRIV_BTN_PAGENUM&nexturl=wallet" formmethod="get">Previous Page</button>
                   </div>
-                  <div class="col-md-4 col-sm-4 col-xs-4 text-center">Page 1 of 1</div>
+                  <div class="col-md-4 col-sm-4 col-xs-4 text-center">Page $TXHIST_CUR_PAGENUM of $TXHIST_TOTAL_PAGENUM</div>
                   <div class="col-md-4 col-sm-4 col-xs-4 text-right">
-                    <button class="btn btn-outline-light" formaction="$URL/method/wallet?tx_list_page=2&nexturl=wallet" formmethod="get">Next Page</button>
+                    <button class="btn btn-outline-light" formaction="$URL/method/wallet?tx_list_page=$TXHIST_NEXT_BTN_PAGENUM&nexturl=wallet" formmethod="get">Next Page</button>
                   </div>
                 </div>
               </form>
