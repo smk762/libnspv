@@ -1213,9 +1213,11 @@ void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
     }
 }
 
-char *NSPV_expand_variables(char *bigbuf,char *filestr)
+char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
 {
     char replacestr[8192];
+    if ( method == 0 )
+        method = "";
     if ( NSPV_chain == 0 )
     {
         free(bigbuf);
@@ -1236,7 +1238,28 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH",replacestr);
     
     //printf("%s\n", NSPV_inforesult.notarization.height);
+    // == Menu Buttons array variables ==
+    // $MENU_BUTTON_ARRAY - Main array variable defined in ALL pages to show buttons conditionally
+    //
+    // Top menu buttons HTML tags variables to use with
+    // conditional logic to show/hide in cases when user is logged in or logged out
+    //
+    // MENU_BTN_INFO="<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button>";
+    // MENU_BTN_PEERINFO="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button>";
+    // MENU_BTN_NEWADDR="<button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button>";
+    // MENU_BTN_WALLET="<button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button>";
+    // MENU_BTN_SEND="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button>";
+    // MENU_BTN_LOGOUT="<button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button>";
+    // MENU_BTN_LOGIN="<button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>";
+    NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH","MENU_BTN_INFO=\"<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button>";
+                          MENU_BTN_PEERINFO="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button>";
+                          MENU_BTN_NEWADDR="<button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button>";
+                          MENU_BTN_WALLET="<button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button>";
+                          MENU_BTN_SEND="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button>";
+                          MENU_BTN_LOGOUT="<button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button>";
+                          MENU_BTN_LOGIN="<button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>");
 
+    
     // == Getinfo page variabls ==
     // $PEERSTOTAL - Total Connected Peers
     // $PROTOVER - Protocol Version
@@ -1250,16 +1273,28 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $MRKLRTHASH - Merkle Root Hash
     // $NTIME - nTime
     // $NBITS - nBits
-
+    if ( strcmp(method,"getinfo") == 0 )
+    {
+        
+    }
+    
     // == Get New Address page variables ==
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
+    else if ( strcmp(method,"getnewaddress") == 0 )
+    {
+        
+    }
 
     // == Wallet page variables ==
     // $BALANCE - Coin Balance
     // $WALLETADDR - Logged in wallet's address
     // -- Wallet Address is also used in send_confirm and send_validate page as "From Address"
+    else if ( strcmp(method,"wallet") == 0 )
+    {
+        
+    }
 
     // == Transactions detail (txidinfo) page variables - spentinfo API ==
     // $TXINFO_TXID - Txid
@@ -1269,6 +1304,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $TXINFO_SPENTVINI - spent vini
     // $TXINFO_SENTTXLEN - spent transaction length
     // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
+    else if ( strcmp(method,"txidinfo") == 0 )
+    {
+        
+    }
 
     // == Broadcast page variables ==
     // $BDCAST_RESULT - broadcast API result output
@@ -1277,6 +1316,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $BDCAST_RETCODE - retcode from broadcast API
     // $BDCAST_TYPE - broadcast type
     // 
+    else if ( strcmp(method,"broadcast") == 0 )
+    {
+        
+    }
 
     // == Send pages variables ==
     // $REWARDS - Rewards accrued by the logged in wallet address
@@ -1292,6 +1335,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $SENDNLOCKTIME - nLockTime
     // $SENDNEXPIRYHT - nExpiryHeight
     // $SENDVALBAL - valueBalance
+    else if ( strcmp(method,"send") == 0 )
+    {
+        
+    }
 
     // == Peer info page array variables ==
     // $PEER_INFO_ROW_ARRAY - Main array variable defined in peerinfo page.
@@ -1306,6 +1353,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $PEER_MISBEHAVESCORE - Missbehave Score
     // $PEER_BESTKNOWNHT - Best Known Height
     // $PEER_INSYNC - In Sync
+    else if ( strcmp(method,"getpeerinfo") == 0 )
+    {
+        
+    }
 
     // == Send Validate page array variables ==
     // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
@@ -1323,6 +1374,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
     // $SEND_TXVOUT_VALUE - value
     // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
+    else if ( strcmp(method,"send_validate") == 0 )
+    {
+        
+    }
 
     // == Wallet page array variables ==
     // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
@@ -1339,6 +1394,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $TXHIST_CUR_PAGENUM - tx history page bottom text showing on which page number you are out of total
     // $TXHIST_TOTAL_PAGENUM - tx history total number of pages
     //
+    if ( strcmp(method,"wallet") == 0 )
+    {
+        
+    }
+
     // Transactions History table HTML tags variables to use in
     // conditional logic in displaying table rows and columns
     // 
@@ -1349,20 +1409,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
     // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
     // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
+    if ( strcmp(method,"txidinfo") == 0 )
+    {
+        
+    }
 
-    // == Menu Buttons array variables ==
-    // $MENU_BUTTON_ARRAY - Main array variable defined in ALL pages to show buttons conditionally
-    // 
-    // Top menu buttons HTML tags variables to use with
-    // conditional logic to show/hide in cases when user is logged in or logged out
-    //
-    // MENU_BTN_INFO="<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button>";
-    // MENU_BTN_PEERINFO="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button>";
-    // MENU_BTN_NEWADDR="<button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button>";
-    // MENU_BTN_WALLET="<button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button>";
-    // MENU_BTN_SEND="<button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button>";
-    // MENU_BTN_LOGOUT="<button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button>";
-    // MENU_BTN_LOGIN="<button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>";
 
     free(bigbuf);
     return(filestr);
@@ -1373,7 +1424,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // 
     char *retstr; cJSON *retjson = 0;
     if ( filestr != 0 )
     {
-        return(NSPV_expand_variables(calloc(4096,4096),filestr));
+        return(NSPV_expand_variables(calloc(4096,4096),filestr,jstr(argjson,"method")));
         //fprintf(stderr,"NSPV filestr.%s\n",filestr);
         // extract data from retjson and put into filestr template
         //return(filestr);
