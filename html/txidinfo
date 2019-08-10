@@ -55,35 +55,35 @@
                   <tbody>
                     <tr>
                       <td>Transaction ID</td>
-                      <td class="text-break text-wrap">e07709088fa2690fdc71b43b5d7760689e42ca90f7dfb74b18bf47a1ad94c855</td>
+                      <td class="text-break text-wrap">$TXINFO_TXID</td>
                     </tr>
                     <tr>
                       <td>vout</td>
-                      <td>1</td>
+                      <td>$TXINFO_VOUT</td>
                     </tr>
                     <tr>
                       <td>Spent Height</td>
-                      <td>1458037</td>
+                      <td>$TXINFO_SPENTHT</td>
                     </tr>
                     <tr>
                       <td>Spent Transaction ID</td>
-                      <td><a href="$URL/method/spentinfo?txid=c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a&vout=1&nexturl=txidinfo" class="text-break text-wrap">c76fede03fd821cf718b8ca7de898b95d04d7b9f7fcaeda89ccc00519476ec4a</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$TXINFO_SPENTTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$TXINFO_SPENTTXID</a></td>
                     </tr>
                     <tr>
                       <td>Spent vini</td>
-                      <td>0</td>
+                      <td>$TXINFO_SPENTVINI</td>
                     </tr>
                     <tr>
                       <td>Spent Transaction Length</td>
-                      <td>254</td>
+                      <td>$TXINFO_SENTTXLEN</td>
                     </tr>
                     <tr>
                       <td>Spent Transaction Proof Length</td>
-                      <td>1655</td>
+                      <td>$TXINFO_SPENTTXPROOFLEN</td>
                     </tr>
                     <tr>
                       <td>Last Peer</td>
-                      <td>nodeid.1</td>
+                      <td>$LASTPEER</td>
                     </tr>
                   </tbody>
                 </table>

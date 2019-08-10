@@ -1261,6 +1261,23 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $WALLETADDR - Logged in wallet's address
     // -- Wallet Address is also used in send_confirm and send_validate page as "From Address"
 
+    // == Transactions detail (txidinfo) page variables - spentinfo API ==
+    // $TXINFO_TXID - Txid
+    // $TXINFO_VOUT - vout
+    // $TXINFO_SPENTHT - spent height
+    // $TXINFO_SPENTTXID - spent txid
+    // $TXINFO_SPENTVINI - spent vini
+    // $TXINFO_SENTTXLEN - spent transaction length
+    // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
+
+    // == Broadcast page variables ==
+    // $BDCAST_RESULT - broadcast API result output
+    // $BDCAST_EXPECTED - expected txid
+    // $BDCAST_TXID - broadcasted txid
+    // $BDCAST_RETCODE - retcode from broadcast API
+    // $BDCAST_TYPE - broadcast type
+    // 
+
     // == Send pages variables ==
     // $REWARDS - Rewards accrued by the logged in wallet address
     // $TOADDR - To address filled by user input and taken from send page
