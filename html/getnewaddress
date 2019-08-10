@@ -47,13 +47,13 @@
                 <div class="alert alert-danger" role="alert"><b>IMPORTANT NOTICE: </b>Please take backup of the "Private Key" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing WIF/Private key. You HAVE to use this address's Private key to login, view transactions and use it's funds.</div>
                 <dl class="row" style="margin-bottom: 0;">
                   <dt class="col-sm-3">Here is your new address:</dt>
-                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">RIUgfgXG2ceaB6C5hfJcN4fvmLH2C45knhB</pre></dd>
+                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">$NEW_WALLETADDR</pre></dd>
                   
                   <dt class="col-sm-3">Private Key (WIF Key) <span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
-                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre></dd>
+                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">$NEW_WIFKEY</pre></dd>
 
                   <dt class="col-sm-3" style="margin-bottom: 0;">Public Key</dt>
-                  <dd class="col-sm-9" style="margin-bottom: 0;"><pre class="text-break text-wrap text-white" style="margin-bottom: 0;">03xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre></dd>
+                  <dd class="col-sm-9" style="margin-bottom: 0;"><pre class="text-break text-wrap text-white" style="margin-bottom: 0;">$NEW_PUBKEY</pre></dd>
                 </dl>
               </div> <!-- Get New Address card body end -->
               <div class="card-footer"> <!-- Get New Address header start -->

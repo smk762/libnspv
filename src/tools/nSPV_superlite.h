@@ -1251,6 +1251,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr)
     // $NTIME - nTime
     // $NBITS - nBits
 
+    // == Get New Address page variables ==
+    // $NEW_WALLETADDR - New wallet address
+    // $NEW_WIFKEY - New wallet address's Private/WIF key
+    // $NEW_PUBKEY - New wallet address's Public key
+
     // == Wallet page variables ==
     // $BALANCE - Coin Balance
     // $WALLETADDR - Logged in wallet's address
