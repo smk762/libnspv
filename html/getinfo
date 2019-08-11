@@ -148,11 +148,11 @@
                     </tr>
                     <tr>
                       <td scope="row">Prev. Block Hash</td>
-                      <td><a href="$URL/method/spentinfo?txid=$PRIVBLKHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$PRIVBLKHASH</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$PREVBLKHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$PREVBLKHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Merkle Root Hash</td>
-                      <td><a href="$URL/method/spentinfo?txid=$MRKLRTHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$MRKLRTHASH</a></td>
+                      <td><a href="$URL/method/spentinfo?txid=$MERKLEHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$MERKLEHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">nTime</td>

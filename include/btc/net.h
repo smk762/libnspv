@@ -107,6 +107,7 @@ typedef struct btc_node_ {
     uint32_t hints; /* can be use for user defined state */
     uint64_t nServices;
     uint32_t prevtimes[16],gotaddrs;
+    char ipaddr[64];
 } btc_node;
 
 LIBBTC_API int net_write_log_printf(const char* format, ...);
