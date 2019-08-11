@@ -253,20 +253,18 @@ void reset_headers(int32_t new_ntz_height)
 
 int32_t validate_notarization(bits256 notarization, uint32_t timestamp)
 {
-    int32_t height; bits256 blockhash,desttxid;
+    int32_t height; bits256 blockhash,desttxid; int32_t retval = 0;
     if ( NSPV_txproofresult.txlen == 0 )
         return(0);
     btc_tx *tx = NSPV_txextract(NSPV_txproofresult.tx,NSPV_txproofresult.txlen); 
     if ( tx == NULL ) 
         return(0);
-    if ( bits256_cmp(NSPV_tx_hash(tx),NSPV_inforesult.notarization.txid) != 0 )
+    if ( bits256_cmp(NSPV_tx_hash(tx),notarization) != 0 )
         return(0);
-    if ( NSPV_notarizationextract(NSPV_client,1,&height,&blockhash,&desttxid,tx, timestamp) == 0 )
-    {
-        btc_tx_free(tx);
-        return(1);
-    }
-    return(0);
+    if ( NSPV_notarizationextract(NSPV_client,1,&height,&blockhash,&desttxid,tx,timestamp) == 0 )
+        retval = 1;
+    btc_tx_free(tx);
+    return(retval);
 }
 
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
@@ -1214,21 +1212,21 @@ int32_t NSPV_replace_var(char *dest,char *fmt,char *key,char *value)
     return(num);
 }
 
-void NSPV_expand_variable(char **bigbufp,char **filestrp,char *key,char *value)
+void NSPV_expand_variable(char *bigbuf,char **filestrp,char *key,char *value)
 {
     int32_t len;
-    if ( NSPV_replace_var(*bigbufp,*filestrp,key,value) != 0 )
+    if ( key != 0 && value != 0 && NSPV_replace_var(bigbuf,*filestrp,key,value) != 0 )
     {
         free(*filestrp);
-        len = (int32_t)strlen(*bigbufp);
+        len = (int32_t)strlen(bigbuf);
         *filestrp = malloc(len+1);
-        strcpy(*filestrp,*bigbufp);
+        strcpy(*filestrp,bigbuf);
     }
 }
 
 char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
 {
-    char replacestr[8192];
+    char replacestr[8192]; int32_t i,n; cJSON *retjson,*item;
     if ( method == 0 )
         method = "";
     if ( NSPV_chain == 0 )
@@ -1242,18 +1240,18 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // Top menu buttons HTML tags variables to use with
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
-     NSPV_expand_variable(&bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button> <button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button> <button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button> <button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button> <button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button> <button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button> <button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>");
+     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button> <button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button> <button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button> <button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button> <button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button> <button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button> <button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>");
     
 
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
-    NSPV_expand_variable(&bigbuf,&filestr,"$URL",replacestr);
+    NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
     
-    NSPV_expand_variable(&bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
-    NSPV_expand_variable(&bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
+    NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
+    NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
     sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
-    NSPV_expand_variable(&bigbuf,&filestr,"$BALANCE",(char *)replacestr);
+    NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
-    NSPV_expand_variable(&bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+    NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
 
     // == Getinfo page variabls ==
     // $PEERSTOTAL - Total Connected Peers
@@ -1271,38 +1269,38 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // $NBITS - nBits
     if ( strcmp(method,"getinfo") == 0 )
     {
-        NSPV_expand_variable(&bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
+        NSPV_expand_variable(bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
         sprintf(replacestr,"%u",btc_node_group_amount_of_connected_nodes(NSPV_client->nodegroup, NODE_CONNECTED));
-        NSPV_expand_variable(&bigbuf,&filestr,"$PEERSTOTAL",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$PEERSTOTAL",replacestr);
 
         sprintf(replacestr,"%08x",NSPV_PROTOCOL_VERSION);
-        NSPV_expand_variable(&bigbuf,&filestr,"$PROTOVER",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$PROTOVER",replacestr);
         sprintf(replacestr,"%u", NSPV_inforesult.height);
-        NSPV_expand_variable(&bigbuf,&filestr,"$CURHEIGHT",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$CURHEIGHT",replacestr);
         
         sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NTZHEIGHT",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZHEIGHT",replacestr);
         bits256_str(replacestr,NSPV_inforesult.notarization.blockhash);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZBLKHASH",replacestr);
         sprintf(replacestr,"%u", NSPV_inforesult.notarization.txidheight);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NTZTXIDHT",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZTXIDHT",replacestr);
         bits256_str(replacestr,NSPV_inforesult.notarization.txid);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NTZTXID",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZTXID",replacestr);
         bits256_str(replacestr,NSPV_inforesult.notarization.othertxid);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NTZDESTTXID",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZDESTTXID",replacestr);
 
         sprintf(replacestr,"%u", NSPV_inforesult.hdrheight);
-        NSPV_expand_variable(&bigbuf,&filestr,"$BLKHDR",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$BLKHDR",replacestr);
         sprintf(replacestr,"%u", NSPV_inforesult.H.nTime);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NTIME",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTIME",replacestr);
         sprintf(replacestr,"%08x", NSPV_inforesult.H.nBits);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NBITS",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$NBITS",replacestr);
         bits256_str(replacestr,NSPV_hdrhash(&NSPV_inforesult.H));
-        NSPV_expand_variable(&bigbuf,&filestr,"$BLKHASH",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$BLKHASH",replacestr);
         bits256_str(replacestr,NSPV_inforesult.H.hashPrevBlock);
-        NSPV_expand_variable(&bigbuf,&filestr,"$PREVBLKHASH",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$PREVBLKHASH",replacestr);
         bits256_str(replacestr,NSPV_inforesult.H.hashMerkleRoot);
-        NSPV_expand_variable(&bigbuf,&filestr,"$MERKLEHASH",replacestr);
+        NSPV_expand_variable(bigbuf,&filestr,"$MERKLEHASH",replacestr);
     }
     
     // == Get New Address page variables ==
@@ -1311,7 +1309,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // $NEW_PUBKEY - New wallet address's Public key
     else if ( strcmp(method,"getnewaddress") == 0 )
     {
-        char *addr,*wif,*pub; cJSON *json = NSPV_getnewaddress(NSPV_chain);
+        char *addr,*wif,*pub;
+        retjson = NSPV_getnewaddress(NSPV_chain);
         if ( json != 0 )
         {
             addr = jstr(json,"address");
@@ -1320,11 +1319,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
             if ( addr != 0 && wif != 0 && pub != 0 )
             {
                 strcpy(replacestr,addr);
-                NSPV_expand_variable(&bigbuf,&filestr,"$NEW_WALLETADDR",replacestr);
+                NSPV_expand_variable(bigbuf,&filestr,"$NEW_WALLETADDR",replacestr);
                 strcpy(replacestr,wif);
-                NSPV_expand_variable(&bigbuf,&filestr,"$NEW_WIFKEY",replacestr);
+                NSPV_expand_variable(bigbuf,&filestr,"$NEW_WIFKEY",replacestr);
                 strcpy(replacestr,pub);
-                NSPV_expand_variable(&bigbuf,&filestr,"$NEW_PUBKEY",replacestr);
+                NSPV_expand_variable(bigbuf,&filestr,"$NEW_PUBKEY",replacestr);
             }
             free_json(json);
         }
@@ -1389,7 +1388,33 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // $PEER_INSYNC - In Sync
     else if ( strcmp(method,"getpeerinfo") == 0 )
     {
-        
+        char *origitemstr,*itemstr,*itembuf; long fsize;
+        if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
+        {
+            itembuf = calloc(64,1024);
+            if ( (retjson= NSPV_getpeerinfo(NSPV_client)) != 0 )
+            {
+                if ( (n= cJSON_GetArraySize(retjson)) > 0 )
+                {
+                    for (i=0; i<n; i++)
+                    {
+                        item = jitem(retjson,i);
+                        if ( (itemstr= clonestr(origitemstr)) != 0 )
+                        {
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddr"));
+                            strcat(bigbuf,itemstr);
+                            itembuf[0] = 0;
+                            free(itemstr);
+                        }
+                    }
+                }
+                free_json(retjson);
+            }
+            free(itembuf);
+            free(origitemstr);
+        }
+        free(filestr);
+        return(bigbuf);
     }
 
     // == Send Validate page array variables ==
