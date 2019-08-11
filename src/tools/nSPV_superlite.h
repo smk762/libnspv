@@ -1371,13 +1371,13 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // == Transactions detail (txidinfo) page variables - spentinfo API ==
     // -$TXINFO_TXID - Txid
     // -$TXINFO_VOUT - vout
-    // $TXINFO_SPENTHT - spent height
-    // $TXINFO_SPENTTXID - spent txid
-    // $TXINFO_SPENTVINI - spent vini
-    // $TXINFO_SENTTXLEN - spent transaction length
-    // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
-    // $TXIDHEX - hex
-    // $TXIDPROOF - proof
+    // -$TXINFO_SPENTHT - spent height
+    // -$TXINFO_SPENTTXID - spent txid
+    // -$TXINFO_SPENTVINI - spent vini
+    // -$TXINFO_SENTTXLEN - spent transaction length
+    // -$TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
+    // -$TXIDHEX - hex
+    // -$TXIDPROOF - proof
     else if ( strcmp(method,"txidinfo") == 0 )
     {
         int32_t vout = jint(argjson,"vout"), height = jint(argjson,"height");
@@ -1389,6 +1389,16 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN","-1");
             if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
             {
+                jaddnum(result,"spentheight",ptr->spent.height);
+                sprintf(replacestr,"%d",jint(retjson,"spentheight"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT",replacestr);
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT",jstr(retjson,"spenttxid"));
+                sprintf(replacestr,"%d",jint(retjson,"spentvini"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTVINI",replacestr);
+                sprintf(replacestr,"%d",jint(retjson,"spenttxlen"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SENTTXLEN",replacestr);
+                sprintf(replacestr,"%d",jint(retjson,"spenttxprooflen"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXPROOFLEN",replacestr);
                 free_json(retjson);
             }
         }
@@ -1401,9 +1411,12 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTVINI","N/A");
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SENTTXLEN","N/A");
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXPROOFLEN","N/A");
+            vout = 0;
         }
-        if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
+        if ( (retjson= NSPV_txproof(1,NSPV_client,vout,jbits256(argjson,"txid"),vout,height)) != 0 )
         {
+            NSPV_expand_variable(bigbuf,&filestr,"$TXIDHEX",jstr(retjson,"hex"));
+            NSPV_expand_variable(bigbuf,&filestr,"$TXIDPROOF",jstr(retjson,"proof");
             free_json(retjson);
         }
     }
