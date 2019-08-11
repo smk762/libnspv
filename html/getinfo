@@ -187,7 +187,7 @@
               <form action="$URL/method/broadcast" method="get">
                 <div class="form-group">
                   <label for="nspv_hexstring">Hex string</label>
-                  <input type="password" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
+                  <input type="text" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
                   <small id="nspvWifHelp" class="form-text text-muted">You can broadcast a transaction to network without login if you have the transaction hex made through other source.</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Broadcast Transaction</button>

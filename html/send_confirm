@@ -72,6 +72,7 @@
                       </tr>
                     </tbody>
                   </table>
+                  <div class="alert alert-info" role="alert" style="margin: 10px;"><b>NOTICE:</b> Creating transaction needs to make network request, so depending on the transaction, and your connections with the network nodes this might take some time. Please be patient while the process finishes.</div>
                 </div> <!-- Send page body end -->
                 <div class="card-footer text-right">
                   <button type="submit" class="btn btn-primary">Create Transaction</button>
