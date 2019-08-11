@@ -910,7 +910,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 int32_t NSPV_periodic(btc_node *node) // called periodically
 {
     static uint32_t lasttxproof;
-    cJSON *retjson; struct NSPV_utxoresp *up; uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
+    cJSON *retjson; char str[65]; struct NSPV_utxoresp *up; uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
     btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
     if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
         NSPV_logout();
