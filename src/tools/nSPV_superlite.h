@@ -1342,7 +1342,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         NSPV_logout();
     else if ( strcmp(method,"getinfo") == 0 )
     {
-        NSPV_expand_variable(bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
         sprintf(replacestr,"%u",btc_node_group_amount_of_connected_nodes(NSPV_client->nodegroup, NODE_CONNECTED));
         NSPV_expand_variable(bigbuf,&filestr,"$PEERSTOTAL",replacestr);
         
@@ -1402,8 +1401,21 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
 
         if ( jstr(argjson,"hex") != 0 && is_hexstr(jstr(argjson,"hex"),0) > 64 && (retjson= NSPV_broadcast(NSPV_client,jstr(argjson,"hex"))) != 0 )
         {
-            fprintf(stderr,"broadcasted transaction (%s)\n",jprint(retjson,0));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RESULT",jstr(retjson,"result"));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_EXPECTED",jstr(retjson,"expected"));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TXID",jstr(retjson,"broadcast"));
+            sprintf(replacestr,"%d",jint(retjson,"retcode"));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RETCODE",replacestr);
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TYPE",jstr(retjson,"type"));
             free_json(retjson);
+        }
+        else
+        {
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RESULT","error");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_EXPECTED","");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TXID","");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RETCODE","-1");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TYPE","invalid hex");
         }
     }
 
@@ -1598,8 +1610,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             }
         }
     }
-
-
+    NSPV_expand_variable(bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
     NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
     NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
