@@ -106,7 +106,7 @@
                     </tr>
                     <tr>
                       <td scope="row">Notarized Blockhash</td>
-                      <td><a href="$URL/method/txidinfo?txid=$NTZBLKHASH&height=$NTZHEIGHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZBLKHASH</a></td>
+                      <td>$NTZBLKHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarized Txid</td>
