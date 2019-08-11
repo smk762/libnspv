@@ -17,6 +17,11 @@
 #ifndef NSPV_RPC_H
 #define NSPV_RPC_H
 
+
+char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/bootstrap.min.css.map", "/custom.css", "/favicon.ico", "/font/rubik.css", "/antara150x150.png", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
+
+char *methodfiles[] = { "wallet", "login", "broadcast", "getinfo", "receive", "getnewaddress", "index", "getpeerinfo", "send_confirm", "send_validate", "send", "txidinfo", "logout" };
+
 /**
  * - we need to include WinSock2.h header to correctly use windows structure
  * as the application is still using 32bit structure from mingw so, we need to
@@ -551,10 +556,6 @@ int32_t Supernet_lineparse(char *key,int32_t keymax,char *value,int32_t valuemax
     //printf("key.(%s) value.(%s)\n",origkey,origvalue);
     return(n);
 }
-
-char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/bootstrap.min.css.map", "/custom.css", "/favicon.ico", "/font/rubik.css", "/antara150x150.png", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
-
-char *methodfiles[] = { "wallet", "login", "broadcast", "getinfo", "receive", "getnewaddress", "index", "getpeerinfo", "send_confirm", "send_validate", "send", "txidinfo", "logout" };
 
 cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 {

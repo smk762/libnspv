@@ -1281,12 +1281,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     //
      NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" type=\"button\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" type=\"button\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" type=\"button\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-2\" type=\"button\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-2\" type=\"button\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
     
-
-    sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
-    NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
     
-    NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
+    NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
     sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
@@ -1599,6 +1596,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $SEND_TXVOUT_VALUE - value
     // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
 
+    sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
+    NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
 
     free(bigbuf);
     return(filestr);
