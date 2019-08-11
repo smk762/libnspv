@@ -1545,7 +1545,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     else if ( strcmp(method,"send") == 0 )
     {
         if ( strcmp(NSPV_utxosresult.coinaddr,NSPV_address) == 0 && NSPV_didfirsttxproofs == 0 )
+        {
             NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos;
+            fprintf(stderr,"fetch %d txids\n",NSPV_didfirsttxproofs);
     }
 
     // == Send Validate page array variables ==
