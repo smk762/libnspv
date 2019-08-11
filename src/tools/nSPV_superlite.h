@@ -1584,7 +1584,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     NSPV_expand_variable(bigbuf,&filestr,"$TXFEE",jstr(retjson,"txfee"));
                     NSPV_expand_variable(bigbuf,&filestr,"$TOTALAMOUNT",jstr(retjson,"total"));
                     NSPV_expand_variable(bigbuf,&filestr,"$CHANGEAMOUNT",jstr(retjson,"change"));
-                    fprintf(stderr,"change %s\n",change);
+                    fprintf(stderr,"change %s\n",jstr(retjson,"change"));
                     if ( (retcodes= jobj(retjson,"retcodes")) != 0 )
                     {
                         tmpstr = jprint(retcodes,0);
