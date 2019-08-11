@@ -1311,11 +1311,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     {
         char *addr,*wif,*pub;
         retjson = NSPV_getnewaddress(NSPV_chain);
-        if ( json != 0 )
+        if ( retjson != 0 )
         {
-            addr = jstr(json,"address");
-            wif = jstr(json,"wif");
-            pub = jstr(json,"pubkey");
+            addr = jstr(retjson,"address");
+            wif = jstr(retjson,"wif");
+            pub = jstr(retjson,"pubkey");
             if ( addr != 0 && wif != 0 && pub != 0 )
             {
                 strcpy(replacestr,addr);
@@ -1325,7 +1325,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                 strcpy(replacestr,pub);
                 NSPV_expand_variable(bigbuf,&filestr,"$NEW_PUBKEY",replacestr);
             }
-            free_json(json);
+            free_json(retjson);
         }
     }
 
