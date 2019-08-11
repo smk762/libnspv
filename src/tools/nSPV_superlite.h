@@ -1280,15 +1280,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
      NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" type=\"button\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" type=\"button\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" type=\"button\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-2\" type=\"button\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-2\" type=\"button\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
-    
-    
-    NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
-    NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
-    NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
-    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
-    NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
-    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
-    NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
 
     // == Coin specific gloabal variable
     // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
@@ -1573,6 +1564,12 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 if ( (retjson= NSPV_spend(NSPV_client,NSPV_address,dest,satoshis)) != 0 )
                 {
                     fprintf(stderr,"got.(%s)\n",jprint(retjson,0));
+                    
+                    sprintf(replacestr,"%.8f",dstr(0));
+                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSVLD",(char *)replacestr);
+                    NSPV_expand_variable(bigbuf,&filestr,"$SENDHEX",jstr(retjson,"hex"));
+                    NSPV_expand_variable(bigbuf,&filestr,"$SENDTXID",jstr(retjson,"txid"));
+                    
                     free_json(retjson);
                 }
             }
@@ -1596,6 +1593,13 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $SEND_TXVOUT_VALUE - value
     // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
 
+    NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
+    NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
+    NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
+    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
+    NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
+    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
+    NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
 
