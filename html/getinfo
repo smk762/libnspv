@@ -118,7 +118,7 @@
                     </tr>
                     <tr>
                       <td scope="row">Notarization Destination Txid</td>
-                      <td><a href="$URL/method/txidinfo?txid=$NTZDESTTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$NTZDESTTXID</a></td>
+                      <td>$NTZDESTTXID</td>
                     </tr>
                   </tbody>
                 </table>
@@ -150,15 +150,15 @@
                     </tr>
                     <tr>
                       <td scope="row">Blockhash</td>
-                      <td><a href="$URL/method/txidinfo?txid=$BLKHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$BLKHASH</a></td>
+                      <td>$BLKHASH</td>
                     </tr>
                     <tr>
                       <td scope="row">Prev. Block Hash</td>
-                      <td><a href="$URL/method/txidinfo?txid=$PREVBLKHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$PREVBLKHASH</a></td>
+                      <td>$PREVBLKHASH</td>
                     </tr>
                     <tr>
                       <td scope="row">Merkle Root Hash</td>
-                      <td><a href="$URL/method/txidinfo?txid=$MERKLEHASH&vout=1&nexturl=txidinfo" class="text-break text-wrap">$MERKLEHASH</a></td>
+                      <td>$MERKLEHASH</td>
                     </tr>
                     <tr>
                       <td scope="row">nTime</td>
