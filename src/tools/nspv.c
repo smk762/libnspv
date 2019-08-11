@@ -116,8 +116,7 @@ void spv_sync_completed(btc_spv_client* client) {
 
 /*
  Todo:
- return rawhex in txproof: "hex" and "proof"
- dynamically generated localhost browser wallet refinement
+add check for p2sh in script_to_address
  
  mempool based pruning of utxos
  

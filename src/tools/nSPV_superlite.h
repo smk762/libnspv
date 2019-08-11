@@ -1667,6 +1667,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     if ( strcmp(method,"wallet") == 0 )
     {
         char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
+        if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+        {
+            fprintf(stderr,"issued listunspent\n");
+            free_json(retjson);
+        }
         if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
         {
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
