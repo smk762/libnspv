@@ -1275,7 +1275,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
 // $SEND_TXVIN_AMOUNT - amount
 // $SEND_TXVIN_SCRIPTSIG - scriptSig
 // $SEND_TXVIN_SEQID - sequenceid
-    char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int32_t i,num; long fsize; cJSON *vins,*vouts,*item;
+    char *origitemstr,*itemstr,itembuf[32768],*itemsbuf; int32_t i,num; long fsize; cJSON *vins,*vouts,*item;
     if ( (origitemstr= OS_filestr(&fsize,"html/send_validate_txvin_table_row.inc")) != 0 )
     {
         if ( (vins= jarray(&num,txobj,"vin")) != 0 )
@@ -1299,6 +1299,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SCRIPTSIG",jstr(item,"scriptSig"));
 
                     strcat(itemsbuf,itemstr);
+                    fprintf(stderr,"itemstr.(%s)\n",itemstr);
                     itembuf[0] = 0;
                     free(itemstr);
                 }
@@ -1332,6 +1333,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ADDR",jstr(item,"scriptPubKey"));
                     
                     strcat(itemsbuf,itemstr);
+                    fprintf(stderr,"itemstr.(%s)\n",itemstr);
                     itembuf[0] = 0;
                     free(itemstr);
                 }
@@ -1341,6 +1343,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
         }
         free(origitemstr);
     }
+    fprintf(stderr,"done\n");
 }
 
 char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjson)
