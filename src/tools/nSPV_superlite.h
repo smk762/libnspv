@@ -1506,7 +1506,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_TXID",replacestr);
                         strcat(itemsbuf,itemstr);
                         itembuf[0] = 0;
-                        fprintf(stderr,"%d of %d: (%s)\n",i,NSPV_txidsresult.numtxids,itemstr);
                         free(itemstr);
                     }
                 }
