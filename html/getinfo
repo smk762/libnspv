@@ -106,11 +106,11 @@
                     </tr>
                     <tr>
                       <td scope="row">Notarized Blockhash</td>
-                      <td><a href="$URL/method/txidinfo?txid=$NTZBLKHASH&height=$NTZHEIGHT&vout=1&nexturl=txidinfo" class="text-break text-wrap">$NTZBLKHASH</a></td>
+                      <td><a href="$URL/method/txidinfo?txid=$NTZBLKHASH&height=$NTZHEIGHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZBLKHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarized Txid</td>
-                      <td><a href="$URL/method/txidinfo?txid=$NTZTXID&height=$NTZHEIGHT&vout=1&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
+                      <td><a href="$URL/method/txidinfo?txid=$NTZTXID&height=$NTZHEIGHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarization Txid Height</td>
