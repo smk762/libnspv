@@ -937,7 +937,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
                 free_json(retjson);
             }
         }
-        if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) != 0 && (NSPV_didfirsttxids == 0 || timestamp > NSPV_didfirsttxids+NSPV_chain->blocktime/2) )
+        if ( 0 && strcmp(NSPV_address,NSPV_txidsresult.coinaddr) != 0 && (NSPV_didfirsttxids == 0 || timestamp > NSPV_didfirsttxids+NSPV_chain->blocktime/2) )
         {
             if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
             {
@@ -1646,10 +1646,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             free(origitemstr);
         }
     }
-    sprintf(replacestr,"%.8f",dstr(NSPV_balance));
-    NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
-    sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
-    NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
 
     // == Wallet page array variables ==
     // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
@@ -1673,13 +1669,17 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
     if ( strcmp(method,"wallet") == 0 )
     {
+        if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+            free_json(retjson);
+        if ( (retjson= NSPV_addressutxos(1,NSPV_client,NSPV_address,0,0,0)) != 0 )
+            free_json(retjson);
         char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
         if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
         {
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
                 itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
-                for (i=0; i<NSPV_txidsresult.numtxids; i++)
+                for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
                     ptr = &NSPV_txidsresult.txids[i];
                     if ( (itemstr= clonestr(origitemstr)) != 0 )
@@ -1726,10 +1726,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         }
         if ( didflag == 0 )
             NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY","");
-        if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
-        {
-            free_json(retjson);
-        }
     }
     // == Send pages variables ==
     // $REWARDS - Rewards accrued by the logged in wallet address
@@ -1808,6 +1804,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
+    sprintf(replacestr,"%.8f",dstr(NSPV_balance));
+    NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
+    sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
+    NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
 
     free(bigbuf);
     return(filestr);
