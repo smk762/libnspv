@@ -1280,28 +1280,25 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
     {
         if ( (vins= jarray(&num,txobj,"vin")) != 0 )
         {
-            itemsbuf = calloc(num,4096);
-            fprintf(stderr,"numvins.%d\n",num);
+            itemsbuf = calloc(num,16384);
             for (i=0; i<num; i++)
             {
                 item = jitem(vins,i);
-                fprintf(stderr,"vin %d.(%s)\n",i,jprint(item,0));
+                //fprintf(stderr,"vin %d.(%s)\n",i,jprint(item,0));
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     sprintf(replacestr,"%d",i);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_ARRAYNUM",replacestr);
-                    if ( jstr(item,"txid") != 0 )
-                        NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_TXID",jstr(item,"txid"));
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_TXID",jstr(item,"txid"));
                     sprintf(replacestr,"%d",jint(item,"vout"));
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_VOUT",replacestr);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_AMOUNT","remove");
                     sprintf(replacestr,"%u",jint(item,"sequenceid"));
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SEQID",replacestr);
-                    if ( jstr(item,"scriptSig") != 0 )
-                        NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SCRIPTSIG",jstr(item,"scriptSig"));
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SCRIPTSIG",jstr(item,"scriptSig"));
 
                     strcat(itemsbuf,itemstr);
-                    fprintf(stderr,"itemstr.(%s)\n",itemstr);
+                    //fprintf(stderr,"itemstr.(%s)\n",itemstr);
                     itembuf[0] = 0;
                     free(itemstr);
                 }
@@ -1322,7 +1319,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
     {
         if ( (vouts= jarray(&num,txobj,"vout")) != 0 )
         {
-            itemsbuf = calloc(num,1024);
+            itemsbuf = calloc(num,16384);
             for (i=0; i<num; i++)
             {
                 item = jitem(vouts,i);
