@@ -1283,17 +1283,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
 
     // == Coin specific gloabal variable
     // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
-    
-    // == Account page variables ==
-    // $LOGIN_DISPLAY - If NO LOGIN session active
-    //         LOGIN_DISPLAY=""
+    // $REWARDS_DISPLAY_KMD - If KMD coin is active
+    //         REWARDS_DISPLAY_KMD=""
     //      else
-    //         LOGIN_DISPLAY="none"
-    // $LOGOUT_DISPLAY - If LOGIN session IS active
-    //         LOGOUT_DISPLAY="none"
-    //      else
-    //         LOGOUT_DISPLAY=""
-    // $ACCOUNT_SESSION_SECONDS - shows active logged in wallet accounts remaining seconds
+    //         REWARDS_DISPLAY_KMD="none"
 
     // == Getinfo page variabls ==
     // $PEERSTOTAL - Total Connected Peers
