@@ -1263,6 +1263,35 @@ void NSPV_expand_variable(char *bigbuf,char **filestrp,char *key,char *value)
     }
 }
 
+char *NSPV_script_to_address(char *destaddr,char *scriptstr)
+{
+    uint8_t *script; btc_pubkey pk; uint8_t hash160[sizeof(uint160)+1]; int32_t len;
+    len = (int32_t)strlen(scriptstr) >> 1;
+    strcpy(destaddr,"unknown");
+    script = malloc(len);
+    decode_hex(script,len,scriptstr);
+    memset(hash160,0,sizeof(hash160));
+    hash160[0] = NSPV_chain->b58prefix_pubkey_address;
+    if ( len == 35 )
+    {
+        if ( script[0] == 33 && script[34] == OP_CHECKSIG )
+        {
+            memset(&pk,0,sizeof(pk));
+            pk.compressed = true;
+            memcpy(pk.pubkey,script+1,33);
+            btc_pubkey_get_hash160(&pk,hash160+1);
+        }
+    }
+    else if ( len == 25 )
+    {
+        // check opcodes, maybe it is p2sh
+        memcpy(&hash160[1],script+3,20);
+    }
+    else return(destaddr);
+    btc_base58_encode_check(hash160,sizeof(hash160),destaddr,100);
+    return(destaddr);
+}
+
 void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replacestr)
 {
 //{"nVersion":4,"vin":[],"vout":[{"value":1,"scriptPubKey":"76a914bed47f9cda72a1bf743257617d7a5a1b2a68216688ac"}, {"value":140855.3434,"scriptPubKey":"210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac"}],"nLockTime":0,"nExpiryHeight":0,"valueBalance":0}
@@ -1275,7 +1304,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
 // $SEND_TXVIN_AMOUNT - amount
 // $SEND_TXVIN_SCRIPTSIG - scriptSig
 // $SEND_TXVIN_SEQID - sequenceid
-    char *origitemstr,*itemstr,itembuf[32768],*itemsbuf; int32_t i,num; long fsize; cJSON *vins,*vouts,*item;
+    char *origitemstr,*itemstr,itembuf[32768],*itemsbuf,str[256]; int32_t i,num; long fsize; cJSON *vins,*vouts,*item;
     if ( (origitemstr= OS_filestr(&fsize,"html/send_validate_txvin_table_row.inc")) != 0 )
     {
         if ( (vins= jarray(&num,txobj,"vin")) != 0 )
@@ -1329,7 +1358,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ARRAYNUM",replacestr);
                     sprintf(replacestr,"%.8f",dstr((uint64_t)(jdouble(item,"value")*SATOSHIDEN+0.0000000049)));
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_VALUE",replacestr);
-                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ADDR",jstr(item,"scriptPubKey"));
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ADDR",NSPV_script_to_address(str,jstr(item,"scriptPubKey")));
                     
                     strcat(itemsbuf,itemstr);
                     itembuf[0] = 0;
@@ -1342,7 +1371,6 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
         }
         free(origitemstr);
     }
-    fprintf(stderr,"done\n");
 }
 
 char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjson)
