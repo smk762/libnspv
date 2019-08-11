@@ -1383,6 +1383,23 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $TXINFO_SPENTVINI - spent vini
     // $TXINFO_SENTTXLEN - spent transaction length
     // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
+
+    // == Transactions detail (txidinfo) page array variables ==
+    // $TXIDINFO_TXVIN_ARRAY - Main array variable defined in txidinfo page for Tx-Vin table
+    //
+    // $TXIDINFO_TXVIN_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+    // $TXIDINFO_TXVIN_TXID - txid
+    // $TXIDINFO_TXVIN_VOUT - vout
+    // $TXIDINFO_TXVIN_AMOUNT - amount
+    // $TXIDINFO_TXVIN_SCRIPTSIG - scriptSig
+    // $TXIDINFO_TXVIN_SEQID - sequenceid
+    //
+    //
+    // $TXIDINFO_TXVOUT_ARRAY - Main array variable defined in txidinfo page for Tx-Vout table
+    //
+    // $TXIDINFO_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+    // $TXIDINFO_TXVOUT_VALUE - value
+    // $TXIDINFO_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
     else if ( strcmp(method,"spentinfo") == 0 )
     {
         
