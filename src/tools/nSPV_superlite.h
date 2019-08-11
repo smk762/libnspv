@@ -915,7 +915,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
     }
     if ( NSPV_address[0] != 0 && strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
     {
-        if ( (retjson= NSPV_addressutxos(1,NSPV_client,coinaddr,CCflag,skipcount,0)) != 0 )
+        if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
         {
             fprintf(stderr,"send first utxos for %s\n",NSPV_address);
             NSPV_didfirstutxos = timestamp;
