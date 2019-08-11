@@ -64,7 +64,6 @@
                       <th scope="col-md">Amount</th>
                       <th scope="col-md">Height</th>
                       <th scope="col-md">TxID</th>
-                      <th scope="col-md">Tx Details</th>
                     </tr>
                   </thead>
                   <tbody>
