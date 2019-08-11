@@ -1325,9 +1325,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // == Get New Address page variables ==
     // $GENADDR - Login page has this section by default hidden.
     //      If URL is = $URL/method/index?nexturl=genaddr
-    //         GENADDR="none"
+    //         GENADDR=""
     //      else
-    //          GENADDR=""
+    //          GENADDR="none"
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
