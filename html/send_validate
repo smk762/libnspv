@@ -31,9 +31,9 @@
         <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
-                <span class="col-3">Coin: $COINNAME ($COIN)</span>
-                <span class="col-3">Balance: $BALANCE $COIN</span>
-                <span class="col-6 text-right">Your Address: <span class="badge badge-secondary" style="margin-right: 15px;">$WALLETADDR</span></span>
+                <span class="col-3">Coin: <font style="font-size: 22px;">$COINNAME ($COIN)</font></span>
+                <span class="col-3">Balance: <font style="font-size: 22px;">$BALANCE $COIN</font></span>
+                <span class="col-6 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
@@ -41,15 +41,18 @@
 
       <div class="row" style="margin-bottom: 1em;">
         <div class="col-12" style="padding-right: 7.5px; margin-bottom: 10px;"> <!-- Send page div start -->
+            <form action="$URL/method/broadcast?hex=$SENDHEX&nexturl=broadcast" method="get"> <!-- Send form start -->
             <div class="card text-white bg-dark"> <!-- Send page card start -->
               <div class="card-header"> <!-- Send page header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
                     <h6 class="card-title" style="vertical-align: ">Confirm Details before sending</h6>
                   </div>
+                  <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                    <button type="submit" class="btn btn-primary">Broadcast Transaction</button>
+                  </div>
                 </div>
               </div> <!-- Send page header end -->
-              <form action="$URL/method/broadcast?hex=$SENDHEX&nexturl=broadcast" method="get"> <!-- Send form start -->
                 <div class="card-body" style="padding: 0;"> <!-- Send page body start -->
                   <table class="table table-striped table-dark">
                     <tbody>
@@ -62,13 +65,13 @@
                         </td>
                       </tr>
                       <tr>
-                        <th>Rewards</th>
-                        <td>$REWARDSEXT</td>
-                      </tr>
-                      <tr>
-                        <th>Validated</th>
-                        <td>$REWARDSVLD
-                          <small id="validatedHelp" class="form-text text-muted">Locally calculated value of rewards to match with the value from network.</small>
+                        <th>Rewards Info</th>
+                        <td>
+                          <div class="row">
+                            <div class="col-md-6">Rewards<br>$REWARDS $COIN</div>
+                            <div class="col-md-6"><b>Validated</b><br>$REWARDSVLD $COIN
+                          <small id="validatedHelp" class="form-text text-muted">Locally calculated value of rewards to match with the value from network.</small></div>
+                          </div>
                         </td>
                       </tr>
                       <tr>
@@ -77,19 +80,18 @@
                       </tr>
                       <tr>
                         <th>To Address</th>
-                        <td>$TOADDR</td>
+                        <td colspan="3">$TOADDR</td>
                       </tr>
                       <tr>
-                        <th>Amount</th>
-                        <td>$SENDAMOUNT $COIN</td>
-                      </tr>
-                      <tr>
-                        <th>Transaction Fees</th>
-                        <td>$TXFEE $COIN</td>
-                      </tr>
-                      <tr>
-                        <th>Total amount being sent</th>
-                        <td>$TOTALAMOUNT $COIN</td>
+                        <th>Amount Info</th>
+                        <td>
+                          <div class="row">
+                            <div class="col-md-3">Amount<br>$SENDAMOUNT $COIN</div>
+                            <div class="col-md-3"><b>Transaction Fees</b><br>$TXFEE $COIN</div>
+                            <div class="col-md-3"><b>Total amount being sent</b><br>$TOTALAMOUNT $COIN</div>
+                            <div class="col-md-3"><b>Change Amount</b><br>$CHANGEAMOUNT $COIN</div>
+                          </div>
+                        </td>
                       </tr>
                       <tr>
                         <th>txid</th>
@@ -107,9 +109,6 @@
                     </tbody>
                   </table>
                 </div> <!-- Send page body end -->
-                <div class="card-footer text-right">
-                  <button type="submit" class="btn btn-primary">Broadcast Transaction</button>
-                </div>
               </form> <!-- Send form send -->
             </div> <!-- Send page card end -->
         </div> <!-- Send page div end -->

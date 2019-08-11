@@ -31,9 +31,9 @@
         <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
-                <span class="col-3">Coin: $COINNAME ($COIN)</span>
-                <span class="col-3">Balance: $BALANCE $COIN</span>
-                <span class="col-6 text-right">Your Address: <span class="badge badge-secondary" style="margin-right: 15px;">$WALLETADDR</span></span>
+                <span class="col-3">Coin: <font style="font-size: 22px;">$COINNAME ($COIN)</font></span>
+                <span class="col-3">Balance: <font style="font-size: 22px;">$BALANCE $COIN</font></span>
+                <span class="col-6 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
@@ -186,7 +186,7 @@
               <form action="$URL/method/broadcast" method="get">
                 <div class="form-group">
                   <label for="nspv_hexstring">Hex string</label>
-                  <input type="password" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
+                  <input type="text" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
                   <small id="nspvWifHelp" class="form-text text-muted">You can broadcast a transaction to network without login if you have the transaction hex made through other source.</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Broadcast Transaction</button>
