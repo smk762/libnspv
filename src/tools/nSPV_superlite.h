@@ -1313,7 +1313,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
     // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
     if ( (origitemstr= OS_filestr(&fsize,"html/send_validate_txvout_table_row.inc")) != 0 )
     {
-        if ( (vins= jarray(&num,txobj,"vout")) != 0 )
+        if ( (vouts= jarray(&num,txobj,"vout")) != 0 )
         {
             itemsbuf = calloc(num,1024);
             for (i=0; i<num; i++)
