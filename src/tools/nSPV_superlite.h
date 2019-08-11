@@ -367,7 +367,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_UTXOSRESP:
                 NSPV_utxosresp_purge(&NSPV_utxosresult);
                 NSPV_rwutxosresp(0,&response[1],&NSPV_utxosresult);
-                fprintf(stderr,"got utxos response %u size.%d numtxos.%d\n",timestamp,len,NSPV_utxosresult.numutxos);
+                fprintf(stderr,"got utxos response %s %u size.%d numtxos.%d\n",from->ipaddr,timestamp,len,NSPV_utxosresult.numutxos);
                 if ( NSPV_utxosresult.nodeheight >= NSPV_inforesult.height )
                 {
                     NSPV_balance = NSPV_utxosresult.total;
@@ -557,7 +557,7 @@ cJSON *NSPV_addressutxos(int32_t waitflag,btc_spv_client *client,char *coinaddr,
                 if ( (NSPV_inforesult.height == 0 || NSPV_utxosresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_utxosresult.coinaddr) == 0 && CCflag == NSPV_utxosresult.CCflag )
                     return(NSPV_utxosresp_json(&NSPV_utxosresult));
             }
-        }
+        } else break;
     } else sleep(1);
     jaddstr(result,"result","error");
     jaddstr(result,"error","timeout");
@@ -602,7 +602,7 @@ cJSON *NSPV_addresstxids(int32_t waitflag,btc_spv_client *client,char *coinaddr,
                 if ( (NSPV_inforesult.height == 0 || NSPV_txidsresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag )
                     return(NSPV_txidsresp_json(&NSPV_txidsresult));
             }
-        }
+        } else break;
     } else sleep(1);
     jaddstr(result,"result","error");
     jaddstr(result,"error","timeout");
@@ -792,7 +792,7 @@ cJSON *NSPV_txproof(int32_t waitflag,btc_spv_client *client,int32_t vout,bits256
                 if ( memcmp(&NSPV_txproofresult.txid,&txid,sizeof(txid)) == 0 )
                     return(NSPV_txproof_json(&NSPV_txproofresult));
             }
-        }
+        } else break;
     } else sleep(1);
     fprintf(stderr,"txproof timeout\n");
     memset(&P,0,sizeof(P));
@@ -1728,7 +1728,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY","");
         if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
         {
-            fprintf(stderr,"issued listunspent\n");
             free_json(retjson);
         }
     }
