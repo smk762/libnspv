@@ -36,7 +36,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
 int32_t NSPV_didfirsttxproofs;
-char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
+char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
 
@@ -1286,6 +1286,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
     
     NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
+    NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
     sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
@@ -1545,7 +1546,30 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     else if ( strcmp(method,"send") == 0 )
     {
         if ( strcmp(NSPV_utxosresult.coinaddr,NSPV_address) == 0 && NSPV_didfirsttxproofs == 0 )
-            NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos
+        {
+            NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos;
+            fprintf(stderr,"fetch %d txids\n",NSPV_didfirsttxproofs);
+        }
+    }
+    else if ( strcmp(method,"send_confirm") == 0 || strcmp(method,"send_validate") == 0 )
+    {
+        char *dest; int64_t satoshis;
+        dest = jstr(argjson,"address");
+        satoshis = jdouble(argjson,"amount")*SATOSHIDEN + 0.0000000049;
+        if ( dest != 0 && satoshis != 0 )
+        {
+            NSPV_expand_variable(bigbuf,&filestr,"$TOADDR",dest);
+            sprintf(replacestr,"%.8f",dstr(satoshis));
+            NSPV_expand_variable(bigbuf,&filestr,"$SENDAMOUNT",replacestr);
+            if ( strcmp(method,"send_validate") == 0 )
+            {
+                if ( (retjson= NSPV_spend(NSPV_client,NSPV_address,dest,satoshis)) != 0 )
+                {
+                    fprintf(stderr,"got.(%s)\n",jprint(retjson,0));
+                    free_json(retjson);
+                }
+            }
+        }
     }
 
     // == Send Validate page array variables ==
@@ -1564,10 +1588,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
     // $SEND_TXVOUT_VALUE - value
     // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
-    else if ( strcmp(method,"send_validate") == 0 )
-    {
-        
-    }
 
 
     free(bigbuf);

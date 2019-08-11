@@ -156,6 +156,8 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
                         fprintf(stderr,"Found (%s) magic.%s, p2p.%u seeds.(%s)\n",symbol,magic,chain->default_port,seeds);
                         break;
                     }
+                    if ( jstr(coin,"fname") != 0 )
+                        strcpy(NSPV_fullname,jstr(coin,"fname"));
                 }
             }
             if ( i == n )
