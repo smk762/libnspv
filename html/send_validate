@@ -65,7 +65,7 @@
                           </ul>
                         </td>
                       </tr>
-                      <tr>
+                      <tr style="display: $REWARDS_DISPLAY_KMD;">
                         <th>Rewards Info</th>
                         <td>
                           <div class="row">
