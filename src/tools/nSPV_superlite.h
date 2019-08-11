@@ -39,6 +39,7 @@ int32_t NSPV_didfirsttxproofs;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
+int64_t NSPV_balance,NSPV_rewards;
 
 btc_key NSPV_key;
 btc_pubkey NSPV_pubkey;
@@ -272,7 +273,7 @@ int32_t validate_notarization(bits256 notarization, uint32_t timestamp)
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
     struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
-    const btc_chainparams *chain = from->nodegroup->chainparams; int32_t lag,issueflag = 0;
+    const btc_chainparams *chain = from->nodegroup->chainparams; int32_t lag;
     //sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     strcpy(NSPV_lastpeer,from->ipaddr);
     if ( len > 0 )
@@ -364,13 +365,14 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 }
                 break;
             case NSPV_UTXOSRESP:
-                if ( NSPV_didfirsttxproofs == 0 && NSPV_utxosresult.coinaddr[0] == 0 && timestamp < NSPV_didfirstutxos+8 )
-                    issueflag = 1;
                 NSPV_utxosresp_purge(&NSPV_utxosresult);
                 NSPV_rwutxosresp(0,&response[1],&NSPV_utxosresult);
                 fprintf(stderr,"got utxos response %u size.%d issueflag.%d numtxos.%d\n",timestamp,len,issueflag,NSPV_utxosresult.numutxos);
-                //if ( issueflag != 0 && NSPV_utxosresult.numutxos < 64 )
-                //    NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos;
+                if ( NSPV_utxosresult.height >= NSPV_inforesult.height )
+                {
+                    NSPV_balance = NSPV_utxosresult.total;
+                    NSPV_rewards = NSPV_utxosresult.interest;
+                }
                 break;
             case NSPV_TXIDSRESP:
                 NSPV_txidsresp_purge(&NSPV_txidsresult);
@@ -926,7 +928,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
     }
     if ( NSPV_address[0] != 0 )
     {
-        if ( strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
+        if ( 0 && strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
         {
             if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
             {
@@ -1644,9 +1646,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             free(origitemstr);
         }
     }
-    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
+    sprintf(replacestr,"%.8f",dstr(NSPV_balance));
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
-    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
+    sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
 
     // == Wallet page array variables ==
