@@ -1548,6 +1548,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $SENDNLOCKTIME - nLockTime
     // $SENDNEXPIRYHT - nExpiryHeight
     // $SENDVALBAL - valueBalance
+    // $CHANGEAMOUNT - Change amount
     else if ( strcmp(method,"send") == 0 )
     {
         if ( strcmp(NSPV_utxosresult.coinaddr,NSPV_address) == 0 && NSPV_didfirsttxproofs == 0 )
