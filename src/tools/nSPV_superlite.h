@@ -1404,7 +1404,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                             sprintf(replacestr,"%d",jint(item,"nodeid"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_NODEID",replacestr);
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddress"));
-                            sprintf(replacestr,"%u",node->nodegroup->chainparams->default_port);
+                            sprintf(replacestr,"%u",NPSV_chain->default_port);
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_PORT",replacestr);
                             sprintf(replacestr,"%u",juint(item,"lastping"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_LASTPING",replacestr);
