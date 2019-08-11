@@ -1398,7 +1398,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // 
     else if ( strcmp(method,"broadcast") == 0 )
     {
-        if ( jstr(argjson,"hex") != 0 && (retjson= NSPV_broadcast(NSPV_client,jstr(argjson,"hex"))) != 0 )
+        // broadcasted transaction ({"result":"success","expected":"f5ae0bb2491198f5b4d435a990bb1ba870a5800cb308b2980b0393a89b39d0f6","broadcast":"f5ae0bb2491198f5b4d435a990bb1ba870a5800cb308b2980b0393a89b39d0f6","retcode":1,"type":"broadcast and mempool","lastpeer":"5.9.253.199:12985"})
+
+        if ( jstr(argjson,"hex") != 0 && is_hexstr(jstr(argjson,"hex"),0) > 64 && (retjson= NSPV_broadcast(NSPV_client,jstr(argjson,"hex"))) != 0 )
         {
             fprintf(stderr,"broadcasted transaction (%s)\n",jprint(retjson,0));
             free_json(retjson);
