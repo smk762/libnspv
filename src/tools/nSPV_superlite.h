@@ -899,7 +899,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 
 int32_t NSPV_periodic(btc_node *node) // called periodically
 {
-    uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
+    cJSON *retjson; uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
     btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
     if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
         NSPV_logout();
@@ -913,7 +913,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
         cstr_free(request, true);
         //fprintf(stderr,"request addrs\n");
     }
-    if ( NSPV_address[0] != 0 && strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+ASSETCHAINS_BLOCKTIME/2) )
+    if ( NSPV_address[0] != 0 && strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
     {
         if ( (retjson= NSPV_addressutxos(1,NSPV_client,coinaddr,CCflag,skipcount,0)) != 0 )
         {
