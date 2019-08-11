@@ -1391,7 +1391,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
         char *origitemstr,*itemstr,*itembuf; long fsize;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
-            fprintf(stderr,"[%s]\n",origitemstr);
             /*jaddnum(node_json,"nodeid",(int64_t)node->nodeid);
             jaddnum(node_json,"protocolversion",(uint32_t)node->version);
             jaddstr(node_json,"ipaddress",ipaddr);
@@ -1417,6 +1416,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                         if ( (itemstr= clonestr(origitemstr)) != 0 )
                         {
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddress"));
+                            fprintf(stderr,"i.%d [%s] [%s]\n",i,itembuf,itemstr);
                             strcat(bigbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
