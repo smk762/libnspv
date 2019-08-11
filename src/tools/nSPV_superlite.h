@@ -1286,18 +1286,19 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
             {
                 item = jitem(vins,i);
                 fprintf(stderr,"vin %d.(%s)\n",i,jprint(item,0));
-                continue;
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     sprintf(replacestr,"%d",i);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_ARRAYNUM",replacestr);
-                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_TXID",jstr(item,"txid"));
+                    if ( jstr(item,"txid") != 0 )
+                        NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_TXID",jstr(item,"txid"));
                     sprintf(replacestr,"%d",jint(item,"vout"));
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_VOUT",replacestr);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_AMOUNT","remove");
                     sprintf(replacestr,"%u",jint(item,"sequenceid"));
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SEQID",replacestr);
-                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SCRIPTSIG",jstr(item,"scriptSig"));
+                    if ( jstr(item,"scriptSig") != 0 )
+                        NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SCRIPTSIG",jstr(item,"scriptSig"));
 
                     strcat(itemsbuf,itemstr);
                     fprintf(stderr,"itemstr.(%s)\n",itemstr);
