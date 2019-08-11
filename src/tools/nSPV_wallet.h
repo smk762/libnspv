@@ -730,7 +730,7 @@ void NSPV_CCunspents(std::vector<std::pair<CAddressUnspentKey, CAddressUnspentVa
 
 void NSPV_CCtxids(std::vector<std::pair<CAddressIndexKey, CAmount> > &txids,char *coinaddr,bool ccflag)
 {
-    NSPV_addresstxids(coinaddr,ccflag,0,0);
+    NSPV_addresstxids(1,coinaddr,ccflag,0,0);
     NSPV_txids2CCtxids(&NSPV_txidsresult,txids);
 }
 #endif

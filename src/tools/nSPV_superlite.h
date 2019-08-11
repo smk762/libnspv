@@ -34,7 +34,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
 void expand_ipbits(char *ipaddr,uint64_t ipbits);
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump);
 
-uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos;
+uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
@@ -557,7 +557,7 @@ cJSON *NSPV_addressutxos(int32_t waitflag,btc_spv_client *client,char *coinaddr,
     return(result);
 }
 
-cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
+cJSON *NSPV_addresstxids(int32_t waitflag,btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; int32_t i,iter,slen,len = 1;
     if ( NSPV_txidsresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag && skipcount == NSPV_txidsresult.skipcount )
@@ -586,11 +586,14 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_ADDRINDEX,msg[1]>>1) != 0 )
     {
-        for (i=0; i<NSPV_POLLITERS; i++)
+        if ( waitflag != 0 )
         {
-            usleep(NSPV_POLLMICROS);
-            if ( (NSPV_inforesult.height == 0 || NSPV_txidsresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag )
-                return(NSPV_txidsresp_json(&NSPV_txidsresult));
+            for (i=0; i<NSPV_POLLITERS; i++)
+            {
+                usleep(NSPV_POLLMICROS);
+                if ( (NSPV_inforesult.height == 0 || NSPV_txidsresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag )
+                    return(NSPV_txidsresp_json(&NSPV_txidsresult));
+            }
         }
     } else sleep(1);
     jaddstr(result,"result","error");
@@ -911,13 +914,25 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
         cstr_free(request, true);
         //fprintf(stderr,"request addrs\n");
     }
-    if ( NSPV_address[0] != 0 && strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
+    if ( NSPV_address[0] != 0 )
     {
-        if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+        if (strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
         {
-            fprintf(stderr,"send first utxos for %s\n",NSPV_address);
-            NSPV_didfirstutxos = timestamp;
-            free_json(retjson);
+            if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+            {
+                fprintf(stderr,"send first utxos for %s\n",NSPV_address);
+                NSPV_didfirstutxos = timestamp;
+                free_json(retjson);
+            }
+        }
+        if (strcmp(NSPV_address,NSPV_txidsresult.coinaddr) != 0 && (NSPV_didfirsttxids == 0 || timestamp > NSPV_didfirsttxids+NSPV_chain->blocktime/2) )
+        {
+            if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+            {
+                fprintf(stderr,"send first txids for %s\n",NSPV_address);
+                NSPV_didfirsttxids = timestamp;
+                free_json(retjson);
+            }
         }
     }
     if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
@@ -1141,7 +1156,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount,0));
+        return(NSPV_addresstxids(1,NSPV_client,coinaddr,CCflag,skipcount,0));
     }
     else if ( strcmp(method,"notarizations") == 0 )
     {
@@ -1363,25 +1378,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         
     }
 
-    // == Send pages variables ==
-    // $REWARDS - Rewards accrued by the logged in wallet address
-    // $TOADDR - To address filled by user input and taken from send page
-    // $SENDAMOUNT - Amount filled by the user input taken from send page
-    // $REWARDSVLD - Validated Rewards calculated from local and network info
-    // $TXFEE - Transaction fee included in amount being sent
-    // $TOTALAMOUNT - Total amount being sent. Amount + Tx Fee
-    // $SPENDRETCODE - retcode value from spend API
-    // $SENDTXID - TXID generated by creating a transaction using spend API
-    // $SENDHEX - HEX generated by create a transaction using spend API
-    // $SENDNVER - nVersion
-    // $SENDNLOCKTIME - nLockTime
-    // $SENDNEXPIRYHT - nExpiryHeight
-    // $SENDVALBAL - valueBalance
-    else if ( strcmp(method,"send") == 0 )
-    {
-        
-    }
-
     // == Peer info page array variables ==
     // $PEER_INFO_ROW_ARRAY - Main array variable defined in peerinfo page.
     // 
@@ -1441,6 +1437,90 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             free(origitemstr);
         }
     }
+    // == Wallet page array variables ==
+    // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
+    //
+    // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
+    // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
+    // $TXHIST_CONFIRMS - Confirmations
+    // $TXHIST_AMOUNT - Amount
+    // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
+    // $TXHIST_DESTADDDR - Destination address
+    // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
+    // Transactions History table HTML tags variables to use in
+    // conditional logic in displaying table rows and columns
+    //
+    // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
+    // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
+    // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
+    // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
+    // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
+    // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
+    // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
+    if ( strcmp(method,"wallet") == 0 )
+    {
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr;
+        if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
+        {
+            if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
+            {
+                itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
+                for (i=0; i<NSPV_txidsresult.numtxids; i++)
+                {
+                    ptr = &NSPV_txidsresult.txids[i];
+                    if ( (itemstr= clonestr(origitemstr)) != 0 )
+                    {
+                        satoshis = ptr->satoshis;
+                        if ( ptr->satoshis > 0 )
+                            strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
+                        else
+                        {
+                            satoshis = -satoshis;
+                            strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
+                        }
+                        if ( ptr->height <= NSPV_lastntz.height )
+                            strcat(replacestr,"<span class=\"badge badge-info\">dPoW Secured</span>");
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
+                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
+                        sprintf(replacestr,"%.8f",dstr(satoshis));
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_AMOUNT",replacestr);
+                        sprintf(replacestr,"%d",ptr->height);
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DATETIME",replacestr);
+                        bits256_str(replacestr,ptr->txid);
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_TXID",replacestr);
+                        strcat(itemsbuf,itemstr);
+                        itembuf[0] = 0;
+                        fprintf(stderr,"%d of %d: (%s)\n",i,NSPV_txidsresult.numtxids,itemstr);
+                        free(itemstr);
+                    }
+                }
+                NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY",itemsbuf);
+                free(itemsbuf);
+            }
+            free(origitemstr);
+        }
+    }
+    
+
+    // == Send pages variables ==
+    // $REWARDS - Rewards accrued by the logged in wallet address
+    // $TOADDR - To address filled by user input and taken from send page
+    // $SENDAMOUNT - Amount filled by the user input taken from send page
+    // $REWARDSVLD - Validated Rewards calculated from local and network info
+    // $TXFEE - Transaction fee included in amount being sent
+    // $TOTALAMOUNT - Total amount being sent. Amount + Tx Fee
+    // $SPENDRETCODE - retcode value from spend API
+    // $SENDTXID - TXID generated by creating a transaction using spend API
+    // $SENDHEX - HEX generated by create a transaction using spend API
+    // $SENDNVER - nVersion
+    // $SENDNLOCKTIME - nLockTime
+    // $SENDNEXPIRYHT - nExpiryHeight
+    // $SENDVALBAL - valueBalance
+    else if ( strcmp(method,"send") == 0 )
+    {
+        
+    }
 
     // == Send Validate page array variables ==
     // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
@@ -1459,41 +1539,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $SEND_TXVOUT_VALUE - value
     // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
     else if ( strcmp(method,"send_validate") == 0 )
-    {
-        
-    }
-
-    // == Wallet page array variables ==
-    // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
-    // 
-    // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
-    // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
-    // $TXHIST_CONFIRMS - Confirmations
-    // $TXHIST_AMOUNT - Amount
-    // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
-    // $TXHIST_DESTADDDR - Destination address
-    // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
-    // $TXHIST_PRIV_BTN_PAGENUM - tx history previous page button link number
-    // $TXHIST_NEXT_BTN_PAGENUM - tx history next page button link number
-    // $TXHIST_CUR_PAGENUM - tx history page bottom text showing on which page number you are out of total
-    // $TXHIST_TOTAL_PAGENUM - tx history total number of pages
-    //
-    if ( strcmp(method,"wallet") == 0 )
-    {
-        
-    }
-
-    // Transactions History table HTML tags variables to use in
-    // conditional logic in displaying table rows and columns
-    // 
-    // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
-    // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
-    // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
-    // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
-    // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
-    // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
-    // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
-    if ( strcmp(method,"txidinfo") == 0 )
     {
         
     }
