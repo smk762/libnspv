@@ -12,26 +12,26 @@
     <title>Antara Superlite</title>
   </head>
   <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
+      <form class="form-inline">
+        $MENU_BUTTON_ARRAY
+        <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+      </form>
+    </nav>
 
-    <h1 class="text-center"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</h1>
-    <div class="container-fluid">
+    <div class="container-fluid" style="margin-top: 15px;">
       <div class="row" style="margin-bottom: 1em;">
-        <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
+        <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
-              <div class="card-body"> <!-- coin info body start -->
-                <span>Coin: $COIN</span><br>
+              <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
+                <span class="col-3">Coin: $COINNAME ($COIN)</span>
+                <span class="col-3">Balance: $BALANCE $COIN</span>
+                <span class="col-6 text-right">Your Address: <span class="badge badge-secondary" style="margin-right: 15px;">$WALLETADDR</span></span>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
-        <div class="col-8" style="padding-left: 7.5px;">
-          <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
-            <div class="card-body text-right"> <!-- wallet buttons body start -->
-              <form> <!-- coin info buttons form start -->
-                $MENU_BUTTON_ARRAY
-              </form> <!-- coin info buttons form end -->
-            </div> <!-- wallet buttons body end -->
-          </div> <!-- wallet buttons card start -->
-        </div>
       </div>
       
       <div class="row" style="margin-bottom: 1em;">
