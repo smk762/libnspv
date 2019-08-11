@@ -1496,7 +1496,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
 
 char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // from rpc port
 {
-    char *retstr,*method; long fsize; cJSON *retjson = 0;
+    char *retstr,*method,*wifstr; long fsize; cJSON *retjson = 0;
     if ( filestr != 0 )
     {
         if ( (method= jstr(argjson,"method")) != 0 )
