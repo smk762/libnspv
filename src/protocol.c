@@ -89,7 +89,7 @@ btc_bool btc_p2p_deser_addr(unsigned int protocol_version, btc_p2p_address* addr
     } else
         addr->time = 0;
 
-    if (!deser_u64(&addr->nServices, buf))
+    if (!deser_u64(&addr->services, buf))
         return false;
     if (!deser_bytes(&addr->ip, buf, 16))
         return false;
@@ -102,7 +102,7 @@ void btc_p2p_ser_addr(unsigned int protover, const btc_p2p_address* addr, cstrin
 {
     if (protover >= BTC_ADDR_TIME_VERSION)
         ser_u32(s, addr->time);
-    ser_u64(s, addr->nServices);
+    ser_u64(s, addr->services);
     ser_bytes(s, addr->ip, 16);
     ser_u16(s, addr->port);
 }
