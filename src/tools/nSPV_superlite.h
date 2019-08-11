@@ -1224,7 +1224,7 @@ void NSPV_expand_variable(char *bigbuf,char **filestrp,char *key,char *value)
     }
 }
 
-char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
+char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjson)
 {
     char replacestr[8192]; int32_t i,n; cJSON *retjson,*item;
     if ( method == 0 )
@@ -1496,10 +1496,27 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
 
 char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // from rpc port
 {
-    char *retstr; cJSON *retjson = 0;
+    char *retstr,*method; long fsize; cJSON *retjson = 0;
     if ( filestr != 0 )
     {
-        return(NSPV_expand_variables(calloc(4096,4096),filestr,jstr(argjson,"method")));
+        if ( (method= jstr(argjson,"method")) != 0 )
+        {
+            if ( strcmp(method,"login") == 0 )
+            {
+                if ( (wifstr= jstr(argjson,"wif")) != 0 )
+                {
+                    if ( (retjson= NSPV_login(NSPV_chain,wifstr)) != 0 )
+                    {
+                        free_json(retjson);
+                        retjson = 0;
+                    }
+                }
+                free(filestr);
+                filestr = OS_filestr(&fsize,"html/wallet");
+                method = "wallet";
+            }
+            return(NSPV_expand_variables(calloc(4096,4096),filestr,method,argjson));
+        }
         //fprintf(stderr,"NSPV filestr.%s\n",filestr);
         // extract data from retjson and put into filestr template
         //return(filestr);
