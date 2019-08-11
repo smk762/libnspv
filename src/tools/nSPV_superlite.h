@@ -1649,6 +1649,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
 
+    if ( strcmp(NSPV_chain->symbol,"KMD") == 0 )
+        NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
+    else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
+
     free(bigbuf);
     return(filestr);
 }
