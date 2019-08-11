@@ -1577,18 +1577,14 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             {
                 if ( (retjson= NSPV_spend(NSPV_client,NSPV_address,dest,satoshis)) != 0 )
                 {
-//got.({"tx":{"nVersion":4,"vin":[{"txid":"67fcfba751ff799e9ba234e4482281ee836af3edb0dc9d5b788c9ef4c6e67178","vout":1,"scriptSig":"483045022100a3d46b0bfde8d6572bff48182e9c9836864794fcc5c23db39a30b026a158167f02202b14b6e86544c54657732b293241e9c15191a3fba96e64d517d3261337dac88d01","sequenceid":4294967295}],"vout":[{"value":1,"scriptPubKey":"76a914bed47f9cda72a1bf743257617d7a5a1b2a68216688ac"}, {"value":140856.3435,"scriptPubKey":"210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac"}],"nLockTime":0,"nExpiryHeight":0,"valueBalance":0},"result":"success","hex":"0400008085202f89017871e6c6f49e8c785b9ddcb0edf36a83ee812248e434a29b9e79ff51a7fbfc670100000049483045022100a3d46b0bfde8d6572bff48182e9c9836864794fcc5c23db39a30b026a158167f02202b14b6e86544c54657732b293241e9c15191a3fba96e64d517d3261337dac88d01ffffffff0200e1f505000000001976a914bed47f9cda72a1bf743257617d7a5a1b2a68216688acb05b3b91cf0c000023210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac00000000000000000000000000000000000000","retcodes":[0],"lastpeer":"5.9.253.202:12985"})
-fprintf(stderr,"got.(%s)\n",jprint(retjson,0));
-                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"validated")));
-                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSVLD",replacestr);
-                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"rewards")));
-                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSEXT",replacestr);
-                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"txfee")));
-                    NSPV_expand_variable(bigbuf,&filestr,"$TXFEE",replacestr);
-                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"total")));
-                    NSPV_expand_variable(bigbuf,&filestr,"$TOTALAMOUNT",replacestr);
-                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"change")));
-                    NSPV_expand_variable(bigbuf,&filestr,"$CHANGEAMOUNT",replacestr);
+//got.({"txfee":"0.00010000","total":"140856.34350000","change":"140855.34340000","txid":"aa19764684e3c6dda23de3a4989d16d6568b41d87777dce2fca18e8548f57633","tx":{"nVersion":4,"vin":[{"txid":"f5ae0bb2491198f5b4d435a990bb1ba870a5800cb308b2980b0393a89b39d0f6","vout":1,"scriptSig":"473044022055857a361c31f99b1bacb518597aee57e37b430f537d158ad21888a0330700ea02204734f66d49472319534001f187f402993d6bb80398aefc92d90893204ec23ea301","sequenceid":4294967295}],"vout":[{"value":1,"scriptPubKey":"76a914bed47f9cda72a1bf743257617d7a5a1b2a68216688ac"}, {"value":140855.3434,"scriptPubKey":"210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac"}],"nLockTime":0,"nExpiryHeight":0,"valueBalance":0},"result":"success","hex":"0400008085202f8901f6d0399ba893030b98b208b30c80a570a81bbb90a935d4b4f5981149b20baef50100000048473044022055857a361c31f99b1bacb518597aee57e37b430f537d158ad21888a0330700ea02204734f66d49472319534001f187f402993d6bb80398aefc92d90893204ec23ea301ffffffff0200e1f505000000001976a914bed47f9cda72a1bf743257617d7a5a1b2a68216688aca053458bcf0c000023210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac00000000000000000000000000000000000000","retcodes":[0],"lastpeer":"5.9.253.203:12985"})
+//fprintf(stderr,"got.(%s)\n",jprint(retjson,0));
+                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSVLD",jstr(retjson,"validated"));
+                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSEXT",jstr(retjson,"rewards"));
+                    NSPV_expand_variable(bigbuf,&filestr,"$TXFEE",jstr(retjson,"txfee"));
+                    NSPV_expand_variable(bigbuf,&filestr,"$TOTALAMOUNT",jstr(retjson,"total"));
+                    NSPV_expand_variable(bigbuf,&filestr,"$CHANGEAMOUNT",jstr(retjson,"change"));
+                    fprintf(stderr,"change %s\n",change);
                     if ( (retcodes= jobj(retjson,"retcodes")) != 0 )
                     {
                         tmpstr = jprint(retcodes,0);
