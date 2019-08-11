@@ -1387,11 +1387,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         int32_t vout = jint(argjson,"vout"), height = jint(argjson,"height");
         NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_TXID",jstr(argjson,"txid"));
         sprintf(replacestr,"%d",vout);
-        if ( vout >= 0 )
+        if ( vout < 99999 )
         {
             fprintf(stderr,"got vout.%d\n",vout);
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VOUT",replacestr);
-            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN","-1");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN","99999");
             if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
             {
                 if ( jint(retjson,"spentheight") > 0 )
@@ -1408,6 +1408,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 }
                 else
                 {
+                    NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT","0");
                     NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXID","unspent");
                     NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTVINI","unspent");
                     NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXLEN","0");
@@ -1419,7 +1420,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         else
         {
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN",replacestr);
-            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VOUT","-1");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VOUT","99999");
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT","N/A");
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXID","N/A");
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTVINI","N/A");
@@ -1559,7 +1560,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         {
                             sprintf(replacestr,"%d",ptr->vout);
                             NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VOUT",replacestr);
-                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VIN","-1");
+                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VIN","99999");
                             strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
                             if ( ptr->vout != 0 && i > 0 && bits256_cmp(NSPV_txidsresult.txids[i-1].txid,ptr->txid) == 0 && NSPV_txidsresult.txids[i-1].satoshis < 0 )
                                 strcat(replacestr,"  <span class=\"badge badge-primary\">CHANGE</span>");
@@ -1568,7 +1569,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         {
                             sprintf(replacestr,"%d",ptr->vout);
                             NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VIN",replacestr);
-                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VOUT","-1");
+                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VOUT","99999");
                             satoshis = -satoshis;
                             strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
                         }
