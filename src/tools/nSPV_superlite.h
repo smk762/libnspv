@@ -1389,7 +1389,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN","-1");
             if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
             {
-                jaddnum(result,"spentheight",ptr->spent.height);
                 sprintf(replacestr,"%d",jint(retjson,"spentheight"));
                 NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT",replacestr);
                 NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT",jstr(retjson,"spenttxid"));
@@ -1413,10 +1412,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXPROOFLEN","N/A");
             vout = 0;
         }
-        if ( (retjson= NSPV_txproof(1,NSPV_client,vout,jbits256(argjson,"txid"),vout,height)) != 0 )
+        if ( (retjson= NSPV_txproof(1,NSPV_client,vout,jbits256(argjson,"txid"),height)) != 0 )
         {
             NSPV_expand_variable(bigbuf,&filestr,"$TXIDHEX",jstr(retjson,"hex"));
-            NSPV_expand_variable(bigbuf,&filestr,"$TXIDPROOF",jstr(retjson,"proof");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXIDPROOF",jstr(retjson,"proof"));
             free_json(retjson);
         }
     }
