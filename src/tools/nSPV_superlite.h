@@ -1295,7 +1295,23 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // $NEW_PUBKEY - New wallet address's Public key
     else if ( strcmp(method,"getnewaddress") == 0 )
     {
-        
+        char *addr,*wif,*pub; cJSON *json = NSPV_getnewaddress(NSPV_chain);
+        if ( json != 0 )
+        {
+            addr = jstr(json,"address");
+            wif = jstr(json,"wif");
+            pub = jstr(json,"pubkey");
+            if ( addr != 0 && wif != 0 && pub != 0 )
+            {
+                strcpy(replacestr,addr);
+                NSPV_expand_variable(&bigbuf,&filestr,"$NEW_WALLETADDR",replacestr);
+                strcpy(replacestr,wif);
+                NSPV_expand_variable(&bigbuf,&filestr,"$NEW_WIFKEY",replacestr);
+                strcpy(replacestr,pub);
+                NSPV_expand_variable(&bigbuf,&filestr,"$NEW_PUBKEY",replacestr);
+            }
+            free_json(json);
+        }
     }
 
     // == Wallet page variables ==
