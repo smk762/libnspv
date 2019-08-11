@@ -1378,7 +1378,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
     // $TXIDHEX - hex
     // $TXIDPROOF - proof
-    else if ( strcmp(method,"spentinfo") == 0 )
+    else if ( strcmp(method,"txidinfo") == 0 )
     {
         
     }
@@ -1505,12 +1505,18 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         satoshis = ptr->satoshis;
                         if ( ptr->satoshis > 0 )
                         {
+                            sprintf(replacestr,"%d",ptr->vout);
+                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VOUT",replacestr);
+                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VIN","-1");
                             strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
                             if ( ptr->vout != 0 && i > 0 && bits256_cmp(NSPV_txidsresult.txids[i-1].txid,ptr->txid) == 0 && NSPV_txidsresult.txids[i-1].satoshis < 0 )
                                 strcat(replacestr,"  <span class=\"badge badge-primary\">CHANGE</span>");
-                        }
+                         }
                         else
                         {
+                            sprintf(replacestr,"%d",ptr->vout);
+                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VIN",replacestr);
+                            NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_VOUT","-1");
                             satoshis = -satoshis;
                             strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
                         }
@@ -1635,6 +1641,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
+
+    if ( strcmp(NSPV_chain->symbol,"KMD") == 0 )
+        NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
+    else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
 
     free(bigbuf);
     return(filestr);
