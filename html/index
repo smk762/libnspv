@@ -24,8 +24,15 @@
     <div class="container-fluid" style="margin-top: 15px;">
       <div class="row justify-content-md-center">
         <div class="col-md-4 col-sm-12 text-center">
-            <h4>To continue, log in to your account.</h4>
+            <!-- logout section start -->
+            <div class="logout-section" style="display: $LOGOUT_DISPLAY;">
+              <div>Your logged in wallet session will expire in $ACCOUNT_SESSION_SECONDS seconds</div>
+              <button class="btn btn-lg btn-danger" formaction="$URL/method/logout?nexturl=index" formmethod="get">LOGOUT</button>
+            </div>
+            <!-- logout section end -->
             <!-- login form start -->
+            <div class="login-section" style="display: $LOGIN_DISPLAY;">
+              <h4>To continue, log in to your account.</h4>
             <!--<form action="$URL/method/login" method="get">
               <div class="form-group">
                 Select a .jpg image file: <input type="file" name="jpg_image" accept=".jpg">
@@ -47,7 +54,8 @@
               <h4>Don't have an account?</h4>
               <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">Generate New Address</button>
             </form>
-            <!-- login form end -->
+          </div>
+          <!-- login form end -->
         </div>
         <!-- Get New Address section start -->
         <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $GENADDR;"> <!-- Get New Address div start -->
