@@ -1682,7 +1682,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
                 itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
-                for (i=0; i<NSPV_txidsresult.numtxids; i++)
+                for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
                     ptr = &NSPV_txidsresult.txids[i];
                     if ( (itemstr= clonestr(origitemstr)) != 0 )
