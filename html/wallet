@@ -14,10 +14,15 @@
   <body>
     <nav class="navbar navbar-dark bg-dark">
       <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
+      <form class="form-inline" action="$URL/method/send_confirm" method="get">
+        <input class="form-control mr-sm-1" type="search" placeholder="Address" aria-label="ToAddress">
+        <input class="form-control mr-sm-2" type="search" placeholder="Amount" aria-label="SendAmount">
+          <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Send $COIN</button>
+      </form>
       <form class="form-inline">
         $MENU_BUTTON_ARRAY
         <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>-->
       </form>
     </nav>
 

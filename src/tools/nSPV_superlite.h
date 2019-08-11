@@ -1279,7 +1279,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // Top menu buttons HTML tags variables to use with
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
-     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" type=\"button\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-warning mr-sm-1\" type=\"button\" href=\"$URL/method/send?nexturl=send\">Send</a> <a class=\"btn btn-outline-info mr-sm-1\" type=\"button\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" type=\"button\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-2\" type=\"button\" href=\"$URL/method/index?nexturl=index\">Account</a>");
+     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" type=\"button\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-warning mr-sm-1\" type=\"button\" href=\"$URL/method/send?nexturl=send\">Send</a> <a class=\"btn btn-outline-info mr-sm-1\" type=\"button\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" type=\"button\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-2\" type=\"button\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-2\" type=\"button\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
     
 
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
@@ -1295,7 +1295,17 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
 
     // == Coin specific gloabal variable
     // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
-    // 
+    
+    // == Account page variables ==
+    // $LOGIN_DISPLAY - If NO LOGIN session active
+    //         LOGIN_DISPLAY=""
+    //      else
+    //         LOGIN_DISPLAY="none"
+    // $LOGOUT_DISPLAY - If LOGIN session IS active
+    //         LOGOUT_DISPLAY="none"
+    //      else
+    //         LOGOUT_DISPLAY=""
+    // $ACCOUNT_SESSION_SECONDS - shows active logged in wallet accounts remaining seconds
 
     // == Getinfo page variabls ==
     // $PEERSTOTAL - Total Connected Peers
