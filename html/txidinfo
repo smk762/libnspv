@@ -54,32 +54,23 @@
                 <table class="table table-striped table-dark" style="margin-bottom: 0;">
                   <tbody>
                     <tr>
-                      <td style="width: 270px;">Transaction ID</td>
-                      <td class="text-break text-wrap">$TXINFO_TXID</td>
+                      <th style="width: 200px;">Spent Transaction Info</th>
+                      <td>
+                        <div class="row">
+                          <div class="col-md-6 col-sm-12"><b>Spent Transaction Height</b><br>$TXINFO_SPENTHT</div>
+                          <div class="col-md-6 col-sm-12 text-break text-wrap"><b>Spent Transaction ID</b><br><a href="$URL/method/txidinfo?txid=$TXINFO_SPENTTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$TXINFO_SPENTTXID</a></div>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
-                      <td>vout</td>
-                      <td>$TXINFO_VOUT</td>
-                    </tr>
-                    <tr>
-                      <td>Spent Height</td>
-                      <td>$TXINFO_SPENTHT</td>
-                    </tr>
-                    <tr>
-                      <td>Spent Transaction ID</td>
-                      <td><a href="$URL/method/txidinfo?txid=$TXINFO_SPENTTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$TXINFO_SPENTTXID</a></td>
-                    </tr>
-                    <tr>
-                      <td>Spent vini</td>
-                      <td>$TXINFO_SPENTVINI</td>
-                    </tr>
-                    <tr>
-                      <td>Spent Transaction Length</td>
-                      <td>$TXINFO_SPENTTXLEN</td>
-                    </tr>
-                    <tr>
-                      <td>Spent Transaction Proof Length</td>
-                      <td>$TXINFO_SPENTTXPROOFLEN</td>
+                      <th></th>
+                      <td>
+                        <div class="row">
+                          <div class="col-md-4 col-sm-12"><b>Spent vini</b><br>$TXINFO_SPENTVINI</div>
+                          <div class="col-md-4 col-sm-12"><b>Spent Transaction Length</b><br>$TXINFO_SPENTTXLEN</div>
+                          <div class="col-md-4 col-sm-12"><b>Spent Transaction Proof Length</b><br>$TXINFO_SPENTTXPROOFLEN</div>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <th>hex</th>
