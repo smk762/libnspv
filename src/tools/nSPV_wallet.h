@@ -545,7 +545,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         return(result);
     }
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
-        NSPV_addressutxos(client,srcaddr,0,0,0);
+        NSPV_addressutxos(1,client,srcaddr,0,0,0);
     if ( NSPV_utxosresult.CCflag != 0 || strcmp(NSPV_utxosresult.coinaddr,srcaddr) != 0 || NSPV_utxosresult.nodeheight < NSPV_inforesult.height )
     {
         jaddstr(result,"result","error");
@@ -664,7 +664,7 @@ int64_t NSPV_AddNormalinputs(CMutableTransaction &mtx,CPubKey mypk,int64_t total
         Getscriptaddress(coinaddr,CScript() << ParseHex(HexStr(mypk)) << OP_CHECKSIG);
         if ( strcmp(ptr->U.coinaddr,coinaddr) != 0 )
         {
-            NSPV_addressutxos(coinaddr,CCflag,0,0);
+            NSPV_addressutxos(1,coinaddr,CCflag,0,0);
             NSPV_utxosresp_purge(&ptr->U);
             NSPV_utxosresp_copy(&ptr->U,&NSPV_utxosresult);
         }
@@ -724,7 +724,7 @@ void NSPV_txids2CCtxids(struct NSPV_txidsresp *ptr,std::vector<std::pair<CAddres
 
 void NSPV_CCunspents(std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &outputs,char *coinaddr,bool ccflag)
 {
-    NSPV_addressutxos(coinaddr,ccflag,0,0);
+    NSPV_addressutxos(1,coinaddr,ccflag,0,0);
     NSPV_utxos2CCunspents(&NSPV_utxosresult,outputs);
 }
 

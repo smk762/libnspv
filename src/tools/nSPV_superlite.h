@@ -34,7 +34,7 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
 void expand_ipbits(char *ipaddr,uint64_t ipbits);
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump);
 
-uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
+uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
@@ -155,7 +155,7 @@ void NSPV_logout()
     memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));
     memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
     memset(&NSPV_key,0,sizeof(NSPV_key));
-    NSPV_logintime = 0;
+    NSPV_didfirstutxos = NSPV_logintime = 0;
 }
 
 btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
@@ -200,43 +200,6 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
         node->prevtimes[ind] = timestamp;
         return(node);
     } else fprintf(stderr,"no nodes\n");
-    return(0);
-}
-
-int32_t NSPV_periodic(btc_node *node) // called periodically
-{
-    uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
-    btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
-    if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
-        NSPV_logout();
-    if ( node->prevtimes[NSPV_INFO>>1] > timestamp )
-        node->prevtimes[NSPV_INFO>>1] = 0;
-    if ( node->gotaddrs == 0 )
-    {
-        // void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr) to use nSPV flag
-        cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getaddr",NULL,0);
-        btc_node_send(node,request);
-        cstr_free(request, true);
-        //fprintf(stderr,"request addrs\n");
-    }
-    if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
-    {
-        int32_t reqht, hdrheight;
-        if ( NSPV_lastntz.height == 0 || IS_IN_SYNC == 1 || (NSPV_inforesult.height-NSPV_lastntz.height-NSPV_num_headers < 5 && rand() % 100 < 10) )
-            reqht = 0;
-        else 
-            reqht = NSPV_hdrheight_counter;
-        msg[len++] = NSPV_INFO;
-        len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
-        //fprintf(stderr,"[%i] getinfo for block %i\n",node->nodeid, reqht);
-        NSPV_hdrheight_counter++;
-        if ( NSPV_hdrheight_counter > NSPV_inforesult.height+1 )
-            NSPV_hdrheight_counter = NSPV_lastntz.height;
-        if ( NSPV_inforesult.height-NSPV_lastntz.height-NSPV_hdrheight_counter > 101 )
-            NSPV_hdrheight_counter = NSPV_inforesult.height-101;
-        
-        return(NSPV_req(client,node,msg,len,NODE_NSPV,NSPV_INFO>>1) != 0);
-    }
     return(0);
 }
 
@@ -395,7 +358,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                         if ( validate_headers(hdrhash) == 0 )
                         {
                             from->banscore += 1;
-                            fprintf(stderr, "[%i] sent invalid header banscore.%i\n",from->nodeid, from->banscore);
+                            fprintf(stderr, "[%s] sent invalid header banscore.%i\n",from->ipaddr, from->banscore);
                         }
                     }
                 }
@@ -553,7 +516,7 @@ uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight)
     return(0);
 }
 
-cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
+cJSON *NSPV_addressutxos(int32_t waitflag,btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
 {
     cJSON *result = cJSON_CreateObject(); uint8_t msg[512]; int32_t i,iter,slen,len = 1; size_t sz;
     //fprintf(stderr,"utxos %s NSPV addr %s\n",coinaddr,NSPV_address.c_str());
@@ -563,7 +526,6 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
         skipcount = 0;
     NSPV_utxosresp_purge(&NSPV_utxosresult);
     if ( (sz= btc_base58_decode_check(coinaddr,msg,sizeof(msg))) != 25 )
-    //if ( bitcoin_base58decode(msg,coinaddr) != 25 )
     {
         jaddstr(result,"result","error");
         jaddstr(result,"error","invalid address");
@@ -581,11 +543,14 @@ cJSON *NSPV_addressutxos(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_ADDRINDEX,msg[1]>>1) != 0 )
     {
-        for (i=0; i<NSPV_POLLITERS; i++)
+        if ( waitflag != 0 )
         {
-            usleep(NSPV_POLLMICROS);
-            if ( (NSPV_inforesult.height == 0 || NSPV_utxosresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_utxosresult.coinaddr) == 0 && CCflag == NSPV_utxosresult.CCflag )
-                return(NSPV_utxosresp_json(&NSPV_utxosresult));
+            for (i=0; i<NSPV_POLLITERS; i++)
+            {
+                usleep(NSPV_POLLMICROS);
+                if ( (NSPV_inforesult.height == 0 || NSPV_utxosresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_utxosresult.coinaddr) == 0 && CCflag == NSPV_utxosresult.CCflag )
+                    return(NSPV_utxosresp_json(&NSPV_utxosresult));
+            }
         }
     } else sleep(1);
     jaddstr(result,"result","error");
@@ -932,6 +897,53 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
     return(result);
 }
 
+int32_t NSPV_periodic(btc_node *node) // called periodically
+{
+    uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
+    btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
+    if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
+        NSPV_logout();
+    if ( node->prevtimes[NSPV_INFO>>1] > timestamp )
+        node->prevtimes[NSPV_INFO>>1] = 0;
+    if ( node->gotaddrs == 0 )
+    {
+        // void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr) to use nSPV flag
+        cstring *request = btc_p2p_message_new(node->nodegroup->chainparams->netmagic,"getaddr",NULL,0);
+        btc_node_send(node,request);
+        cstr_free(request, true);
+        //fprintf(stderr,"request addrs\n");
+    }
+    if ( NSPV_address[0] != 0 && strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+ASSETCHAINS_BLOCKTIME/2) )
+    {
+        if ( (retjson= NSPV_addressutxos(1,NSPV_client,coinaddr,CCflag,skipcount,0)) != 0 )
+        {
+            fprintf(stderr,"send first utxos for %s\n",NSPV_address);
+            NSPV_didfirstutxos = timestamp;
+            free_json(retjson);
+        }
+    }
+    if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
+    {
+        int32_t reqht, hdrheight;
+        if ( NSPV_lastntz.height == 0 || IS_IN_SYNC == 1 || (NSPV_inforesult.height-NSPV_lastntz.height-NSPV_num_headers < 5 && rand() % 100 < 10) )
+            reqht = 0;
+        else
+            reqht = NSPV_hdrheight_counter;
+        len = 1;
+        msg[len++] = NSPV_INFO;
+        len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
+        //fprintf(stderr,"[%i] getinfo for block %i\n",node->nodeid, reqht);
+        NSPV_hdrheight_counter++;
+        if ( NSPV_hdrheight_counter > NSPV_inforesult.height+1 )
+            NSPV_hdrheight_counter = NSPV_lastntz.height;
+        if ( NSPV_inforesult.height-NSPV_lastntz.height-NSPV_hdrheight_counter > 101 )
+            NSPV_hdrheight_counter = NSPV_inforesult.height-101;
+        
+        return(NSPV_req(client,node,msg,len,NODE_NSPV,NSPV_INFO>>1) != 0);
+    }
+    return(0);
+}
+
 #define NSPV_STR 1
 #define NSPV_INT 2
 #define NSPV_UINT 3
@@ -1125,7 +1137,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addressutxos(NSPV_client,coinaddr,CCflag,skipcount,0));
+        return(NSPV_addressutxos(1,NSPV_client,coinaddr,CCflag,skipcount,0));
     }
     else if ( strcmp(method,"listtransactions") == 0 )
     {
@@ -1237,8 +1249,12 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     NSPV_expand_variable(&bigbuf,&filestr,"$URL",replacestr);
     
     NSPV_expand_variable(&bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
-    
-    
+    NSPV_expand_variable(&bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
+    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
+    NSPV_expand_variable(&bigbuf,&filestr,"$BALANCE",(char *)replacestr);
+    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
+    NSPV_expand_variable(&bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+
     // == Getinfo page variabls ==
     // $PEERSTOTAL - Total Connected Peers
     // $PROTOVER - Protocol Version
@@ -1312,15 +1328,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
             }
             free_json(json);
         }
-    }
-
-    // == Wallet page variables ==
-    // $BALANCE - Coin Balance
-    // $WALLETADDR - Logged in wallet's address
-    // -- Wallet Address is also used in send_confirm and send_validate page as "From Address"
-    else if ( strcmp(method,"wallet") == 0 )
-    {
-        
     }
 
     // == Transactions detail (txidinfo) page variables - spentinfo API ==
