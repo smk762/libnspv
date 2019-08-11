@@ -1283,7 +1283,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
             itemsbuf = calloc(num,1024);
             fprintf(stderr,"numvins.%d\n",num);
             for (i=0; i<num; i++)
-            {
+            {break;
                 item = jitem(vins,i);
                 fprintf(stderr,"vin %d.(%s)\n",i,jprint(item,0));
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
@@ -1294,7 +1294,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
                     sprintf(replacestr,"%d",jint(item,"vout"));
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_VOUT",replacestr);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_AMOUNT","remove");
-                    sprintf(replacestr,"%d",jint(item,"sequenceid"));
+                    sprintf(replacestr,"%u",jint(item,"sequenceid"));
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SEQID",replacestr);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SCRIPTSIG",jstr(item,"scriptSig"));
 
