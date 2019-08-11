@@ -110,7 +110,7 @@
                     </tr>
                     <tr>
                       <td scope="row">Notarized Txid</td>
-                      <td><a href="$URL/method/txidinfo?txid=$NTZTXID&height=$NTZHEIGHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
+                      <td><a href="$URL/method/txidinfo?txid=$NTZTXID&height=$NTZTXIDHEIGHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarization Txid Height</td>
