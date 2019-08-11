@@ -462,7 +462,7 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
             jaddnum(node_json,"lastping",(int64_t)node->lastping);
             jaddnum(node_json,"time_started_con",(int64_t)node->time_started_con);
             jaddnum(node_json,"time_last_request",(int64_t)node->time_last_request);
-            jaddnum(node_json,"services",(int64_t)node->services);
+            jaddnum(node_json,"services",(int64_t)node->nServices);
             jaddnum(node_json,"missbehavescore",(int64_t)node->banscore);
             jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight);
             if ( node->synced == 0 )

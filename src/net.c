@@ -220,7 +220,7 @@ btc_node* btc_node_new()
     node->version_handshake = false;
     node->state = 0;
     node->nonce = 0;
-    node->services = 0;
+    node->nServices = 0;
     node->lastping = 0;
     node->time_started_con = 0;
     node->time_last_request = 0;
