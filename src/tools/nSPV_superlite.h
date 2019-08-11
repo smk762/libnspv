@@ -1548,6 +1548,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         {
             NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos;
             fprintf(stderr,"fetch %d txids\n",NSPV_didfirsttxproofs);
+        }
     }
 
     // == Send Validate page array variables ==
