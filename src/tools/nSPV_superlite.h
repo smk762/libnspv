@@ -1263,6 +1263,82 @@ void NSPV_expand_variable(char *bigbuf,char **filestrp,char *key,char *value)
     }
 }
 
+void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replacestr)
+{
+//{"nVersion":4,"vin":[],"vout":[{"value":1,"scriptPubKey":"76a914bed47f9cda72a1bf743257617d7a5a1b2a68216688ac"}, {"value":140855.3434,"scriptPubKey":"210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac"}],"nLockTime":0,"nExpiryHeight":0,"valueBalance":0}
+// == Send Validate page array variables ==
+// $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
+//
+// $SEND_TXVIN_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+// $SEND_TXVIN_TXID - txid
+// $SEND_TXVIN_VOUT - vout
+// $SEND_TXVIN_AMOUNT - amount
+// $SEND_TXVIN_SCRIPTSIG - scriptSig
+// $SEND_TXVIN_SEQID - sequenceid
+    char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int32_t i,num; long fsize; cJSON *vins,*vouts,*item;
+    if ( (origitemstr= OS_filestr(&fsize,"html/send_validate_txvin_table_row.inc")) != 0 )
+    {
+        if ( (vins= jarray(&num,txobj,"vin")) != 0 )
+        {
+            itemsbuf = calloc(num,1024);
+            for (i=0; i<num; i++)
+            {
+                item = jitem(vins,i);
+                if ( (itemstr= clonestr(origitemstr)) != 0 )
+                {
+                    sprintf(replacestr,"%d",i);
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_ARRAYNUM",replacestr);
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_TXID",jstr(item,"txid"));
+                    sprintf(replacestr,"%d",jint(item,"vout"));
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_VOUT",replacestr);
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_AMOUNT","remove");
+                    sprintf(replacestr,"%d",jint(item,"sequenceid"));
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SEQID",replacestr);
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVIN_SCRIPTSIG",jstr(item,"scriptSig"));
+
+                    strcat(itemsbuf,itemstr);
+                    itembuf[0] = 0;
+                    free(itemstr);
+                }
+            }
+            NSPV_expand_variable(bigbuf,&filestr,"$SEND_TXVIN_ARRAY",itemsbuf);
+            free(itemsbuf);
+        }
+        free(origitemstr);
+    }
+    // $SEND_TXVOUT_ARRAY - Main array variable defined in send_validate page for Tx-Vout table
+    //
+    // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+    // $SEND_TXVOUT_VALUE - value
+    // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
+    if ( (origitemstr= OS_filestr(&fsize,"html/send_validate_txvout_table_row.inc")) != 0 )
+    {
+        if ( (vins= jarray(&num,txobj,"vout")) != 0 )
+        {
+            itemsbuf = calloc(num,1024);
+            for (i=0; i<num; i++)
+            {
+                item = jitem(vouts,i);
+                if ( (itemstr= clonestr(origitemstr)) != 0 )
+                {
+                    sprintf(replacestr,"%d",i);
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ARRAYNUM",replacestr);
+                    sprintf(replacestr,"%.8f",dstr((uint64_t)(jdouble(item,"value")*SATOSHIDEN+0.0000000049)));
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_VALUE",replacestr);
+                    NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ADDR",jstr(item,"scriptPubKey"));
+                    
+                    strcat(itemsbuf,itemstr);
+                    itembuf[0] = 0;
+                    free(itemstr);
+                }
+            }
+            NSPV_expand_variable(bigbuf,&filestr,"$SEND_TXVOUT_ARRAY",itemsbuf);
+            free(itemsbuf);
+        }
+        free(origitemstr);
+    }
+}
+
 char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjson)
 {
     char replacestr[8192]; int32_t i,n; cJSON *retjson,*item;
@@ -1288,7 +1364,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     //      else
     //         REWARDS_DISPLAY_KMD="none"
 
-    // == Getinfo page variabls ==
+    // == Getinfo page variables ==
     // $PEERSTOTAL - Total Connected Peers
     // $PROTOVER - Protocol Version
     // $LASTPEER - Last connected Peers
@@ -1389,7 +1465,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         sprintf(replacestr,"%d",vout);
         if ( jstr(argjson,"vout") == 0 || strcmp(jstr(argjson,"vout"),"ignore") != 0 )
         {
-            fprintf(stderr,"got vout.%d\n",vout);
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VOUT",replacestr);
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN","ignore");
             if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
@@ -1430,8 +1505,21 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         }
         if ( (retjson= NSPV_txproof(1,NSPV_client,vout,jbits256(argjson,"txid"),height)) != 0 )
         {
-            NSPV_expand_variable(bigbuf,&filestr,"$TXIDHEX",jstr(retjson,"hex"));
-            NSPV_expand_variable(bigbuf,&filestr,"$TXIDPROOF",jstr(retjson,"proof"));
+            if ( jstr(retjson,"hex") != 0 )
+            {
+                btc_tx *tx; cJSON *txobj;
+                NSPV_expand_variable(bigbuf,&filestr,"$TXIDHEX",jstr(retjson,"hex"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXIDPROOF",jstr(retjson,"proof"));
+                if ( (tx= btc_tx_decodehex(jstr(retjson,"hex"))) != 0 )
+                {
+                    if ( (txobj= btc_tx_to_json(tx)) != 0 )
+                    {
+                        NSPV_expand_vinvout(bigbuf,&filestr,txobj,replacestr);
+                        free_json(txobj);
+                    }
+                    btc_tx_free(tx);
+                }
+            }
             free_json(retjson);
         }
     }
@@ -1662,23 +1750,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDNEXPIRYHT",(char *)replacestr);
                         sprintf(replacestr,"%lld",j64bits(txobj,"valueBalance"));
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDVALBAL",(char *)replacestr);
+                        NSPV_expand_vinvout(bigbuf,&filestr,txobj,replacestr);
                     }
-                    // == Send Validate page array variables ==
-                    // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
-                    //
-                    // $SEND_TXVIN_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
-                    // $SEND_TXVIN_TXID - txid
-                    // $SEND_TXVIN_VOUT - vout
-                    // $SEND_TXVIN_AMOUNT - amount
-                    // $SEND_TXVIN_SCRIPTSIG - scriptSig
-                    // $SEND_TXVIN_SEQID - sequenceid
-                    //
-                    //
-                    // $SEND_TXVOUT_ARRAY - Main array variable defined in send_validate page for Tx-Vout table
-                    //
-                    // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
-                    // $SEND_TXVOUT_VALUE - value
-                    // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
                     free_json(retjson);
                 }
             }
