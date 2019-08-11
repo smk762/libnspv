@@ -524,7 +524,7 @@ cstring *NSPV_signtx(btc_spv_client *client,int32_t isKMD,int64_t *rewardsump,in
 
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis)
 {
-    cJSON *result = cJSON_CreateObject(),*retcodes = cJSON_CreateArray(); uint8_t *ptr,rmd160[128]; int32_t len,isKMD = 0; int64_t txfee = 10000; cstring *scriptPubKey=0,*hex=0; btc_tx *mtx=0,*tx=0; struct NSPV_utxoresp used[NSPV_MAXVINS]; char numstr[64]; int64_t rewardsum=0,interestsum=0;
+    cJSON *result = cJSON_CreateObject(),*retcodes = cJSON_CreateArray(); uint8_t *ptr,rmd160[128]; int32_t len,isKMD = 0; int64_t totalinputs,change,txfee = 10000; cstring *scriptPubKey=0,*hex=0; btc_tx *mtx=0,*tx=0; struct NSPV_utxoresp used[NSPV_MAXVINS]; char numstr[64]; int64_t rewardsum=0,interestsum=0;
     if ( NSPV_logintime == 0 || time(NULL) > NSPV_logintime+NSPV_AUTOLOGOUT )
     {
         jaddstr(result,"result","error");
@@ -595,6 +595,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
     memset(used,0,sizeof(used));
     if ( (totalinputs= NSPV_addinputs(used,mtx,satoshis+txfee,64,NSPV_utxosresult.utxos,NSPV_utxosresult.numutxos)) > 0 )
     {
+        change = totalinputs - (satoshis + txfee);
         btc_tx_add_txout(mtx,satoshis,scriptPubKey);
         if ( NSPV_logintime == 0 || time(NULL) > NSPV_logintime+NSPV_AUTOLOGOUT )
         {
