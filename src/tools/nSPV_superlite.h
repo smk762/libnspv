@@ -1463,7 +1463,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     {
                         satoshis = ptr->satoshis;
                         if ( ptr->satoshis > 0 )
-                            strcpy(replacestr,"<span class=\"badge badge-danger\">IN</span>");
+                            strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
                         else
                         {
                             satoshis = -satoshis;
