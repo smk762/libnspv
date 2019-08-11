@@ -81,6 +81,18 @@
                       <td>$TXINFO_SPENTTXPROOFLEN</td>
                     </tr>
                     <tr>
+                      <th>hex</th>
+                        <td>
+                          <pre class="text-break text-wrap text-white">$TXIDHEX</pre>
+                        </td>
+                    </tr>
+                    <tr>
+                      <th>proof</th>
+                        <td>
+                          <pre class="text-break text-wrap text-white">$TXIDPROOF</pre>
+                        </td>
+                    </tr>
+                    <tr>
                       <td>Last Peer</td>
                       <td>$LASTPEER</td>
                     </tr>
