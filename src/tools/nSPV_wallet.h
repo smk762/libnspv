@@ -203,7 +203,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
     *retvalp = skipvalidation != 0 ? 0 : -1;
     if ( (ptr= NSPV_txproof_find(txid,height)) == 0 )
     {
-        NSPV_txproof(client,v,txid,height);
+        NSPV_txproof(1,client,v,txid,height);
         ptr = &NSPV_txproofresult;
     }
     if ( bits256_cmp(ptr->txid,txid) != 0 )

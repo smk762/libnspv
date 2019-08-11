@@ -258,7 +258,7 @@ extern struct NSPV_broadcastresp NSPV_broadcastresult;
 
 extern struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
 extern struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
-extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 10];
 
 // validation 
 extern struct NSPV_ntz NSPV_lastntz;
