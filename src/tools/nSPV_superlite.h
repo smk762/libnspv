@@ -1526,14 +1526,18 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     {
                         satoshis = ptr->satoshis;
                         if ( ptr->satoshis > 0 )
+                        {
                             strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
+                            if ( ptr->vout != 0 && i > 0 && bits256_cmp(NSPV_txidsresult.txids[i-1].txid,ptr->txid) == 0 && NSPV_txidsresult.txids[i-1].satoshis < 0 )
+                                strcat(replacestr,"<span class=\"badge badge-primary\">CHANGE</span>");
+                        }
                         else
                         {
                             satoshis = -satoshis;
                             strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
                         }
                         if ( ptr->height <= NSPV_lastntz.height )
-                            strcat(replacestr,"  <span class=\"badge badge-info\">dPoW Secured</span>");
+                            strcat(replacestr,"  <span class=\"badge badge-info\">dPoW</span>");
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
                         sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
