@@ -68,7 +68,7 @@
                         <th>Rewards Info</th>
                         <td>
                           <div class="row">
-                            <div class="col-md-6">Rewards<br>$REWARDS $COIN</div>
+                            <div class="col-md-6">Rewards<br>$REWARDSEXT $COIN</div>
                             <div class="col-md-6"><b>Validated</b><br>$REWARDSVLD $COIN
                           <small id="validatedHelp" class="form-text text-muted">Locally calculated value of rewards to match with the value from network.</small></div>
                           </div>

@@ -593,7 +593,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
     if ( isKMD != 0 )
         mtx->locktime = (uint32_t)time(NULL) - 777;
     memset(used,0,sizeof(used));
-    if ( NSPV_addinputs(used,mtx,satoshis+txfee,64,NSPV_utxosresult.utxos,NSPV_utxosresult.numutxos) > 0 )
+    if ( (totalinputs= NSPV_addinputs(used,mtx,satoshis+txfee,64,NSPV_utxosresult.utxos,NSPV_utxosresult.numutxos)) > 0 )
     {
         btc_tx_add_txout(mtx,satoshis,scriptPubKey);
         if ( NSPV_logintime == 0 || time(NULL) > NSPV_logintime+NSPV_AUTOLOGOUT )
@@ -616,6 +616,13 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         {
             if ( (tx= btc_tx_decodehex(hex->str)) != 0 )
             {
+                sprintf(numstr,"%.8f",(double)txfee/COIN);
+                jaddstr(result,"txfee",numstr);
+                sprintf(numstr,"%.8f",(double)totalinputs/COIN);
+                jaddstr(result,"total",numstr);
+                sprintf(numstr,"%.8f",(double)change/COIN);
+                jaddstr(result,"change",numstr);
+                jaddbits256(result,"txid",NSPV_tx_hash(tx));
                 jadd(result,"tx",btc_tx_to_json(tx));
                 jaddstr(result,"result","success");
                 jaddstr(result,"hex",hex->str);

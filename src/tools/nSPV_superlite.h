@@ -1588,7 +1588,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"total")));
                     NSPV_expand_variable(bigbuf,&filestr,"$TOTALAMOUNT",replacestr);
                     sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"change")));
-                    NSPV_expand_variable(bigbuf,&filestr,"$CHANGE",replacestr);
+                    NSPV_expand_variable(bigbuf,&filestr,"$CHANGEAMOUNT",replacestr);
                     if ( (retcodes= jobj(retjson,"retcodes")) != 0 )
                     {
                         tmpstr = jprint(retcodes,0);
