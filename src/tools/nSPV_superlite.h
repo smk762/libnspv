@@ -1482,13 +1482,14 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_TXID",replacestr);
                         strcat(itemsbuf,itemstr);
                         itembuf[0] = 0;
-                        free(itemstr);
+                        fprintf(stderr,"%d: (%s)\n",itemstr);
+                        //free(itemstr);
                     }
                 }
                 NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY",itemsbuf);
-                free(itemsbuf);
+                //free(itemsbuf);
             }
-            free(origitemstr);
+            //free(origitemstr);
         }
     }
     
