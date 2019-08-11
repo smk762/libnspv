@@ -1644,6 +1644,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             free(origitemstr);
         }
     }
+    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
+    NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
+    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
+    NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+
     // == Wallet page array variables ==
     // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
     //
@@ -1719,6 +1724,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         }
         if ( didflag == 0 )
             NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY","");
+        if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+        {
+            fprintf(stderr,"issued listunspent\n");
+            free_json(retjson);
+        }
     }
     // == Send pages variables ==
     // $REWARDS - Rewards accrued by the logged in wallet address
@@ -1795,10 +1805,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
     NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
-    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.total));
-    NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
-    sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
-    NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
 
