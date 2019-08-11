@@ -1281,9 +1281,11 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
         if ( (vins= jarray(&num,txobj,"vin")) != 0 )
         {
             itemsbuf = calloc(num,1024);
+            fprintf(stderr,"numvins.%d\n",num);
             for (i=0; i<num; i++)
             {
                 item = jitem(vins,i);
+                fprintf(stderr,"vin %d.(%s)\n",jprint(item,0));
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     sprintf(replacestr,"%d",i);
@@ -1315,10 +1317,12 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
     {
         if ( (vouts= jarray(&num,txobj,"vout")) != 0 )
         {
+            fprintf(stderr,"numvouts.%d\n",num);
             itemsbuf = calloc(num,1024);
             for (i=0; i<num; i++)
             {
                 item = jitem(vouts,i);
+                fprintf(stderr,"vout %d.(%s)\n",jprint(item,0));
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     sprintf(replacestr,"%d",i);
