@@ -1301,7 +1301,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
                     free(itemstr);
                 }
             }
-            NSPV_expand_variable(bigbuf,&filestr,"$SEND_TXVIN_ARRAY",itemsbuf);
+            NSPV_expand_variable(bigbuf,filestrp,"$SEND_TXVIN_ARRAY",itemsbuf);
             free(itemsbuf);
         }
         free(origitemstr);
@@ -1332,7 +1332,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
                     free(itemstr);
                 }
             }
-            NSPV_expand_variable(bigbuf,&filestr,"$SEND_TXVOUT_ARRAY",itemsbuf);
+            NSPV_expand_variable(bigbuf,filestrp,"$SEND_TXVOUT_ARRAY",itemsbuf);
             free(itemsbuf);
         }
         free(origitemstr);
