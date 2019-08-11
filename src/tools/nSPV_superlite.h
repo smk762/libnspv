@@ -1283,9 +1283,10 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
             itemsbuf = calloc(num,1024);
             fprintf(stderr,"numvins.%d\n",num);
             for (i=0; i<num; i++)
-            {break;
+            {
                 item = jitem(vins,i);
                 fprintf(stderr,"vin %d.(%s)\n",i,jprint(item,0));
+                continue;
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     sprintf(replacestr,"%d",i);
@@ -1306,8 +1307,10 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
             }
             NSPV_expand_variable(bigbuf,filestrp,"$SEND_TXVIN_ARRAY",itemsbuf);
             free(itemsbuf);
+            itemsbuf = 0;
         }
         free(origitemstr);
+        origitemstr = 0;
     }
     // $SEND_TXVOUT_ARRAY - Main array variable defined in send_validate page for Tx-Vout table
     //
@@ -1318,12 +1321,10 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
     {
         if ( (vouts= jarray(&num,txobj,"vout")) != 0 )
         {
-            fprintf(stderr,"numvouts.%d\n",num);
             itemsbuf = calloc(num,1024);
             for (i=0; i<num; i++)
             {
                 item = jitem(vouts,i);
-                fprintf(stderr,"vout %d.(%s)\n",i,jprint(item,0));
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     sprintf(replacestr,"%d",i);
@@ -1339,6 +1340,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
             }
             NSPV_expand_variable(bigbuf,filestrp,"$SEND_TXVOUT_ARRAY",itemsbuf);
             free(itemsbuf);
+            itemsbuf = 0;
         }
         free(origitemstr);
     }
