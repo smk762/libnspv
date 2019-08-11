@@ -1311,6 +1311,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
+    if ( strcmp(NSPV_chain->name,"KMD") == 0 )
+        NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
+    else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
+
     {
         char *addr,*wif,*pub;
         retjson = NSPV_getnewaddress(NSPV_chain);
@@ -1678,10 +1682,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
-
-    if ( strcmp(NSPV_chain->name,"KMD") == 0 )
-        NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
-    else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
 
     free(bigbuf);
     return(filestr);
