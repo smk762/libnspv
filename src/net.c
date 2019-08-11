@@ -238,6 +238,7 @@ btc_bool btc_node_set_ipport(btc_node* node, const char* ipport)
     int outlen = (int)sizeof(node->addr);
 
     //return true in case of success (0 == no error)
+    strncpy(node->ipaddr,ipport,sizeof(node->ipaddr)-1);
     return (evutil_parse_sockaddr_port(ipport, &node->addr, &outlen) == 0);
 }
 

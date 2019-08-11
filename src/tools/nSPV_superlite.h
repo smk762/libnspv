@@ -310,7 +310,8 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
 {
     struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
     const btc_chainparams *chain = from->nodegroup->chainparams; int32_t lag;
-    sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
+    //sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
+    strcpy(NSPV_lastpeer,from->ipaddr);
     if ( len > 0 )
     {
         switch ( response[0] )
