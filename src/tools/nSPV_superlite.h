@@ -1507,13 +1507,14 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // 
                 {
                     if ( (retjson= NSPV_login(NSPV_chain,wifstr)) != 0 )
                     {
+                        memset(wifstr,0,strlen(wifstr));
                         free_json(retjson);
                         retjson = 0;
                     }
+                    free(filestr);
+                    filestr = OS_filestr(&fsize,"html/wallet");
+                    method = "wallet";
                 }
-                free(filestr);
-                filestr = OS_filestr(&fsize,"html/wallet");
-                method = "wallet";
             }
             return(NSPV_expand_variables(calloc(4096,4096),filestr,method,argjson));
         }
