@@ -937,7 +937,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
                 free_json(retjson);
             }
         }
-        if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) != 0 && (NSPV_didfirsttxids == 0 || timestamp > NSPV_didfirsttxids+NSPV_chain->blocktime/2) )
+        if ( 0 && strcmp(NSPV_address,NSPV_txidsresult.coinaddr) != 0 && (NSPV_didfirsttxids == 0 || timestamp > NSPV_didfirsttxids+NSPV_chain->blocktime/2) )
         {
             if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
             {
