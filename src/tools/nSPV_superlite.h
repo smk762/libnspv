@@ -1509,7 +1509,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         sprintf(replacestr,"%.8f",dstr(satoshis));
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_AMOUNT",replacestr);
                         sprintf(replacestr,"%d",ptr->height);
-                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DATETIME",replacestr);
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_HEIGHT",replacestr);
                         bits256_str(replacestr,ptr->txid);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_TXID",replacestr);
                         strcat(itemsbuf,itemstr);
