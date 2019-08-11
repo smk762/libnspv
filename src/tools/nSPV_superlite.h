@@ -1463,11 +1463,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     {
                         satoshis = ptr->satoshis;
                         if ( ptr->satoshis > 0 )
-                            strcpy(replacestr,"IN");
+                            strcpy(replacestr,"<span class=\"badge badge-danger\">IN</span>");
                         else
                         {
                             satoshis = -satoshis;
-                            strcpy(replacestr,"OUT");
+                            strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
                         }
                         if ( ptr->height <= NSPV_lastntz.height )
                             strcat(replacestr,"<span class=\"badge badge-info\">dPoW Secured</span>");
