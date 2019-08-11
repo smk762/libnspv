@@ -1369,8 +1369,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     }
     
     // == Transactions detail (txidinfo) page variables - spentinfo API ==
-    // $TXINFO_TXID - Txid
-    // $TXINFO_VOUT - vout
+    // -$TXINFO_TXID - Txid
+    // -$TXINFO_VOUT - vout
     // $TXINFO_SPENTHT - spent height
     // $TXINFO_SPENTTXID - spent txid
     // $TXINFO_SPENTVINI - spent vini
@@ -1380,7 +1380,32 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $TXIDPROOF - proof
     else if ( strcmp(method,"txidinfo") == 0 )
     {
-        
+        int32_t vout = jint(argjson,"vout"), height = jint(argjson,"height");
+        NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_TXID",jstr(argjson,"txid"));
+        sprintf(replacestr,"%d",vout);
+        if ( vout >= 0 )
+        {
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VOUT",replacestr);
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN","-1");
+            if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
+            {
+                free_json(retjson);
+            }
+        }
+        else
+        {
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN",replacestr);
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VOUT","-1");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT","N/A");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXID","N/A");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTVINI","N/A");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SENTTXLEN","N/A");
+            NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXPROOFLEN","N/A");
+        }
+        if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
+        {
+            free_json(retjson);
+        }
     }
     else if ( strcmp(method,"broadcast") == 0 )
     {
@@ -1642,7 +1667,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
 
-    if ( strcmp(NSPV_chain->symbol,"KMD") == 0 )
+    if ( strcmp(NSPV_chain->name,"KMD") == 0 )
         NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
     else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
 
