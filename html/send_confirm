@@ -63,12 +63,12 @@
                       </tr>
                       <tr>
                         <th>To Address</th>
-                        <td><input type="text" class="form-control-plaintext text-white" id="address" name="address" value="testaddressstring" readonly>
-                        $TOADDR</td>
+                        <td><input type="text" class="form-control-plaintext text-white" id="address" name="address" value="$TOADDR" readonly>
+                        </td>
                       </tr>
                       <tr>
                         <th>Amount</th>
-                        <td><input type="text" class="form-control-plaintext text-white" id="amount" name="amount" value="test_amount" readonly>$SENDAMOUNT $COIN</td>
+                        <td><input type="text" class="form-control-plaintext text-white" id="amount" name="amount" value="$SENDAMOUNT" readonly></td>
                       </tr>
                     </tbody>
                   </table>
