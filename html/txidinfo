@@ -54,7 +54,7 @@
                 <table class="table table-striped table-dark" style="margin-bottom: 0;">
                   <tbody>
                     <tr>
-                      <td>Transaction ID</td>
+                      <td style="width: 270px;">Transaction ID</td>
                       <td class="text-break text-wrap">$TXINFO_TXID</td>
                     </tr>
                     <tr>
