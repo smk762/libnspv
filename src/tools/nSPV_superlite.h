@@ -557,7 +557,7 @@ cJSON *NSPV_addressutxos(int32_t waitflag,btc_spv_client *client,char *coinaddr,
     return(result);
 }
 
-cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
+cJSON *NSPV_addresstxids(int32_t waitflag,btc_spv_client *client,char *coinaddr,int32_t CCflag,int32_t skipcount,int32_t filter)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; uint8_t msg[512]; int32_t i,iter,slen,len = 1;
     if ( NSPV_txidsresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag && skipcount == NSPV_txidsresult.skipcount )
@@ -586,11 +586,14 @@ cJSON *NSPV_addresstxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,in
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_ADDRINDEX,msg[1]>>1) != 0 )
     {
-        for (i=0; i<NSPV_POLLITERS; i++)
+        if ( waitflag != 0 )
         {
-            usleep(NSPV_POLLMICROS);
-            if ( (NSPV_inforesult.height == 0 || NSPV_txidsresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag )
-                return(NSPV_txidsresp_json(&NSPV_txidsresult));
+            for (i=0; i<NSPV_POLLITERS; i++)
+            {
+                usleep(NSPV_POLLMICROS);
+                if ( (NSPV_inforesult.height == 0 || NSPV_txidsresult.nodeheight >= NSPV_inforesult.height) && strcmp(coinaddr,NSPV_txidsresult.coinaddr) == 0 && CCflag == NSPV_txidsresult.CCflag )
+                    return(NSPV_txidsresp_json(&NSPV_txidsresult));
+            }
         }
     } else sleep(1);
     jaddstr(result,"result","error");
@@ -1153,7 +1156,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( coinaddr == 0 )
             coinaddr = NSPV_address;
-        return(NSPV_addresstxids(NSPV_client,coinaddr,CCflag,skipcount,0));
+        return(NSPV_addresstxids(1,NSPV_client,coinaddr,CCflag,skipcount,0));
     }
     else if ( strcmp(method,"notarizations") == 0 )
     {
@@ -1466,11 +1469,14 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             satoshis = -satoshis;
                             strcpy(replacestr,"OUT");
                         }
+                        if ( ptr->height <= NSPV_lastntz.height )
+                            strcat(replacestr,"<span class=\"badge badge-info\">dPoW Secured</span>");
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
-                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",NSPV_inforesult.height-ptr->height);
+                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
                         sprintf(replacestr,"%.8f",dstr(satoshis));
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_AMOUNT",replacestr);
-                        sprintf(replacestr,"%d",ptr->height)
+                        sprintf(replacestr,"%d",ptr->height);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DATETIME",replacestr);
                         bits256_str(replacestr,ptr->txid);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_TXID",replacestr);
