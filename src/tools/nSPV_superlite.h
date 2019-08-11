@@ -1388,7 +1388,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // $PEER_INSYNC - In Sync
     else if ( strcmp(method,"getpeerinfo") == 0 )
     {
-        char *origitemstr,*itemstr,*itembuf; long fsize;
+        char *origitemstr,*itemstr,*itembuf,*itemsbuf; long fsize;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
             /*jaddnum(node_json,"nodeid",(int64_t)node->nodeid);
@@ -1405,7 +1405,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                 jaddstr(node_json,"in_sync", "not_synced");
             else if ( IS_IN_SYNC == 1 )
                 jaddstr(node_json,"in_sync", "synced");*/
-            itembuf = calloc(64,1024);
+            itembuf = calloc(1,1024);
+            itemsbuf = calloc(128,1024);
             if ( (retjson= NSPV_getpeerinfo(NSPV_client)) != 0 )
             {
                 if ( (n= cJSON_GetArraySize(retjson)) > 0 )
@@ -1416,7 +1417,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                         if ( (itemstr= clonestr(origitemstr)) != 0 )
                         {
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddress"));
-                            strcat(bigbuf,itemstr);
+                            strcat(itemsbuf,itemstr);
                             fprintf(stderr,"i.%d [%s] [%s]\n",i,bigbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
@@ -1425,10 +1426,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                 }
                 free_json(retjson);
             }
-            strcpy(itembuf,bigbuf);
-            bigbuf[0] = 0;
-            NSPV_expand_variable(bigbuf,&filestr,"$PEER_INFO_ROW_ARRAY",itembuf);
+            NSPV_expand_variable(bigbuf,&filestr,"$PEER_INFO_ROW_ARRAY",itemsbuf);
             free(itembuf);
+            free(itemsbuf);
             free(origitemstr);
         }
     }
