@@ -1398,7 +1398,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // 
     else if ( strcmp(method,"broadcast") == 0 )
     {
-        
+        if ( jstr(argjson,"hex") != 0 && (retjson= NSPV_broadcast(NSPV_client,jstr(argjson,"hex"))) != 0 )
+        {
+            fprintf(stderr,"broadcasted transaction (%s)\n",jprint(retjson,0));
+            free_json(retjson);
+        }
     }
 
     // == Peer info page array variables ==
