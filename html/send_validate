@@ -86,9 +86,10 @@
                         <th>Amount Info</th>
                         <td>
                           <div class="row">
-                            <div class="col-md-4">Amount<br>$SENDAMOUNT $COIN</div>
-                            <div class="col-md-4"><b>Transaction Fees</b><br>$TXFEE $COIN</div>
-                            <div class="col-md-4"><b>Total amount being sent</b><br>$TOTALAMOUNT $COIN</div>
+                            <div class="col-md-3">Amount<br>$SENDAMOUNT $COIN</div>
+                            <div class="col-md-3"><b>Transaction Fees</b><br>$TXFEE $COIN</div>
+                            <div class="col-md-3"><b>Total amount being sent</b><br>$TOTALAMOUNT $COIN</div>
+                            <div class="col-md-3"><b>Change Amount</b><br>$CHANGEAMOUNT $COIN</div>
                           </div>
                         </td>
                       </tr>
