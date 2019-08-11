@@ -1391,6 +1391,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
         char *origitemstr,*itemstr,*itembuf; long fsize;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
+            fprintf(stderr,"[%s]\n",origitemstr);
             /*jaddnum(node_json,"nodeid",(int64_t)node->nodeid);
             jaddnum(node_json,"protocolversion",(uint32_t)node->version);
             jaddstr(node_json,"ipaddress",ipaddr);
