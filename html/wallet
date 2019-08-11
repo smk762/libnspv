@@ -33,7 +33,8 @@
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
                 <span class="col-3">Coin: <font style="font-size: 22px;">$COINNAME ($COIN)</font></span>
                 <span class="col-3">Balance: <font style="font-size: 22px;">$BALANCE $COIN</font></span>
-                <span class="col-6 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
+                <span class="col-3">Rewards: <font style="font-size: 22px; display: $REWARDS_DISPLAY_KMD;">$REWARDS $COIN</font></span>
+                <span class="col-3 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
