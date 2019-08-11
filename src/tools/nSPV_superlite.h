@@ -1326,18 +1326,13 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
                 fprintf(stderr,"vout %d.(%s)\n",i,jprint(item,0));
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
-                    fprintf(stderr,"A itemstr.(%s)\n",itemstr);
                     sprintf(replacestr,"%d",i);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ARRAYNUM",replacestr);
                     sprintf(replacestr,"%.8f",dstr((uint64_t)(jdouble(item,"value")*SATOSHIDEN+0.0000000049)));
-                    fprintf(stderr,"B itemstr.(%s)\n",itemstr);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_VALUE",replacestr);
-                    fprintf(stderr,"C itemstr.(%s)\n",itemstr);
                     NSPV_expand_variable(itembuf,&itemstr,"$SEND_TXVOUT_ADDR",jstr(item,"scriptPubKey"));
-                    fprintf(stderr,"D itemstr.(%s)\n",itemstr);
                     
                     strcat(itemsbuf,itemstr);
-                    fprintf(stderr,"E itemstr.(%s)\n",itemstr);
                     itembuf[0] = 0;
                     free(itemstr);
                 }
