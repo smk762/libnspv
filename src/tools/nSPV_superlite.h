@@ -1455,7 +1455,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         {
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
-                itemsbuf = calloc(n,1024);
+                itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
                 for (i=0; i<NSPV_txidsresult.numtxids; i++)
                 {
                     ptr = &NSPV_txidsresult.txids[i];
@@ -1469,27 +1469,27 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             satoshis = -satoshis;
                             strcpy(replacestr,"OUT");
                         }
-                        //if ( ptr->height <= NSPV_lastntz.height )
-                        //    strcat(replacestr,"<span class=\"badge badge-info\">dPoW Secured</span>");
+                        if ( ptr->height <= NSPV_lastntz.height )
+                            strcat(replacestr,"<span class=\"badge badge-info\">dPoW Secured</span>");
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
-                        /*sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
+                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
                         sprintf(replacestr,"%.8f",dstr(satoshis));
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_AMOUNT",replacestr);
                         sprintf(replacestr,"%d",ptr->height);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DATETIME",replacestr);
                         bits256_str(replacestr,ptr->txid);
-                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_TXID",replacestr);*/
+                        NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_TXID",replacestr);
                         strcat(itemsbuf,itemstr);
                         itembuf[0] = 0;
                         fprintf(stderr,"%d of %d: (%s)\n",i,NSPV_txidsresult.numtxids,itemstr);
-                        //free(itemstr);
+                        free(itemstr);
                     }
                 }
                 NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY",itemsbuf);
-                //free(itemsbuf);
+                free(itemsbuf);
             }
-            //free(origitemstr);
+            free(origitemstr);
         }
     }
     
