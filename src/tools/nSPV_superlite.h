@@ -1238,8 +1238,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     NSPV_expand_variable(&bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     
     
-    //printf("%s\n", NSPV_inforesult.notarization.height);
-    
     // == Getinfo page variabls ==
     // $PEERSTOTAL - Total Connected Peers
     // $PROTOVER - Protocol Version
@@ -1247,22 +1245,47 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // $NTZTXID - Notarised Txid
     // $NTZTXIDHT - Notarised Txid Height
     // $NTZDESTTXID - Notarised Destination Txid
+    
     // $BLKHDR - Block Header
     // $BLKHASH - Block Hash
-    // $PRIVBLKHASH - Previous Block Hash
-    // $MRKLRTHASH - Merkle Root Hash
+    // $PREVBLKHASH - Previous Block Hash
+    // $MERKLEHASH - Merkle Root Hash
     // $NTIME - nTime
     // $NBITS - nBits
     if ( strcmp(method,"getinfo") == 0 )
     {
+        NSPV_expand_variable(&bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
+        sprintf(replacestr,"%u",btc_node_group_amount_of_connected_nodes(NSPV_client->nodegroup, NODE_CONNECTED));
+        NSPV_expand_variable(&bigbuf,&filestr,"$PEERSTOTAL",replacestr);
+
+        sprintf(replacestr,"%08x",NSPV_PROTOCOL_VERSION);
+        NSPV_expand_variable(&bigbuf,&filestr,"$PROTOVER",replacestr);
         sprintf(replacestr,"%u", NSPV_inforesult.height);
         NSPV_expand_variable(&bigbuf,&filestr,"$CURHEIGHT",replacestr);
         
         sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);
         NSPV_expand_variable(&bigbuf,&filestr,"$NTZHEIGHT",replacestr);
-        
         bits256_str(replacestr,NSPV_inforesult.notarization.blockhash);
         NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.notarization.txid);
+        NSPV_expand_variable(&bigbuf,&filestr,"$NTZTXID",replacestr);
+        sprintf(replacestr,"%u", NSPV_inforesult.notarization.txidheight);
+        NSPV_expand_variable(&bigbuf,&filestr,"$NTZTXIDHT",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.notarization.othertxid);
+        NSPV_expand_variable(&bigbuf,&filestr,"$NTZDESTTXID",replacestr);
+
+        sprintf(replacestr,"%u", NSPV_inforesult.hdrheight);
+        NSPV_expand_variable(&bigbuf,&filestr,"$BLKHDR",replacestr);
+        sprintf(replacestr,"%u", NSPV_inforesult.H.nTime);
+        NSPV_expand_variable(&bigbuf,&filestr,"$NTIME",replacestr);
+        sprintf(replacestr,"%08x", NSPV_inforesult.H.nBits);
+        NSPV_expand_variable(&bigbuf,&filestr,"$NBITS",replacestr);
+        bits256_str(replacestr,NSPV_hdrhash(&NSPV_inforesult.H));
+        NSPV_expand_variable(&bigbuf,&filestr,"$BLKHASH",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.H.hashPrevBlock);
+        NSPV_expand_variable(&bigbuf,&filestr,"$PREVBLKHASH",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.H.hashMerkleRoot);
+        NSPV_expand_variable(&bigbuf,&filestr,"$MERKLEHASH",replacestr);
     }
     
     // == Get New Address page variables ==
