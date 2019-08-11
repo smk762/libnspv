@@ -74,7 +74,7 @@
                   </table>
                 </div> <!-- Send page body end -->
                 <div class="card-footer text-right">
-                  <button type="submit" class="btn btn-primary">Confirm Transaction</button>
+                  <button type="submit" class="btn btn-primary">Create Transaction</button>
                 </div>
               </form> <!-- Send form send -->
             </div> <!-- Send page card end -->
