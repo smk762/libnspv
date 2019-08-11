@@ -1311,6 +1311,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
+    if ( strcmp(NSPV_chain->name,"KMD") == 0 )
+        NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
+    else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
+
     {
         char *addr,*wif,*pub;
         retjson = NSPV_getnewaddress(NSPV_chain);
@@ -1371,13 +1375,13 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // == Transactions detail (txidinfo) page variables - spentinfo API ==
     // -$TXINFO_TXID - Txid
     // -$TXINFO_VOUT - vout
-    // $TXINFO_SPENTHT - spent height
-    // $TXINFO_SPENTTXID - spent txid
-    // $TXINFO_SPENTVINI - spent vini
-    // $TXINFO_SENTTXLEN - spent transaction length
-    // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
-    // $TXIDHEX - hex
-    // $TXIDPROOF - proof
+    // -$TXINFO_SPENTHT - spent height
+    // -$TXINFO_SPENTTXID - spent txid
+    // -$TXINFO_SPENTVINI - spent vini
+    // -$TXINFO_SENTTXLEN - spent transaction length
+    // -$TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
+    // -$TXIDHEX - hex
+    // -$TXIDPROOF - proof
     else if ( strcmp(method,"txidinfo") == 0 )
     {
         int32_t vout = jint(argjson,"vout"), height = jint(argjson,"height");
@@ -1389,6 +1393,15 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_VIN","-1");
             if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
             {
+                sprintf(replacestr,"%d",jint(retjson,"spentheight"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT",replacestr);
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTHT",jstr(retjson,"spenttxid"));
+                sprintf(replacestr,"%d",jint(retjson,"spentvini"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTVINI",replacestr);
+                sprintf(replacestr,"%d",jint(retjson,"spenttxlen"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SENTTXLEN",replacestr);
+                sprintf(replacestr,"%d",jint(retjson,"spenttxprooflen"));
+                NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXPROOFLEN",replacestr);
                 free_json(retjson);
             }
         }
@@ -1401,9 +1414,12 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTVINI","N/A");
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SENTTXLEN","N/A");
             NSPV_expand_variable(bigbuf,&filestr,"$TXINFO_SPENTTXPROOFLEN","N/A");
+            vout = 0;
         }
-        if ( (retjson= NSPV_spentinfo(NSPV_client,jbits256(argjson,"txid"),vout)) != 0 )
+        if ( (retjson= NSPV_txproof(1,NSPV_client,vout,jbits256(argjson,"txid"),height)) != 0 )
         {
+            NSPV_expand_variable(bigbuf,&filestr,"$TXIDHEX",jstr(retjson,"hex"));
+            NSPV_expand_variable(bigbuf,&filestr,"$TXIDPROOF",jstr(retjson,"proof"));
             free_json(retjson);
         }
     }
@@ -1666,10 +1682,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
-
-    if ( strcmp(NSPV_chain->name,"KMD") == 0 )
-        NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
-    else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
 
     free(bigbuf);
     return(filestr);

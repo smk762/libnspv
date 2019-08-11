@@ -502,11 +502,16 @@ void NSPV_broadcast_purge(struct NSPV_broadcastresp *ptr)
 
 cJSON *NSPV_txproof_json(struct NSPV_txproof *ptr)
 {
-    cJSON *result = cJSON_CreateObject();
+    char *hexstr; cJSON *result = cJSON_CreateObject();
     jaddbits256(result,"txid",ptr->txid);
     jaddnum(result,"height",ptr->height);
     jaddnum(result,"txlen",ptr->txlen);
     jaddnum(result,"txprooflen",ptr->txprooflen);
+    hexstr = malloc((ptr->txlen+ptr->txprooflen)*2+1);
+    utils_bin_to_hex(ptr->tx,ptr->txlen,hexstr);
+    jaddstr(result,"hex",hexstr);
+    utils_bin_to_hex(ptr->txproof,ptr->txprooflen,hexstr);
+    jaddstr(result,"proof",hexstr);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
