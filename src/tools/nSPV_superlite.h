@@ -1571,7 +1571,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             NSPV_expand_variable(bigbuf,&filestr,"$TOADDR",dest);
             sprintf(replacestr,"%.8f",dstr(satoshis));
             NSPV_expand_variable(bigbuf,&filestr,"$SENDAMOUNT",replacestr);
-            //if ( strcmp(method,"send_validate") == 0 )
+            if ( strcmp(method,"send_validate") == 0 )
             {
                 if ( (retjson= NSPV_spend(NSPV_client,NSPV_address,dest,satoshis)) != 0 )
                 {
