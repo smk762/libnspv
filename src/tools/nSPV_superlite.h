@@ -1280,7 +1280,7 @@ void NSPV_expand_vinvout(char *bigbuf,char **filestrp,cJSON *txobj,char *replace
     {
         if ( (vins= jarray(&num,txobj,"vin")) != 0 )
         {
-            itemsbuf = calloc(num,1024);
+            itemsbuf = calloc(num,4096);
             fprintf(stderr,"numvins.%d\n",num);
             for (i=0; i<num; i++)
             {
