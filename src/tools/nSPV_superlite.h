@@ -1514,7 +1514,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         {
                             strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
                             if ( ptr->vout != 0 && i > 0 && bits256_cmp(NSPV_txidsresult.txids[i-1].txid,ptr->txid) == 0 && NSPV_txidsresult.txids[i-1].satoshis < 0 )
-                                strcat(replacestr,"<span class=\"badge badge-primary\">CHANGE</span>");
+                                strcat(replacestr,"  <span class=\"badge badge-primary\">CHANGE</span>");
                         }
                         else
                         {
