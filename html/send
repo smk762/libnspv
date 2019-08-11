@@ -18,7 +18,6 @@
         <input class="form-control mr-sm-1" type="search" placeholder="Address" name="address" aria-label="ToAddress" style="width: 350px;">
         <input class="form-control mr-sm-2" type="search" placeholder="Amount" name="amount" aria-label="SendAmount" style="width: 120px;">
           <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Send $COIN</button>
-          <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Send $COIN</button>
       </form>
       <form class="form-inline">
         $MENU_BUTTON_ARRAY
