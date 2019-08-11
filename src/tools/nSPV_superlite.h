@@ -1279,7 +1279,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // Top menu buttons HTML tags variables to use with
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
-     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<button class=\"btn btn-info btn-sm\" formaction=\"$URL/method/getinfo?nexturl=info\" formmethod=\"get\">Info</button> <button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/getpeerinfo?nexturl=peerinfo\" formmethod=\"get\">Peer Info</button> <button class=\"btn btn-primary btn-sm\" formaction=\"$URL/method/getnewaddress?nexturl=genaddr\" formmethod=\"get\">Generate New Address</button> <button class=\"btn btn-secondary btn-sm\" formaction=\"$URL/method/wallet?nexturl=wallet\" formmethod=\"get\">Transactions</button> <button class=\"btn btn-warning btn-sm\" formaction=\"$URL/method/send?nexturl=send\" formmethod=\"get\">Send</button> <button class=\"btn btn-danger btn-sm\" formaction=\"$URL/method/logout?nexturl=login\" formmethod=\"get\">Logout</button> <button class=\"btn btn-success btn-sm\" formaction=\"$URL/method/login?nexturl=login\" formmethod=\"get\">Login</button>");
+     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" type=\"button\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" type=\"button\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-warning mr-sm-1\" type=\"button\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-2\" type=\"button\" href=\"$URL/method/index?nexturl=index\">Account</a>");
     
 
     sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
@@ -1291,6 +1291,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_utxosresult.interest));
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+
+    // == Coin specific gloabal variable
+    // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
+    // 
 
     // == Getinfo page variabls ==
     // $PEERSTOTAL - Total Connected Peers
@@ -1343,6 +1347,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     }
     
     // == Get New Address page variables ==
+    // $GENADDR - Login page has this section by default hidden.
+    //      If URL is = $URL/method/index?nexturl=genaddr
+    //         GENADDR=""
+    //      else
+    //          GENADDR="none"
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
