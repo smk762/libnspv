@@ -117,7 +117,7 @@ void spv_sync_completed(btc_spv_client* client) {
 /*
  Todo:
 add check for p2sh in script_to_address
- 
+ mempool tracking of balance
  mempool based pruning of utxos
  
  cross chain superwallet (jaragua) -> blackjok3r
