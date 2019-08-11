@@ -1342,7 +1342,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         NSPV_logout();
     else if ( strcmp(method,"getinfo") == 0 )
     {
-        NSPV_expand_variable(bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
         sprintf(replacestr,"%u",btc_node_group_amount_of_connected_nodes(NSPV_client->nodegroup, NODE_CONNECTED));
         NSPV_expand_variable(bigbuf,&filestr,"$PEERSTOTAL",replacestr);
         
@@ -1388,22 +1387,31 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     {
         
     }
-
-    // == Broadcast page variables ==
-    // $BDCAST_RESULT - broadcast API result output
-    // $BDCAST_EXPECTED - expected txid
-    // $BDCAST_TXID - broadcasted txid
-    // $BDCAST_RETCODE - retcode from broadcast API
-    // $BDCAST_TYPE - broadcast type
-    // 
     else if ( strcmp(method,"broadcast") == 0 )
     {
-        // broadcasted transaction ({"result":"success","expected":"f5ae0bb2491198f5b4d435a990bb1ba870a5800cb308b2980b0393a89b39d0f6","broadcast":"f5ae0bb2491198f5b4d435a990bb1ba870a5800cb308b2980b0393a89b39d0f6","retcode":1,"type":"broadcast and mempool","lastpeer":"5.9.253.199:12985"})
-
+        // == Broadcast page variables ==
+        // $BDCAST_RESULT - broadcast API result output
+        // $BDCAST_EXPECTED - expected txid
+        // $BDCAST_TXID - broadcasted txid
+        // $BDCAST_RETCODE - retcode from broadcast API
+        // $BDCAST_TYPE - broadcast type
         if ( jstr(argjson,"hex") != 0 && is_hexstr(jstr(argjson,"hex"),0) > 64 && (retjson= NSPV_broadcast(NSPV_client,jstr(argjson,"hex"))) != 0 )
         {
-            fprintf(stderr,"broadcasted transaction (%s)\n",jprint(retjson,0));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RESULT",jstr(retjson,"result"));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_EXPECTED",jstr(retjson,"expected"));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TXID",jstr(retjson,"broadcast"));
+            sprintf(replacestr,"%d",jint(retjson,"retcode"));
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RETCODE",replacestr);
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TYPE",jstr(retjson,"type"));
             free_json(retjson);
+        }
+        else
+        {
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RESULT","error");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_EXPECTED","");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TXID","");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_RETCODE","-1");
+            NSPV_expand_variable(bigbuf,&filestr,"$BDCAST_TYPE","invalid hex");
         }
     }
 
@@ -1532,8 +1540,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         if ( didflag == 0 )
             NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY","");
     }
-    
-
     // == Send pages variables ==
     // $REWARDS - Rewards accrued by the logged in wallet address
     // $TOADDR - To address filled by user input and taken from send page
@@ -1559,7 +1565,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     }
     else if ( strcmp(method,"send_confirm") == 0 || strcmp(method,"send_validate") == 0 )
     {
-        char *dest; int64_t satoshis;
+        char *dest,*tmpstr; int64_t satoshis; cJSON *txobj,*retcodes;
         dest = jstr(argjson,"address");
         satoshis = jdouble(argjson,"amount")*SATOSHIDEN + 0.0000000049;
         if ( dest != 0 && satoshis != 0 )
@@ -1571,13 +1577,38 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             {
                 if ( (retjson= NSPV_spend(NSPV_client,NSPV_address,dest,satoshis)) != 0 )
                 {
-                    fprintf(stderr,"got.(%s)\n",jprint(retjson,0));
-                    
-                    sprintf(replacestr,"%.8f",dstr(0));
-                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSVLD",(char *)replacestr);
+//got.({"tx":{"nVersion":4,"vin":[{"txid":"67fcfba751ff799e9ba234e4482281ee836af3edb0dc9d5b788c9ef4c6e67178","vout":1,"scriptSig":"483045022100a3d46b0bfde8d6572bff48182e9c9836864794fcc5c23db39a30b026a158167f02202b14b6e86544c54657732b293241e9c15191a3fba96e64d517d3261337dac88d01","sequenceid":4294967295}],"vout":[{"value":1,"scriptPubKey":"76a914bed47f9cda72a1bf743257617d7a5a1b2a68216688ac"}, {"value":140856.3435,"scriptPubKey":"210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac"}],"nLockTime":0,"nExpiryHeight":0,"valueBalance":0},"result":"success","hex":"0400008085202f89017871e6c6f49e8c785b9ddcb0edf36a83ee812248e434a29b9e79ff51a7fbfc670100000049483045022100a3d46b0bfde8d6572bff48182e9c9836864794fcc5c23db39a30b026a158167f02202b14b6e86544c54657732b293241e9c15191a3fba96e64d517d3261337dac88d01ffffffff0200e1f505000000001976a914bed47f9cda72a1bf743257617d7a5a1b2a68216688acb05b3b91cf0c000023210286de5bd7831baacc55b87cdf14a1938b2f2ab905529c739c82709c2993cfeafcac00000000000000000000000000000000000000","retcodes":[0],"lastpeer":"5.9.253.202:12985"})
+
+                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"validated")));
+                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSVLD",replacestr);
+                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"rewards")));
+                    NSPV_expand_variable(bigbuf,&filestr,"$REWARDSEXT",replacestr);
+                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"txfee")));
+                    NSPV_expand_variable(bigbuf,&filestr,"$TXFEE",replacestr);
+                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"total")));
+                    NSPV_expand_variable(bigbuf,&filestr,"$TOTALAMOUNT",replacestr);
+                    sprintf(replacestr,"%.8f",dstr(jdouble(retjson,"change")));
+                    NSPV_expand_variable(bigbuf,&filestr,"$CHANGE",replacestr);
+                    if ( (retcodes= jobj(retjson,"retcodes")) != 0 )
+                    {
+                        tmpstr = jprint(retcodes,0);
+                        strcpy(replacestr,tmpstr);
+                        free(tmpstr);
+                        NSPV_expand_variable(bigbuf,&filestr,"$SPENDRETCODE",replacestr);
+                    }
                     NSPV_expand_variable(bigbuf,&filestr,"$SENDHEX",jstr(retjson,"hex"));
                     NSPV_expand_variable(bigbuf,&filestr,"$SENDTXID",jstr(retjson,"txid"));
-                    
+                    if ( (txobj= jobj(retjson,"tx")) != 0 )
+                    {
+                        sprintf(replacestr,"%u",juint(txobj,"nVersion"));
+                        NSPV_expand_variable(bigbuf,&filestr,"$SENDNVER",(char *)replacestr);
+                        sprintf(replacestr,"%u",juint(txobj,"nLockTime"));
+                        NSPV_expand_variable(bigbuf,&filestr,"$SENDNLOCKTIME",(char *)replacestr);
+                        sprintf(replacestr,"%d",juint(txobj,"nExpiryHeight"));
+                        NSPV_expand_variable(bigbuf,&filestr,"$SENDNEXPIRYHT",(char *)replacestr);
+                        sprintf(replacestr,"%lld",j64bits(txobj,"valueBalance"));
+                        NSPV_expand_variable(bigbuf,&filestr,"$SENDVALBAL",(char *)replacestr);
+                    }
                     // == Send Validate page array variables ==
                     // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
                     //
@@ -1599,8 +1630,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             }
         }
     }
-
-
+    NSPV_expand_variable(bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
     NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
     NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
