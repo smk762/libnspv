@@ -143,7 +143,7 @@ void btc_p2paddr_to_addr(btc_p2p_address* p2p_addr, struct sockaddr* addr_out)
 void btc_p2p_msg_version_init(uint32_t protocol,btc_p2p_version_msg* msg, const btc_p2p_address* addrFrom, const btc_p2p_address* addrTo, const char* strSubVer, btc_bool relay)
 {
     msg->version = protocol;
-    msg->nServices = 0;
+    msg->services = 0;
     msg->timestamp = time(NULL);
     if (addrTo)
         msg->addr_recv = *addrTo;
@@ -164,7 +164,7 @@ void btc_p2p_msg_version_init(uint32_t protocol,btc_p2p_version_msg* msg, const 
 void btc_p2p_msg_version_ser(btc_p2p_version_msg* msg, cstring* buf)
 {
     ser_s32(buf, msg->version);
-    ser_u64(buf, msg->nServices);
+    ser_u64(buf, msg->services);
     ser_s64(buf, msg->timestamp);
     btc_p2p_ser_addr(0, &msg->addr_recv, buf);
     btc_p2p_ser_addr(0, &msg->addr_from, buf);
@@ -179,7 +179,7 @@ btc_bool btc_p2p_msg_version_deser(btc_p2p_version_msg* msg, struct const_buffer
     memset(msg, 0, sizeof(*msg));
     if (!deser_s32(&msg->version, buf))
         return false;
-    if (!deser_u64(&msg->nServices, buf))
+    if (!deser_u64(&msg->services, buf))
         return false;
     if (!deser_s64(&msg->timestamp, buf))
         return false;
