@@ -75,7 +75,7 @@
                     </tr>
                     <tr>
                       <td>Spent Transaction Length</td>
-                      <td>$TXINFO_SENTTXLEN</td>
+                      <td>$TXINFO_SPENTTXLEN</td>
                     </tr>
                     <tr>
                       <td>Spent Transaction Proof Length</td>
