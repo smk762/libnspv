@@ -642,7 +642,8 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
             jaddstr(result,"error","signing error");
         }
         btc_tx_free(mtx);
-        btc_tx_free(tx);
+        if ( tx != 0 )
+            btc_tx_free(tx);
         cstr_free(hex,1);
         jaddstr(result,"lastpeer",NSPV_lastpeer);
         return(result);
