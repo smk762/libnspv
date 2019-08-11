@@ -1550,6 +1550,18 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             fprintf(stderr,"fetch %d txids\n",NSPV_didfirsttxproofs);
         }
     }
+    else if ( strcmp(method,"send_confirm") == 0 )
+    {
+        char *dest; int64_t satoshis;
+        dest = jstr(argjson,"address");
+        satoshis = jdouble(argjson,"amount")*SATOSHIDEN + 0.0000000049;
+        if ( dest != 0 && satoshis != 0 )
+        {
+            NSPV_expand_variable(bigbuf,&filestr,"$TOADDR",dest);
+            sprintf(replacestr,"%.8f",dstr(satoshis));
+            NSPV_expand_variable(bigbuf,&filestr,"$SENDAMOUNT",replacestr);
+        }
+    }
 
     // == Send Validate page array variables ==
     // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
