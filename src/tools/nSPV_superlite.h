@@ -950,7 +950,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
             up = &NSPV_utxosresult.utxos[NSPV_didfirsttxproofs];
             if ( (retjson= NSPV_txproof(0,NSPV_client,up->vout,up->txid,up->height)) != 0 )
             {
-                fprintf(stderr,"request utxo[%d] %s\n",i,bits256_str(str,up->txid));
+                fprintf(stderr,"request utxo[%d] %s\n",NSPV_didfirsttxproofs,bits256_str(str,up->txid));
                 NSPV_didfirsttxids = timestamp;
                 free_json(retjson);
             }
@@ -1355,7 +1355,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
-    else if ( strcmp(method,"getnewaddress") == 0 )
     {
         char *addr,*wif,*pub;
         retjson = NSPV_getnewaddress(NSPV_chain);
@@ -1385,7 +1384,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $TXINFO_SPENTVINI - spent vini
     // $TXINFO_SENTTXLEN - spent transaction length
     // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
-    else if ( strcmp(method,"txidinfo") == 0 )
+    if ( strcmp(method,"spentinfo") == 0 )
     {
         
     }
