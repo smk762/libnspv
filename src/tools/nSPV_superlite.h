@@ -1309,42 +1309,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $MERKLEHASH - Merkle Root Hash
     // $NTIME - nTime
     // $NBITS - nBits
-    if ( strcmp(method,"getinfo") == 0 )
-    {
-        NSPV_expand_variable(bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
-        sprintf(replacestr,"%u",btc_node_group_amount_of_connected_nodes(NSPV_client->nodegroup, NODE_CONNECTED));
-        NSPV_expand_variable(bigbuf,&filestr,"$PEERSTOTAL",replacestr);
-
-        sprintf(replacestr,"%08x",NSPV_PROTOCOL_VERSION);
-        NSPV_expand_variable(bigbuf,&filestr,"$PROTOVER",replacestr);
-        sprintf(replacestr,"%u", NSPV_inforesult.height);
-        NSPV_expand_variable(bigbuf,&filestr,"$CURHEIGHT",replacestr);
-        
-        sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);
-        NSPV_expand_variable(bigbuf,&filestr,"$NTZHEIGHT",replacestr);
-        bits256_str(replacestr,NSPV_inforesult.notarization.blockhash);
-        NSPV_expand_variable(bigbuf,&filestr,"$NTZBLKHASH",replacestr);
-        sprintf(replacestr,"%u", NSPV_inforesult.notarization.txidheight);
-        NSPV_expand_variable(bigbuf,&filestr,"$NTZTXIDHT",replacestr);
-        bits256_str(replacestr,NSPV_inforesult.notarization.txid);
-        NSPV_expand_variable(bigbuf,&filestr,"$NTZTXID",replacestr);
-        bits256_str(replacestr,NSPV_inforesult.notarization.othertxid);
-        NSPV_expand_variable(bigbuf,&filestr,"$NTZDESTTXID",replacestr);
-
-        sprintf(replacestr,"%u", NSPV_inforesult.hdrheight);
-        NSPV_expand_variable(bigbuf,&filestr,"$BLKHDR",replacestr);
-        sprintf(replacestr,"%u", NSPV_inforesult.H.nTime);
-        NSPV_expand_variable(bigbuf,&filestr,"$NTIME",replacestr);
-        sprintf(replacestr,"%08x", NSPV_inforesult.H.nBits);
-        NSPV_expand_variable(bigbuf,&filestr,"$NBITS",replacestr);
-        bits256_str(replacestr,NSPV_hdrhash(&NSPV_inforesult.H));
-        NSPV_expand_variable(bigbuf,&filestr,"$BLKHASH",replacestr);
-        bits256_str(replacestr,NSPV_inforesult.H.hashPrevBlock);
-        NSPV_expand_variable(bigbuf,&filestr,"$PREVBLKHASH",replacestr);
-        bits256_str(replacestr,NSPV_inforesult.H.hashMerkleRoot);
-        NSPV_expand_variable(bigbuf,&filestr,"$MERKLEHASH",replacestr);
-    }
-    
     // == Get New Address page variables ==
     // $GENADDR - Login page has this section by default hidden.
     //      If URL is = $URL/method/index?nexturl=genaddr
@@ -1374,7 +1338,44 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             free_json(retjson);
         }
     }
-
+    if ( strcmp(method,"logout") == 0 )
+        NSPV_logout();
+    else if ( strcmp(method,"getinfo") == 0 )
+    {
+        NSPV_expand_variable(bigbuf,&filestr,"$LASTPEER",NSPV_lastpeer);
+        sprintf(replacestr,"%u",btc_node_group_amount_of_connected_nodes(NSPV_client->nodegroup, NODE_CONNECTED));
+        NSPV_expand_variable(bigbuf,&filestr,"$PEERSTOTAL",replacestr);
+        
+        sprintf(replacestr,"%08x",NSPV_PROTOCOL_VERSION);
+        NSPV_expand_variable(bigbuf,&filestr,"$PROTOVER",replacestr);
+        sprintf(replacestr,"%u", NSPV_inforesult.height);
+        NSPV_expand_variable(bigbuf,&filestr,"$CURHEIGHT",replacestr);
+        
+        sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZHEIGHT",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.notarization.blockhash);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZBLKHASH",replacestr);
+        sprintf(replacestr,"%u", NSPV_inforesult.notarization.txidheight);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZTXIDHT",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.notarization.txid);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZTXID",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.notarization.othertxid);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTZDESTTXID",replacestr);
+        
+        sprintf(replacestr,"%u", NSPV_inforesult.hdrheight);
+        NSPV_expand_variable(bigbuf,&filestr,"$BLKHDR",replacestr);
+        sprintf(replacestr,"%u", NSPV_inforesult.H.nTime);
+        NSPV_expand_variable(bigbuf,&filestr,"$NTIME",replacestr);
+        sprintf(replacestr,"%08x", NSPV_inforesult.H.nBits);
+        NSPV_expand_variable(bigbuf,&filestr,"$NBITS",replacestr);
+        bits256_str(replacestr,NSPV_hdrhash(&NSPV_inforesult.H));
+        NSPV_expand_variable(bigbuf,&filestr,"$BLKHASH",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.H.hashPrevBlock);
+        NSPV_expand_variable(bigbuf,&filestr,"$PREVBLKHASH",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.H.hashMerkleRoot);
+        NSPV_expand_variable(bigbuf,&filestr,"$MERKLEHASH",replacestr);
+    }
+    
     // == Transactions detail (txidinfo) page variables - spentinfo API ==
     // $TXINFO_TXID - Txid
     // $TXINFO_VOUT - vout
@@ -1383,7 +1384,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $TXINFO_SPENTVINI - spent vini
     // $TXINFO_SENTTXLEN - spent transaction length
     // $TXINFO_SPENTTXPROOFLEN - Spent Transaction Proof Length
-    if ( strcmp(method,"spentinfo") == 0 )
+    else if ( strcmp(method,"spentinfo") == 0 )
     {
         
     }
@@ -1397,7 +1398,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // 
     else if ( strcmp(method,"broadcast") == 0 )
     {
-        
+        if ( jstr(argjson,"hex") != 0 && (retjson= NSPV_broadcast(NSPV_client,jstr(argjson,"hex"))) != 0 )
+        {
+            fprintf(stderr,"broadcasted transaction (%s)\n",jprint(retjson,0));
+            free_json(retjson);
+        }
     }
 
     // == Peer info page array variables ==
@@ -1570,28 +1575,28 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     NSPV_expand_variable(bigbuf,&filestr,"$SENDHEX",jstr(retjson,"hex"));
                     NSPV_expand_variable(bigbuf,&filestr,"$SENDTXID",jstr(retjson,"txid"));
                     
+                    // == Send Validate page array variables ==
+                    // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
+                    //
+                    // $SEND_TXVIN_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+                    // $SEND_TXVIN_TXID - txid
+                    // $SEND_TXVIN_VOUT - vout
+                    // $SEND_TXVIN_AMOUNT - amount
+                    // $SEND_TXVIN_SCRIPTSIG - scriptSig
+                    // $SEND_TXVIN_SEQID - sequenceid
+                    //
+                    //
+                    // $SEND_TXVOUT_ARRAY - Main array variable defined in send_validate page for Tx-Vout table
+                    //
+                    // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
+                    // $SEND_TXVOUT_VALUE - value
+                    // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
                     free_json(retjson);
                 }
             }
         }
     }
 
-    // == Send Validate page array variables ==
-    // $SEND_TXVIN_ARRAY - Main array variable defined in send_validate page for Tx-Vin table
-    // 
-    // $SEND_TXVIN_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
-    // $SEND_TXVIN_TXID - txid
-    // $SEND_TXVIN_VOUT - vout
-    // $SEND_TXVIN_AMOUNT - amount
-    // $SEND_TXVIN_SCRIPTSIG - scriptSig
-    // $SEND_TXVIN_SEQID - sequenceid
-    // 
-    // 
-    // $SEND_TXVOUT_ARRAY - Main array variable defined in send_validate page for Tx-Vout table
-    // 
-    // $SEND_TXVOUT_ARRAYNUM - object location in array. Example arr[0], arr[1] etc.
-    // $SEND_TXVOUT_VALUE - value
-    // $SEND_TXVOUT_ADDR - Address. This is in place of scriptPubKey.
 
     NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
     NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);

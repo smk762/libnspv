@@ -148,6 +148,8 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
                 {
                     if ( (seeds= jstr(coin,"nSPV")) != 0 && strlen(seeds) < sizeof(chain->dnsseeds[0].domain)-1 && (magic= jstr(coin,"magic")) != 0 && strlen(magic) == 8 )
                     {
+                        if ( jstr(coin,"fname") != 0 )
+                            strcpy(NSPV_fullname,jstr(coin,"fname"));
                         chain->default_port = juint(coin,"p2p");
                         chain->rpcport = juint(coin,"rpcport");
                         strcpy(chain->dnsseeds[0].domain,seeds);
@@ -156,8 +158,6 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
                         fprintf(stderr,"Found (%s) magic.%s, p2p.%u seeds.(%s)\n",symbol,magic,chain->default_port,seeds);
                         break;
                     }
-                    if ( jstr(coin,"fname") != 0 )
-                        strcpy(NSPV_fullname,jstr(coin,"fname"));
                 }
             }
             if ( i == n )
