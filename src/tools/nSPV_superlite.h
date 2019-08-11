@@ -1388,47 +1388,47 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
     // $PEER_INSYNC - In Sync
     else if ( strcmp(method,"getpeerinfo") == 0 )
     {
-        char *origitemstr,*itemstr,*itembuf,*itemsbuf; long fsize;
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; long fsize;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
-            /*jaddnum(node_json,"nodeid",(int64_t)node->nodeid);
-            jaddnum(node_json,"protocolversion",(uint32_t)node->version);
-            jaddstr(node_json,"ipaddress",ipaddr);
-            jaddnum(node_json,"port", (int64_t)node->nodegroup->chainparams->default_port);
-            jaddnum(node_json,"lastping",(int64_t)node->lastping);
-            jaddnum(node_json,"time_started_con",(int64_t)node->time_started_con);
-            jaddnum(node_json,"time_last_request",(int64_t)node->time_last_request);
-            jaddnum(node_json,"services",(int64_t)node->services);
-            jaddnum(node_json,"missbehavescore",(int64_t)node->banscore);
-            jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight);
-            if ( node->synced == 0 )
-                jaddstr(node_json,"in_sync", "not_synced");
-            else if ( IS_IN_SYNC == 1 )
-                jaddstr(node_json,"in_sync", "synced");*/
-            itembuf = calloc(1,1024);
-            itemsbuf = calloc(128,1024);
             if ( (retjson= NSPV_getpeerinfo(NSPV_client)) != 0 )
             {
                 if ( (n= cJSON_GetArraySize(retjson)) > 0 )
                 {
+                    itemsbuf = calloc(n,1024);
                     for (i=0; i<n; i++)
                     {
                         item = jitem(retjson,i);
                         if ( (itemstr= clonestr(origitemstr)) != 0 )
                         {
+                            sprintf(replacestr,"%d",jint(item,"nodeid"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_NODEID",replacestr);
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddress"));
+                            sprintf(replacestr,"%u",node->nodegroup->chainparams->default_port);
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_PORT",replacestr);
+                            sprintf(replacestr,"%u",juint(item,"lastping"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_LASTPING",replacestr);
+                            sprintf(replacestr,"%u",juint(item,"time_started_con"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMECONSTART",replacestr);
+                            sprintf(replacestr,"%u",juint(item,"time_last_request"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMELASTREQ",replacestr);
+                            sprintf(replacestr,"%llx",j64bits(item,"services"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_SERVICES",replacestr);
+                            sprintf(replacestr,"%u",juint(item,"missbehavescore"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
+                            sprintf(replacestr,"%u",juint(item,"bestknownheight"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_BESTKNOWNHT",replacestr);
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",jstr(item,"in_sync"));
                             strcat(itemsbuf,itemstr);
-                            fprintf(stderr,"i.%d [%s] [%s]\n",i,bigbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
                         }
                     }
+                    NSPV_expand_variable(bigbuf,&filestr,"$PEER_INFO_ROW_ARRAY",itemsbuf);
+                    free(itemsbuf);
                 }
                 free_json(retjson);
             }
-            NSPV_expand_variable(bigbuf,&filestr,"$PEER_INFO_ROW_ARRAY",itemsbuf);
-            free(itembuf);
-            free(itemsbuf);
             free(origitemstr);
         }
     }
