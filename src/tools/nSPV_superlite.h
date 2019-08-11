@@ -1416,8 +1416,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                         if ( (itemstr= clonestr(origitemstr)) != 0 )
                         {
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddress"));
-                            fprintf(stderr,"i.%d [%s] [%s]\n",i,itembuf,itemstr);
                             strcat(bigbuf,itemstr);
+                            fprintf(stderr,"i.%d [%s] [%s]\n",i,bigbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
                         }
@@ -1425,6 +1425,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                 }
                 free_json(retjson);
             }
+            strcpy(itembuf,bigbuf);
+            bigbuf[0] = 0;
             NSPV_expand_variable(bigbuf,&filestr,"$PEER_INFO_ROW_ARRAY",itembuf);
             free(itembuf);
             free(origitemstr);
