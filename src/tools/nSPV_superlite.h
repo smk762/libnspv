@@ -1391,6 +1391,20 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
         char *origitemstr,*itemstr,*itembuf; long fsize;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
+            /*jaddnum(node_json,"nodeid",(int64_t)node->nodeid);
+            jaddnum(node_json,"protocolversion",(uint32_t)node->version);
+            jaddstr(node_json,"ipaddress",ipaddr);
+            jaddnum(node_json,"port", (int64_t)node->nodegroup->chainparams->default_port);
+            jaddnum(node_json,"lastping",(int64_t)node->lastping);
+            jaddnum(node_json,"time_started_con",(int64_t)node->time_started_con);
+            jaddnum(node_json,"time_last_request",(int64_t)node->time_last_request);
+            jaddnum(node_json,"services",(int64_t)node->services);
+            jaddnum(node_json,"missbehavescore",(int64_t)node->banscore);
+            jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight);
+            if ( node->synced == 0 )
+                jaddstr(node_json,"in_sync", "not_synced");
+            else if ( IS_IN_SYNC == 1 )
+                jaddstr(node_json,"in_sync", "synced");*/
             itembuf = calloc(64,1024);
             if ( (retjson= NSPV_getpeerinfo(NSPV_client)) != 0 )
             {
@@ -1401,7 +1415,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                         item = jitem(retjson,i);
                         if ( (itemstr= clonestr(origitemstr)) != 0 )
                         {
-                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddr"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_IPADDR",jstr(item,"ipaddress"));
                             strcat(bigbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
@@ -1410,11 +1424,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
                 }
                 free_json(retjson);
             }
+            NSPV_expand_variable(bigbuf,&filestr,"$PEER_INFO_ROW_ARRAY",itembuf);
             free(itembuf);
             free(origitemstr);
         }
-        free(filestr);
-        return(bigbuf);
     }
 
     // == Send Validate page array variables ==
