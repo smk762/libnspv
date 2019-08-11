@@ -1268,10 +1268,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method)
         NSPV_expand_variable(&bigbuf,&filestr,"$NTZHEIGHT",replacestr);
         bits256_str(replacestr,NSPV_inforesult.notarization.blockhash);
         NSPV_expand_variable(&bigbuf,&filestr,"$NTZBLKHASH",replacestr);
-        bits256_str(replacestr,NSPV_inforesult.notarization.txid);
-        NSPV_expand_variable(&bigbuf,&filestr,"$NTZTXID",replacestr);
         sprintf(replacestr,"%u", NSPV_inforesult.notarization.txidheight);
         NSPV_expand_variable(&bigbuf,&filestr,"$NTZTXIDHT",replacestr);
+        bits256_str(replacestr,NSPV_inforesult.notarization.txid);
+        NSPV_expand_variable(&bigbuf,&filestr,"$NTZTXID",replacestr);
         bits256_str(replacestr,NSPV_inforesult.notarization.othertxid);
         NSPV_expand_variable(&bigbuf,&filestr,"$NTZDESTTXID",replacestr);
 
