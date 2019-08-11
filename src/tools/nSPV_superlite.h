@@ -30,11 +30,12 @@
 #include <btc/base58.h>
 
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
-cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t height);
+cJSON *NSPV_txproof(int32_t waitflag,btc_spv_client *client,int32_t vout,bits256 txid,int32_t height);
 void expand_ipbits(char *ipaddr,uint64_t ipbits);
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump);
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
+int32_t NSPV_didfirsttxproofs;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
@@ -53,7 +54,7 @@ struct NSPV_broadcastresp NSPV_broadcastresult;
 
 struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
 struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
-struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 10];
 
 // validation 
 struct NSPV_ntz NSPV_lastntz;
@@ -156,6 +157,7 @@ void NSPV_logout()
     memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
     memset(&NSPV_key,0,sizeof(NSPV_key));
     NSPV_didfirstutxos = NSPV_logintime = 0;
+    NSPV_didfirsttxproofs = 0;
 }
 
 btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t len,uint64_t mask,int32_t ind)
@@ -270,7 +272,7 @@ int32_t validate_notarization(bits256 notarization, uint32_t timestamp)
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
     struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
-    const btc_chainparams *chain = from->nodegroup->chainparams; int32_t lag;
+    const btc_chainparams *chain = from->nodegroup->chainparams; int32_t lag,issueflag = 0;
     //sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     strcpy(NSPV_lastpeer,from->ipaddr);
     if ( len > 0 )
@@ -325,7 +327,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     {
                         static int32_t counter = 0;
                         if ( counter < 1 )
-                            NSPV_txproof(NSPV_client, 0, NSPV_inforesult.notarization.txid, -1);
+                            NSPV_txproof(0,NSPV_client, 0, NSPV_inforesult.notarization.txid, -1);
                         counter++;
                         if ( counter > 5 ) 
                             counter = 0;
@@ -362,9 +364,13 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 }
                 break;
             case NSPV_UTXOSRESP:
+                if ( NSPV_didfirsttxproofs == 0 && NSPV_utxosresult.coinaddr[0] == 0 && timestamp < NSPV_didfirstutxos+8 )
+                    issueflag = 1;
                 NSPV_utxosresp_purge(&NSPV_utxosresult);
                 NSPV_rwutxosresp(0,&response[1],&NSPV_utxosresult);
-                fprintf(stderr,"got utxos response %u size.%d\n",timestamp,len);
+                fprintf(stderr,"got utxos response %u size.%d issueflag.%d numtxos.%d\n",timestamp,len,issueflag,NSPV_utxosresult.numutxos);
+                if ( issueflag != 0 && NSPV_utxosresult.numutxos < 64 )
+                    NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos;
                 break;
             case NSPV_TXIDSRESP:
                 NSPV_txidsresp_purge(&NSPV_txidsresult);
@@ -752,7 +758,7 @@ cJSON *NSPV_hdrsproof(btc_spv_client *client,int32_t prevht,int32_t nextht)
     return(NSPV_txidhdrsproof(client,prevtxid,nexttxid));
 }
 
-cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t height)
+cJSON *NSPV_txproof(int32_t waitflag,btc_spv_client *client,int32_t vout,bits256 txid,int32_t height)
 {
     uint8_t msg[512]; char str[65]; int32_t i,iter,len = 1; struct NSPV_txproof P,*ptr;
     if ( height > 0 && (ptr= NSPV_txproof_find(txid,height)) != 0 )
@@ -776,11 +782,14 @@ cJSON *NSPV_txproof(btc_spv_client *client,int32_t vout,bits256 txid,int32_t hei
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[1]>>1) != 0 )
     {
-        for (i=0; i<NSPV_POLLITERS; i++)
+        if ( waitflag != 0 )
         {
-            usleep(NSPV_POLLMICROS);
-            if ( memcmp(&NSPV_txproofresult.txid,&txid,sizeof(txid)) == 0 )
-                return(NSPV_txproof_json(&NSPV_txproofresult));
+            for (i=0; i<NSPV_POLLITERS; i++)
+            {
+                usleep(NSPV_POLLMICROS);
+                if ( memcmp(&NSPV_txproofresult.txid,&txid,sizeof(txid)) == 0 )
+                    return(NSPV_txproof_json(&NSPV_txproofresult));
+            }
         }
     } else sleep(1);
     fprintf(stderr,"txproof timeout\n");
@@ -900,7 +909,8 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 
 int32_t NSPV_periodic(btc_node *node) // called periodically
 {
-    cJSON *retjson; uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
+    static uint32_t lasttxproof;
+    cJSON *retjson; struct NSPV_utxoresp *up; uint8_t msg[512]; int32_t i,len = 1; uint32_t timestamp = (uint32_t)time(NULL);
     btc_spv_client *client = (btc_spv_client*)node->nodegroup->ctx;
     if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )
         NSPV_logout();
@@ -916,7 +926,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
     }
     if ( NSPV_address[0] != 0 )
     {
-        if (strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
+        if ( strcmp(NSPV_address,NSPV_utxosresult.coinaddr) != 0 && (NSPV_didfirstutxos == 0 || timestamp > NSPV_didfirstutxos+NSPV_chain->blocktime/2) )
         {
             if ( (retjson= NSPV_addressutxos(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
             {
@@ -925,7 +935,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
                 free_json(retjson);
             }
         }
-        if (strcmp(NSPV_address,NSPV_txidsresult.coinaddr) != 0 && (NSPV_didfirsttxids == 0 || timestamp > NSPV_didfirsttxids+NSPV_chain->blocktime/2) )
+        if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) != 0 && (NSPV_didfirsttxids == 0 || timestamp > NSPV_didfirsttxids+NSPV_chain->blocktime/2) )
         {
             if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
             {
@@ -933,6 +943,20 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
                 NSPV_didfirsttxids = timestamp;
                 free_json(retjson);
             }
+        }
+        if ( timestamp > lasttxproof && NSPV_didfirsttxproofs > 0 && strcmp(NSPV_address,NSPV_utxosresult.coinaddr) == 0 && NSPV_didfirsttxproofs <= NSPV_utxosresult.numutxos )
+        {
+            --NSPV_didfirsttxproofs;
+            up = &NSPV_utxosresult.utxos[NSPV_didfirsttxproofs];
+            if ( (retjson= NSPV_txproof(0,NSPV_client,up->vout,up->txid,up->height)) != 0 )
+            {
+                fprintf(stderr,"request utxo[%d] %s\n",i,bits256_str(str,up->txid));
+                NSPV_didfirsttxids = timestamp;
+                free_json(retjson);
+            }
+            lasttxproof = timestamp;
+            if ( NSPV_didfirsttxproofs == 0 )
+                NSPV_didfirsttxproofs = -1;
         }
     }
     if ( timestamp > NSPV_lastinfo + client->chainparams->blocktime/2 && timestamp > node->prevtimes[NSPV_INFO>>1] + 2*client->chainparams->blocktime/3 )
@@ -1174,7 +1198,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( vout < 0 || memcmp(&zeroid,&txid,sizeof(txid)) == 0 )
             return(cJSON_Parse("{\"error\":\"invalid utxo\"}"));
-        else return(NSPV_txproof(NSPV_client,vout,txid,height));
+        else return(NSPV_txproof(1,NSPV_client,vout,txid,height));
     }
     else if ( strcmp(method,"spentinfo") == 0 )
     {
@@ -1470,7 +1494,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
                         }
                         if ( ptr->height <= NSPV_lastntz.height )
-                            strcat(replacestr,"<span class=\"badge badge-info\">dPoW Secured</span>");
+                            strcat(replacestr,"  <span class=\"badge badge-info\">dPoW Secured</span>");
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
                         sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
