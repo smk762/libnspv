@@ -1507,7 +1507,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // 
                 {
                     if ( (retjson= NSPV_login(NSPV_chain,wifstr)) != 0 )
                     {
-                        if ( NSPV_address[0] != 0 )
+                        if ( NSPV_address[0] != 0 && NSPV_wifstr[0] != 0 )
                         {
                             free(filestr);
                             filestr = OS_filestr(&fsize,"html/wallet");
