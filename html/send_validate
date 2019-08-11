@@ -99,6 +99,7 @@
                       <tr>
                         <th>hex</th>
                         <td>
+                          <input type="text" class="form-control-plaintext text-white" id="hex" name="hex" aria-describedby="sendfromaddrHelp" value="$SENDHEX" readonly style="display: none;">
                           <pre class="text-break text-wrap text-white">$SENDHEX</pre>
                           <small id="broadcastHexHelp" class="form-text text-muted">You can also just copy this hex string and broadcast through another computer if you wish.</small>
                         </td>
