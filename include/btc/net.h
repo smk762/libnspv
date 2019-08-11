@@ -94,7 +94,6 @@ typedef struct btc_node_ {
 
     cstring* recvBuffer;
     uint64_t nonce;
-    uint64_t services;
     uint32_t state;
     int missbehavescore;
     btc_bool version_handshake;
