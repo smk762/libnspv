@@ -369,8 +369,8 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 NSPV_utxosresp_purge(&NSPV_utxosresult);
                 NSPV_rwutxosresp(0,&response[1],&NSPV_utxosresult);
                 fprintf(stderr,"got utxos response %u size.%d issueflag.%d numtxos.%d\n",timestamp,len,issueflag,NSPV_utxosresult.numutxos);
-                if ( issueflag != 0 && NSPV_utxosresult.numutxos < 64 )
-                    NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos;
+                //if ( issueflag != 0 && NSPV_utxosresult.numutxos < 64 )
+                //    NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos;
                 break;
             case NSPV_TXIDSRESP:
                 NSPV_txidsresp_purge(&NSPV_txidsresult);
@@ -1482,7 +1482,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
     if ( strcmp(method,"wallet") == 0 )
     {
-        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr;
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
         if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
         {
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
@@ -1518,10 +1518,13 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     }
                 }
                 NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY",itemsbuf);
+                didflag = 1;
                 free(itemsbuf);
             }
             free(origitemstr);
         }
+        if ( didflag == 0 )
+            NSPV_expand_variable(bigbuf,&filestr,"$TXHIST_ROW_ARRAY","");
     }
     
 
@@ -1541,7 +1544,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $SENDVALBAL - valueBalance
     else if ( strcmp(method,"send") == 0 )
     {
-        
+        if ( strcmp(NSPV_utxosresult.coinaddr,NSPV_address) == 0 && NSPV_didfirsttxproofs == 0 )
+            NSPV_didfirsttxproofs = NSPV_utxosresult.numutxos
     }
 
     // == Send Validate page array variables ==
