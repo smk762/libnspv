@@ -367,8 +367,8 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_UTXOSRESP:
                 NSPV_utxosresp_purge(&NSPV_utxosresult);
                 NSPV_rwutxosresp(0,&response[1],&NSPV_utxosresult);
-                fprintf(stderr,"got utxos response %u size.%d issueflag.%d numtxos.%d\n",timestamp,len,issueflag,NSPV_utxosresult.numutxos);
-                if ( NSPV_utxosresult.height >= NSPV_inforesult.height )
+                fprintf(stderr,"got utxos response %u size.%d numtxos.%d\n",timestamp,len,NSPV_utxosresult.numutxos);
+                if ( NSPV_utxosresult.nodeheight >= NSPV_inforesult.height )
                 {
                     NSPV_balance = NSPV_utxosresult.total;
                     NSPV_rewards = NSPV_utxosresult.interest;
