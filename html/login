@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="custom.css">
+
+    <title>Antara Superlite</title>
+  </head>
+  <body class="login-body">
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
+      <form class="form-inline">
+        $MENU_BUTTON_ARRAY
+        <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+      </form>
+    </nav>
+
+    <div class="container-fluid" style="margin-top: 15px;">
+      <div class="row justify-content-md-center">
+        <div class="col-md-4 col-sm-12 text-center">
+            <!-- login form start -->
+            <div class="login-section">
+              <h4>To continue, log in to your account.</h4>
+            <!--<form action="$URL/method/login" method="get">
+              <div class="form-group">
+                Select a .jpg image file: <input type="file" name="jpg_image" accept=".jpg">
+                <input type="password" class="form-control" id="nspv_password" name="jpg_password" aria-describedby="nspvUserpassHelp" placeholder="Password" readonly>
+                <small id="nspvPasswordHelp" class="form-text text-muted">Password (any random string) is used for session login. (disabled for now in debug versions)</small>
+              </div>
+              <button type="submit" class="btn btn-primary">Login with image + password</button>
+            </form>-->
+            <form action="$URL/method/login" method="get">
+              <!--<div class="divider">
+                <strong class="divider-title">or</strong>
+              </div>-->
+              <div class="form-group">
+                <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key">
+                <small id="nspvWifHelp" class="form-text text-muted">Enter WIF key (private key) of an address.</small>
+              </div>
+              <button type="submit" class="btn btn-primary">Login with WIF key</button>
+              <div class="divider"></div>
+              <h4>Don't have an account?</h4>
+              <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">Generate New Address</button>
+            </form>
+          </div>
+          <!-- login form end -->
+        </div>
+        <!-- Get New Address section start -->
+        <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $GENADDR;"> <!-- Get New Address div start -->
+            <div class="card text-white bg-dark"> <!-- Get New Address card start -->
+              <div class="card-body"> <!-- Get New Address card body start -->
+                <div class="alert alert-danger" role="alert"><b>IMPORTANT NOTICE: </b>Please take backup of the "Private Key" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing WIF/Private key. You HAVE to use this address's Private key to login, view transactions and use it's funds.</div>
+                <dl class="row" style="margin-bottom: 0;">
+                  <dt class="col-sm-3">Here is your new address:</dt>
+                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">$NEW_WALLETADDR</pre></dd>
+                  
+                  <dt class="col-sm-3">Private Key (WIF Key) <span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
+                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">$NEW_WIFKEY</pre></dd>
+
+                  <dt class="col-sm-3" style="margin-bottom: 0;">Public Key</dt>
+                  <dd class="col-sm-9" style="margin-bottom: 0;"><pre class="text-break text-wrap text-white" style="margin-bottom: 0;">$NEW_PUBKEY</pre></dd>
+                </dl>
+              </div> <!-- Get New Address card body end -->
+            </div> <!-- Get New Address card end -->
+        </div> <!-- Get New Address div end -->
+        <!-- Get New Address section end -->
+      </div>
+    </div>
+  
+  </body>
+</html>

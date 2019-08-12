@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="custom.css">
+
+    <title>Antara Superlite</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
+      <form class="form-inline" action="$URL/method/send_confirm" method="get">
+        <input class="form-control mr-sm-1" type="search" placeholder="Address" name="address" aria-label="ToAddress" style="width: 400px;">
+        <input class="form-control mr-sm-2" type="search" placeholder="Amount" name="amount" aria-label="SendAmount" style="width: 120px;">
+          <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Send $COIN</button>
+      </form>
+      <form class="form-inline">
+        $MENU_BUTTON_ARRAY
+        <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+      </form>
+    </nav>
+
+    <div class="container-fluid" style="margin-top: 15px;">
+      <div class="row" style="margin-bottom: 1em;">
+        <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
+            <div class="card text-white bg-dark"> <!-- coin info card start -->
+              <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
+                <span class="col-3">Coin: <font style="font-size: 22px;">$COINNAME ($COIN)</font></span>
+                <span class="col-3">Balance: <font style="font-size: 22px;">$BALANCE $COIN</font></span>
+                <span class="col-3" style="display: $REWARDS_DISPLAY_KMD;">Rewards: <font style="font-size: 22px;">$REWARDS $COIN</font></span>
+                <span class="col-6 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
+              </div> <!-- coin info body end -->
+            </div> <!-- coin info card end -->
+        </div> <!-- coin info div end -->
+      </div>
+
+      <div class="row" style="margin-bottom: 1em;">
+        <div class="col-12" style="margin-bottom: 10px;"> <!-- GetInfo div start -->
+            <div class="card text-white bg-dark"> <!-- GetInfo card start -->
+              <div class="card-header"> <!-- GetInfo header start -->
+                <div class="row">
+                  <div class="col-md-6 col-sm-6 col-xs-6">
+                    <h6 class="card-title" style="vertical-align: ">Network Info</h6>
+                  </div>
+                  <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                    <form> <!-- GetInfo reresh button form start -->
+                      <button class="btn btn-outline-light btn-sm" formaction="$URL/method/getinfo?nexturl=info" formmethod="get">Refresh</button>
+                    </form> <!-- GetInfo reresh button form end -->
+                  </div>
+                </div>
+              </div> <!-- GetInfo header end -->
+              <div class="card-body" style="padding: 0;"> <!-- GetInfo body start -->
+                <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                  <thead>
+                    <tr>
+                      <th scope="col">nSPV</th>
+                      <th scope="col">Current Height</th>
+                      <th scope="col">Notarized Height</th>
+                      <th scope="col">Peers Connected</th>
+                      <th scope="col">Protocol Version</th>
+                      <th scope="col">Last Peer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>SuperLite</td>
+                      <td>$CURHEIGHT</td>
+                      <td>$NTZHEIGHT</td>
+                      <td>$PEERSTOTAL</td>
+                      <td>$PROTOVER</td>
+                      <td>$LASTPEER</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div> <!-- GetInfo body end -->
+            </div> <!-- GetInfo card end -->
+        </div> <!-- GetInfo div end -->
+
+        <div class="col-6" style="padding-right: 5px;"> <!-- GetInfo div start -->
+            <div class="card text-white bg-dark"> <!-- GetInfo card start -->
+              <div class="card-header"> <!-- GetInfo header start -->
+                <div class="row">
+                  <div class="col-md-6 col-sm-6 col-xs-6">
+                    <h6 class="card-title" style="vertical-align: ">Notarization Info</h6>
+                  </div>
+                </div>
+              </div> <!-- GetInfo header end -->
+              <div class="card-body" style="padding: 0;"> <!-- GetInfo body start -->
+                <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                  <!--<thead>
+                    <tr>
+                      <th scope="col">First</th>
+                      <th scope="col">Last</th>
+                    </tr>
+                  </thead> -->
+                  <tbody>
+                    <tr>
+                      <td scope="row">Notarized Height</td>
+                      <td>$NTZHEIGHT</td>
+                    </tr>
+                    <tr>
+                      <td scope="row">Notarized Blockhash</td>
+                      <td>$NTZBLKHASH</a></td>
+                    </tr>
+                    <tr>
+                      <td scope="row">Notarized Txid</td>
+                      <td><a href="$URL/method/txidinfo?txid=$NTZTXID&height=$NTZTXIDHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
+                    </tr>
+                    <tr>
+                      <td scope="row">Notarization Txid Height</td>
+                      <td>$NTZTXIDHT</td>
+                    </tr>
+                    <tr>
+                      <td scope="row">Notarization Destination Txid</td>
+                      <td>$NTZDESTTXID</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div> <!-- GetInfo body end -->
+            </div> <!-- GetInfo card end -->
+        </div> <!-- GetInfo div end -->
+
+        <div class="col-6" style="padding-left: 5px;"> <!-- GetInfo div start -->
+            <div class="card text-white bg-dark"> <!-- GetInfo card start -->
+              <div class="card-header"> <!-- GetInfo header start -->
+                <div class="row">
+                  <div class="col-md-6 col-sm-6 col-xs-6">
+                    <h6 class="card-title" style="vertical-align: ">Current Header Info</h6>
+                  </div>
+                </div>
+              </div> <!-- GetInfo header end -->
+              <div class="card-body" style="padding: 0;"> <!-- GetInfo body start -->
+                <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                  <!--<thead>
+                    <tr>
+                      <th scope="col">First</th>
+                      <th scope="col">Last</th>
+                    </tr>
+                  </thead> -->
+                  <tbody>
+                    <tr>
+                      <td scope="row">Header</td>
+                      <td>$BLKHDR</td>
+                    </tr>
+                    <tr>
+                      <td scope="row">Blockhash</td>
+                      <td>$BLKHASH</td>
+                    </tr>
+                    <tr>
+                      <td scope="row">Prev. Block Hash</td>
+                      <td>$PREVBLKHASH</td>
+                    </tr>
+                    <tr>
+                      <td scope="row">Merkle Root Hash</td>
+                      <td>$MERKLEHASH</td>
+                    </tr>
+                    <tr>
+                      <td scope="row">nTime</td>
+                      <td>$NTIME</td>
+                    </tr>
+                    <tr>
+                      <td scope="row">nBits</td>
+                      <td>$NBITS</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div> <!-- GetInfo body end -->
+            </div> <!-- GetInfo card end -->
+        </div> <!-- GetInfo div end -->
+
+      </div>
+
+      <div class="row justify-content-md-center" style="margin-bottom: 1em;">
+        <div class="col-12">
+          <div class="card text-white bg-dark">
+            <div class="card-header">
+              <h5>Broadcast transaction to network</h5>
+            </div>
+            <div class="card-body">
+              <!-- login form start -->
+              <form action="$URL/method/broadcast" method="get">
+                <div class="form-group">
+                  <label for="nspv_hexstring">Hex string</label>
+                  <input type="text" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
+                  <small id="nspvWifHelp" class="form-text text-muted">You can broadcast a transaction to network without login if you have the transaction hex made through other source.</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Broadcast Transaction</button>
+              </form>
+              <!-- login form end -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  
+  </body>
+</html>
