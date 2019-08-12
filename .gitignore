@@ -42,3 +42,4 @@ libbtc.pc
 *.gcda
 *.gcov
 *.gcno
+.idea/
