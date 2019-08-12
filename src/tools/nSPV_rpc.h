@@ -597,7 +597,7 @@ cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 
 char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
 {
-    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr=0,*token = 0; int32_t i,j,n,num=0; uint32_t queueid;
+    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr=0,*token = 0; int32_t i,j,n,apiflag=0,num=0; uint32_t queueid;
     for (i=0; i<(int32_t)sizeof(urlmethod)-1&&urlstr[i]!=0&&urlstr[i]!=' '; i++)
         urlmethod[i] = urlstr[i];
     urlmethod[i++] = 0;
@@ -616,6 +616,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
     {
         *jsonflagp = 1;
+        apiflag = 1;
         i += strlen("/api");
     } else *jsonflagp = 0;
     if ( strcmp(&url[i],"/") == 0 && strcmp(urlmethod,"GET") == 0 )
@@ -868,7 +869,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     //printf("after urlconv.(%s) argjson.(%s)\n",jprint(json,0),jprint(argjson,0));
                     if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(argjson) > 0 )
                     {
-                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port,filestr)) != 0 )
+                        if ( (retstr= NSPV_JSON(argjson,remoteaddr,port,filestr,apiflag)) != 0 )
                         {
                             if ( (retitem= cJSON_Parse(retstr)) != 0 )
                                 jaddi(retarray,retitem);
@@ -895,7 +896,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
                 {
                     portable_mutex_lock(&NSPV_commandmutex);
-                    retstr = NSPV_JSON(arg,remoteaddr,port,filestr);
+                    retstr = NSPV_JSON(arg,remoteaddr,port,filestr,apiflag);
                     portable_mutex_unlock(&NSPV_commandmutex);
                 } else retstr = clonestr("{\"error\":\"invalid remote method\"}");
             }
