@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="custom.css">
+
+    <title>Antara Superlite</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
+      <form class="form-inline" action="$URL/method/send_confirm" method="get">
+        <input class="form-control mr-sm-1" type="search" placeholder="Address" name="address" aria-label="ToAddress" style="width: 400px;">
+        <input class="form-control mr-sm-2" type="search" placeholder="Amount" name="amount" aria-label="SendAmount" style="width: 120px;">
+          <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Send $COIN</button>
+      </form>
+      <form class="form-inline">
+        $MENU_BUTTON_ARRAY
+        <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
+        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>-->
+      </form>
+    </nav>
+
+    <div class="container-fluid" style="margin-top: 15px;">
+      <div class="row" style="margin-bottom: 1em;">
+        <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
+            <div class="card text-white bg-dark"> <!-- coin info card start -->
+              <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
+                <span class="col-3">Coin: <font style="font-size: 22px;">$COINNAME ($COIN)</font></span>
+                <span class="col-3">Balance: <font style="font-size: 22px;">$BALANCE $COIN</font></span>
+                <span class="col-3" style="display: $REWARDS_DISPLAY_KMD;">Rewards: <font style="font-size: 22px;">$REWARDS $COIN</font></span>
+                <span class="col-3 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
+              </div> <!-- coin info body end -->
+            </div> <!-- coin info card end -->
+        </div> <!-- coin info div end -->
+      </div>
+
+      <div class="row justify-content-center"> <!-- wallet transactions history section start -->
+        <div class="col-12"> <!-- wallet transactions history column start -->
+          <div class="card text-white bg-dark"> <!-- wallet card start -->
+            <div class="card-header"> <!-- wallet card header start -->
+              <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                  <h6 class="card-title">Transaction History</h6>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                  <form> <!-- tx history reresh button form start -->
+                    <button class="btn btn-outline-light btn-sm" formaction="$URL/method/wallet?nexturl=wallet" formmethod="get">Refresh</button>
+                  </form> <!-- tx history reresh button form end -->
+                </div>
+              </div>
+            </div> <!-- wallet card header end -->
+            <div class="card-body" style="padding: 0;"> <!-- wallet card body start -->
+              <form> <!-- tx history table form start -->
+                <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                  <thead>
+                    <tr>
+                      <th scope="col-md">Direction</th>
+                      <th scope="col-md">Confirmations</th>
+                      <th scope="col-md">Amount</th>
+                      <th scope="col-md">Height</th>
+                      <th scope="col-md">TxID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    $TXHIST_ROW_ARRAY
+                  </tbody>
+                </table>
+              </form> <!-- tx history table form end -->
+            </div> <!-- wallet card body end -->
+          </div> <!-- wallet card end -->
+        </div> <!-- wallet transactions history column end -->
+      </div> <!-- wallet transactions history section end -->
+    </div>
+  
+  </body>
+</html>

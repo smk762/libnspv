@@ -1,95 +1,34 @@
+dist: bionic
 language: c
-
 cache:
-  apt: true
-  directories:
-  - depends/built
-  - depends/sdk-sources
-  - $HOME/Library/Caches/Homebrew
-
+- pip
+- ccache
+env:
+  global:
+  - secure: tdQoakwaYJcfmRX1nI3kQgR4I7xjP3PYSHaQ9FZBUF5N5O5fJlgns5WF2ofh5WhvjuTKABMGBGqjNC9R7E68L24UCS2JftGHVQ0UQANtDdf3fN3wsD4Ev4tOM27blNj77Ud5fx2xZQfASDdh0Mrrz3GtE/FaLGoN3g9X03vRYnrD+z8aXn/j8oIVej26sOmy5DZfKbhtRv57f9A5ek9yMFkRD6NEbaisbTxvoW7Qri+6h9Rf3M4P8izufDsBBGj/eEoEOPfL5oDVJDOpy+cixAmaCc8GfGY5Kqd3pH8aBflaigdE0UOVUGD5EHQaHmth3P5Wzqz+tqVaGhNfhTh+blOlI1JId7ovEJPYnFur+RzLFhABqYjlhm6smCpNIOow/Q8gXAnMXNFq5460vlrOvHB3d0z20Gsb7cZamZsv0Nf6MfoXJQd9DniF45rAIGUGDFojg9xqVLuxzuMcTTTOaaSxYZ9g8pTDOFwwF5oCQLQ7gdeagv1EjexD3N3RhYQ/rR6TfbWbY98OhncDL4OYR5s48Nw+j747OVnp8N87S1R+AYWwgEDxRYFo8ykqsAPOzZCFazS+rXp4X9yA9VtgG0fWgpUh7cVeB9J0aZIps7yFu4oyFqltsRIcv6KgwtGukxVgnhT6RCMZGXazLorafJpDDwWjD+Ba66uyHwjVIhw=
+  - secure: qFwNrx16rhlX5KKpkIfcgfwjlKXO1LtjN1uK5h+mp4ZnrFHiitCJl6wct2ZwKtBEc0V4ux57ZdggE9uff0Ur0ZAwal5QkQSpBToO99Gpk8S2TB4OFQq5wbD1EDzsqOY72FM28LUqejDqzaN7AwkRCKjvDFMvRiVrXtXF8iZqkaIz2Gv9DWEMYcXFbAhsqN7cRTnHlpgT4CNWjw0x7NW6CUUVoEwE4NaltED/QJhO4xI8IVTW1VPCnbwkHmvlSvjoqDgjCYyQLRD7MnhmKZQuY18iKYzHce2lLUcq9i76aJmnLfLUV61C4R1W1r+wQqXqs+wCkDFGzTRP3eq3P0Wx8hq55yUNQEojTIWrYAUdMLKHd+KxwDs94XiEXTslkur8C2BvrHr0NRIGuqr2kEzr6zRIlcf2bRvQLo/rsDPbzLpBGkePKy4vMLo7xUF70ztM9gvBsWjk5+bzxb8HQTiCCc1BnEUNEaKHXZxve93uGqGijfzwGFqaIyP2iWvUv6nWAq2bEhyS2QAe22nwk6PgIE3EB/hmfCcyzdszedLKJCrpYOrtZ8ucMcVuP4m8DVO9uCG7qsluSoA8E8RkP49gWpZ8YJ7syBuoBua/+68LJn3g/oWy3SlBawjqL0Cj1eRXcDrk4DWurZKiL7vQN4Mgq4rfE3yuBs9PQ3EKK+GZSkI=
+  - secure: Pr0/hlroT/QMilFDmUoKvmZ61g5/DY9lGLaNX5EccxCYqiC373Zgi/gbN9OyRjJs9g93UZDW5lFJ3MGt2eBWeIbHeE37W+eTYp+2j0cb7PB0Iz604TDr+Rl8LQcAm6FqAqCNwq/OXuuHluZdvqKCmQPRhvAxREwOBM/P2UPsD45OqQGPSuSwyF67Fy3804cQI/hTffd+wRJCwEfCBKyPSLYY7NggvN+Vref6u8YlhcpFd0YJnGWNDgCOYJg9xqytJ+J7J3MBx1KAXpi992dlOdSQt6Y6V0Za+1MHI8xvhx4hXlDNlagqGDHgBLY2AwMtU5Worl4wUEkJXqYsxqL1wHrvLV+MHs1oJZug3LQ2U4Ntl/VZ7S0e243qMOR8hRaqK+6Hql+Cjm921YlU3cKXeX6OaDkqCuEORWCu6MyFSUfA56p+QOlG3raRMe9h2WqBwzQyqyoLm0bEY2g1WYDuiuUE6uB8Kos/VTZ+f/k0AJyortRzGGOrPphphTUq6VD9hkeCPzRcmIfTGbKwoWIUq8JSOvScUpT3rrTuXs7O2pFrgYVnOz6ewYtiJLkG5TjJ21r0wVrdoHhk96CoZP18cCtyU0HReolTj0lgs6n0s/SSQEy41249TkoiRo2jvmhPjsWsaDX1AtRAHMI8gGSS+F4QJeRH2z/XUlGs65eE3XU=
 addons:
   apt:
     packages:
-        - valgrind
-        - binutils-mingw-w64
-        - g++-mingw-w64-x86-64
-        - gcc-mingw-w64
-        - wine1.6
-        - libevent-dev
-
-before_install:
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew install valgrind gnu-sed --default-names; fi
-
-matrix:
-    fast_finish:
-        - true
-    include:
-      - os: osx
-        compiler: clang
-        env: RUN_MAKE_CHECK="yes" $BUILD_CONFIG='--enable-debug'
-      - os: osx
-        compiler: gcc
-        env: RUN_TOOLTESTS="yes" $BUILD_CONFIG=""
-      - os: linux
-        compiler: gcc
-        env: VALGRIND_UNIT_TESTS="yes" RUN_TOOLTESTS="yes" SUBMIT_COVERALLS="yes" $BUILD_CONFIG=''
-      - os: linux
-        compiler: x86_64-w64-mingw32
-        env: HOST="x86_64-w64-mingw32" CROSS_COMPILE="yes" RUN_WINE_UNIT_TESTS="yes" $BUILD_CONFIG="--disable-shared --enable-static --disable-net"
-      - os: linux
-        compiler: i686-w64-mingw32
-        env: HOST="i686-w64-mingw32" CROSS_COMPILE="yes" RUN_WINE_UNIT_TESTS="yes" $BUILD_CONFIG="--disable-shared --enable-static --disable-net"
-      - os: linux
-        compiler: arm-linux-gnueabihf
-        env: HOST="arm-linux-gnueabihf" CROSS_COMPILE="yes"
-        addons:
-          apt:
-            packages:
-              - g++-arm-linux-gnueabihf
-            sources:
-              - ubuntu-toolchain-r-test
-#      - os: linux
-#        compiler: i686-pc-linux-gnu
-#        env: HOST="i686-pc-linux-gnu" CROSS_COMPILE="yes"
-#        addons:
-#          apt:
-#            packages:
-#            - g++-arm-linux-gnueabihf
-#            - g++-multilib
-
+    - cmake
+    - python3
+    - python3-pip
+    - python3-setuptools
+    - python3-dev
+    - libevent-2.1-6
+    - libevent-dev
+    - libsodium23
+    - libsodium-dev
+compiler:
+- gcc
+before_install: pip3 install --upgrade --user travis pip setuptools wheel virtualenv
+install: pip3 install --user -r rpctest/requirements.txt
 before_script:
-    - ./autogen.sh
-    - if [ "$CROSS_COMPILE" == "yes" ]; then
-          make -C depends HOST=$HOST;
-          LIBTOOL_APP_LDFLAGS='-all-static' LDFLAGS='-static' ./configure --prefix=$TRAVIS_BUILD_DIR/depends/$HOST $BUILD_CONFIG; cat config.log;
-      elif [ "$SUBMIT_COVERALLS" == "yes" ]; then
-          ./configure $BUILD_CONFIG CFLAGS='-fprofile-arcs -ftest-coverage'; cat config.log;
-      else
-          ./configure $BUILD_CONFIG; cat config.log;
-      fi
-
-script: 
-    - make -j2 V=1
-    - ls -la
-    - if ( [ "$VALGRIND_UNIT_TESTS" == "yes" ] ); then
-          valgrind --track-origins=yes --leak-check=full --error-exitcode=1 ./tests;
-          ./tests;
-      fi
-    - if ( [ "$RUN_MAKE_CHECK" == "yes" ] ); then
-          make check;
-          if [ ! -f test-suite.log; ]; then
-              cat test-suite.log;
-          fi
-      fi
-    - if ( [ "$RUN_WINE_UNIT_TESTS" == "yes" ] ); then
-          wine /home/travis/build/libbtc/libbtc/tests.exe;
-      fi
-    - if ( [ "$RUN_TOOLTESTS" == "yes" ] ); then
-          ./tooltests.py;
-      fi
-
-after_success:
-  - if [ "$SUBMIT_COVERALLS" == "yes" ]; then
-      sudo pip install -U "cpp-coveralls";
-      coveralls --verbose -i src -x c -e src/logdb -e src/secp256k1 -r $TRAVIS_BUILD_DIR -b $TRAVIS_BUILD_DIR --gcov-options '\-lp';
-    fi
+- "./travis-build.sh"
+script:
+- "./nspv ILN &"
+- sleep 10
+- cd rpctest
+- python3 travis.py $PARAM1 $PARAM2 $PARAM3
+- python3 -m pytest test_nspv.py

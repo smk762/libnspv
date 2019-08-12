@@ -919,7 +919,8 @@ int32_t komodo_notaries(btc_spv_client *client,uint8_t pubkeys[64][33],int32_t h
 
 bits256 NSPV_opretextract(int32_t *heightp,bits256 *blockhashp,char* opret)
 {
-    bits256 desttxid; int32_t i,offset=3; char str[65];
+    bits256 desttxid; int32_t i,offset; char str[65];
+    offset = strcmp(NSPV_client->chainparams->name,"KMD") == 0 ? 2 : 3; 
     if ( opret != 0 )
     {
         //for (i=0; i<opret->len; i++)

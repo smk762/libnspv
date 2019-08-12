@@ -59,8 +59,8 @@ struct rpcrequest_info
 #define NODE_ADDRINDEX (1 << 29)
 #define NODE_SPENTINDEX (1 << 28)
 
-#define NSPV_POLLITERS 100
-#define NSPV_POLLMICROS 30000
+#define NSPV_POLLITERS 200
+#define NSPV_POLLMICROS 50000
 #define NSPV_MAXVINS 64
 #define NSPV_AUTOLOGOUT 777
 #define NSPV_BRANCHID 0x76b809bb
@@ -258,7 +258,7 @@ extern struct NSPV_broadcastresp NSPV_broadcastresult;
 
 extern struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
 extern struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
-extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 10];
 
 // validation 
 extern struct NSPV_ntz NSPV_lastntz;

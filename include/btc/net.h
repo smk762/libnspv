@@ -94,7 +94,6 @@ typedef struct btc_node_ {
 
     cstring* recvBuffer;
     uint64_t nonce;
-    uint64_t services;
     uint32_t state;
     int missbehavescore;
     btc_bool version_handshake;
@@ -102,10 +101,12 @@ typedef struct btc_node_ {
     unsigned int bestknownheight;
     int32_t synced;
     int32_t banscore;
+    uint32_t version;
 
     uint32_t hints; /* can be use for user defined state */
     uint64_t nServices;
     uint32_t prevtimes[16],gotaddrs;
+    char ipaddr[64];
 } btc_node;
 
 LIBBTC_API int net_write_log_printf(const char* format, ...);

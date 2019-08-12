@@ -220,7 +220,7 @@ btc_node* btc_node_new()
     node->version_handshake = false;
     node->state = 0;
     node->nonce = 0;
-    node->services = 0;
+    node->nServices = 0;
     node->lastping = 0;
     node->time_started_con = 0;
     node->time_last_request = 0;
@@ -238,6 +238,7 @@ btc_bool btc_node_set_ipport(btc_node* node, const char* ipport)
     int outlen = (int)sizeof(node->addr);
 
     //return true in case of success (0 == no error)
+    strncpy(node->ipaddr,ipport,sizeof(node->ipaddr)-1);
     return (evutil_parse_sockaddr_port(ipport, &node->addr, &outlen) == 0);
 }
 
