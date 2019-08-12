@@ -1813,10 +1813,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     return(filestr);
 }
 
-char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr) // from rpc port
+char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int32_t apiflag) // from rpc port
 {
     char *retstr,*method,*wifstr; long fsize; cJSON *retjson = 0;
-    if ( filestr != 0 )
+    if ( filestr != 0 && apiflag == 0 )
     {
         if ( (method= jstr(argjson,"method")) != 0 )
         {
