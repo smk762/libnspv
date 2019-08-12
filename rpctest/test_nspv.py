@@ -338,7 +338,10 @@ def test_faucetinfo():
 
 
 def test_gettransaction():
-    pass
+    """Not implemented yet"""
+    print("testing gettransaction call")
+    rpc_call = call.nspv_gettransaction()
+    call.assert_error(rpc_call)
 
 
 def test_autologout():
@@ -353,4 +356,3 @@ def test_autologout():
     rpc_call = call.nspv_spend(addr_send, 0.001)
     call.assert_error(rpc_call)
     print("all tests are finished")
-

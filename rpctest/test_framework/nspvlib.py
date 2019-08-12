@@ -54,7 +54,8 @@ class NspvRpcCalls:
         """ assert there is an error with known error message """
         error_msg = ['no height', 'invalid height range', 'invalid method', 'timeout', 'error', 'no hex',
                      'couldnt get addressutxos', 'invalid address or amount too small', 'not enough funds',
-                     'invalid address or amount too small', 'invalid utxo', 'wif expired', 'not implemented yet']
+                     'invalid address or amount too small', 'invalid utxo', 'wif expired', 'not implemented yet',
+                     'invalid utxo']
         result_d = self.type_convert(result)
         error = result_d.get('error')
         if error:
