@@ -1,7 +1,6 @@
 body {
 	background-color: #1e2938;
 	color: #fff;
-	font-family: 'Rubik', sans-serif;
 }
 
 .bg-dark {
@@ -19,7 +18,7 @@ body {
 .login-body {
 	background-image: url("images/sub-header-logo-min.png");
 	background-size: auto auto;
-	text-align: center;
+	/*text-align: center;*/
 	background-color: #1e2938;
 	background-repeat: no-repeat;
 	position: relative;

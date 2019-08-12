@@ -8,34 +8,36 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="custom.css">
-    <link rel="stylesheet" href="font/rubik.css">
 
     <title>Antara Superlite</title>
   </head>
   <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
+      <form class="form-inline" action="$URL/method/send_confirm" method="get">
+        <input class="form-control mr-sm-1" type="search" placeholder="Address" name="address" aria-label="ToAddress" style="width: 400px;">
+        <input class="form-control mr-sm-2" type="search" placeholder="Amount" name="amount" aria-label="SendAmount" style="width: 120px;">
+          <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Send $COIN</button>
+      </form>
+      <form class="form-inline">
+        $MENU_BUTTON_ARRAY
+        <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+      </form>
+    </nav>
 
-    <h3 class="text-center"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</h3>
-    <div class="container-fluid">
+    <div class="container-fluid" style="margin-top: 15px;">
       <div class="row" style="margin-bottom: 1em;">
-        <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
+        <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
-              <div class="card-body"> <!-- coin info body start -->
-                <span>Coin/Asset: KMD</span><br>
+              <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
+                <span class="col-3">Coin: <font style="font-size: 22px;">$COINNAME ($COIN)</font></span>
+                <span class="col-3">Balance: <font style="font-size: 22px;">$BALANCE $COIN</font></span>
+                <span class="col-3" style="display: $REWARDS_DISPLAY_KMD;">Rewards: <font style="font-size: 22px;">$REWARDS $COIN</font></span>
+                <span class="col-6 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
-        <div class="col-8" style="padding-left: 7.5px;">
-          <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
-            <div class="card-body text-right"> <!-- wallet buttons body start -->
-              <form> <!-- coin info buttons form start -->
-                <button class="btn btn-info btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Info</button>
-                <button class="btn btn-warning btn-sm" formaction="http://127.0.0.1:7771/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
-                <button class="btn btn-primary btn-sm" formaction="http://127.0.0.1:7771/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
-                <button class="btn btn-success btn-sm" formaction="http://127.0.0.1:7771/method/login?nexturl=login" formmethod="get">Login</button>
-              </form> <!-- coin info buttons form end -->
-            </div> <!-- wallet buttons body end -->
-          </div> <!-- wallet buttons card start -->
-        </div>
       </div>
 
       <div class="row" style="margin-bottom: 1em;">
@@ -48,7 +50,7 @@
                   </div>
                   <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                     <form> <!-- GetInfo reresh button form start -->
-                      <button class="btn btn-outline-light btn-sm" formaction="http://127.0.0.1:7771/method/getinfo?nexturl=info" formmethod="get">Refresh</button>
+                      <button class="btn btn-outline-light btn-sm" formaction="$URL/method/getinfo?nexturl=info" formmethod="get">Refresh</button>
                     </form> <!-- GetInfo reresh button form end -->
                   </div>
                 </div>
@@ -68,11 +70,11 @@
                   <tbody>
                     <tr>
                       <td>SuperLite</td>
-                      <td>1458356</td>
-                      <td>1458340</td>
-                      <td>7</td>
-                      <td>0</td>
-                      <td>nodeid.1</td>
+                      <td>$CURHEIGHT</td>
+                      <td>$NTZHEIGHT</td>
+                      <td>$PEERSTOTAL</td>
+                      <td>$PROTOVER</td>
+                      <td>$LASTPEER</td>
                     </tr>
                   </tbody>
                 </table>
@@ -100,23 +102,23 @@
                   <tbody>
                     <tr>
                       <td scope="row">Notarized Height</td>
-                      <td>1458340</td>
+                      <td>$NTZHEIGHT</td>
                     </tr>
                     <tr>
                       <td scope="row">Notarized Blockhash</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce&vout=1&nexturl=txidinfo" class="text-break text-wrap">02ec52149e0ebc3d8c0e33612f6a6da76ceb01d3604cd3a63269c9c14f8b50ce</a></td>
+                      <td>$NTZBLKHASH</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarized Txid</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da&vout=1&nexturl=txidinfo" class="text-break text-wrap">3f6e11d0f210fd2fa2d39359fae3e70ce63cfc78e2cf555b1a84d88eb7eab7da</a></td>
+                      <td><a href="$URL/method/txidinfo?txid=$NTZTXID&height=$NTZTXIDHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
                     </tr>
                     <tr>
                       <td scope="row">Notarization Txid Height</td>
-                      <td>1458354</td>
+                      <td>$NTZTXIDHT</td>
                     </tr>
                     <tr>
                       <td scope="row">Notarization Destination Txid</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6&vout=1&nexturl=txidinfo" class="text-break text-wrap">500a12dd8aab6b82db602f3f8f7f80573f6d4af6be4d9eb96dee0accf4ecf1b6</a></td>
+                      <td>$NTZDESTTXID</td>
                     </tr>
                   </tbody>
                 </table>
@@ -144,27 +146,27 @@
                   <tbody>
                     <tr>
                       <td scope="row">Header</td>
-                      <td>1458356</td>
+                      <td>$BLKHDR</td>
                     </tr>
                     <tr>
                       <td scope="row">Blockhash</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479&vout=1&nexturl=txidinfo" class="text-break text-wrap">09b322ed45c2346316fb7f5bc9fbd7a4e27ea1b4803f68ad4c9649c13f19b479</a></td>
+                      <td>$BLKHASH</td>
                     </tr>
                     <tr>
                       <td scope="row">Prev. Block Hash</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af&vout=1&nexturl=txidinfo" class="text-break text-wrap">08d31454a0f5a05c1cb194d608c803b94ec0012d0257d08102da8e26439d48af</a></td>
+                      <td>$PREVBLKHASH</td>
                     </tr>
                     <tr>
                       <td scope="row">Merkle Root Hash</td>
-                      <td><a href="http://127.0.0.1:7771/method/spentinfo?txid=26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16&vout=1&nexturl=txidinfo" class="text-break text-wrap">26123db79cfa63d79e92a375271349e4ba4e0a6d9eddf3fc2044572d29045a16</a></td>
+                      <td>$MERKLEHASH</td>
                     </tr>
                     <tr>
                       <td scope="row">nTime</td>
-                      <td>1564069327</td>
+                      <td>$NTIME</td>
                     </tr>
                     <tr>
                       <td scope="row">nBits</td>
-                      <td>486605795</td>
+                      <td>$NBITS</td>
                     </tr>
                   </tbody>
                 </table>
@@ -182,10 +184,10 @@
             </div>
             <div class="card-body">
               <!-- login form start -->
-              <form action="http://127.0.0.1:7771/method/broadcast" method="get">
+              <form action="$URL/method/broadcast" method="get">
                 <div class="form-group">
                   <label for="nspv_hexstring">Hex string</label>
-                  <input type="password" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
+                  <input type="text" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="Input hex string here">
                   <small id="nspvWifHelp" class="form-text text-muted">You can broadcast a transaction to network without login if you have the transaction hex made through other source.</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Broadcast Transaction</button>
