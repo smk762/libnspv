@@ -330,6 +330,17 @@ def test_spentinfo_call():
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
 
 
+def test_faucetinfo():
+    """Not implemented call yet"""
+    print("testing faucetget call")
+    rpc_call = call.nspv_faucetget
+    call.assert_error(rpc_call)
+
+
+def test_gettransaction():
+    pass
+
+
 def test_autologout():
     """Wif should expeire in 777 seconds"""
     print("testing auto logout")
@@ -342,3 +353,4 @@ def test_autologout():
     rpc_call = call.nspv_spend(addr_send, 0.001)
     call.assert_error(rpc_call)
     print("all tests are finished")
+
