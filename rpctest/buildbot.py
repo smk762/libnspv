@@ -13,7 +13,7 @@ def main():
 #    dirpath = os.path.basename(os.getcwd())
     print("/usr/bin/nohup", "./nspv", "ILN")
 #    with daemon.DaemonContext():
-    sub.Popen(["./nspv", "ILN"], shell=True)
+    sub.Popen(["./nspv ILN"], shell=True)
     time.sleep(5)  # give nspv 5 sec to connect nodes
 
 
