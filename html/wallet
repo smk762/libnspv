@@ -46,11 +46,11 @@
             <div class="card-header"> <!-- wallet mempool transactions card header start -->
               <div class="row">
                 <div class="col-md-6 col-sm-6 col-xs-6">
-                  <h6 class="card-title">Mempool Transactions</h6>
+                  <h6 class="card-title">Unconfirmed Transactions</h6>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- mempool transactions reresh button form start -->
-                    <button class="btn btn-outline-light btn-sm" formaction="$URL/method/wallet?nexturl=wallet" formmethod="get">Update</button>
+                    <a class="btn btn-outline-light btn-sm" href="$URL/method/wallet?nexturl=wallet&update=1">Update</a>
                   </form> <!-- mempool transactions reresh button form end -->
                 </div>
               </div>
@@ -86,7 +86,7 @@
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- tx history reresh button form start -->
-                    <button class="btn btn-outline-light btn-sm" formaction="$URL/method/wallet?nexturl=wallet" formmethod="get">Refresh</button>
+                    <a class="btn btn-outline-light btn-sm" href="$URL/method/wallet?nexturl=wallet&refresh=1" formmethod="get">Refresh</a>
                   </form> <!-- tx history reresh button form end -->
                 </div>
               </div>
