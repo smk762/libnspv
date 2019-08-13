@@ -68,7 +68,7 @@ def setup_module():
 def test_help_call():
     """ Response should contain "result": "success"
         Response should contain actual help data"""
-    print("testing help call")
+    print('\n', "testing help call")
     rpc_call = call.nspv_help()
     if not rpc_call:
         pytest.exit("Can't connect daemon")
@@ -78,7 +78,7 @@ def test_help_call():
 
 def test_getpeerinfo_call():
     """Response should not be empty, at least one node should be in sync"""
-    print("testing peerinfo call, checking peers status")
+    print('\n', "testing peerinfo call, checking peers status")
     rpc_call = call.type_convert(call.nspv_getpeerinfo())
     if not rpc_call[0]:
         raise Exception("Empty response :", rpc_call)
@@ -87,7 +87,7 @@ def test_getpeerinfo_call():
 
 def test_check_balance():
     """Check if wif given has actual balance to perform further tests"""
-    print("Checking wif balance")
+    print('\n', "Checking wif balance")
     call.nspv_login(wif_real)
     res = call.type_convert(call.nspv_listunspent())
     amount = res.get("balance")
@@ -100,7 +100,7 @@ def test_check_balance():
 def test_getinfo_call():
     """ Response should contain "result": "success"
         Response should contain actual data"""
-    print("testing getinfo call")
+    print('\n', "testing getinfo call")
     rpc_call = call.nspv_getinfo()
     call.assert_success(rpc_call)
     call.assert_contains(rpc_call, "notarization")
@@ -110,7 +110,7 @@ def test_getinfo_call():
 def test_hdrsproof_call():
     """ Response should be successful for case 2 and fail for others
         Response should contain actual headers"""
-    print("testing hdrsproof call")
+    print('\n', "testing hdrsproof call")
     prevheight = [False, chain_params.get(coin).get("hdrs_proof_low")]
     nextheight = [False, chain_params.get(coin).get("hdrs_proof_high")]
 
@@ -132,7 +132,7 @@ def test_hdrsproof_call():
 def test_notarization_call():
     """ Response should be successful for case 2
      Successful response should contain prev and next notarizations data"""
-    print("testing notarization call")
+    print('\n', "testing notarization call")
     height = [False, chain_params.get(coin).get("notarization_height")]
 
     # Case 1 - False data
@@ -148,7 +148,7 @@ def test_notarization_call():
 
 def getnewaddress_call():
     """ Get a new address, save it for latter calls"""
-    print("testing getnewaddr call")
+    print('\n', "testing getnewaddr call")
     rpc_call = call.nspv_getnewaddress()
     call.assert_contains(rpc_call, "wifprefix")
     call.assert_contains(rpc_call, "wif")
@@ -159,7 +159,7 @@ def getnewaddress_call():
 def test_login_call():
     """"login with fresh credentials
         Response should contain address, address should be equal to generated earlier one"""
-    print("testing log in call")
+    print('\n', "testing log in call")
     global logged_address
     rpc_call = call.nspv_getnewaddress()
     rep = call.type_convert(rpc_call)
@@ -178,7 +178,7 @@ def test_login_call():
 def test_listtransactions_call():
     """"Successful response should [not] contain txids and same address as requested
         Case 1 - False data, user is logged in - should not print txids for new address"""
-    print("testing listtransactions call")
+    print('\n', "testing listtransactions call")
     call.nspv_logout()
     real_addr = chain_params.get(coin).get("tx_list_address")
 
@@ -212,7 +212,7 @@ def test_listtransactions_call():
 
 def test_litunspent_call():
     """ Successful response should [not] contain utxos and same address as requested"""
-    print("testing listunspent call")
+    print('\n', "testing listunspent call")
     call.nspv_logout()
     real_addr = chain_params.get(coin).get("tx_list_address")
 
@@ -246,7 +246,7 @@ def test_litunspent_call():
 
 def test_spend_call():
     """Successful response should contain tx and transaction hex"""
-    print("testing spend call")
+    print('\n', "testing spend call")
     amount = [False, 0.001]
     address = [False, addr_send]
 
@@ -271,7 +271,7 @@ def test_spend_call():
 
 def test_broadcast_call():
     """Successful broadcasst should have equal hex broadcasted and expected"""
-    print("testing broadcast call")
+    print('\n', "testing broadcast call")
     call.nspv_logout()
     call.nspv_login(wif_real)
     rpc_call = call.nspv_spend(addr_send, 0.001)
@@ -302,7 +302,7 @@ def test_broadcast_call():
 
 def test_mempool_call():
     """ Response should contain txids"""
-    print("testing mempool call")
+    print('\n', "testing mempool call")
     rpc_call = call.nspv_mempool()
     call.assert_success(rpc_call)
     call.assert_contains(rpc_call, "txids")
@@ -310,7 +310,7 @@ def test_mempool_call():
 
 def test_spentinfo_call():
     """Successful response sould contain same txid and same vout"""
-    print("testing spentinfo call")
+    print('\n', "testing spentinfo call")
     r_txids = [False, chain_params.get(coin).get("tx_proof_id")]
     r_vouts = [False, 1]
 
@@ -330,9 +330,23 @@ def test_spentinfo_call():
         raise AssertionError("Unxepected vout: ", r_vouts[1], vout_resp)
 
 
+def test_faucetinfo():
+    """Not implemented call yet"""
+    print('\n', "testing faucetget call")
+    rpc_call = call.nspv_faucetget()
+    call.assert_error(rpc_call)
+
+
+def test_gettransaction():
+    """Not implemented yet"""
+    print('\n', "testing gettransaction call")
+    rpc_call = call.nspv_gettransaction()
+    call.assert_error(rpc_call)
+
+
 def test_autologout():
     """Wif should expeire in 777 seconds"""
-    print("testing auto logout")
+    print('\n', "testing auto logout")
     rpc_call = call.nspv_getnewaddress()
     rep = call.type_convert(rpc_call)
     wif = rep.get('wif')
@@ -341,4 +355,11 @@ def test_autologout():
     time.sleep(778)
     rpc_call = call.nspv_spend(addr_send, 0.001)
     call.assert_error(rpc_call)
-    print("all tests are finished")
+
+
+def test_stop():
+    """Stop nspv process after tests"""
+    print('\n', "stopping nspv process")
+    rpc_call = call.nspv_stop()
+    call.assert_success(rpc_call)
+    print('\n', "all tests are finished")
