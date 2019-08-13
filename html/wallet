@@ -40,6 +40,42 @@
         </div> <!-- coin info div end -->
       </div>
 
+      <div class="row justify-content-center" style="margin-bottom: 1em;"> <!-- wallet mempool transactions section start -->
+        <div class="col-12"> <!-- wallet mempool transactions column start -->
+          <div class="card text-white bg-dark"> <!-- wallet mempool transactions card start -->
+            <div class="card-header"> <!-- wallet mempool transactions card header start -->
+              <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                  <h6 class="card-title">Mempool Transactions</h6>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                  <form> <!-- mempool transactions reresh button form start -->
+                    <button class="btn btn-outline-light btn-sm" formaction="$URL/method/wallet?nexturl=wallet" formmethod="get">Update</button>
+                  </form> <!-- mempool transactions reresh button form end -->
+                </div>
+              </div>
+            </div> <!-- wallet mempool transactions card header end -->
+            <div class="card-body" style="padding: 0;"> <!-- wallet mempool transactions card body start -->
+              <form> <!-- mempool transactions table form start -->
+                <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                  <thead>
+                    <tr>
+                      <th scope="col-md">Type</th>
+                      <th scope="col-md">Dest. Addr.</th>
+                      <th scope="col-md">Amount</th>
+                      <th scope="col-md">TxID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    $MEMP_ROW_ARRAY
+                  </tbody>
+                </table>
+              </form> <!-- mempool transactions table form end -->
+            </div> <!-- wallet mempool transactions card body end -->
+          </div> <!-- wallet mempool transactions card end -->
+        </div> <!-- wallet mempool transactions column end -->
+      </div> <!-- wallet transactions history section end -->
+
       <div class="row justify-content-center"> <!-- wallet transactions history section start -->
         <div class="col-12"> <!-- wallet transactions history column start -->
           <div class="card text-white bg-dark"> <!-- wallet card start -->
