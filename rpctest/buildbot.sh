@@ -7,6 +7,4 @@
 # 3. wait 4 seconds for tests to start and write log to stdout with tail
 ./nspv ILN &>./testnspv.log &
 sleep 10  \
-&&  /usr/bin/python3 -m pytest rpctest/test_nspv.py -s &>./pytest.log &
-sleep 5 \
-&& tail -f ./pytest.log
+&&  /usr/bin/python3 -m pytest rpctest/test_nspv.py -s | tee ./pytest.log
