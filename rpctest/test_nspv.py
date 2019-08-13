@@ -358,8 +358,8 @@ def test_autologout():
 
 
 def test_stop():
-    """Stop nspv daemon after tests"""
-    print("stoping nspv process")
+    """Stop nspv process after tests"""
+    print("stopping nspv process")
     rpc_call = call.nspv_stop
     call.assert_success(rpc_call)
     print("all tests are finished")
