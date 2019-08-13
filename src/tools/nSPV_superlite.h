@@ -1672,11 +1672,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             {
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
-                    strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
+                    strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
                     satoshis = 0;
                     sprintf(replacestr,"%.8f",dstr(satoshis));
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
                     bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TXID",replacestr);
