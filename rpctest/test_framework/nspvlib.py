@@ -226,14 +226,14 @@ class NspvRpcCalls:
         time.sleep(1)
         return r.content
 
-    def nspv_faucetinfo(self):
+    def nspv_faucetget(self):
         params = {'userpass': self.user_pass,
                   'method': 'faucetget'}
         r = requests.post(self.node_ip, json=params)
         time.sleep(1)
         return r.content
 
-    def nspv_gettransaction(self, hash, vout, height):
+    def nspv_gettransaction(self, hash="", vout="", height=""):
         params = {'userpass': self.user_pass,
                   'method': 'gettransaction'}
         if hash:
