@@ -1650,10 +1650,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     if ( strcmp(method,"wallet") == 0 )
     {
         if ( jint(argjson,"update") != 0 )
-        {
-            if ( (retjson= NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0)) != 0 )
-                free_json(retjson);
-        }
+            NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
         else
         {
             if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
