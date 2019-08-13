@@ -624,6 +624,12 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
         *jsonflagp = 1;
         if ( (filestr= OS_filestr(&filesize,"html/index")) == 0 )
             return(clonestr("{\"error\":\"cant find index\"}"));
+        fprintf(stderr,"got index request %p\n",(void *)filestr);
+        argjson = cJSON_CreateObject();
+        jaddstr(argjson,"method","index");
+        retstr = NSPV_JSON(argjson,remoteaddr,port,filestr,apiflag);
+        free_json(argjson);
+        return(retstr);
         //else return(filestr);
     }
     else
