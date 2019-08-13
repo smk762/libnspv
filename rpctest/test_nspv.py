@@ -333,7 +333,7 @@ def test_spentinfo_call():
 def test_faucetinfo():
     """Not implemented call yet"""
     print("testing faucetget call")
-    rpc_call = call.nspv_faucetget
+    rpc_call = call.nspv_faucetget()
     call.assert_error(rpc_call)
 
 
@@ -360,6 +360,6 @@ def test_autologout():
 def test_stop():
     """Stop nspv process after tests"""
     print("stopping nspv process")
-    rpc_call = call.nspv_stop
+    rpc_call = call.nspv_stop()
     call.assert_success(rpc_call)
     print("all tests are finished")
