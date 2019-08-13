@@ -1308,7 +1308,6 @@ void *NSPV_rpcloop(void *args)
                 while ( (bindsock= iguana_socket(1,NSPV_externalip,port)) < 0 )
                     usleep(10000);
             }
-        }
 #ifndef _WIN32
             //fcntl(bindsock, F_SETFL, fcntl(bindsock, F_GETFL, 0) | O_NONBLOCK);
 #endif

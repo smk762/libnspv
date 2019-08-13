@@ -29,6 +29,7 @@
 #include <btc/utils.h>
 #include <btc/base58.h>
 
+extern char *NSPV_externalip;
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
 cJSON *NSPV_txproof(int32_t waitflag,btc_spv_client *client,int32_t vout,bits256 txid,int32_t height);
 void expand_ipbits(char *ipaddr,uint64_t ipbits);
