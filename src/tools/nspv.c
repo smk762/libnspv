@@ -263,7 +263,7 @@ int main(int argc, char* argv[])
         case 'x':
             if ( optarg != 0 )
             {
-                NSPV_externalip = clonestr(optarg);
+                NSPV_externalip = clonestr(optarg+1);
                 fprintf(stderr,"set external ip to %s\n",NSPV_externalip);
             }
             break;
