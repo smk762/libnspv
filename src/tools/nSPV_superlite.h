@@ -1842,7 +1842,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
     NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
-    sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
+    sprintf(replacestr,"http://%s:%u",NSPV_externalip,NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_balance));
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);

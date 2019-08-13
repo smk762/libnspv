@@ -1291,20 +1291,20 @@ void *NSPV_rpcloop(void *args)
     if ( (port= *(uint16_t *)args) == 0 )
         port = 7889;
     printf("Start NSPV_rpcloop.%u\n",port);
-    localhostbits = (uint32_t)calc_ipbits("127.0.0.1");
+    localhostbits = (uint32_t)calc_ipbits(NSPV_externalip);
     //initial_bindsock_reset = LP_bindsock_reset;
     while ( NSPV_STOP_RECEIVED == 0 )//LP_bindsock_reset == initial_bindsock_reset )
     {
         //printf("LP_bindsock.%d\n",LP_bindsock);
         if ( bindsock < 0 )
         {
-            while ( (bindsock= iguana_socket(1,"0.0.0.0",port)) < 0 )
+            while ( (bindsock= iguana_socket(1,NSPV_externalip,port)) < 0 )
                 usleep(10000);
 #ifndef _WIN32
             //fcntl(bindsock, F_SETFL, fcntl(bindsock, F_GETFL, 0) | O_NONBLOCK);
 #endif
             //if ( counter++ < 1 )
-            printf(">>>>>>>>>> NSPV_rpcloop 127.0.0.1:%d bind sock.%d API enabled at unixtime.%u <<<<<<<<<\n",port,bindsock,(uint32_t)time(NULL));
+            printf(">>>>>>>>>> NSPV_rpcloop %s:%d bind sock.%d API enabled at unixtime.%u <<<<<<<<<\n",NSPV_externalip,port,bindsock,(uint32_t)time(NULL));
         }
         //printf("after sock.%d\n",sock);
         clilen = sizeof(cli_addr);
