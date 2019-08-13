@@ -4,6 +4,7 @@
 set -ev
 
 echo "Preparing libnspv build"
+make clean
 ./autogen.sh
 ./configure
 make
