@@ -1660,7 +1660,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         }
         retjson = 0;
         char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
-        if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == 0 && (origitemstr= OS_filestr(&fsize,"wallet_mempool_table_row.inc")) != 0 )
+        if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,NSPV_address) == 0 && NSPV_mempoolresult.CCflag == 0 && (origitemstr= OS_filestr(&fsize,"wallet_mempool_table_row.inc")) != 0 )
         {
             itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
             // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
