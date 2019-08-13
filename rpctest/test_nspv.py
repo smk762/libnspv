@@ -355,4 +355,11 @@ def test_autologout():
     time.sleep(778)
     rpc_call = call.nspv_spend(addr_send, 0.001)
     call.assert_error(rpc_call)
+
+
+def test_stop():
+    """Stop nspv daemon after tests"""
+    print("stoping nspv process")
+    rpc_call = call.nspv_stop
+    call.assert_success(rpc_call)
     print("all tests are finished")
