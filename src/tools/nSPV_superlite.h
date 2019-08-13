@@ -1675,10 +1675,17 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $MEMP_TXID - Transaction ID
     if ( strcmp(method,"wallet") == 0 )
     {
-        if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
-            free_json(retjson);
-        if ( (retjson= NSPV_addressutxos(1,NSPV_client,NSPV_address,0,0,0)) != 0 )
-            free_json(retjson);
+        if ( jint(argjson,"update") != 0 )
+        {
+            fprintf(stderr,"update path, query mempool\n");
+        }
+        else
+        {
+            if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+                free_json(retjson);
+            if ( (retjson= NSPV_addressutxos(1,NSPV_client,NSPV_address,0,0,0)) != 0 )
+                free_json(retjson);
+        }
         char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
         if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
         {
