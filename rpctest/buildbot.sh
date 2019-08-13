@@ -8,5 +8,5 @@
 ./nspv ILN &>./testnspv.log &
 sleep 10  \
 &&  /usr/bin/python3 -m pytest rpctest/test_nspv.py -s &>./pytest.log &
-sleep 4 \
+sleep 5 \
 && tail -f ./pytest.log
