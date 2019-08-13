@@ -1667,6 +1667,12 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
     // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
     // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
+    // 
+    // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
+    // $MEMP_TYPE - Type
+    // $MEMP_DEST - Destination Address
+    // $MEMP_AMOUNT - Amount sent in this transaction
+    // $MEMP_TXID - Transaction ID
     if ( strcmp(method,"wallet") == 0 )
     {
         if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
@@ -1808,6 +1814,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+
+    // == Error page variable ==
+    // $ERROR_OUTPUT - use it for displaying any error
 
     free(bigbuf);
     return(filestr);
