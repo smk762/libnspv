@@ -1647,37 +1647,12 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         }
     }
 
-    // == Wallet page array variables ==
-    // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
-    //
-    // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
-    // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
-    // $TXHIST_CONFIRMS - Confirmations
-    // $TXHIST_AMOUNT - Amount
-    // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
-    // $TXHIST_DESTADDDR - Destination address
-    // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
-    // Transactions History table HTML tags variables to use in
-    // conditional logic in displaying table rows and columns
-    //
-    // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
-    // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
-    // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
-    // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
-    // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
-    // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
-    // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
-    // 
-    // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
-    // $MEMP_TYPE - Type
-    // $MEMP_DEST - Destination Address
-    // $MEMP_AMOUNT - Amount sent in this transaction
-    // $MEMP_TXID - Transaction ID
     if ( strcmp(method,"wallet") == 0 )
     {
         if ( jint(argjson,"update") != 0 )
         {
-            fprintf(stderr,"update path, query mempool\n");
+            if ( (retjson= NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0)) != 0 )
+                free_json(retjson);
         }
         else
         {
@@ -1686,9 +1661,64 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             if ( (retjson= NSPV_addressutxos(1,NSPV_client,NSPV_address,0,0,0)) != 0 )
                 free_json(retjson);
         }
+        retjson = 0;
         char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
+        if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == 0 && (origitemstr= OS_filestr(&fsize,"wallet_mempool_table_row.inc")) != 0 )
+        {
+            itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
+            // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
+            // $MEMP_TYPE - Type
+            // $MEMP_DEST - Destination Address
+            // $MEMP_AMOUNT - Amount sent in this transaction
+            // $MEMP_TXID - Transaction ID
+            for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
+            {
+                if ( (itemstr= clonestr(origitemstr)) != 0 )
+                {
+                    strcpy(replacestr,"<span class=\"badge badge-danger\">OUT</span>");
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
+                    satoshis = 0;
+                    sprintf(replacestr,"%.8f",dstr(satoshis));
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
+                    bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TXID",replacestr);
+                    strcat(itemsbuf,itemstr);
+                    itembuf[0] = 0;
+                    free(itemstr);
+                }
+            }
+            NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY",itemsbuf);
+            didflag = 1;
+            free(itemsbuf);
+            free(origitemstr);
+        }
+        if ( didflag == 0 )
+            NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY","");
+        didflag = 0;
         if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
         {
+            // == Wallet page array variables ==
+            // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
+            //
+            // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
+            // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
+            // $TXHIST_CONFIRMS - Confirmations
+            // $TXHIST_AMOUNT - Amount
+            // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
+            // $TXHIST_DESTADDDR - Destination address
+            // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
+            // Transactions History table HTML tags variables to use in
+            // conditional logic in displaying table rows and columns
+            //
+            // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
+            // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
+            // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
+            // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
+            // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
+            // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
+            // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
+            //
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
                 itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
