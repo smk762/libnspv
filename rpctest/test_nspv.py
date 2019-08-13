@@ -27,6 +27,7 @@ def setup_module():
 
     wif_real = test_setup.get("wif")
     addr_send = test_setup.get("address")
+    coin = test_setup.get("chain")
 
     if not addr_send or not wif_real:
         pytest.exit("Please check test wif and address in test_setup.txt")
@@ -75,7 +76,6 @@ def setup_module():
                             }
                     }
     userpass = "userpass"
-    coin = "HUSH"
     url = "http://127.0.0.1:" + chain_params.get(coin).get("port")
     call = NRC(url, userpass)
     call.nspv_logout()
