@@ -1809,6 +1809,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
 
+    // == Error page variable ==
+    // $ERROR_OUTPUT - use it for displaying any error
+
     free(bigbuf);
     return(filestr);
 }
