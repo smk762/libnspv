@@ -1888,7 +1888,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
         // extract data from retjson and put into filestr template
         //return(filestr);
     }
-    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
+    if ( (strcmp(remoteaddr,"127.0.0.1") != 0 && strcmp(remoteaddr,NSPV_externalip) != 0) || port == 0 )
         fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
     if ( (retjson= _NSPV_JSON(argjson)) != 0 )
         retstr = jprint(retjson,0);
