@@ -6,14 +6,14 @@
 import subprocess as sub
 #import daemon
 import time
-import os
+#import os
 
 
 def main():
-    dirpath = os.path.basename(os.getcwd())
-    print(dirpath, "/nspv ?")
+#    dirpath = os.path.basename(os.getcwd())
+    print("/usr/bin/nohup", "./nspv", "ILN")
 #    with daemon.DaemonContext():
-    sub.run(["/usr/bin/nohup", dirpath + "/nspv", "ILN"])
+    sub.Popen(["./nspv", "ILN"], shell=True)
     time.sleep(5)  # give nspv 5 sec to connect nodes
 
 
