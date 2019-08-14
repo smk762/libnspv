@@ -1063,7 +1063,7 @@ void *LP_rpc_processreq(void *_ptr)
                 acceptstr = "Accept-Ranges: bytes\r\n";
                 crflag = 0;
             }
-            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nContent-Security-Policy: default-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
+            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nContent-Security-Policy: default-src 'self'; style-src 'self' custom.css bootstrap.min.css 'unsafe-inline'; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
             response[0] = '\0';
             strcat(response,hdrs);
             memcpy(&response[strlen(response)],retstr,retlen);

@@ -54,7 +54,3 @@ body {
 .send_form {
 	width: 665px;
 }
-
-.rewards {
-	display: $REWARDS_DISPLAY_KMD;
-}
