@@ -40,7 +40,7 @@ int32_t NSPV_didfirsttxproofs;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
-int64_t NSPV_balance,NSPV_rewards;
+int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
 
 btc_key NSPV_key;
 btc_pubkey NSPV_pubkey;
@@ -202,6 +202,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
         cstr_free(request, true);
         //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
         node->prevtimes[ind] = timestamp;
+        NSPV_totalsent += len;
         return(node);
     } else fprintf(stderr,"no nodes\n");
     return(0);
@@ -279,6 +280,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
     strcpy(NSPV_lastpeer,from->ipaddr);
     if ( len > 0 )
     {
+        NSPV_totalrecv += len;
         switch ( response[0] )
         {
             case NSPV_INFORESP:
@@ -861,6 +863,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     NSPV_logout();
     if ( strlen(wifstr) < 64 && (sz= btc_base58_decode_check(wifstr,data,sizeof(data))) > 0 && ((sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1)) )
         valid = 1;
+    // if error, treat as seed, also get remote working, html needs to use -p=port
     if ( valid == 0 || data[0] != chain->b58prefix_secret_address )
     {
         jaddstr(result,"result","error");
@@ -1651,7 +1654,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     if ( strcmp(method,"wallet") == 0 )
     {
         if ( jint(argjson,"update") != 0 )
-            NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
+        {
+            if ( NSPV_address[0] != 0 )
+                NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
+        }
         else
         {
             if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
@@ -1676,7 +1682,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
-                    satoshis = 0;
+                    iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)NSPV_mempoolresult.txid.bytes);
                     sprintf(replacestr,"%.8f",dstr(satoshis));
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
                     bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
