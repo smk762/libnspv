@@ -859,7 +859,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 
 cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
-    cJSON *result = cJSON_CreateObject(); char coinaddr[64],_wifstr[8192],wif2[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2;
+    cJSON *result = cJSON_CreateObject(); char coinaddr[64],wif2[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2;
     NSPV_logout();
     memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
     NSPV_logintime = (uint32_t)time(NULL);
@@ -874,8 +874,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         jaddnum(result,"wifprefix",(int64_t)data[0]);
         jaddnum(result,"expected",(int64_t)chain->b58prefix_secret_address);
         return(result);*/
-        strncpy(_wifstr,wifstr,sizeof(_wifstr)-1);
-        wifstr = wif2;//NSPV_seed_to_wif(wif2,_wifstr);
+        wifstr = NSPV_seed_to_wif(wif2,wifstr);
     }
     if ( strcmp(NSPV_wifstr,wifstr) != 0 )
     {
@@ -884,12 +883,10 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         {
             jaddstr(result,"wiferror","couldnt decode wif");
             memset(wif2,0,sizeof(wif2));
-            memset(_wifstr,0,sizeof(_wifstr));
             return(result);
         }
     }
     memset(wif2,0,sizeof(wif2));
-    memset(_wifstr,0,sizeof(_wifstr));
     jaddstr(result,"result","success");
     jaddstr(result,"status","wif will expire in 777 seconds");
     btc_pubkey_from_key(&NSPV_key,&NSPV_pubkey);
@@ -1176,7 +1173,11 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( wifstr == 0 )
             return(cJSON_Parse("{\"error\":\"no wif\"}"));
-        else return(NSPV_login(NSPV_chain,wifstr));
+        else
+        {
+            retjson = NSPV_login(NSPV_chain,wifstr);
+            memset(wifstr,0,strlen(wifstr));
+        }
     }
     else if ( strcmp(method,"getnewaddress") == 0 )
         return(NSPV_getnewaddress(NSPV_chain));

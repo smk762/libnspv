@@ -77,6 +77,14 @@ btc_chainparams iln_chainparams_main =
     1,1,0,
 };*/
 
+char *NSPV_seed_to_wif(char *wif,char *seed)
+{
+    bits256 privkey,pub;
+    conv_NXTpassword(privkey.bytes,pub.bytes,(uint8_t *)seed,(int32_t)strlen(seed));
+    privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
+    return(wif)
+}
+
 char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;
