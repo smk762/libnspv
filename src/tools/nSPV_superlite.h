@@ -385,7 +385,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_MEMPOOLRESP:
                 NSPV_mempoolresp_purge(&NSPV_mempoolresult);
                 NSPV_rwmempoolresp(0,&response[1],&NSPV_mempoolresult);
-                fprintf(stderr,"got mempool response %u size.%d (%s) CC.%d num.%d memfunc.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.memfunc,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
+                fprintf(stderr,"got mempool response %s %u size.%d (%s) CC.%d num.%d memfunc.%d %s/v%d\n",from->ipaddr,timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.memfunc,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
                 break;
             case NSPV_NTZSRESP:
                 NSPV_ntzsresp_purge(&NSPV_ntzsresult);
@@ -636,14 +636,14 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
-    fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
+    //fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[1]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memcmp(&txid,&NSPV_mempoolresult.txid,sizeof(txid)) == 0 && vout == NSPV_mempoolresult.vout && memfunc == NSPV_mempoolresult.memfunc )
+            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memfunc == NSPV_mempoolresult.memfunc )
                 return(NSPV_mempoolresp_json(&NSPV_mempoolresult));
         }
     } else sleep(1);
@@ -658,13 +658,13 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
     NSPV_mempooltxids(client,coinaddr,CCflag,NSPV_MEMPOOL_ADDRESS,zeroid,-1);
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == CCflag )
     {
-        fprintf(stderr,"found (%s) vout in mempool\n",coinaddr);
+        char str[65]; fprintf(stderr,"found (%s) vout in mempool %s\n",coinaddr,bits256_str(str,NSPV_mempoolresult.txids[0]));
         if ( logcategory != 0 )
         {
             // add to logfile
         }
-        return(true);
-    } else return(false);
+        return(1);
+    } else return(0);
 }
 
 bool NSPV_spentinmempool(btc_spv_client *client,bits256 *spenttxidp,int32_t *spentvinip,bits256 txid,int32_t vout)
@@ -1675,10 +1675,47 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
 
     if ( strcmp(method,"wallet") == 0 )
     {
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
         if ( jint(argjson,"update") != 0 )
         {
             if ( NSPV_address[0] != 0 )
+            {
                 NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
+                if ( (origitemstr= OS_filestr(&fsize,"html/wallet_mempool_table_row.inc")) != 0 )
+                {
+                    fprintf(stderr,"inside loop with %d mempool\n",NSPV_mempoolresult.numtxids);
+                    itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
+                    // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
+                    // $MEMP_TYPE - Type
+                    // $MEMP_DEST - Destination Address
+                    // $MEMP_AMOUNT - Amount sent in this transaction
+                    // $MEMP_TXID - Transaction ID
+                    iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)NSPV_mempoolresult.txid.bytes);
+                    for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
+                    {
+                        if ( i < NSPV_mempoolresult.numtxids-1000 )
+                            break;
+                        if ( (itemstr= clonestr(origitemstr)) != 0 )
+                        {
+                            strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
+                            sprintf(replacestr,"%.8f",dstr(satoshis));
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
+                            bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TXID",replacestr);
+                            strcat(itemsbuf,itemstr);
+                            itembuf[0] = 0;
+                            free(itemstr);
+                        }
+                        satoshis = 0;
+                    }
+                    NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY",itemsbuf);
+                    didflag = 1;
+                    free(itemsbuf);
+                    free(origitemstr);
+                }
+            }
         }
         else
         {
@@ -1688,40 +1725,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 free_json(retjson);
         }
         retjson = 0;
-        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
-        if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,NSPV_address) == 0 && NSPV_mempoolresult.CCflag == 0 && (origitemstr= OS_filestr(&fsize,"wallet_mempool_table_row.inc")) != 0 )
-        {
-            itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
-            // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
-            // $MEMP_TYPE - Type
-            // $MEMP_DEST - Destination Address
-            // $MEMP_AMOUNT - Amount sent in this transaction
-            // $MEMP_TXID - Transaction ID
-            iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)NSPV_mempoolresult.txid.bytes);
-            for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
-            {
-                if ( i < NSPV_mempoolresult.numtxids-1000 )
-                    break;
-                if ( (itemstr= clonestr(origitemstr)) != 0 )
-                {
-                    strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
-                    sprintf(replacestr,"%.8f",dstr(satoshis));
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
-                    bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TXID",replacestr);
-                    strcat(itemsbuf,itemstr);
-                    itembuf[0] = 0;
-                    free(itemstr);
-                }
-                satoshis = 0;
-            }
-            NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY",itemsbuf);
-            didflag = 1;
-            free(itemsbuf);
-            free(origitemstr);
-        }
         if ( didflag == 0 )
             NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY","");
         didflag = 0;
