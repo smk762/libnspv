@@ -48,6 +48,38 @@
         </div> <!-- coin info div end -->
       </div>
 
+      <div class="row">
+        <div class="col-md-6 col-sm-12 pr-sm-1" style="margin-bottom: 1em;">
+          <div class="card text-white bg-dark">
+            <div class="card-header">
+              <h5>Tx - vin</h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                <tbody>
+                  $SEND_TXVIN_ARRAY
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-12 pl-sm-1" style="margin-bottom: 1em;">
+          <div class="card text-white bg-dark">
+            <div class="card-header">
+              <h5>Tx - vout</h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                <tbody>
+                  $SEND_TXVOUT_ARRAY
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="row" style="margin-bottom: 1em;">
         <div class="col-12" style="padding-right: 7.5px; margin-bottom: 10px;"> <!-- TxidInfo div start -->
             <div class="card text-white bg-dark"> <!-- TxidInfo card start -->
@@ -101,38 +133,6 @@
               </div> <!-- TxidInfo body end -->
             </div> <!-- TxidInfo card end -->
         </div> <!-- TxidInfo div end -->
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 col-sm-12 pr-sm-1" style="margin-bottom: 1em;">
-          <div class="card text-white bg-dark">
-            <div class="card-header">
-              <h5>Tx - vin</h5>
-            </div>
-            <div class="card-body" style="padding: 0;">
-              <table class="table table-striped table-dark" style="margin-bottom: 0;">
-                <tbody>
-                  $SEND_TXVIN_ARRAY
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-sm-12 pl-sm-1" style="margin-bottom: 1em;">
-          <div class="card text-white bg-dark">
-            <div class="card-header">
-              <h5>Tx - vout</h5>
-            </div>
-            <div class="card-body" style="padding: 0;">
-              <table class="table table-striped table-dark" style="margin-bottom: 0;">
-                <tbody>
-                  $SEND_TXVOUT_ARRAY
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   
