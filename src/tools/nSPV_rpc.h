@@ -635,7 +635,7 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflag);
     else
     {
         int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
-        strcpy(cmpstr,&url[i]);
+        strncpy(cmpstr,&url[i],sizeof(cmpstr)-1);
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
