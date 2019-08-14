@@ -385,7 +385,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_MEMPOOLRESP:
                 NSPV_mempoolresp_purge(&NSPV_mempoolresult);
                 NSPV_rwmempoolresp(0,&response[1],&NSPV_mempoolresult);
-                fprintf(stderr,"got mempool response %u size.%d (%s) CC.%d num.%d memfunc.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.memfunc,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
+                fprintf(stderr,"got mempool response %s %u size.%d (%s) CC.%d num.%d memfunc.%d %s/v%d\n",from->ipaddr,timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.memfunc,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
                 break;
             case NSPV_NTZSRESP:
                 NSPV_ntzsresp_purge(&NSPV_ntzsresult);
@@ -636,14 +636,14 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
-    fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
+    //fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[1]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memcmp(&txid,&NSPV_mempoolresult.txid,sizeof(txid)) == 0 && vout == NSPV_mempoolresult.vout && memfunc == NSPV_mempoolresult.memfunc )
+            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memfunc == NSPV_mempoolresult.memfunc )
                 return(NSPV_mempoolresp_json(&NSPV_mempoolresult));
         }
     } else sleep(1);
