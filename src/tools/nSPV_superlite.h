@@ -876,6 +876,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         return(result);*/
         privkey = NSPV_seed_to_wif(wifstr);
         memcpy(NSPV_key.privkey,privkey.bytes,sizeof(privkey));
+        char str[65]; fprintf(stderr,"seed.(%s) -> %s\n",wifstr,bits256_str(str,privkey));
         btc_privkey_decode_wif(wif2,chain,&NSPV_key);
         wifstr = wif2;
         memset(&NSPV_key,0,sizeof(NSPV_key));
@@ -902,6 +903,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     jaddstr(result,"pubkey",NSPV_pubkeystr);
     jaddnum(result,"wifprefix",(int64_t)data[0]);
     jaddnum(result,"compressed",(int64_t)(data[sz-5] == 1));
+    fprintf(stderr,"result (%s)\n",jprint(result,0));
     memset(data,0,sizeof(data));
     return(result);
 }

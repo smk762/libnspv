@@ -80,7 +80,7 @@ btc_chainparams iln_chainparams_main =
 bits256 NSPV_seed_to_wif(char *seed)
 {
     bits256 privkey;
-    sha256_Raw(seed,strlen(seed),privkey.bytes);
+    sha256_Raw((uint8_t *)seed,strlen(seed),privkey.bytes);
     privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
     return(privkey);
 }
