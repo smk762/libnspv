@@ -1681,7 +1681,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             if ( NSPV_address[0] != 0 )
             {
                 NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
-                if ( (origitemstr= OS_filestr(&fsize,"wallet_mempool_table_row.inc")) != 0 )
+                if ( (origitemstr= OS_filestr(&fsize,"html/wallet_mempool_table_row.inc")) != 0 )
                 {
                     fprintf(stderr,"inside loop with %d mempool\n",NSPV_mempoolresult.numtxids);
                     itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
@@ -1715,8 +1715,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     free(itemsbuf);
                     free(origitemstr);
                 }
-                if ( didflag == 0 )
-                    NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY","");
             }
         }
         else
@@ -1727,6 +1725,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 free_json(retjson);
         }
         retjson = 0;
+        if ( didflag == 0 )
+            NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY","");
         didflag = 0;
         if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
         {
