@@ -40,7 +40,7 @@ int32_t NSPV_didfirsttxproofs;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
-int64_t NSPV_balance,NSPV_rewards;
+int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
 
 btc_key NSPV_key;
 btc_pubkey NSPV_pubkey;
@@ -202,6 +202,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
         cstr_free(request, true);
         //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
         node->prevtimes[ind] = timestamp;
+        NSPV_totalsent += len;
         return(node);
     } else fprintf(stderr,"no nodes\n");
     return(0);
@@ -279,6 +280,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
     strcpy(NSPV_lastpeer,from->ipaddr);
     if ( len > 0 )
     {
+        NSPV_totalrecv += len;
         switch ( response[0] )
         {
             case NSPV_INFORESP:
