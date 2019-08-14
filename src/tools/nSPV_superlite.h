@@ -658,7 +658,7 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
     NSPV_mempooltxids(client,coinaddr,CCflag,NSPV_MEMPOOL_ADDRESS,zeroid,-1);
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == CCflag )
     {
-        fprintf(stderr,"found (%s) vout in mempool %s\n",coinaddr,bits256_str(str,NSPV_mempoolresult.txids[0]));
+        char str[65]; fprintf(stderr,"found (%s) vout in mempool %s\n",coinaddr,bits256_str(str,NSPV_mempoolresult.txids[0]));
         if ( logcategory != 0 )
         {
             // add to logfile
