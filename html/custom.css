@@ -3,6 +3,10 @@ body {
 	color: #fff;
 }
 
+.logo{
+	width: 25px;
+}
+
 .bg-dark {
 	background-color: #283547 !important;
 }
@@ -45,4 +49,8 @@ body {
 
 .login-hr {
 	border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.send_form {
+	width: 665px;
 }

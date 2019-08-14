@@ -13,8 +13,8 @@
   </head>
   <body>
     <nav class="navbar navbar-dark bg-dark">
-      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
-      <form class="form-row" action="$URL/method/send_confirm" method="get">
+      <a class="navbar-brand"><img src="images/antara150x150.png" class="logo"/> Antara Superlite</a>
+      <form class="form-row send_form" action="$URL/method/send_confirm" method="get">
           <div class="col-lg-6 col-sm-6 col-xs-12">
             <input class="form-control form-control-sm" type="text" placeholder="Address" name="address" aria-label="ToAddress">
           </div>
@@ -85,6 +85,14 @@
                           <div class="col-md-2 col-sm-4 col-xs-12"><b>Peers Connected:</b><br>$PEERSTOTAL</div>
                           <div class="col-md-2 col-sm-4 col-xs-12"><b>Protocol Version:</b><br>$PROTOVER</div>
                           <div class="col-md-2 col-sm-4 col-xs-12"><b>Last Peer:</b><br>$LASTPEER</div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="row">
+                          <div class="col-md-6 col-sm-6 col-xs-12"><b>Network Bytes Received:</b><br>$NETBYTEIN</div>
+                          <div class="col-md-6 col-sm-6 col-xs-12"><b>Network Bytes Sent:</b><br>$NETBYTEOUT</div>
                         </div>
                       </td>
                     </tr>
