@@ -194,7 +194,6 @@ bits256 curve25519(bits256 mysecret,bits256 basepoint)
 #else
 // from curve25519-donna.c
 
-typedef int32_t s32;
 typedef int64_t limb;
 
 /* Multiply a number by a scalar: output = in * scalar */
@@ -458,61 +457,61 @@ static void fmul32(limb *output, const limb *in, const limb *in2)
  *
  * output[x] <= 14 * the largest product of the input limbs. */
 static void fsquare_inner(limb *output, const limb *in) {
-    output[0] =       ((limb) ((s32) in[0])) * ((s32) in[0]);
-    output[1] =  2 *  ((limb) ((s32) in[0])) * ((s32) in[1]);
-    output[2] =  2 * (((limb) ((s32) in[1])) * ((s32) in[1]) +
-                      ((limb) ((s32) in[0])) * ((s32) in[2]));
-    output[3] =  2 * (((limb) ((s32) in[1])) * ((s32) in[2]) +
-                      ((limb) ((s32) in[0])) * ((s32) in[3]));
-    output[4] =       ((limb) ((s32) in[2])) * ((s32) in[2]) +
-    4 *  ((limb) ((s32) in[1])) * ((s32) in[3]) +
-    2 *  ((limb) ((s32) in[0])) * ((s32) in[4]);
-    output[5] =  2 * (((limb) ((s32) in[2])) * ((s32) in[3]) +
-                      ((limb) ((s32) in[1])) * ((s32) in[4]) +
-                      ((limb) ((s32) in[0])) * ((s32) in[5]));
-    output[6] =  2 * (((limb) ((s32) in[3])) * ((s32) in[3]) +
-                      ((limb) ((s32) in[2])) * ((s32) in[4]) +
-                      ((limb) ((s32) in[0])) * ((s32) in[6]) +
-                      2 *  ((limb) ((s32) in[1])) * ((s32) in[5]));
-    output[7] =  2 * (((limb) ((s32) in[3])) * ((s32) in[4]) +
-                      ((limb) ((s32) in[2])) * ((s32) in[5]) +
-                      ((limb) ((s32) in[1])) * ((s32) in[6]) +
-                      ((limb) ((s32) in[0])) * ((s32) in[7]));
-    output[8] =       ((limb) ((s32) in[4])) * ((s32) in[4]) +
-    2 * (((limb) ((s32) in[2])) * ((s32) in[6]) +
-         ((limb) ((s32) in[0])) * ((s32) in[8]) +
-         2 * (((limb) ((s32) in[1])) * ((s32) in[7]) +
-              ((limb) ((s32) in[3])) * ((s32) in[5])));
-    output[9] =  2 * (((limb) ((s32) in[4])) * ((s32) in[5]) +
-                      ((limb) ((s32) in[3])) * ((s32) in[6]) +
-                      ((limb) ((s32) in[2])) * ((s32) in[7]) +
-                      ((limb) ((s32) in[1])) * ((s32) in[8]) +
-                      ((limb) ((s32) in[0])) * ((s32) in[9]));
-    output[10] = 2 * (((limb) ((s32) in[5])) * ((s32) in[5]) +
-                      ((limb) ((s32) in[4])) * ((s32) in[6]) +
-                      ((limb) ((s32) in[2])) * ((s32) in[8]) +
-                      2 * (((limb) ((s32) in[3])) * ((s32) in[7]) +
-                           ((limb) ((s32) in[1])) * ((s32) in[9])));
-    output[11] = 2 * (((limb) ((s32) in[5])) * ((s32) in[6]) +
-                      ((limb) ((s32) in[4])) * ((s32) in[7]) +
-                      ((limb) ((s32) in[3])) * ((s32) in[8]) +
-                      ((limb) ((s32) in[2])) * ((s32) in[9]));
-    output[12] =      ((limb) ((s32) in[6])) * ((s32) in[6]) +
-    2 * (((limb) ((s32) in[4])) * ((s32) in[8]) +
-         2 * (((limb) ((s32) in[5])) * ((s32) in[7]) +
-              ((limb) ((s32) in[3])) * ((s32) in[9])));
-    output[13] = 2 * (((limb) ((s32) in[6])) * ((s32) in[7]) +
-                      ((limb) ((s32) in[5])) * ((s32) in[8]) +
-                      ((limb) ((s32) in[4])) * ((s32) in[9]));
-    output[14] = 2 * (((limb) ((s32) in[7])) * ((s32) in[7]) +
-                      ((limb) ((s32) in[6])) * ((s32) in[8]) +
-                      2 *  ((limb) ((s32) in[5])) * ((s32) in[9]));
-    output[15] = 2 * (((limb) ((s32) in[7])) * ((s32) in[8]) +
-                      ((limb) ((s32) in[6])) * ((s32) in[9]));
-    output[16] =      ((limb) ((s32) in[8])) * ((s32) in[8]) +
-    4 *  ((limb) ((s32) in[7])) * ((s32) in[9]);
-    output[17] = 2 *  ((limb) ((s32) in[8])) * ((s32) in[9]);
-    output[18] = 2 *  ((limb) ((s32) in[9])) * ((s32) in[9]);
+    output[0] =       ((limb) ((int32_t) in[0])) * ((int32_t) in[0]);
+    output[1] =  2 *  ((limb) ((int32_t) in[0])) * ((int32_t) in[1]);
+    output[2] =  2 * (((limb) ((int32_t) in[1])) * ((int32_t) in[1]) +
+                      ((limb) ((int32_t) in[0])) * ((int32_t) in[2]));
+    output[3] =  2 * (((limb) ((int32_t) in[1])) * ((int32_t) in[2]) +
+                      ((limb) ((int32_t) in[0])) * ((int32_t) in[3]));
+    output[4] =       ((limb) ((int32_t) in[2])) * ((int32_t) in[2]) +
+    4 *  ((limb) ((int32_t) in[1])) * ((int32_t) in[3]) +
+    2 *  ((limb) ((int32_t) in[0])) * ((int32_t) in[4]);
+    output[5] =  2 * (((limb) ((int32_t) in[2])) * ((int32_t) in[3]) +
+                      ((limb) ((int32_t) in[1])) * ((int32_t) in[4]) +
+                      ((limb) ((int32_t) in[0])) * ((int32_t) in[5]));
+    output[6] =  2 * (((limb) ((int32_t) in[3])) * ((int32_t) in[3]) +
+                      ((limb) ((int32_t) in[2])) * ((int32_t) in[4]) +
+                      ((limb) ((int32_t) in[0])) * ((int32_t) in[6]) +
+                      2 *  ((limb) ((int32_t) in[1])) * ((int32_t) in[5]));
+    output[7] =  2 * (((limb) ((int32_t) in[3])) * ((int32_t) in[4]) +
+                      ((limb) ((int32_t) in[2])) * ((int32_t) in[5]) +
+                      ((limb) ((int32_t) in[1])) * ((int32_t) in[6]) +
+                      ((limb) ((int32_t) in[0])) * ((int32_t) in[7]));
+    output[8] =       ((limb) ((int32_t) in[4])) * ((int32_t) in[4]) +
+    2 * (((limb) ((int32_t) in[2])) * ((int32_t) in[6]) +
+         ((limb) ((int32_t) in[0])) * ((int32_t) in[8]) +
+         2 * (((limb) ((int32_t) in[1])) * ((int32_t) in[7]) +
+              ((limb) ((int32_t) in[3])) * ((int32_t) in[5])));
+    output[9] =  2 * (((limb) ((int32_t) in[4])) * ((int32_t) in[5]) +
+                      ((limb) ((int32_t) in[3])) * ((int32_t) in[6]) +
+                      ((limb) ((int32_t) in[2])) * ((int32_t) in[7]) +
+                      ((limb) ((int32_t) in[1])) * ((int32_t) in[8]) +
+                      ((limb) ((int32_t) in[0])) * ((int32_t) in[9]));
+    output[10] = 2 * (((limb) ((int32_t) in[5])) * ((int32_t) in[5]) +
+                      ((limb) ((int32_t) in[4])) * ((int32_t) in[6]) +
+                      ((limb) ((int32_t) in[2])) * ((int32_t) in[8]) +
+                      2 * (((limb) ((int32_t) in[3])) * ((int32_t) in[7]) +
+                           ((limb) ((int32_t) in[1])) * ((int32_t) in[9])));
+    output[11] = 2 * (((limb) ((int32_t) in[5])) * ((int32_t) in[6]) +
+                      ((limb) ((int32_t) in[4])) * ((int32_t) in[7]) +
+                      ((limb) ((int32_t) in[3])) * ((int32_t) in[8]) +
+                      ((limb) ((int32_t) in[2])) * ((int32_t) in[9]));
+    output[12] =      ((limb) ((int32_t) in[6])) * ((int32_t) in[6]) +
+    2 * (((limb) ((int32_t) in[4])) * ((int32_t) in[8]) +
+         2 * (((limb) ((int32_t) in[5])) * ((int32_t) in[7]) +
+              ((limb) ((int32_t) in[3])) * ((int32_t) in[9])));
+    output[13] = 2 * (((limb) ((int32_t) in[6])) * ((int32_t) in[7]) +
+                      ((limb) ((int32_t) in[5])) * ((int32_t) in[8]) +
+                      ((limb) ((int32_t) in[4])) * ((int32_t) in[9]));
+    output[14] = 2 * (((limb) ((int32_t) in[7])) * ((int32_t) in[7]) +
+                      ((limb) ((int32_t) in[6])) * ((int32_t) in[8]) +
+                      2 *  ((limb) ((int32_t) in[5])) * ((int32_t) in[9]));
+    output[15] = 2 * (((limb) ((int32_t) in[7])) * ((int32_t) in[8]) +
+                      ((limb) ((int32_t) in[6])) * ((int32_t) in[9]));
+    output[16] =      ((limb) ((int32_t) in[8])) * ((int32_t) in[8]) +
+    4 *  ((limb) ((int32_t) in[7])) * ((int32_t) in[9]);
+    output[17] = 2 *  ((limb) ((int32_t) in[8])) * ((int32_t) in[9]);
+    output[18] = 2 *  ((limb) ((int32_t) in[9])) * ((int32_t) in[9]);
 }
 
 /* fsquare sets output = in^2.
@@ -540,7 +539,7 @@ fsquare32(limb *output, const limb *in) {
 #endif
 
 /* s32_eq returns 0xffffffff iff a == b and zero otherwise. */
-static s32 s32_eq(s32 a, s32 b) {
+static int32_t s32_eq(int32_t a, int32_t b) {
     a = ~(a ^ b);
     a &= a << 16;
     a &= a << 8;
@@ -552,7 +551,7 @@ static s32 s32_eq(s32 a, s32 b) {
 
 /* s32_gte returns 0xffffffff if a >= b and zero otherwise, where a and b are
  * both non-negative. */
-static s32 s32_gte(s32 a, s32 b) {
+static int32_t s32_gte(int32_t a, int32_t b) {
     a -= b;
     /* a >= 0 iff a >= b. */
     return ~(a >> 31);
@@ -566,25 +565,25 @@ static void fcontract32(uint8_t *output, limb *input_limbs)
 {
     int i;
     int j;
-    s32 input[10];
-    s32 mask;
+    int32_t input[10];
+    int32_t mask;
     
-    /* |input_limbs[i]| < 2^26, so it's valid to convert to an s32. */
+    /* |input_limbs[i]| < 2^26, so it's valid to convert to an int32_t. */
     for (i = 0; i < 10; i++)
-        input[i] = (s32)input_limbs[i];
+        input[i] = (int32_t)input_limbs[i];
     
     for (j = 0; j < 2; ++j) {
         for (i = 0; i < 9; ++i) {
             if ((i & 1) == 1) {
                 /* This calculation is a time-invariant way to make input[i]
                  * non-negative by borrowing from the next-larger limb. */
-                const s32 mask = input[i] >> 31;
-                const s32 carry = -((input[i] & mask) >> 25);
+                const int32_t mask = input[i] >> 31;
+                const int32_t carry = -((input[i] & mask) >> 25);
                 input[i] = input[i] + (carry << 25);
                 input[i+1] = input[i+1] - carry;
             } else {
-                const s32 mask = input[i] >> 31;
-                const s32 carry = -((input[i] & mask) >> 26);
+                const int32_t mask = input[i] >> 31;
+                const int32_t carry = -((input[i] & mask) >> 26);
                 input[i] = input[i] + (carry << 26);
                 input[i+1] = input[i+1] - carry;
             }
@@ -593,8 +592,8 @@ static void fcontract32(uint8_t *output, limb *input_limbs)
         /* There's no greater limb for input[9] to borrow from, but we can multiply
          * by 19 and borrow from input[0], which is valid mod 2^255-19. */
         {
-            const s32 mask = input[9] >> 31;
-            const s32 carry = -((input[9] & mask) >> 25);
+            const int32_t mask = input[9] >> 31;
+            const int32_t carry = -((input[9] & mask) >> 25);
             input[9] = input[9] + (carry << 25);
             input[0] = input[0] - (carry * 19);
         }
@@ -617,8 +616,8 @@ static void fcontract32(uint8_t *output, limb *input_limbs)
      through input[9] were all zero.  In that case, input[1] is now 2^25 - 1,
      and this last borrow-propagation step will leave input[1] non-negative. */
     {
-        const s32 mask = input[0] >> 31;
-        const s32 carry = -((input[0] & mask) >> 26);
+        const int32_t mask = input[0] >> 31;
+        const int32_t carry = -((input[0] & mask) >> 26);
         input[0] = input[0] + (carry << 26);
         input[1] = input[1] - carry;
     }
@@ -628,18 +627,18 @@ static void fcontract32(uint8_t *output, limb *input_limbs)
     for (j = 0; j < 2; j++) {
         for (i = 0; i < 9; i++) {
             if ((i & 1) == 1) {
-                const s32 carry = input[i] >> 25;
+                const int32_t carry = input[i] >> 25;
                 input[i] &= 0x1ffffff;
                 input[i+1] += carry;
             } else {
-                const s32 carry = input[i] >> 26;
+                const int32_t carry = input[i] >> 26;
                 input[i] &= 0x3ffffff;
                 input[i+1] += carry;
             }
         }
         
         {
-            const s32 carry = input[9] >> 25;
+            const int32_t carry = input[9] >> 25;
             input[9] &= 0x1ffffff;
             input[0] += 19*carry;
         }

@@ -53,7 +53,7 @@
 #define inline __inline
 #endif
 
-typedef int32_t s32;
+//typedef int32_t s32;
 typedef int64_t limb;
 
 /* Field element representation:
@@ -97,106 +97,106 @@ static void fscalar_product(limb *output, const limb *in, const limb scalar) {
  *
  * output[x] <= 14 * the largest product of the input limbs. */
 static void fproduct(limb *output, const limb *in2, const limb *in) {
-  output[0] =       ((limb) ((s32) in2[0])) * ((s32) in[0]);
-  output[1] =       ((limb) ((s32) in2[0])) * ((s32) in[1]) +
-                    ((limb) ((s32) in2[1])) * ((s32) in[0]);
-  output[2] =  2 *  ((limb) ((s32) in2[1])) * ((s32) in[1]) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[2]) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[0]);
-  output[3] =       ((limb) ((s32) in2[1])) * ((s32) in[2]) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[1]) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[3])) * ((s32) in[0]);
-  output[4] =       ((limb) ((s32) in2[2])) * ((s32) in[2]) +
-               2 * (((limb) ((s32) in2[1])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[3])) * ((s32) in[1])) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[4]) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[0]);
-  output[5] =       ((limb) ((s32) in2[2])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[3])) * ((s32) in[2]) +
-                    ((limb) ((s32) in2[1])) * ((s32) in[4]) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[1]) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[5])) * ((s32) in[0]);
-  output[6] =  2 * (((limb) ((s32) in2[3])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[1])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[5])) * ((s32) in[1])) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[4]) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[2]) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[6]) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[0]);
-  output[7] =       ((limb) ((s32) in2[3])) * ((s32) in[4]) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[5])) * ((s32) in[2]) +
-                    ((limb) ((s32) in2[1])) * ((s32) in[6]) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[1]) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[7])) * ((s32) in[0]);
-  output[8] =       ((limb) ((s32) in2[4])) * ((s32) in[4]) +
-               2 * (((limb) ((s32) in2[3])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[5])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[1])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[7])) * ((s32) in[1])) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[6]) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[2]) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[0]);
-  output[9] =       ((limb) ((s32) in2[4])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[5])) * ((s32) in[4]) +
-                    ((limb) ((s32) in2[3])) * ((s32) in[6]) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[7])) * ((s32) in[2]) +
-                    ((limb) ((s32) in2[1])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[1]) +
-                    ((limb) ((s32) in2[0])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[0]);
-  output[10] = 2 * (((limb) ((s32) in2[5])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[3])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[7])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[1])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[1])) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[6]) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[4]) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[2]);
-  output[11] =      ((limb) ((s32) in2[5])) * ((s32) in[6]) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[7])) * ((s32) in[4]) +
-                    ((limb) ((s32) in2[3])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[3]) +
-                    ((limb) ((s32) in2[2])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[2]);
-  output[12] =      ((limb) ((s32) in2[6])) * ((s32) in[6]) +
-               2 * (((limb) ((s32) in2[5])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[7])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[3])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[3])) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[4]);
-  output[13] =      ((limb) ((s32) in2[6])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[7])) * ((s32) in[6]) +
-                    ((limb) ((s32) in2[5])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[5]) +
-                    ((limb) ((s32) in2[4])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[4]);
-  output[14] = 2 * (((limb) ((s32) in2[7])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[5])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[5])) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[6]);
-  output[15] =      ((limb) ((s32) in2[7])) * ((s32) in[8]) +
-                    ((limb) ((s32) in2[8])) * ((s32) in[7]) +
-                    ((limb) ((s32) in2[6])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[6]);
-  output[16] =      ((limb) ((s32) in2[8])) * ((s32) in[8]) +
-               2 * (((limb) ((s32) in2[7])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[7]));
-  output[17] =      ((limb) ((s32) in2[8])) * ((s32) in[9]) +
-                    ((limb) ((s32) in2[9])) * ((s32) in[8]);
-  output[18] = 2 *  ((limb) ((s32) in2[9])) * ((s32) in[9]);
+  output[0] =       ((limb) ((int32_t) in2[0])) * ((int32_t) in[0]);
+  output[1] =       ((limb) ((int32_t) in2[0])) * ((int32_t) in[1]) +
+                    ((limb) ((int32_t) in2[1])) * ((int32_t) in[0]);
+  output[2] =  2 *  ((limb) ((int32_t) in2[1])) * ((int32_t) in[1]) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[0]);
+  output[3] =       ((limb) ((int32_t) in2[1])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[1]) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[3])) * ((int32_t) in[0]);
+  output[4] =       ((limb) ((int32_t) in2[2])) * ((int32_t) in[2]) +
+               2 * (((limb) ((int32_t) in2[1])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[3])) * ((int32_t) in[1])) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[0]);
+  output[5] =       ((limb) ((int32_t) in2[2])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[3])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in2[1])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[1]) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[5])) * ((int32_t) in[0]);
+  output[6] =  2 * (((limb) ((int32_t) in2[3])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[1])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[5])) * ((int32_t) in[1])) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[0]);
+  output[7] =       ((limb) ((int32_t) in2[3])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[5])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in2[1])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[1]) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[7])) * ((int32_t) in[0]);
+  output[8] =       ((limb) ((int32_t) in2[4])) * ((int32_t) in[4]) +
+               2 * (((limb) ((int32_t) in2[3])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[5])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[1])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[7])) * ((int32_t) in[1])) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[0]);
+  output[9] =       ((limb) ((int32_t) in2[4])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[5])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in2[3])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[7])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in2[1])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[1]) +
+                    ((limb) ((int32_t) in2[0])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[0]);
+  output[10] = 2 * (((limb) ((int32_t) in2[5])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[3])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[7])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[1])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[1])) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[2]);
+  output[11] =      ((limb) ((int32_t) in2[5])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[7])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in2[3])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in2[2])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[2]);
+  output[12] =      ((limb) ((int32_t) in2[6])) * ((int32_t) in[6]) +
+               2 * (((limb) ((int32_t) in2[5])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[7])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[3])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[3])) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[4]);
+  output[13] =      ((limb) ((int32_t) in2[6])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[7])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in2[5])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in2[4])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[4]);
+  output[14] = 2 * (((limb) ((int32_t) in2[7])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[5])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[5])) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[6]);
+  output[15] =      ((limb) ((int32_t) in2[7])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in2[8])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in2[6])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[6]);
+  output[16] =      ((limb) ((int32_t) in2[8])) * ((int32_t) in[8]) +
+               2 * (((limb) ((int32_t) in2[7])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[7]));
+  output[17] =      ((limb) ((int32_t) in2[8])) * ((int32_t) in[9]) +
+                    ((limb) ((int32_t) in2[9])) * ((int32_t) in[8]);
+  output[18] = 2 *  ((limb) ((int32_t) in2[9])) * ((int32_t) in[9]);
 }
 
 /* Reduce a long form to a short form by taking the input mod 2^255 - 19.
@@ -343,61 +343,61 @@ static void fmul32(limb *output, const limb *in, const limb *in2)
  *
  * output[x] <= 14 * the largest product of the input limbs. */
 static void fsquare_inner(limb *output, const limb *in) {
-  output[0] =       ((limb) ((s32) in[0])) * ((s32) in[0]);
-  output[1] =  2 *  ((limb) ((s32) in[0])) * ((s32) in[1]);
-  output[2] =  2 * (((limb) ((s32) in[1])) * ((s32) in[1]) +
-                    ((limb) ((s32) in[0])) * ((s32) in[2]));
-  output[3] =  2 * (((limb) ((s32) in[1])) * ((s32) in[2]) +
-                    ((limb) ((s32) in[0])) * ((s32) in[3]));
-  output[4] =       ((limb) ((s32) in[2])) * ((s32) in[2]) +
-               4 *  ((limb) ((s32) in[1])) * ((s32) in[3]) +
-               2 *  ((limb) ((s32) in[0])) * ((s32) in[4]);
-  output[5] =  2 * (((limb) ((s32) in[2])) * ((s32) in[3]) +
-                    ((limb) ((s32) in[1])) * ((s32) in[4]) +
-                    ((limb) ((s32) in[0])) * ((s32) in[5]));
-  output[6] =  2 * (((limb) ((s32) in[3])) * ((s32) in[3]) +
-                    ((limb) ((s32) in[2])) * ((s32) in[4]) +
-                    ((limb) ((s32) in[0])) * ((s32) in[6]) +
-               2 *  ((limb) ((s32) in[1])) * ((s32) in[5]));
-  output[7] =  2 * (((limb) ((s32) in[3])) * ((s32) in[4]) +
-                    ((limb) ((s32) in[2])) * ((s32) in[5]) +
-                    ((limb) ((s32) in[1])) * ((s32) in[6]) +
-                    ((limb) ((s32) in[0])) * ((s32) in[7]));
-  output[8] =       ((limb) ((s32) in[4])) * ((s32) in[4]) +
-               2 * (((limb) ((s32) in[2])) * ((s32) in[6]) +
-                    ((limb) ((s32) in[0])) * ((s32) in[8]) +
-               2 * (((limb) ((s32) in[1])) * ((s32) in[7]) +
-                    ((limb) ((s32) in[3])) * ((s32) in[5])));
-  output[9] =  2 * (((limb) ((s32) in[4])) * ((s32) in[5]) +
-                    ((limb) ((s32) in[3])) * ((s32) in[6]) +
-                    ((limb) ((s32) in[2])) * ((s32) in[7]) +
-                    ((limb) ((s32) in[1])) * ((s32) in[8]) +
-                    ((limb) ((s32) in[0])) * ((s32) in[9]));
-  output[10] = 2 * (((limb) ((s32) in[5])) * ((s32) in[5]) +
-                    ((limb) ((s32) in[4])) * ((s32) in[6]) +
-                    ((limb) ((s32) in[2])) * ((s32) in[8]) +
-               2 * (((limb) ((s32) in[3])) * ((s32) in[7]) +
-                    ((limb) ((s32) in[1])) * ((s32) in[9])));
-  output[11] = 2 * (((limb) ((s32) in[5])) * ((s32) in[6]) +
-                    ((limb) ((s32) in[4])) * ((s32) in[7]) +
-                    ((limb) ((s32) in[3])) * ((s32) in[8]) +
-                    ((limb) ((s32) in[2])) * ((s32) in[9]));
-  output[12] =      ((limb) ((s32) in[6])) * ((s32) in[6]) +
-               2 * (((limb) ((s32) in[4])) * ((s32) in[8]) +
-               2 * (((limb) ((s32) in[5])) * ((s32) in[7]) +
-                    ((limb) ((s32) in[3])) * ((s32) in[9])));
-  output[13] = 2 * (((limb) ((s32) in[6])) * ((s32) in[7]) +
-                    ((limb) ((s32) in[5])) * ((s32) in[8]) +
-                    ((limb) ((s32) in[4])) * ((s32) in[9]));
-  output[14] = 2 * (((limb) ((s32) in[7])) * ((s32) in[7]) +
-                    ((limb) ((s32) in[6])) * ((s32) in[8]) +
-               2 *  ((limb) ((s32) in[5])) * ((s32) in[9]));
-  output[15] = 2 * (((limb) ((s32) in[7])) * ((s32) in[8]) +
-                    ((limb) ((s32) in[6])) * ((s32) in[9]));
-  output[16] =      ((limb) ((s32) in[8])) * ((s32) in[8]) +
-               4 *  ((limb) ((s32) in[7])) * ((s32) in[9]);
-  output[17] = 2 *  ((limb) ((s32) in[8])) * ((s32) in[9]);
-  output[18] = 2 *  ((limb) ((s32) in[9])) * ((s32) in[9]);
+  output[0] =       ((limb) ((int32_t) in[0])) * ((int32_t) in[0]);
+  output[1] =  2 *  ((limb) ((int32_t) in[0])) * ((int32_t) in[1]);
+  output[2] =  2 * (((limb) ((int32_t) in[1])) * ((int32_t) in[1]) +
+                    ((limb) ((int32_t) in[0])) * ((int32_t) in[2]));
+  output[3] =  2 * (((limb) ((int32_t) in[1])) * ((int32_t) in[2]) +
+                    ((limb) ((int32_t) in[0])) * ((int32_t) in[3]));
+  output[4] =       ((limb) ((int32_t) in[2])) * ((int32_t) in[2]) +
+               4 *  ((limb) ((int32_t) in[1])) * ((int32_t) in[3]) +
+               2 *  ((limb) ((int32_t) in[0])) * ((int32_t) in[4]);
+  output[5] =  2 * (((limb) ((int32_t) in[2])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in[1])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in[0])) * ((int32_t) in[5]));
+  output[6] =  2 * (((limb) ((int32_t) in[3])) * ((int32_t) in[3]) +
+                    ((limb) ((int32_t) in[2])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in[0])) * ((int32_t) in[6]) +
+               2 *  ((limb) ((int32_t) in[1])) * ((int32_t) in[5]));
+  output[7] =  2 * (((limb) ((int32_t) in[3])) * ((int32_t) in[4]) +
+                    ((limb) ((int32_t) in[2])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in[1])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in[0])) * ((int32_t) in[7]));
+  output[8] =       ((limb) ((int32_t) in[4])) * ((int32_t) in[4]) +
+               2 * (((limb) ((int32_t) in[2])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in[0])) * ((int32_t) in[8]) +
+               2 * (((limb) ((int32_t) in[1])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in[3])) * ((int32_t) in[5])));
+  output[9] =  2 * (((limb) ((int32_t) in[4])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in[3])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in[2])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in[1])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in[0])) * ((int32_t) in[9]));
+  output[10] = 2 * (((limb) ((int32_t) in[5])) * ((int32_t) in[5]) +
+                    ((limb) ((int32_t) in[4])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in[2])) * ((int32_t) in[8]) +
+               2 * (((limb) ((int32_t) in[3])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in[1])) * ((int32_t) in[9])));
+  output[11] = 2 * (((limb) ((int32_t) in[5])) * ((int32_t) in[6]) +
+                    ((limb) ((int32_t) in[4])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in[3])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in[2])) * ((int32_t) in[9]));
+  output[12] =      ((limb) ((int32_t) in[6])) * ((int32_t) in[6]) +
+               2 * (((limb) ((int32_t) in[4])) * ((int32_t) in[8]) +
+               2 * (((limb) ((int32_t) in[5])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in[3])) * ((int32_t) in[9])));
+  output[13] = 2 * (((limb) ((int32_t) in[6])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in[5])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in[4])) * ((int32_t) in[9]));
+  output[14] = 2 * (((limb) ((int32_t) in[7])) * ((int32_t) in[7]) +
+                    ((limb) ((int32_t) in[6])) * ((int32_t) in[8]) +
+               2 *  ((limb) ((int32_t) in[5])) * ((int32_t) in[9]));
+  output[15] = 2 * (((limb) ((int32_t) in[7])) * ((int32_t) in[8]) +
+                    ((limb) ((int32_t) in[6])) * ((int32_t) in[9]));
+  output[16] =      ((limb) ((int32_t) in[8])) * ((int32_t) in[8]) +
+               4 *  ((limb) ((int32_t) in[7])) * ((int32_t) in[9]);
+  output[17] = 2 *  ((limb) ((int32_t) in[8])) * ((int32_t) in[9]);
+  output[18] = 2 *  ((limb) ((int32_t) in[9])) * ((int32_t) in[9]);
 }
 
 /* fsquare sets output = in^2.
@@ -446,7 +446,7 @@ static void fexpand32(limb *output, const uint8_t *input)
 #endif
 
 /* s32_eq returns 0xffffffff iff a == b and zero otherwise. */
-static s32 s32_eq(s32 a, s32 b) {
+static int32_t s32_eq(int32_t a, int32_t b) {
   a = ~(a ^ b);
   a &= a << 16;
   a &= a << 8;
@@ -458,7 +458,7 @@ static s32 s32_eq(s32 a, s32 b) {
 
 /* s32_gte returns 0xffffffff if a >= b and zero otherwise, where a and b are
  * both non-negative. */
-static s32 s32_gte(s32 a, s32 b) {
+static int32_t s32_gte(int32_t a, int32_t b) {
   a -= b;
   /* a >= 0 iff a >= b. */
   return ~(a >> 31);
@@ -472,12 +472,12 @@ static void fcontract32(uint8_t *output, limb *input_limbs)
 {
   int i;
   int j;
-  s32 input[10];
-  s32 mask,carry;
+  int32_t input[10];
+  int32_t mask,carry;
 
-  /* |input_limbs[i]| < 2^26, so it's valid to convert to an s32. */
+  /* |input_limbs[i]| < 2^26, so it's valid to convert to an int32_t. */
   for (i = 0; i < 10; i++) {
-    input[i] = (s32)input_limbs[i];
+    input[i] = (int32_t)input_limbs[i];
   }
 
   for (j = 0; j < 2; ++j) {
@@ -709,12 +709,12 @@ static void fmonty(limb *x2, limb *z2,  /* output 2Q */
 static void
 swap_conditional(limb a[19], limb b[19], limb iswap) {
   unsigned i;
-  const s32 swap = (s32) -iswap;
+  const int32_t swap = (int32_t) -iswap;
 
   for (i = 0; i < 10; ++i) {
-    const s32 x = swap & ( ((s32)a[i]) ^ ((s32)b[i]) );
-    a[i] = ((s32)a[i]) ^ x;
-    b[i] = ((s32)b[i]) ^ x;
+    const int32_t x = swap & ( ((int32_t)a[i]) ^ ((int32_t)b[i]) );
+    a[i] = ((int32_t)a[i]) ^ x;
+    b[i] = ((int32_t)b[i]) ^ x;
   }
 }
 
