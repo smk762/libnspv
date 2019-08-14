@@ -196,7 +196,7 @@ bits256 curve25519(bits256 mysecret,bits256 basepoint)
 #ifndef u8
 //typedef uint8_t u8;
 //typedef int32_t s32;
-//typedef int64_t limb;
+typedef int64_t limb;
 #endif
 
 /* Multiply a number by a scalar: output = in * scalar */
