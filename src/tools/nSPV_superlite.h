@@ -1868,6 +1868,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+    sprintf(replacestr,"%llu",(long long)NSPV_totalsent);
+    NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEOUT",(char *)replacestr);
+    sprintf(replacestr,"%llu",(long long)NSPV_totalrecv);
+    NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEIN",(char *)replacestr);
 
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
