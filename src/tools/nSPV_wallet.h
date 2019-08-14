@@ -42,13 +42,13 @@ int GetProofMerkleRoot(uint8_t *proof, int prooflen, merkle_block *pMblock, vect
 bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen)
 {
     // sapling tx sighash preimage
-    uint8_t for_sig_hash[1000]; bits256 sigtxid; int32_t hashtype,version,i,len=0; btc_tx_in *vin; btc_tx_out *vout;
+    uint8_t for_sig_hash[11000]; bits256 sigtxid; int32_t hashtype,version,i,len=0; btc_tx_in *vin; btc_tx_out *vout;
     hashtype = SIGHASH_ALL;
     version = (tx->version & 0x7fffffff);
     len = iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->version), &tx->version);
     len += iguana_rwnum(1, &for_sig_hash[len], sizeof(tx->nVersionGroupId), &tx->nVersionGroupId);
     {
-        uint8_t prev_outs[1000],hash_prev_outs[32]; int32_t prev_outs_len = 0;
+        uint8_t prev_outs[10000],hash_prev_outs[32]; int32_t prev_outs_len = 0;
         for (i=0; i<(int32_t)tx->vin->len; i++)
         {
             vin = btc_tx_vin(tx,i);

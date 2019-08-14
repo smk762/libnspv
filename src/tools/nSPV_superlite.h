@@ -29,6 +29,7 @@
 #include <btc/utils.h>
 #include <btc/base58.h>
 
+extern char *NSPV_externalip;
 cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t satoshis);
 cJSON *NSPV_txproof(int32_t waitflag,btc_spv_client *client,int32_t vout,bits256 txid,int32_t height);
 void expand_ipbits(char *ipaddr,uint64_t ipbits);
@@ -39,7 +40,7 @@ int32_t NSPV_didfirsttxproofs;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
-int64_t NSPV_balance,NSPV_rewards;
+int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
 
 btc_key NSPV_key;
 btc_pubkey NSPV_pubkey;
@@ -201,6 +202,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
         cstr_free(request, true);
         //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
         node->prevtimes[ind] = timestamp;
+        NSPV_totalsent += len;
         return(node);
     } else fprintf(stderr,"no nodes\n");
     return(0);
@@ -278,6 +280,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
     strcpy(NSPV_lastpeer,from->ipaddr);
     if ( len > 0 )
     {
+        NSPV_totalrecv += len;
         switch ( response[0] )
         {
             case NSPV_INFORESP:
@@ -860,6 +863,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     NSPV_logout();
     if ( strlen(wifstr) < 64 && (sz= btc_base58_decode_check(wifstr,data,sizeof(data))) > 0 && ((sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1)) )
         valid = 1;
+    // if error, treat as seed, also get remote working, html needs to use -p=port
     if ( valid == 0 || data[0] != chain->b58prefix_secret_address )
     {
         jaddstr(result,"result","error");
@@ -1391,7 +1395,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // Top menu buttons HTML tags variables to use with
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
-     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" type=\"button\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" type=\"button\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" type=\"button\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-2\" type=\"button\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-2\" type=\"button\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
+     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-1\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-1\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
 
     // == Coin specific gloabal variable
     // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
@@ -1647,41 +1651,78 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         }
     }
 
-    // == Wallet page array variables ==
-    // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
-    //
-    // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
-    // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
-    // $TXHIST_CONFIRMS - Confirmations
-    // $TXHIST_AMOUNT - Amount
-    // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
-    // $TXHIST_DESTADDDR - Destination address
-    // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
-    // Transactions History table HTML tags variables to use in
-    // conditional logic in displaying table rows and columns
-    //
-    // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
-    // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
-    // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
-    // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
-    // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
-    // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
-    // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
-    // 
-    // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
-    // $MEMP_TYPE - Type
-    // $MEMP_DEST - Destination Address
-    // $MEMP_AMOUNT - Amount sent in this transaction
-    // $MEMP_TXID - Transaction ID
     if ( strcmp(method,"wallet") == 0 )
     {
-        if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
-            free_json(retjson);
-        if ( (retjson= NSPV_addressutxos(1,NSPV_client,NSPV_address,0,0,0)) != 0 )
-            free_json(retjson);
+        if ( jint(argjson,"update") != 0 )
+        {
+            if ( NSPV_address[0] != 0 )
+                NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
+        }
+        else
+        {
+            if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
+                free_json(retjson);
+            if ( (retjson= NSPV_addressutxos(1,NSPV_client,NSPV_address,0,0,0)) != 0 )
+                free_json(retjson);
+        }
+        retjson = 0;
         char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
+        if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,NSPV_address) == 0 && NSPV_mempoolresult.CCflag == 0 && (origitemstr= OS_filestr(&fsize,"wallet_mempool_table_row.inc")) != 0 )
+        {
+            itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
+            // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
+            // $MEMP_TYPE - Type
+            // $MEMP_DEST - Destination Address
+            // $MEMP_AMOUNT - Amount sent in this transaction
+            // $MEMP_TXID - Transaction ID
+            for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
+            {
+                if ( (itemstr= clonestr(origitemstr)) != 0 )
+                {
+                    strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
+                    satoshis = 0;
+                    sprintf(replacestr,"%.8f",dstr(satoshis));
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
+                    bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
+                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TXID",replacestr);
+                    strcat(itemsbuf,itemstr);
+                    itembuf[0] = 0;
+                    free(itemstr);
+                }
+            }
+            NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY",itemsbuf);
+            didflag = 1;
+            free(itemsbuf);
+            free(origitemstr);
+        }
+        if ( didflag == 0 )
+            NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY","");
+        didflag = 0;
         if ( (origitemstr= OS_filestr(&fsize,"html/wallet_tx_history_table_row.inc")) != 0 )
         {
+            // == Wallet page array variables ==
+            // $TXHIST_ROW_ARRAY - Main array vairable defined in wallet page for tx history table
+            //
+            // $TXHIST_TYPE - Type of the transaction. Public/Private. Need to show relevat HTML tag
+            // $TXHIST_DIR_ARRAY - Direction of transaction. IN/OUT/MINTED + dPOW tag if dPoWed.
+            // $TXHIST_CONFIRMS - Confirmations
+            // $TXHIST_AMOUNT - Amount
+            // $TXHIST_DATETIME - Date and time. Example output "23 Jul 2019 15:08"
+            // $TXHIST_DESTADDDR - Destination address
+            // $TXHIST_TXID - txid of the transaction. When user clicks on "Details" button it should go to txidinfo page
+            // Transactions History table HTML tags variables to use in
+            // conditional logic in displaying table rows and columns
+            //
+            // TXHIST_TYPE_PUBLIC_TAG="<span class=\"badge badge-secondary\">public</span>";
+            // TXHIST_TYPE_PRIVATE_TAG="<span class="badge badge-dark">private</span>";
+            // TXHIST_DIR_MINTED_TAG="<span class=\"badge badge-light\">Minted</span>";
+            // TXHIST_DIR_OUT_TAG="<span class=\"badge badge-danger\">OUT</span>";
+            // TXHIST_DIR_IN_TAG="<span class=\"badge badge-success\">IN</span>";
+            // TXHIST_DIR_DPOW_TAG="<span class=\"badge badge-info\">dPoW Secured</span>";
+            // TXHIST_DESTADDR_PRIVADDR_TAG="<span class=\"badge badge-dark\">Address not listed by wallet</span>";
+            //
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
                 itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
@@ -1808,7 +1849,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$COINNAME",(char *)NSPV_fullname);
     NSPV_expand_variable(bigbuf,&filestr,"$COIN",(char *)NSPV_chain->name);
     NSPV_expand_variable(bigbuf,&filestr,"$WALLETADDR",(char *)NSPV_address);
-    sprintf(replacestr,"http://127.0.0.1:%u",NSPV_chain->rpcport);
+    sprintf(replacestr,"http://%s:%u",NSPV_externalip,NSPV_chain->rpcport);
     NSPV_expand_variable(bigbuf,&filestr,"$URL",replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_balance));
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
@@ -1853,7 +1894,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
         // extract data from retjson and put into filestr template
         //return(filestr);
     }
-    if ( strcmp(remoteaddr,"127.0.0.1") != 0 || port == 0 )
+    if ( (strcmp(remoteaddr,"127.0.0.1") != 0 && strcmp(remoteaddr,NSPV_externalip) != 0) || port == 0 )
         fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
     if ( (retjson= _NSPV_JSON(argjson)) != 0 )
         retstr = jprint(retjson,0);

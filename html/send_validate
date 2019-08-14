@@ -14,10 +14,16 @@
   <body>
     <nav class="navbar navbar-dark bg-dark">
       <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
-      <form class="form-inline" action="$URL/method/send_confirm" method="get">
-        <input class="form-control mr-sm-1" type="search" placeholder="Address" name="address" aria-label="ToAddress" style="width: 400px;">
-        <input class="form-control mr-sm-2" type="search" placeholder="Amount" name="amount" aria-label="SendAmount" style="width: 120px;">
-          <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Send $COIN</button>
+      <form class="form-row" action="$URL/method/send_confirm" method="get">
+          <div class="col-lg-6 col-sm-6 col-xs-12">
+            <input class="form-control form-control-sm" type="text" placeholder="Address" name="address" aria-label="ToAddress">
+          </div>
+          <div class="col-lg-3 col-sm-3 col-xs-3">
+            <input class="form-control form-control-sm" type="text" placeholder="Amount" name="amount" aria-label="SendAmount">
+          </div>
+          <div class="col-lg-3 col-lg-3 col-xs-3">
+          <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">Send $COIN</button>
+        </div>
       </form>
       <form class="form-inline">
         $MENU_BUTTON_ARRAY
@@ -31,10 +37,12 @@
         <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
-                <span class="col-3">Coin: <font style="font-size: 22px;">$COINNAME ($COIN)</font></span>
-                <span class="col-3">Balance: <font style="font-size: 22px;">$BALANCE $COIN</font></span>
-                <span class="col-3" style="display: $REWARDS_DISPLAY_KMD;">Rewards: <font style="font-size: 22px;">$REWARDS $COIN</font></span>
-                <span class="col-6 text-right">Your Address: <font style="font-size: 22px;">$WALLETADDR</font></span>
+                <div class="row">
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>Coin:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>Balance:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>Rewards:</b><br> $REWARDS $COIN</span>
+                  <span class="col-lg-3 col-sm-12 col-xs-12"><b>Your Address:</b><br> $WALLETADDR</span>
+                </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
@@ -142,7 +150,7 @@
           </div>
         </div>
 
-        <div class="col-6" style="margin-bottom: 1em; padding-right: 5px;">
+        <div class="col-md-6 col-sm-12 pr-sm-1" style="margin-bottom: 1em;">
           <div class="card text-white bg-dark">
             <div class="card-header">
               <h5>Tx - vin</h5>
@@ -157,7 +165,7 @@
           </div>
         </div>
 
-        <div class="col-6" style="margin-bottom: 1em; padding-left: 5px;">
+        <div class="col-md-6 col-sm-12 pl-sm-1" style="margin-bottom: 1em;">
           <div class="card text-white bg-dark">
             <div class="card-header">
               <h5>Tx - vout</h5>

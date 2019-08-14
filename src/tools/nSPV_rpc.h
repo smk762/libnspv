@@ -17,7 +17,7 @@
 #ifndef NSPV_RPC_H
 #define NSPV_RPC_H
 
-
+char *NSPV_externalip = "127.0.0.1";
 char *htmlfiles[] = { "/index", "/bootstrap.min.css", "/bootstrap.min.css.map", "/custom.css", "/favicon.ico", "/font/rubik.css", "/antara150x150.png", "/images/antara150x150.png", "/images/sub-header-logo-min.png", "/font/iJWHBXyIfDnIV7Eyjmmd8WD07oB-.woff2", "/font/iJWKBXyIfDnIV7nBrXyw023e.woff2", "/font/iJWHBXyIfDnIV7F6iGmd8WD07oB-.woff2" };
 
 char *methodfiles[] = { "wallet", "login", "broadcast", "getinfo", "receive", "getnewaddress", "index", "getpeerinfo", "send_confirm", "send_validate", "send", "txidinfo", "logout" };
@@ -873,7 +873,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     if ( userpass != 0 && jstr(argjson,"userpass") == 0 )
                         jaddstr(argjson,"userpass",userpass);
                     //printf("after urlconv.(%s) argjson.(%s)\n",jprint(json,0),jprint(argjson,0));
-                    if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(argjson) > 0 )
+                    if ( strcmp(remoteaddr,"127.0.0.1") == 0 || strcmp(remoteaddr,NSPV_externalip) == 0 || LP_valid_remotemethod(argjson) > 0 )
                     {
                         if ( (retstr= NSPV_JSON(argjson,remoteaddr,port,filestr,apiflag)) != 0 )
                         {
@@ -899,7 +899,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 //printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
                 if ( userpass != 0 && jstr(arg,"userpass") == 0 )
                     jaddstr(arg,"userpass",userpass);
-                if ( strcmp(remoteaddr,"127.0.0.1") == 0 || LP_valid_remotemethod(arg) > 0 )
+                if ( strcmp(remoteaddr,"127.0.0.1") == 0 || strcmp(remoteaddr,NSPV_externalip) == 0 || LP_valid_remotemethod(arg) > 0 )
                 {
                     portable_mutex_lock(&NSPV_commandmutex);
                     retstr = NSPV_JSON(arg,remoteaddr,port,filestr,apiflag);
@@ -1060,7 +1060,7 @@ void *LP_rpc_processreq(void *_ptr)
                 acceptstr = "Accept-Ranges: bytes\r\n";
                 crflag = 0;
             }
-            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
+            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nContent-Security-Policy: default-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
             response[0] = '\0';
             strcat(response,hdrs);
             memcpy(&response[strlen(response)],retstr,retlen);
@@ -1291,20 +1291,28 @@ void *NSPV_rpcloop(void *args)
     if ( (port= *(uint16_t *)args) == 0 )
         port = 7889;
     printf("Start NSPV_rpcloop.%u\n",port);
-    localhostbits = (uint32_t)calc_ipbits("127.0.0.1");
+    localhostbits = (uint32_t)calc_ipbits(NSPV_externalip);
     //initial_bindsock_reset = LP_bindsock_reset;
     while ( NSPV_STOP_RECEIVED == 0 )//LP_bindsock_reset == initial_bindsock_reset )
     {
         //printf("LP_bindsock.%d\n",LP_bindsock);
         if ( bindsock < 0 )
         {
-            while ( (bindsock= iguana_socket(1,"0.0.0.0",port)) < 0 )
-                usleep(10000);
+            if ( strcmp(NSPV_externalip,"127.0.0.1") == 0 )
+            {
+                while ( (bindsock= iguana_socket(1,"0.0.0.0",port)) < 0 )
+                    usleep(10000);
+            }
+            else
+            {
+                while ( (bindsock= iguana_socket(1,NSPV_externalip,port)) < 0 )
+                    usleep(10000);
+            }
 #ifndef _WIN32
             //fcntl(bindsock, F_SETFL, fcntl(bindsock, F_GETFL, 0) | O_NONBLOCK);
 #endif
             //if ( counter++ < 1 )
-            printf(">>>>>>>>>> NSPV_rpcloop 127.0.0.1:%d bind sock.%d API enabled at unixtime.%u <<<<<<<<<\n",port,bindsock,(uint32_t)time(NULL));
+            printf(">>>>>>>>>> NSPV_rpcloop %s:%d bind sock.%d API enabled at unixtime.%u <<<<<<<<<\n",NSPV_externalip,port,bindsock,(uint32_t)time(NULL));
         }
         //printf("after sock.%d\n",sock);
         clilen = sizeof(cli_addr);
