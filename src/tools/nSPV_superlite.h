@@ -883,12 +883,12 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         if ( btc_privkey_decode_wif(NSPV_wifstr,chain,&NSPV_key) == 0 )
         {
             jaddstr(result,"wiferror","couldnt decode wif");
-            memset(_wif2,0,sizeof(_wif2));
+            memset(wif2,0,sizeof(wif2));
             memset(_wifstr,0,sizeof(_wifstr));
             return(result);
         }
     }
-    memset(_wif2,0,sizeof(_wif2));
+    memset(wif2,0,sizeof(wif2));
     memset(_wifstr,0,sizeof(_wifstr));
     jaddstr(result,"result","success");
     jaddstr(result,"status","wif will expire in 777 seconds");

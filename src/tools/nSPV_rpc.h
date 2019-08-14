@@ -892,6 +892,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                         i++;
                     }
                 }
+                free(buf);
             }
             if ( is_cJSON_Array(argjson) != 0 && (n= cJSON_GetArraySize(argjson)) > 0 )
             {
@@ -938,7 +939,6 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 } else retstr = clonestr("{\"error\":\"invalid remote method\"}");
             }
             free_json(argjson);
-            free(buf);
         }
         free_json(json);
         if ( tmpjson != 0 )
