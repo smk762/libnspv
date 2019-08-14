@@ -16,7 +16,6 @@
 
 #include <curve25519.h>
 
-#if DISABLE_64bits__amd64__
 
 //#undef force_inline
 //#define force_inline  __attribute__((always_inline))
@@ -72,6 +71,7 @@ bits320 fexpand(bits256 basepoint)
     return(out);
 }
 
+#if DISABLE_64bits__amd64__
 // donna: special gcc mode for 128-bit integers. It's implemented on 64-bit platforms only as far as I know.
 typedef unsigned uint128_t __attribute__((mode(TI)));
 
@@ -724,7 +724,7 @@ static inline bits320 fsquare_times(const bits320 in,uint64_t count)
     limb output[10],input[10]; int32_t i;
     for (i=0; i<10; i++)
         input[i] = in.uints[i];
-    for (i=0; i<count; i++)
+    for (i=0; i<(int32_t)count; i++)
     {
         fsquare32(output,input);
         memcpy(input,output,sizeof(input));
