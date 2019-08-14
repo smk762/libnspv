@@ -943,7 +943,7 @@ int32_t iguana_getheadersize(char *buf,int32_t recvlen)
     return(recvlen);
 }
 
-static space[NSPV_MAXPACKETSIZE],space2[NSPV_MAXPACKETSIZE];
+static char space[NSPV_MAXPACKETSIZE],space2[NSPV_MAXPACKETSIZE];
 
 void *LP_rpc_processreq(void *_ptr)
 {
