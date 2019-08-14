@@ -611,7 +611,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     n += i;
     j = i = 0;
     filetype[0] = 0;
-printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
+//printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
     snprintf(furl,sizeof(furl),"%s",url+1);
     if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
     {
@@ -634,8 +634,9 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
     }
     else
     {
-        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
-        strncpy(cmpstr,&url[i],sizeof(cmpstr)-1);
+        int32_t j,f,matches; char fname[512],*cmpstr,*cmpstr2;
+        cmpstr = clonestr(&url[i]);
+        cmpstr2 = malloc(strlen(cmpstr) + 64);
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
@@ -654,9 +655,15 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
                     strcpy(filetype,url+j+1);
                     //printf("set (%s) filetype.(%s)\n",fname,filetype);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    {
+                        free(cmpstr);
+                        free(cmpstr2);
                         return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                    }
                     if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                         *contentlenp = (int32_t)filesize;
+                    free(cmpstr);
+                    free(cmpstr2);
                     return(filestr);
                 }
             }
@@ -670,7 +677,11 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
                 sprintf(fname,"html/%s",methodfiles[f]);
                 //fprintf(stderr,"open1 (%s)\n",fname);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                {
+                    free(cmpstr);
+                    free(cmpstr2);
                     return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                }
                 break;
             }
         }
@@ -684,9 +695,13 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
                     *jsonflagp = 1;
                     strcpy(filetype,"html");
                     sprintf(fname,"html/%s",methodfiles[f]);
-                    fprintf(stderr,"open (%s)\n",fname);
+                    //fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    {
+                        free(cmpstr);
+                        free(cmpstr2);
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                    }
                     break;
                 }
             }
@@ -707,15 +722,23 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
                             strcpy(filetype,url+j+1);
                             //printf("set2 (%s) filetype.(%s)\n",fname,filetype);
                             if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                            {
+                                free(cmpstr);
+                                free(cmpstr2);
                                 return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                            }
                             if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                                 *contentlenp = (int32_t)filesize;
+                            free(cmpstr);
+                            free(cmpstr2);
                             return(filestr);
                         }
                     }
                 }
             }
         }
+        free(cmpstr);
+        free(cmpstr2);
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
@@ -773,8 +796,13 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
         if ( (data= jstr(json,"POST")) != 0 )
         {
             free_json(argjson);
-            argjson = cJSON_Parse(data);
-    printf("data.(%s)\n",data);
+            if ( strncmp("wif=",data,4) == 0 )
+            {
+                argjson = cJSON_CreateObject();
+                jaddstr(argjson,"method","login");
+                jaddstr(argjson,"wif",data+4);
+            } else argjson = cJSON_Parse(data);
+    //printf("data.(%s) -> (%s)\n",data,jprint(argjson,0));
         }
         if ( argjson != 0 )
         {
@@ -897,7 +925,7 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
                     if ( is_cJSON_Array(arg) != 0 && cJSON_GetArraySize(arg) == 1 )
                         arg = jitem(arg,0);
                 } else arg = argjson;
-                printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
+                //printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
                 if ( userpass != 0 && jstr(arg,"userpass") == 0 )
                     jaddstr(arg,"userpass",userpass);
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || strcmp(remoteaddr,NSPV_externalip) == 0 || LP_valid_remotemethod(arg) > 0 )
