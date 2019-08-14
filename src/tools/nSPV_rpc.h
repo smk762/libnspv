@@ -634,8 +634,9 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     }
     else
     {
-        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
-        strncpy(cmpstr,&url[i],sizeof(cmpstr)-1);
+        int32_t j,f,matches; char fname[512],*cmpstr,*cmpstr2;
+        cmpstr = clonestr(&url[i]);
+        cmpstr2 = malloc(strlen(cmpstr) + 64);
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
@@ -654,9 +655,15 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     strcpy(filetype,url+j+1);
                     //printf("set (%s) filetype.(%s)\n",fname,filetype);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    {
+                        free(cmpstr);
+                        free(cmpstr2);
                         return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                    }
                     if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                         *contentlenp = (int32_t)filesize;
+                    free(cmpstr);
+                    free(cmpstr2);
                     return(filestr);
                 }
             }
@@ -670,7 +677,11 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 sprintf(fname,"html/%s",methodfiles[f]);
                 //fprintf(stderr,"open1 (%s)\n",fname);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                {
+                    free(cmpstr);
+                    free(cmpstr2);
                     return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                }
                 break;
             }
         }
@@ -686,7 +697,11 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     sprintf(fname,"html/%s",methodfiles[f]);
                     //fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    {
+                        free(cmpstr);
+                        free(cmpstr2);
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                    }
                     break;
                 }
             }
@@ -707,15 +722,23 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                             strcpy(filetype,url+j+1);
                             //printf("set2 (%s) filetype.(%s)\n",fname,filetype);
                             if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                            {
+                                free(cmpstr);
+                                free(cmpstr2);
                                 return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                            }
                             if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                                 *contentlenp = (int32_t)filesize;
+                            free(cmpstr);
+                            free(cmpstr2);
                             return(filestr);
                         }
                     }
                 }
             }
         }
+        free(cmpstr);
+        free(cmpstr2);
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
