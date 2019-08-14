@@ -943,11 +943,13 @@ int32_t iguana_getheadersize(char *buf,int32_t recvlen)
     return(recvlen);
 }
 
+static char space[NSPV_MAXPACKETSIZE],space2[NSPV_MAXPACKETSIZE];
+
 void *LP_rpc_processreq(void *_ptr)
 {
     char filetype[128],content_type[128];
     int32_t recvlen,retlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
-    char helpname[512],remoteaddr[64],*buf,*retstr,space[8192],space2[32786],*jsonbuf; struct rpcrequest_info *req = _ptr;
+    char helpname[512],remoteaddr[64],*buf,*retstr,*jsonbuf; struct rpcrequest_info *req = _ptr;
     uint32_t ipbits,i,size = NSPV_MAXPACKETSIZE + 512;
     ipbits = req->ipbits;;
     expand_ipbits(remoteaddr,ipbits);
