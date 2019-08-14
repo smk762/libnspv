@@ -1694,7 +1694,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     // $MEMP_DEST - Destination Address
                     // $MEMP_AMOUNT - Amount sent in this transaction
                     // $MEMP_TXID - Transaction ID
-                    iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)&NSPV_mempoolresult.txid.longs[7]);
+                    iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)&NSPV_mempoolresult.txid.ulongs[7]);
                     for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
                     {
                         if ( i < NSPV_mempoolresult.numtxids-1000 )
