@@ -611,7 +611,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     n += i;
     j = i = 0;
     filetype[0] = 0;
-printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
+//printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
     snprintf(furl,sizeof(furl),"%s",url+1);
     if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
     {
@@ -684,7 +684,7 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
                     *jsonflagp = 1;
                     strcpy(filetype,"html");
                     sprintf(fname,"html/%s",methodfiles[f]);
-                    fprintf(stderr,"open (%s)\n",fname);
+                    //fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
                     break;
@@ -773,8 +773,12 @@ printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
         if ( (data= jstr(json,"POST")) != 0 )
         {
             free_json(argjson);
-            argjson = cJSON_Parse(data);
-    printf("data.(%s)\n",data);
+            if ( strncmp("wif=",data,4) == 0 )
+            {
+                argjson = cJSON_CreateObject();
+                jaddstr(argjson,"wif",data+4);
+            } else argjson = cJSON_Parse(data);
+    printf("data.(%s) -> (%s)\n",data,jprint(argjson,0));
         }
         if ( argjson != 0 )
         {
