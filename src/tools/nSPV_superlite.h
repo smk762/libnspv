@@ -878,7 +878,6 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         memcpy(NSPV_key.privkey,privkey.bytes,sizeof(privkey));
         sz2 = sizeof(wif2);
         btc_privkey_encode_wif(&NSPV_key,chain,wif2,&sz2);
-        char str[65]; fprintf(stderr,"seed.(%s) -> %s (%s)\n",wifstr,bits256_str(str,privkey),wif2);
         wifstr = wif2;
         memset(&NSPV_key,0,sizeof(NSPV_key));
         memset(privkey.bytes,0,sizeof(privkey));
@@ -893,7 +892,6 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
             return(result);
         }
         memcpy(privkey.bytes,NSPV_key.privkey,32);
-        char str[65]; fprintf(stderr,"new prive %s\n",bits256_str(str,privkey));
     }
     memset(wif2,0,sizeof(wif2));
     jaddstr(result,"result","success");
@@ -1702,6 +1700,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)NSPV_mempoolresult.txid.bytes);
             for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
             {
+                if ( i < NSPV_mempoolresult.numtxids-1000 )
+                    break;
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
@@ -1753,6 +1753,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
                 for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
+                    if ( i < NSPV_txidsresult.numtxids-1000 )
+                        break;
                     ptr = &NSPV_txidsresult.txids[i];
                     if ( (itemstr= clonestr(origitemstr)) != 0 )
                     {
