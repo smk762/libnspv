@@ -10,4 +10,4 @@ trap "echo ERR;   exit" ERR
 # 2. run tests, write log
 ./nspv HUSH &>./testnspv.log &
 sleep 10  \
-&&  /usr/bin/python3 -m pytest rpctest/test_nspv.py -s | tee ./pytest.log
+&& trap /usr/bin/python3 -m pytest rpctest/test_nspv.py -s | tee ./pytest.log
