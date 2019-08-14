@@ -266,5 +266,6 @@ extern struct NSPV_header NSPV_blockheaders[128]; // limitation here is that 100
 extern int32_t NSPV_num_headers;
 extern int32_t NSPV_hdrheight_counter;
 extern int32_t IS_IN_SYNC;
+extern int64_t NSPV_totalsent,NSPV_totalrecv;
 
 #endif // KOMODO_NSPV_DEFSH

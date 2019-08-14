@@ -13,7 +13,7 @@
   </head>
   <body class="login-body">
     <nav class="navbar navbar-dark bg-dark">
-      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
+      <a class="navbar-brand"><img src="images/antara150x150.png" class="logo"/> Antara Superlite</a>
       <form class="form-inline">
         $MENU_BUTTON_ARRAY
         <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
@@ -35,18 +35,18 @@
               </div>
               <button type="submit" class="btn btn-primary">Login with image + password</button>
             </form>-->
-            <form action="$URL/method/login" method="get">
+            <form action="$URL/method/login" method="post">
               <!--<div class="divider">
                 <strong class="divider-title">or</strong>
               </div>-->
               <div class="form-group">
-                <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key">
-                <small id="nspvWifHelp" class="form-text text-muted">Enter WIF key (private key) of an address.</small>
+                <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key or Wallet Seed">
+                <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
               </div>
-              <button type="submit" class="btn btn-primary">Login with WIF key</button>
+              <button type="submit" class="btn btn-primary">Login with Wallet Seed or WIF key</button>
               <div class="divider"></div>
               <h4>Don't have an account?</h4>
-              <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">Generate New Address</button>
+              <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
             </form>
           </div>
           <!-- login form end -->

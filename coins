@@ -2773,6 +2773,9 @@
     "asset": "HUSH3",
     "fname": "Hush",
     "rpcport": 18031,
+    "p2p": 18030,
+    "magic":"6ed394d3",
+    "nSPV":"188.165.212.101",
     "mm2": 1
   },
   {

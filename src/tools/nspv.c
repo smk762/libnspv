@@ -68,7 +68,7 @@ static void print_version()
 static void print_usage()
 {
     print_version();
-    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-s[--timeout] <secs>) <command>\n");
+    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-s[--timeout] <secs>) <command>\n");
     printf("Supported commands:\n");
     printf("        scan      (scan blocks up to the tip, creates header.db file)\n");
     printf("\nExamples: \n");
@@ -106,6 +106,8 @@ void spv_sync_completed(btc_spv_client* client) {
     }
 }
 
+//#include "curve25519-donna.c"
+//#include "curve25519.c"
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
 #include "nSPV_CCtx.h"
@@ -233,7 +235,7 @@ int main(int argc, char* argv[])
     strcpy(NSPV_symbol,chain->name);
     // get arguments
     uint16_t port = 0;
-    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:", long_options, &long_index)) != -1) {
+    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:x:", long_options, &long_index)) != -1) {
         switch (opt) {
         case 'c':
             quit_when_synced = false;
@@ -259,6 +261,13 @@ int main(int argc, char* argv[])
         case 'p':
             port = (int)strtol(optarg, (char**)NULL, 0);
                 fprintf(stderr,"set port to %u\n",port);
+            break;
+        case 'x':
+            if ( optarg != 0 )
+            {
+                NSPV_externalip = clonestr(optarg+1);
+                fprintf(stderr,"set external ip to %s\n",NSPV_externalip);
+            }
             break;
         case 'f':
             dbfile = optarg;
