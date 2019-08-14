@@ -859,7 +859,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 
 cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
-    cJSON *result = cJSON_CreateObject(); char coinaddr[64],_wifstr[8192],wif2[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2;
+    cJSON *result = cJSON_CreateObject(); char coinaddr[64],wif2[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2; bits256 privkey;
     NSPV_logout();
     memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
     NSPV_logintime = (uint32_t)time(NULL);
@@ -874,8 +874,13 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         jaddnum(result,"wifprefix",(int64_t)data[0]);
         jaddnum(result,"expected",(int64_t)chain->b58prefix_secret_address);
         return(result);*/
-        strncpy(_wifstr,wifstr,sizeof(_wifstr)-1);
-        wifstr = wif2;//NSPV_seed_to_wif(wif2,_wifstr);
+        privkey = NSPV_seed_to_wif(wifstr);
+        memcpy(NSPV_key.privkey,privkey.bytes,sizeof(privkey));
+        sz2 = sizeof(wif2);
+        btc_privkey_encode_wif(&NSPV_key,chain,wif2,&sz2);
+        wifstr = wif2;
+        memset(&NSPV_key,0,sizeof(NSPV_key));
+        memset(privkey.bytes,0,sizeof(privkey));
     }
     if ( strcmp(NSPV_wifstr,wifstr) != 0 )
     {
@@ -884,12 +889,11 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         {
             jaddstr(result,"wiferror","couldnt decode wif");
             memset(wif2,0,sizeof(wif2));
-            memset(_wifstr,0,sizeof(_wifstr));
             return(result);
         }
+        memcpy(privkey.bytes,NSPV_key.privkey,32);
     }
     memset(wif2,0,sizeof(wif2));
-    memset(_wifstr,0,sizeof(_wifstr));
     jaddstr(result,"result","success");
     jaddstr(result,"status","wif will expire in 777 seconds");
     btc_pubkey_from_key(&NSPV_key,&NSPV_pubkey);
@@ -900,6 +904,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     jaddstr(result,"pubkey",NSPV_pubkeystr);
     jaddnum(result,"wifprefix",(int64_t)data[0]);
     jaddnum(result,"compressed",(int64_t)(data[sz-5] == 1));
+    fprintf(stderr,"result (%s)\n",jprint(result,0));
     memset(data,0,sizeof(data));
     return(result);
 }
@@ -1176,7 +1181,12 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( wifstr == 0 )
             return(cJSON_Parse("{\"error\":\"no wif\"}"));
-        else return(NSPV_login(NSPV_chain,wifstr));
+        else
+        {
+            cJSON *retjson = NSPV_login(NSPV_chain,wifstr);
+            memset(wifstr,0,strlen(wifstr));
+            return(retjson);
+        }
     }
     else if ( strcmp(method,"getnewaddress") == 0 )
         return(NSPV_getnewaddress(NSPV_chain));
@@ -1690,6 +1700,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)NSPV_mempoolresult.txid.bytes);
             for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
             {
+                if ( i < NSPV_mempoolresult.numtxids-1000 )
+                    break;
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
                 {
                     strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
@@ -1741,6 +1753,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
                 for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
+                    if ( i < NSPV_txidsresult.numtxids-1000 )
+                        break;
                     ptr = &NSPV_txidsresult.txids[i];
                     if ( (itemstr= clonestr(origitemstr)) != 0 )
                     {

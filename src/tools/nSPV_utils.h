@@ -77,6 +77,14 @@ btc_chainparams iln_chainparams_main =
     1,1,0,
 };*/
 
+bits256 NSPV_seed_to_wif(char *seed)
+{
+    bits256 privkey;
+    sha256_Raw((uint8_t *)seed,strlen(seed),privkey.bytes);
+    privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
+    return(privkey);
+}
+
 char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;
@@ -113,6 +121,35 @@ bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
     len = NSPV_rwequihdr(1,H,hdr,1);
     hash = bits256_doublesha256(H,len);
     return(hash);
+}
+
+char hexbyte(int32_t c)
+{
+    c &= 0xf;
+    if ( c < 10 )
+        return('0'+c);
+    else if ( c < 16 )
+        return('a'+c-10);
+    else return(0);
+}
+
+int32_t init_hexbytes_noT(char *hexbytes,unsigned char *message,long len)
+{
+    int32_t i;
+    if ( len <= 0 )
+    {
+        hexbytes[0] = 0;
+        return(1);
+    }
+    for (i=0; i<len; i++)
+    {
+        hexbytes[i*2] = hexbyte((message[i]>>4) & 0xf);
+        hexbytes[i*2 + 1] = hexbyte(message[i] & 0xf);
+        //printf("i.%d (%02x) [%c%c]\n",i,message[i],hexbytes[i*2],hexbytes[i*2+1]);
+    }
+    hexbytes[len*2] = 0;
+    //printf("len.%ld\n",len*2+1);
+    return((int32_t)len*2+1);
 }
 
 void touppercase(char *str)
