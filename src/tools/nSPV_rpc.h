@@ -604,14 +604,14 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     n = i;
 //printf("URLMETHOD.(%s)\n",urlmethod);
     *postflagp = (strcmp(urlmethod,"POST") == 0);
-    printf("POST.%d rpcparse.(%s)\n",*postflagp,urlstr);
+    //printf("POST.%d rpcparse.(%s)\n",*postflagp,urlstr);
     for (i=0; i<(int32_t)sizeof(url)-1&&urlstr[n+i]!=0&&urlstr[n+i]!=' '; i++)
         url[i] = urlstr[n+i];
     url[i++] = 0;
     n += i;
     j = i = 0;
     filetype[0] = 0;
-printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
+printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflag);
     snprintf(furl,sizeof(furl),"%s",url+1);
     if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
     {
@@ -639,7 +639,7 @@ printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
-        fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
+        //fprintf(stderr,"cmp.(%s) and cmp2.(%s) port.%u\n",cmpstr,cmpstr2,port);
         for (f=0; f<(int32_t)(sizeof(htmlfiles)/sizeof(*htmlfiles)); f++)
         {
             if ( strcmp(cmpstr,htmlfiles[f]) == 0 || strcmp(cmpstr2,htmlfiles[f]) == 0 )
@@ -676,7 +676,7 @@ printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
         }
         if ( filestr == 0 && strncmp("/method/",cmpstr,8) == 0 )
         {
-            fprintf(stderr,"cmpstr[8] (%s)\n",cmpstr+8);
+            //fprintf(stderr,"cmpstr[8] (%s)\n",cmpstr+8);
             for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
                 if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
@@ -774,7 +774,7 @@ printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
         {
             free_json(argjson);
             argjson = cJSON_Parse(data);
-            //printf("data.(%s)\n",data);
+    printf("data.(%s)\n",data);
         }
         if ( argjson != 0 )
         {
@@ -897,7 +897,7 @@ printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
                     if ( is_cJSON_Array(arg) != 0 && cJSON_GetArraySize(arg) == 1 )
                         arg = jitem(arg,0);
                 } else arg = argjson;
-                //printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
+                printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
                 if ( userpass != 0 && jstr(arg,"userpass") == 0 )
                     jaddstr(arg,"userpass",userpass);
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || strcmp(remoteaddr,NSPV_externalip) == 0 || LP_valid_remotemethod(arg) > 0 )
