@@ -40,10 +40,10 @@
                 <strong class="divider-title">or</strong>
               </div>-->
               <div class="form-group">
-                <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key">
-                <small id="nspvWifHelp" class="form-text text-muted">Enter WIF key (private key) of an address.</small>
+                <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key or Wallet Seed">
+                <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
               </div>
-              <button type="submit" class="btn btn-primary">Login with WIF key</button>
+              <button type="submit" class="btn btn-primary">Login with Wallet Seed or WIF key</button>
               <div class="divider"></div>
               <h4>Don't have an account?</h4>
               <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
