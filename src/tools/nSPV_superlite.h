@@ -1411,6 +1411,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $NTZTXID - Notarised Txid
     // $NTZTXIDHT - Notarised Txid Height
     // $NTZDESTTXID - Notarised Destination Txid
+    // $NETBYTEIN - Network Bytes Recieved
+    // $NETBYTEOUT - Network Bytes Sent
     
     // $BLKHDR - Block Header
     // $BLKHASH - Block Hash
