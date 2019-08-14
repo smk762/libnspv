@@ -55,7 +55,7 @@
 
 #ifndef u8
 //typedef uint8_t u8;
-//typedef int32_t s32;
+typedef int32_t s32;
 typedef int64_t limb;
 #endif
 
