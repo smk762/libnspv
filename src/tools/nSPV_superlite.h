@@ -40,7 +40,7 @@ int32_t NSPV_didfirsttxproofs;
 char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
-int64_t NSPV_balance,NSPV_rewards;
+int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
 
 btc_key NSPV_key;
 btc_pubkey NSPV_pubkey;
@@ -202,6 +202,7 @@ btc_node *NSPV_req(btc_spv_client *client,btc_node *node,uint8_t *msg,int32_t le
         cstr_free(request, true);
         //fprintf(stderr,"pushmessage [%d] len.%d\n",msg[1],len);
         node->prevtimes[ind] = timestamp;
+        NSPV_totalsent += len;
         return(node);
     } else fprintf(stderr,"no nodes\n");
     return(0);
@@ -279,6 +280,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
     strcpy(NSPV_lastpeer,from->ipaddr);
     if ( len > 0 )
     {
+        NSPV_totalrecv += len;
         switch ( response[0] )
         {
             case NSPV_INFORESP:
@@ -383,7 +385,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
             case NSPV_MEMPOOLRESP:
                 NSPV_mempoolresp_purge(&NSPV_mempoolresult);
                 NSPV_rwmempoolresp(0,&response[1],&NSPV_mempoolresult);
-                fprintf(stderr,"got mempool response %u size.%d (%s) CC.%d num.%d memfunc.%d %s/v%d\n",timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.memfunc,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
+                fprintf(stderr,"got mempool response %s %u size.%d (%s) CC.%d num.%d memfunc.%d %s/v%d\n",from->ipaddr,timestamp,len,NSPV_mempoolresult.coinaddr,NSPV_mempoolresult.CCflag,NSPV_mempoolresult.numtxids,NSPV_mempoolresult.memfunc,bits256_str(str,NSPV_mempoolresult.txid),NSPV_mempoolresult.vout);
                 break;
             case NSPV_NTZSRESP:
                 NSPV_ntzsresp_purge(&NSPV_ntzsresult);
@@ -634,14 +636,14 @@ cJSON *NSPV_mempooltxids(btc_spv_client *client,char *coinaddr,int32_t CCflag,ui
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
-    fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
+    //fprintf(stderr,"(%s) func.%d CC.%d %s/v%d len.%d\n",coinaddr,memfunc,CCflag,bits256_str(str,txid),vout,len);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,msg[1]>>1) != 0 )
     {
         for (i=0; i<NSPV_POLLITERS; i++)
         {
             usleep(NSPV_POLLMICROS);
-            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memcmp(&txid,&NSPV_mempoolresult.txid,sizeof(txid)) == 0 && vout == NSPV_mempoolresult.vout && memfunc == NSPV_mempoolresult.memfunc )
+            if ( NSPV_mempoolresult.nodeheight >= NSPV_inforesult.height && strcmp(coinaddr,NSPV_mempoolresult.coinaddr) == 0 && CCflag == NSPV_mempoolresult.CCflag && memfunc == NSPV_mempoolresult.memfunc )
                 return(NSPV_mempoolresp_json(&NSPV_mempoolresult));
         }
     } else sleep(1);
@@ -656,13 +658,13 @@ int32_t NSPV_coinaddr_inmempool(btc_spv_client *client,char const *logcategory,c
     NSPV_mempooltxids(client,coinaddr,CCflag,NSPV_MEMPOOL_ADDRESS,zeroid,-1);
     if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,coinaddr) == 0 && NSPV_mempoolresult.CCflag == CCflag )
     {
-        fprintf(stderr,"found (%s) vout in mempool\n",coinaddr);
+        char str[65]; fprintf(stderr,"found (%s) vout in mempool %s\n",coinaddr,bits256_str(str,NSPV_mempoolresult.txids[0]));
         if ( logcategory != 0 )
         {
             // add to logfile
         }
-        return(true);
-    } else return(false);
+        return(1);
+    } else return(0);
 }
 
 bool NSPV_spentinmempool(btc_spv_client *client,bits256 *spenttxidp,int32_t *spentvinip,bits256 txid,int32_t vout)
@@ -836,6 +838,9 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     len += iguana_rwnum(1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
+    for (i=0; i<8; i++)
+        NSPV_req(client,0,msg,len,NODE_NSPV,NSPV_BROADCAST>>1);
+    sleep(1);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,NSPV_BROADCAST>>1) != 0 )
     {
@@ -857,28 +862,41 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 
 cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
-    cJSON *result = cJSON_CreateObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2;
+    cJSON *result = cJSON_CreateObject(); char coinaddr[64],wif2[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2; bits256 privkey;
     NSPV_logout();
+    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
+    NSPV_logintime = (uint32_t)time(NULL);
     if ( strlen(wifstr) < 64 && (sz= btc_base58_decode_check(wifstr,data,sizeof(data))) > 0 && ((sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1)) )
         valid = 1;
     // if error, treat as seed, also get remote working, html needs to use -p=port
     if ( valid == 0 || data[0] != chain->b58prefix_secret_address )
     {
-        jaddstr(result,"result","error");
+        /*jaddstr(result,"result","error");
         jaddstr(result,"error","invalid wif");
         jaddnum(result,"len",(int64_t)sz);
         jaddnum(result,"wifprefix",(int64_t)data[0]);
         jaddnum(result,"expected",(int64_t)chain->b58prefix_secret_address);
-        return(result);
+        return(result);*/
+        privkey = NSPV_seed_to_wif(wifstr);
+        memcpy(NSPV_key.privkey,privkey.bytes,sizeof(privkey));
+        sz2 = sizeof(wif2);
+        btc_privkey_encode_wif(&NSPV_key,chain,wif2,&sz2);
+        wifstr = wif2;
+        memset(&NSPV_key,0,sizeof(NSPV_key));
+        memset(privkey.bytes,0,sizeof(privkey));
     }
-    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
-    NSPV_logintime = (uint32_t)time(NULL);
     if ( strcmp(NSPV_wifstr,wifstr) != 0 )
     {
         strncpy(NSPV_wifstr,wifstr,sizeof(NSPV_wifstr)-1);
         if ( btc_privkey_decode_wif(NSPV_wifstr,chain,&NSPV_key) == 0 )
+        {
             jaddstr(result,"wiferror","couldnt decode wif");
+            memset(wif2,0,sizeof(wif2));
+            return(result);
+        }
+        memcpy(privkey.bytes,NSPV_key.privkey,32);
     }
+    memset(wif2,0,sizeof(wif2));
     jaddstr(result,"result","success");
     jaddstr(result,"status","wif will expire in 777 seconds");
     btc_pubkey_from_key(&NSPV_key,&NSPV_pubkey);
@@ -889,6 +907,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     jaddstr(result,"pubkey",NSPV_pubkeystr);
     jaddnum(result,"wifprefix",(int64_t)data[0]);
     jaddnum(result,"compressed",(int64_t)(data[sz-5] == 1));
+    fprintf(stderr,"result (%s)\n",jprint(result,0));
     memset(data,0,sizeof(data));
     return(result);
 }
@@ -908,6 +927,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
     jaddstr(result,"pubkey",pubkeystr);
     jaddnum(result,"wifprefix",chain->b58prefix_secret_address);
     jaddnum(result,"compressed",1);
+    memset(wifstr,0,sizeof(wifstr));
     return(result);
 }
 
@@ -1164,7 +1184,12 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     {
         if ( wifstr == 0 )
             return(cJSON_Parse("{\"error\":\"no wif\"}"));
-        else return(NSPV_login(NSPV_chain,wifstr));
+        else
+        {
+            cJSON *retjson = NSPV_login(NSPV_chain,wifstr);
+            memset(wifstr,0,strlen(wifstr));
+            return(retjson);
+        }
     }
     else if ( strcmp(method,"getnewaddress") == 0 )
         return(NSPV_getnewaddress(NSPV_chain));
@@ -1393,7 +1418,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // Top menu buttons HTML tags variables to use with
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
-     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" type=\"button\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" type=\"button\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" type=\"button\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-2\" type=\"button\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-2\" type=\"button\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
+     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-1\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-1\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
 
     // == Coin specific gloabal variable
     // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
@@ -1409,6 +1434,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $NTZTXID - Notarised Txid
     // $NTZTXIDHT - Notarised Txid Height
     // $NTZDESTTXID - Notarised Destination Txid
+    // $NETBYTEIN - Network Bytes Recieved
+    // $NETBYTEOUT - Network Bytes Sent
     
     // $BLKHDR - Block Header
     // $BLKHASH - Block Hash
@@ -1651,10 +1678,52 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
 
     if ( strcmp(method,"wallet") == 0 )
     {
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
         if ( jint(argjson,"update") != 0 )
         {
             if ( NSPV_address[0] != 0 )
+            {
                 NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
+                if ( (origitemstr= OS_filestr(&fsize,"html/wallet_mempool_table_row.inc")) != 0 )
+                {
+                    int32_t z;
+                    //for (z=0; z<4; z++) fprintf(stderr,"%016llx ",(long long)NSPV_mempoolresult.txid.ulongs[z]);
+                    //fprintf(stderr," inside loop with %d mempool\n",NSPV_mempoolresult.numtxids);
+                    itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
+                    // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
+                    // $MEMP_TYPE - Type
+                    // $MEMP_DEST - Destination Address
+                    // $MEMP_AMOUNT - Amount sent in this transaction
+                    // $MEMP_TXID - Transaction ID
+                    //iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)&NSPV_mempoolresult.txid.ulongs[7]);
+                    for (i=0; i<NSPV_mempoolresult.numtxids && i<1000; i++)
+                    {
+                        if ( i < 4 )
+                        {
+                            for (z=0; z<8; z++)
+                                ((uint8_t *)&satoshis)[z] = ((uint8_t *)&NSPV_mempoolresult.txid.ulongs[3-i])[7-z];
+                        }
+                        else satoshis = 0;
+                        if ( (itemstr= clonestr(origitemstr)) != 0 )
+                        {
+                            strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
+                            sprintf(replacestr,"%.8f",dstr(satoshis));
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
+                            bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
+                            NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TXID",replacestr);
+                            strcat(itemsbuf,itemstr);
+                            itembuf[0] = 0;
+                            free(itemstr);
+                        }
+                    }
+                    NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY",itemsbuf);
+                    didflag = 1;
+                    free(itemsbuf);
+                    free(origitemstr);
+                }
+            }
         }
         else
         {
@@ -1664,37 +1733,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 free_json(retjson);
         }
         retjson = 0;
-        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; int64_t satoshis; long fsize; struct NSPV_txidresp *ptr; int32_t didflag = 0;
-        if ( NSPV_mempoolresult.txids != 0 && NSPV_mempoolresult.numtxids >= 1 && strcmp(NSPV_mempoolresult.coinaddr,NSPV_address) == 0 && NSPV_mempoolresult.CCflag == 0 && (origitemstr= OS_filestr(&fsize,"wallet_mempool_table_row.inc")) != 0 )
-        {
-            itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
-            // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
-            // $MEMP_TYPE - Type
-            // $MEMP_DEST - Destination Address
-            // $MEMP_AMOUNT - Amount sent in this transaction
-            // $MEMP_TXID - Transaction ID
-            for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
-            {
-                if ( (itemstr= clonestr(origitemstr)) != 0 )
-                {
-                    strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
-                    satoshis = 0;
-                    sprintf(replacestr,"%.8f",dstr(satoshis));
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
-                    bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
-                    NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TXID",replacestr);
-                    strcat(itemsbuf,itemstr);
-                    itembuf[0] = 0;
-                    free(itemstr);
-                }
-            }
-            NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY",itemsbuf);
-            didflag = 1;
-            free(itemsbuf);
-            free(origitemstr);
-        }
         if ( didflag == 0 )
             NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY","");
         didflag = 0;
@@ -1726,6 +1764,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
                 for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
+                    if ( i < NSPV_txidsresult.numtxids-1000 )
+                        break;
                     ptr = &NSPV_txidsresult.txids[i];
                     if ( (itemstr= clonestr(origitemstr)) != 0 )
                     {
@@ -1750,7 +1790,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         if ( ptr->height <= NSPV_lastntz.height )
                             strcat(replacestr,"  <span class=\"badge badge-info\">dPoW</span>");
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
-                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
+                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height+1);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
                         sprintf(replacestr,"%.8f",dstr(satoshis));
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_AMOUNT",replacestr);
@@ -1853,6 +1893,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+    sprintf(replacestr,"%llu",(long long)NSPV_totalsent);
+    NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEOUT",(char *)replacestr);
+    sprintf(replacestr,"%llu",(long long)NSPV_totalrecv);
+    NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEIN",(char *)replacestr);
 
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error

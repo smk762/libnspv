@@ -567,6 +567,8 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     cJSON *result = cJSON_CreateObject(); int32_t expiration; uint32_t timestamp = (uint32_t)time(NULL);
     jaddstr(result,"result","success");
     jaddstr(result,"nSPV","superlite");
+    jaddnum(result,"totalsent",NSPV_totalsent);
+    jaddnum(result,"totalreceived",NSPV_totalrecv);
     if ( NSPV_address[0] != 0 )
     {
         jaddstr(result,"address",NSPV_address);

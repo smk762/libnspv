@@ -597,7 +597,7 @@ cJSON *SuperNET_urlconv(char *value,int32_t bufsize,char *urlstr)
 
 char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *jsonflagp,int32_t *postflagp,char *urlstr,char *remoteaddr,char *filetype,uint16_t port)
 {
-    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],buf[4096],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr=0,*token = 0; int32_t i,j,n,apiflag=0,num=0; uint32_t queueid;
+    cJSON *tokens,*argjson,*origargjson,*tmpjson=0,*json = 0; long filesize; char symbol[64],*userpass=0,urlmethod[16],*data,url[8192],furl[8192],*retstr=0,*filestr=0,*token = 0; int32_t i,j,n,apiflag=0,num=0; uint32_t queueid;
     for (i=0; i<(int32_t)sizeof(urlmethod)-1&&urlstr[i]!=0&&urlstr[i]!=' '; i++)
         urlmethod[i] = urlstr[i];
     urlmethod[i++] = 0;
@@ -611,7 +611,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     n += i;
     j = i = 0;
     filetype[0] = 0;
-    //printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
+//printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
     snprintf(furl,sizeof(furl),"%s",url+1);
     if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
     {
@@ -634,8 +634,9 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     }
     else
     {
-        int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
-        strcpy(cmpstr,&url[i]);
+        int32_t j,f,matches; char fname[512],*cmpstr,*cmpstr2;
+        cmpstr = clonestr(&url[i]);
+        cmpstr2 = malloc(strlen(cmpstr) + 64);
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
@@ -654,9 +655,15 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     strcpy(filetype,url+j+1);
                     //printf("set (%s) filetype.(%s)\n",fname,filetype);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    {
+                        free(cmpstr);
+                        free(cmpstr2);
                         return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                    }
                     if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                         *contentlenp = (int32_t)filesize;
+                    free(cmpstr);
+                    free(cmpstr2);
                     return(filestr);
                 }
             }
@@ -670,12 +677,17 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 sprintf(fname,"html/%s",methodfiles[f]);
                 //fprintf(stderr,"open1 (%s)\n",fname);
                 if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                {
+                    free(cmpstr);
+                    free(cmpstr2);
                     return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                }
                 break;
             }
         }
         if ( filestr == 0 && strncmp("/method/",cmpstr,8) == 0 )
         {
+            //fprintf(stderr,"cmpstr[8] (%s)\n",cmpstr+8);
             for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
                 if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
@@ -685,7 +697,11 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     sprintf(fname,"html/%s",methodfiles[f]);
                     //fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                    {
+                        free(cmpstr);
+                        free(cmpstr2);
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
+                    }
                     break;
                 }
             }
@@ -706,15 +722,23 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                             strcpy(filetype,url+j+1);
                             //printf("set2 (%s) filetype.(%s)\n",fname,filetype);
                             if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
+                            {
+                                free(cmpstr);
+                                free(cmpstr2);
                                 return(clonestr("{\"error\":\"cant find htmlfile\"}"));
+                            }
                             if ( strcmp(filetype,"jpg") == 0 || strcmp(filetype,"png") == 0 || strcmp(filetype,"ico") == 0 )
                                 *contentlenp = (int32_t)filesize;
+                            free(cmpstr);
+                            free(cmpstr2);
                             return(filestr);
                         }
                     }
                 }
             }
         }
+        free(cmpstr);
+        free(cmpstr2);
     }
     /*else if ( (filestr= OS_filestr(&filesize,furl)) != 0 ) allows arbitrary file access!
      {
@@ -772,11 +796,18 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
         if ( (data= jstr(json,"POST")) != 0 )
         {
             free_json(argjson);
-            argjson = cJSON_Parse(data);
-            //printf("data.(%s)\n",data);
+            if ( strncmp("wif=",data,4) == 0 )
+            {
+                argjson = cJSON_CreateObject();
+                jaddstr(argjson,"method","login");
+                jaddstr(argjson,"wif",data+4);
+                memset(data,0,strlen(data));
+            } else argjson = cJSON_Parse(data);
+    //printf("data.(%s) -> (%s)\n",data,jprint(argjson,0));
         }
         if ( argjson != 0 )
         {
+            char *buf = malloc(NSPV_MAXPACKETSIZE);
             userpass = jstr(argjson,"userpass");
             //printf("userpass.(%s)\n",userpass);
             if ( (n= cJSON_GetArraySize(tokens)) > 0 )
@@ -861,6 +892,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                         i++;
                     }
                 }
+                free(buf);
             }
             if ( is_cJSON_Array(argjson) != 0 && (n= cJSON_GetArraySize(argjson)) > 0 )
             {
@@ -943,11 +975,13 @@ int32_t iguana_getheadersize(char *buf,int32_t recvlen)
     return(recvlen);
 }
 
+static char space[NSPV_MAXPACKETSIZE],space2[NSPV_MAXPACKETSIZE];
+
 void *LP_rpc_processreq(void *_ptr)
 {
     char filetype[128],content_type[128];
     int32_t recvlen,retlen,flag,postflag=0,contentlen,remains,sock,numsent,jsonflag=0,hdrsize,len;
-    char helpname[512],remoteaddr[64],*buf,*retstr,space[8192],space2[32786],*jsonbuf; struct rpcrequest_info *req = _ptr;
+    char helpname[512],remoteaddr[64],*buf,*retstr,*jsonbuf; struct rpcrequest_info *req = _ptr;
     uint32_t ipbits,i,size = NSPV_MAXPACKETSIZE + 512;
     ipbits = req->ipbits;;
     expand_ipbits(remoteaddr,ipbits);
@@ -1060,7 +1094,7 @@ void *LP_rpc_processreq(void *_ptr)
                 acceptstr = "Accept-Ranges: bytes\r\n";
                 crflag = 0;
             }
-            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nContent-Security-Policy: default-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
+            sprintf(hdrs,"HTTP/1.1 200 OK\r\n%sAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Methods: GET, POST\r\nContent-Security-Policy: default-src 'self'; style-src 'self' custom.css bootstrap.min.css 'unsafe-inline'; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'\r\nCache-Control :  no-cache, no-store, must-revalidate\r\n%sContent-Length : %8d\r\n\r\n",acceptstr,content_type,retlen);
             response[0] = '\0';
             strcat(response,hdrs);
             memcpy(&response[strlen(response)],retstr,retlen);
@@ -1100,7 +1134,8 @@ void *LP_rpc_processreq(void *_ptr)
             free(retstr);
         }
     }
-    //free(space);
+    memset(space,0,sizeof(space));
+    memset(space2,0,sizeof(space2));
     //printf("free jsonbuf.%p\n",jsonbuf);
     free(jsonbuf);
     closesocket(sock);

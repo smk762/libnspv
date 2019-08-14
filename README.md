@@ -100,6 +100,45 @@ The application will try to connect to max 6 peers, send the transaction two two
 How to Build
 ----------------
 
+You will need to have some dev tools prior to building libnspv for your system. 
+
+## Prepare system before building
+
+#### MacOS
+```shell
+# Install brew
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+# Install Xcode, opens a pop-up window to install CLT without installing the entire Xcode package
+xcode-select --install 
+# Update brew and install dependencies
+brew update
+brew upgrade
+brew install libsodium libevent cmake git wget
+```
+
+#### Android
+```shell
+# Install Termux
+https://play.google.com/store/apps/details?id=com.termux
+# Open and run the following commands
+pkg upgrade
+pkg install build-essential git wget libsodium libevent
+```
+
+#### Linux
+```shell
+sudo apt-get install build-essential pkg-config libc6-dev m4 autoconf libtool unzip git wget automake
+```
+
+## Clone repository using Git
+Once prepared your system, get the source code:
+```shell
+git clone https://github.com/jl777/libnspv/
+cd libnspv
+```
+
+## Now you can follow the next instructions to compile and update
+
 #### Full library including CLI tool and wallet database
 ```
 ./autogen.sh
@@ -112,6 +151,15 @@ make check
 ./autogen.sh
 ./configure --disable-wallet --disable-tools
 make check
+```
+
+#### Updating libnspv
+```shell
+cd libnspv
+git pull
+./autogen.sh
+./configure
+make
 ```
 
 libnspv does all the above, it also can launch a superlite nSPV client

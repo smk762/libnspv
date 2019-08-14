@@ -13,8 +13,8 @@
   </head>
   <body>
     <nav class="navbar navbar-dark bg-dark">
-      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
-      <form class="form-row" action="$URL/method/send_confirm" method="get">
+      <a class="navbar-brand"><img src="images/antara150x150.png" class="logo"/> Antara Superlite</a>
+      <form class="form-row send_form" action="$URL/method/send_confirm" method="get">
           <div class="col-lg-6 col-sm-12 col-xs-12">
             <input class="form-control form-control-sm" type="text" placeholder="Address" name="address" aria-label="ToAddress">
           </div>
@@ -46,6 +46,38 @@
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 col-sm-12 pr-sm-1" style="margin-bottom: 1em;">
+          <div class="card text-white bg-dark">
+            <div class="card-header">
+              <h5>Tx - vin</h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                <tbody>
+                  $SEND_TXVIN_ARRAY
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-12 pl-sm-1" style="margin-bottom: 1em;">
+          <div class="card text-white bg-dark">
+            <div class="card-header">
+              <h5>Tx - vout</h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table class="table table-striped table-dark" style="margin-bottom: 0;">
+                <tbody>
+                  $SEND_TXVOUT_ARRAY
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="row" style="margin-bottom: 1em;">
@@ -101,38 +133,6 @@
               </div> <!-- TxidInfo body end -->
             </div> <!-- TxidInfo card end -->
         </div> <!-- TxidInfo div end -->
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 col-sm-12 pr-sm-1" style="margin-bottom: 1em;">
-          <div class="card text-white bg-dark">
-            <div class="card-header">
-              <h5>Tx - vin</h5>
-            </div>
-            <div class="card-body" style="padding: 0;">
-              <table class="table table-striped table-dark" style="margin-bottom: 0;">
-                <tbody>
-                  $SEND_TXVIN_ARRAY
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-sm-12 pl-sm-1" style="margin-bottom: 1em;">
-          <div class="card text-white bg-dark">
-            <div class="card-header">
-              <h5>Tx - vout</h5>
-            </div>
-            <div class="card-body" style="padding: 0;">
-              <table class="table table-striped table-dark" style="margin-bottom: 0;">
-                <tbody>
-                  $SEND_TXVOUT_ARRAY
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   
