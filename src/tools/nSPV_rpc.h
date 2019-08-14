@@ -676,6 +676,7 @@ printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
         }
         if ( filestr == 0 && strncmp("/method/",cmpstr,8) == 0 )
         {
+            fprintf(stderr,"cmpstr[8] (%s)\n",cmpstr+8);
             for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
                 if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
@@ -683,7 +684,7 @@ printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
                     *jsonflagp = 1;
                     strcpy(filetype,"html");
                     sprintf(fname,"html/%s",methodfiles[f]);
-                    //fprintf(stderr,"open (%s)\n",fname);
+                    fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
                     break;
