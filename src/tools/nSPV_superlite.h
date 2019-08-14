@@ -861,6 +861,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     NSPV_logout();
     if ( strlen(wifstr) < 64 && (sz= btc_base58_decode_check(wifstr,data,sizeof(data))) > 0 && ((sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1)) )
         valid = 1;
+    // if error, treat as seed, also get remote working, html needs to use -p=port
     if ( valid == 0 || data[0] != chain->b58prefix_secret_address )
     {
         jaddstr(result,"result","error");
@@ -1651,7 +1652,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     if ( strcmp(method,"wallet") == 0 )
     {
         if ( jint(argjson,"update") != 0 )
-            NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
+        {
+            if ( NSVP_address[0] != 0 )
+                NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
+        }
         else
         {
             if ( (retjson= NSPV_addresstxids(0,NSPV_client,NSPV_address,0,0,0)) != 0 )
