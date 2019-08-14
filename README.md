@@ -137,4 +137,33 @@ the JSON api is very simple and almost a direct mapping of the nSPV=1 rpc comman
 file at ~/libnspv/src/tools/testvectors will show specifically how to call it using curl. any other method to post the JSON
 to the rpc port will suffice.
 
-https://docs.komodoplatform.com/nSPV has initial docs 
+https://docs.komodoplatform.com/nSPV has initial docs
+
+How To build in Termux on Android:
+-------------------------------------
+
+#### Check if your device will use the new Termux repos: https://github.com/termux/termux-packages#information-for-android-7-users
+
+#### Update and install required packages
+
+    pkg upgrade && pkg install build-essential git wget libsodium libevent
+
+It is possible that other packages are required.
+
+#### Clone and enter the repo
+
+    git clone https://github.com/jl777/libnspv/
+    cd libnspv
+
+#### Update scripts so target environment determined (from https://wiki.termux.com/wiki/Building_packages):
+
+    find . -name 'config.sub' -exec chmod u+w '{}' \; -exec cp -f "${PREFIX}/share/libtool/build-aux/config.sub" '{}' \;
+    find . -name 'config.guess' -exec chmod u+w '{}' \; -exec cp -f "${PREFIX}/share/libtool/build-aux/config.guess" '{}' \;
+
+#### Then the usual: 
+
+    ./autogen.sh
+    ./configure
+    make
+
+Then visit 127.0.0.1:7771 in your Android browser.
