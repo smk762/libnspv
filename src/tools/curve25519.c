@@ -21,7 +21,7 @@
 //#define force_inline  __attribute__((always_inline))
 
 // Sum two numbers: output += in
-static inline bits320 fsum(bits320 output,bits320 in)
+static bits320 fsum(bits320 output,bits320 in)
 {
     int32_t i;
     for (i=0; i<5; i++)
@@ -29,7 +29,7 @@ static inline bits320 fsum(bits320 output,bits320 in)
     return(output);
 }
 
-static inline void fdifference_backwards(uint64_t *out,const uint64_t *in)
+static void fdifference_backwards(uint64_t *out,const uint64_t *in)
 {
     static const uint64_t two54m152 = (((uint64_t)1) << 54) - 152;  // 152 is 19 << 3
     static const uint64_t two54m8 = (((uint64_t)1) << 54) - 8;
@@ -46,7 +46,7 @@ void store_limb(uint8_t *out,uint64_t in)
         out[i] = (in & 0xff);
 }
 
-static inline uint64_t load_limb(uint8_t *in)
+static uint64_t load_limb(uint8_t *in)
 {
     return
     ((uint64_t)in[0]) |
@@ -76,7 +76,7 @@ bits320 fexpand(bits256 basepoint)
 typedef unsigned uint128_t __attribute__((mode(TI)));
 
 // Multiply a number by a scalar: output = in * scalar
-static inline bits320 fscalar_product(const bits320 in,const uint64_t scalar)
+static bits320 fscalar_product(const bits320 in,const uint64_t scalar)
 {
     int32_t i; uint128_t a = 0; bits320 output;
     a = ((uint128_t)in.ulongs[0]) * scalar;
@@ -150,7 +150,7 @@ bits320 fsquare_times(const bits320 in,uint64_t count)
     return(out);
 }
 
-static inline void fcontract_iter(uint128_t t[5],int32_t flag)
+static void fcontract_iter(uint128_t t[5],int32_t flag)
 {
     int32_t i; uint64_t mask = 0x7ffffffffffffLL;
     for (i=0; i<4; i++)
@@ -357,7 +357,7 @@ static void freduce_degree(limb *output) {
 /* return v / 2^26, using only shifts and adds.
  *
  * On entry: v can take any value. */
-static inline limb
+static limb
 div_by_2_26(const limb v)
 {
     /* High word of v; no shift needed. */
@@ -373,7 +373,7 @@ div_by_2_26(const limb v)
 /* return v / (2^25), using only shifts and adds.
  *
  * On entry: v can take any value. */
-static inline limb
+static limb
 div_by_2_25(const limb v)
 {
     /* High word of v; no shift needed*/
@@ -438,6 +438,7 @@ static void freduce_coefficients(limb *output) {
  *
  * output must be distinct to both inputs. The output is reduced degree
  * (indeed, one need only provide storage for 10 limbs) and |output[i]| < 2^26.
+ */
 static void fmul32(limb *output, const limb *in, const limb *in2)
 {
     limb t[19];
@@ -447,7 +448,7 @@ static void fmul32(limb *output, const limb *in, const limb *in2)
     freduce_coefficients(t);
     // |t[i]| < 2^26
     memcpy(output, t, sizeof(limb) * 10);
-}*/
+}
 
 /* Square a number: output = in**2
  *
@@ -710,7 +711,7 @@ bits320 bits320_limbs(limb limbs[10])
     return(output);
 }
 
-static inline bits320 fscalar_product(const bits320 in,const uint64_t scalar)
+static bits320 fscalar_product(const bits320 in,const uint64_t scalar)
 {
     limb output[10],input[10]; int32_t i;
     for (i=0; i<10; i++)
@@ -719,7 +720,7 @@ static inline bits320 fscalar_product(const bits320 in,const uint64_t scalar)
     return(bits320_limbs(output));
 }
 
-static inline bits320 fsquare_times(const bits320 in,uint64_t count)
+static bits320 fsquare_times(const bits320 in,uint64_t count)
 {
     limb output[10],input[10]; int32_t i;
     for (i=0; i<10; i++)
@@ -775,7 +776,7 @@ bits256 curve25519(bits256 mysecret,bits256 theirpublic)
 // x2 z2: long form && x3 z3: long form
 // x z: short form, destroyed && xprime zprime: short form, destroyed
 // qmqp: short form, preserved
-static inline void
+static void
 fmonty(bits320 *x2, bits320 *z2, // output 2Q
        bits320 *x3, bits320 *z3, // output Q + Q'
        bits320 *x, bits320 *z,   // input Q
@@ -803,7 +804,7 @@ fmonty(bits320 *x2, bits320 *z2, // output 2Q
 // long. Perform the swap iff @swap is non-zero.
 // This function performs the swap without leaking any side-channel information.
 // -----------------------------------------------------------------------------
-static inline void swap_conditional(bits320 *a,bits320 *b,uint64_t iswap)
+static void swap_conditional(bits320 *a,bits320 *b,uint64_t iswap)
 {
     int32_t i; const uint64_t swap = -iswap;
     for (i=0; i<5; ++i)
@@ -845,7 +846,7 @@ void cmult(bits320 *resultx,bits320 *resultz,bits256 secret,const bits320 q)
 }
 
 // Shamelessly copied from donna's code that copied djb's code, changed a little
-inline bits320 crecip(const bits320 z)
+bits320 crecip(const bits320 z)
 {
     bits320 a,t0,b,c;
     /* 2 */ a = fsquare_times(z, 1); // a = 2
@@ -939,7 +940,7 @@ bits256 curve25519_basepoint9()
 #define Gamma1(x)       (S(x, 17) ^ S(x, 19) ^ R(x, 10))
 #define MIN(x, y) ( ((x)<(y))?(x):(y) )
 
-static inline int32_t sha256_vcompress(struct sha256_vstate * md,uint8_t *buf)
+static int32_t sha256_vcompress(struct sha256_vstate * md,uint8_t *buf)
 {
     uint32_t S[8],W[64],t0,t1,i;
     for (i=0; i<8; i++) // copy state into S
@@ -1035,7 +1036,7 @@ h  = t0 + t1;
 #undef Gamma0
 #undef Gamma1
 
-static inline void sha256_vinit(struct sha256_vstate * md)
+static void sha256_vinit(struct sha256_vstate * md)
 {
     md->curlen = 0;
     md->length = 0;
@@ -1049,7 +1050,7 @@ static inline void sha256_vinit(struct sha256_vstate * md)
     md->state[7] = 0x5BE0CD19UL;
 }
 
-static inline int32_t sha256_vprocess(struct sha256_vstate *md,const uint8_t *in,uint64_t inlen)
+static int32_t sha256_vprocess(struct sha256_vstate *md,const uint8_t *in,uint64_t inlen)
 {
     uint64_t n; int32_t err;
     if ( md->curlen > sizeof(md->buf) )
@@ -1079,7 +1080,7 @@ static inline int32_t sha256_vprocess(struct sha256_vstate *md,const uint8_t *in
     return(0);
 }
 
-static inline int32_t sha256_vdone(struct sha256_vstate *md,uint8_t *out)
+static int32_t sha256_vdone(struct sha256_vstate *md,uint8_t *out)
 {
     int32_t i;
     if ( md->curlen >= sizeof(md->buf) )
