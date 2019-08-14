@@ -859,28 +859,37 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
 
 cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
-    cJSON *result = cJSON_CreateObject(); char coinaddr[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2;
+    cJSON *result = cJSON_CreateObject(); char coinaddr[64],_wifstr[8192],wif2[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2;
     NSPV_logout();
+    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
+    NSPV_logintime = (uint32_t)time(NULL);
     if ( strlen(wifstr) < 64 && (sz= btc_base58_decode_check(wifstr,data,sizeof(data))) > 0 && ((sz == 38 && data[sz-5] == 1) || (sz == 37 && data[sz-5] != 1)) )
         valid = 1;
     // if error, treat as seed, also get remote working, html needs to use -p=port
     if ( valid == 0 || data[0] != chain->b58prefix_secret_address )
     {
-        jaddstr(result,"result","error");
+        /*jaddstr(result,"result","error");
         jaddstr(result,"error","invalid wif");
         jaddnum(result,"len",(int64_t)sz);
         jaddnum(result,"wifprefix",(int64_t)data[0]);
         jaddnum(result,"expected",(int64_t)chain->b58prefix_secret_address);
-        return(result);
+        return(result);*/
+        strncpy(_wifstr,wifstr,sizeof(_wifstr)-1);
+        wifstr = wif2;//NSPV_seed_to_wif(wif2,_wifstr);
     }
-    memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
-    NSPV_logintime = (uint32_t)time(NULL);
     if ( strcmp(NSPV_wifstr,wifstr) != 0 )
     {
         strncpy(NSPV_wifstr,wifstr,sizeof(NSPV_wifstr)-1);
         if ( btc_privkey_decode_wif(NSPV_wifstr,chain,&NSPV_key) == 0 )
+        {
             jaddstr(result,"wiferror","couldnt decode wif");
+            memset(wif2,0,sizeof(wif2));
+            memset(_wifstr,0,sizeof(_wifstr));
+            return(result);
+        }
     }
+    memset(wif2,0,sizeof(wif2));
+    memset(_wifstr,0,sizeof(_wifstr));
     jaddstr(result,"result","success");
     jaddstr(result,"status","wif will expire in 777 seconds");
     btc_pubkey_from_key(&NSPV_key,&NSPV_pubkey);
@@ -910,6 +919,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
     jaddstr(result,"pubkey",pubkeystr);
     jaddnum(result,"wifprefix",chain->b58prefix_secret_address);
     jaddnum(result,"compressed",1);
+    memset(wifstr,0,sizeof(wifstr));
     return(result);
 }
 
@@ -1755,7 +1765,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         if ( ptr->height <= NSPV_lastntz.height )
                             strcat(replacestr,"  <span class=\"badge badge-info\">dPoW</span>");
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
-                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
+                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height+1);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
                         sprintf(replacestr,"%.8f",dstr(satoshis));
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_AMOUNT",replacestr);
@@ -1858,6 +1868,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$BALANCE",(char *)replacestr);
     sprintf(replacestr,"%.8f",dstr(NSPV_rewards));
     NSPV_expand_variable(bigbuf,&filestr,"$REWARDS",(char *)replacestr);
+    sprintf(replacestr,"%llu",(long long)NSPV_totalsent);
+    NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEOUT",(char *)replacestr);
+    sprintf(replacestr,"%llu",(long long)NSPV_totalrecv);
+    NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEIN",(char *)replacestr);
 
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
