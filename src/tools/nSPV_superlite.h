@@ -1653,7 +1653,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     {
         if ( jint(argjson,"update") != 0 )
         {
-            if ( NSVP_address[0] != 0 )
+            if ( NSPV_address[0] != 0 )
                 NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
         }
         else
