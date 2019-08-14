@@ -1698,7 +1698,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     for (i=0; i<NSPV_mempoolresult.numtxids && i<1000; i++)
                     {
                         if ( i < 4 )
-                            iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)&NSPV_mempoolresult.txid.ulongs[3-i]);
+                        {
+                            for (z=0; z<8; z++)
+                                ((uint8_t *)&satoshis)[z] = ((uint8_t *)&NSPV_mempoolresult.txid.ulongs[3-i])[7-z];
+                        }
                         else satoshis = 0;
                         if ( (itemstr= clonestr(origitemstr)) != 0 )
                         {
