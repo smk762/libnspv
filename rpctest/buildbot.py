@@ -3,7 +3,6 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-import sys
 import subprocess
 import time
 import json
@@ -21,17 +20,19 @@ def main():
     test_setup = json.load(f)
     f.close()
     coin = test_setup.get("chain")
+    if not coin:
+        raise Exception("Invalid setup file")
 
-    command1 = ["../nspv", coin, "&"]
+    command1 = ["./nspv", coin, "&"]
     print("command: ", command1)
-    command2 = ["/usr/bin/python3", "-m", "pytest", "test_nspv.py", "-s"]
+    command2 = ["/usr/bin/python3", "-m", "pytest", "rpctest/test_nspv.py", "-s"]
 
-    #nspv = subprocess.Popen(command1, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    #if nspv.poll():
-    #    print("nspv not running")
-    #else:
-    #    print("nspv is running")
+    nspv = subprocess.Popen(command1, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     time.sleep(10)
+    if nspv.poll():
+        print("nspv not running")
+    else:
+        print("nspv is running")
     test = subprocess.Popen(command2, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     while True:
         output = test.stdout.readline()
