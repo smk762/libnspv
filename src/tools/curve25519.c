@@ -193,6 +193,7 @@ bits256 curve25519(bits256 mysecret,bits256 basepoint)
 
 #else
 // from curve25519-donna.c
+typedef int64_t limb;
 
 /* Multiply a number by a scalar: output = in * scalar */
 static void fscalar_product32(limb *output, const limb *in, const limb scalar) {
