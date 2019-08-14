@@ -746,17 +746,17 @@ bits256 fcontract(const bits320 in)
 
 bits320 fmul(const bits320 in,const bits320 in2)
 {
-    /*limb output[11],input[10],input2[10]; int32_t i;
+    limb output[11],input[10],input2[10]; int32_t i;
     for (i=0; i<10; i++)
     {
         input[i] = in.uints[i];
         input2[i] = in2.uints[i];
     }
     fmul32(output,input,input2);
-    return(bits320_limbs(output));*/
-    bits256 mulval;
-    mulval = fmul_donna(fcontract(in),fcontract(in2));
-    return(fexpand(mulval));
+    return(bits320_limbs(output));
+    //bits256 mulval;
+    //mulval = fmul_donna(fcontract(in),fcontract(in2));
+    //return(fexpand(mulval));
 }
 
 bits256 curve25519(bits256 mysecret,bits256 theirpublic)
