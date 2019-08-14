@@ -799,9 +799,10 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
             if ( strncmp("wif=",data,4) == 0 )
             {
                 argjson = cJSON_CreateObject();
+                jaddstr(argjson,"method","login");
                 jaddstr(argjson,"wif",data+4);
             } else argjson = cJSON_Parse(data);
-    printf("data.(%s) -> (%s)\n",data,jprint(argjson,0));
+    //printf("data.(%s) -> (%s)\n",data,jprint(argjson,0));
         }
         if ( argjson != 0 )
         {
