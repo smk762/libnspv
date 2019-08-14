@@ -604,7 +604,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     n = i;
 //printf("URLMETHOD.(%s)\n",urlmethod);
     *postflagp = (strcmp(urlmethod,"POST") == 0);
-    //printf("POST.%d rpcparse.(%s)\n",*postflagp,urlstr);
+    printf("POST.%d rpcparse.(%s)\n",*postflagp,urlstr);
     for (i=0; i<(int32_t)sizeof(url)-1&&urlstr[n+i]!=0&&urlstr[n+i]!=' '; i++)
         url[i] = urlstr[n+i];
     url[i++] = 0;
@@ -1102,7 +1102,8 @@ void *LP_rpc_processreq(void *_ptr)
             free(retstr);
         }
     }
-    //free(space);
+    memset(space,0,sizeof(space));
+    memset(space2,0,sizeof(space2));
     //printf("free jsonbuf.%p\n",jsonbuf);
     free(jsonbuf);
     closesocket(sock);
