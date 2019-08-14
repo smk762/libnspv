@@ -13,8 +13,8 @@
   </head>
   <body>
     <nav class="navbar navbar-dark bg-dark">
-      <a class="navbar-brand"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</a>
-      <form class="form-row" action="$URL/method/send_confirm" method="get">
+      <a class="navbar-brand"><img src="images/antara150x150.png" class="logo"/> Antara Superlite</a>
+      <form class="form-row send_form" action="$URL/method/send_confirm" method="get">
           <div class="col-lg-6 col-sm-6 col-xs-12">
             <input class="form-control form-control-sm" type="text" placeholder="Address" name="address" aria-label="ToAddress">
           </div>
@@ -22,7 +22,7 @@
             <input class="form-control form-control-sm" type="text" placeholder="Amount" name="amount" aria-label="SendAmount">
           </div>
           <div class="col-lg-3 col-lg-3 col-xs-3">
-          <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">Send $COIN</button>
+          <button class="btn btn-outline-warning btn-sm" type="submit">Send $COIN</button>
         </div>
       </form>
       <form class="form-inline">
@@ -40,7 +40,7 @@
                 <div class="row">
                   <span class="col-lg-3 col-sm-4 col-xs-12"><b>Coin:</b><br> $COINNAME ($COIN)<br></span>
                   <span class="col-lg-3 col-sm-4 col-xs-12"><b>Balance:</b><br> $BALANCE $COIN</span>
-                  <span class="col-lg-3 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>Rewards:</b><br> $REWARDS $COIN</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12 rewards"><b>Rewards:</b><br> $REWARDS $COIN</span>
                   <span class="col-lg-3 col-sm-12 col-xs-12"><b>Your Address:</b><br> $WALLETADDR</span>
                 </div>
               </div> <!-- coin info body end -->
