@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -ev
 #DIR=$(pwd)
 # steps:
 # 1. run nspv, wait 10 seconds to find good peers

@@ -16,13 +16,12 @@
 
 #include <curve25519.h>
 
-#if DISABLE_64bits__amd64__
 
 //#undef force_inline
 //#define force_inline  __attribute__((always_inline))
 
 // Sum two numbers: output += in
-static inline bits320 fsum(bits320 output,bits320 in)
+static bits320 fsum(bits320 output,bits320 in)
 {
     int32_t i;
     for (i=0; i<5; i++)
@@ -30,7 +29,7 @@ static inline bits320 fsum(bits320 output,bits320 in)
     return(output);
 }
 
-static inline void fdifference_backwards(uint64_t *out,const uint64_t *in)
+static void fdifference_backwards(uint64_t *out,const uint64_t *in)
 {
     static const uint64_t two54m152 = (((uint64_t)1) << 54) - 152;  // 152 is 19 << 3
     static const uint64_t two54m8 = (((uint64_t)1) << 54) - 8;
@@ -47,7 +46,7 @@ void store_limb(uint8_t *out,uint64_t in)
         out[i] = (in & 0xff);
 }
 
-static inline uint64_t load_limb(uint8_t *in)
+static uint64_t load_limb(uint8_t *in)
 {
     return
     ((uint64_t)in[0]) |
@@ -72,11 +71,12 @@ bits320 fexpand(bits256 basepoint)
     return(out);
 }
 
+#if DISABLE_64bits__amd64__
 // donna: special gcc mode for 128-bit integers. It's implemented on 64-bit platforms only as far as I know.
 typedef unsigned uint128_t __attribute__((mode(TI)));
 
 // Multiply a number by a scalar: output = in * scalar
-static inline bits320 fscalar_product(const bits320 in,const uint64_t scalar)
+static bits320 fscalar_product(const bits320 in,const uint64_t scalar)
 {
     int32_t i; uint128_t a = 0; bits320 output;
     a = ((uint128_t)in.ulongs[0]) * scalar;
@@ -150,7 +150,7 @@ bits320 fsquare_times(const bits320 in,uint64_t count)
     return(out);
 }
 
-static inline void fcontract_iter(uint128_t t[5],int32_t flag)
+static void fcontract_iter(uint128_t t[5],int32_t flag)
 {
     int32_t i; uint64_t mask = 0x7ffffffffffffLL;
     for (i=0; i<4; i++)
@@ -193,6 +193,7 @@ bits256 curve25519(bits256 mysecret,bits256 basepoint)
 
 #else
 // from curve25519-donna.c
+typedef int64_t limb;
 
 /* Multiply a number by a scalar: output = in * scalar */
 static void fscalar_product32(limb *output, const limb *in, const limb scalar) {
@@ -207,109 +208,109 @@ static void fscalar_product32(limb *output, const limb *in, const limb scalar) {
  * output must be distinct to both inputs. The inputs are reduced coefficient
  * form, the output is not.
  *
- * output[x] <= 14 * the largest product of the input limbs.
+ * output[x] <= 14 * the largest product of the input limbs.*/
 static void fproduct(limb *output, const limb *in2, const limb *in) {
-    output[0] =       ((limb) ((s32) in2[0])) * ((s32) in[0]);
-    output[1] =       ((limb) ((s32) in2[0])) * ((s32) in[1]) +
-    ((limb) ((s32) in2[1])) * ((s32) in[0]);
-    output[2] =  2 *  ((limb) ((s32) in2[1])) * ((s32) in[1]) +
-    ((limb) ((s32) in2[0])) * ((s32) in[2]) +
-    ((limb) ((s32) in2[2])) * ((s32) in[0]);
-    output[3] =       ((limb) ((s32) in2[1])) * ((s32) in[2]) +
-    ((limb) ((s32) in2[2])) * ((s32) in[1]) +
-    ((limb) ((s32) in2[0])) * ((s32) in[3]) +
-    ((limb) ((s32) in2[3])) * ((s32) in[0]);
-    output[4] =       ((limb) ((s32) in2[2])) * ((s32) in[2]) +
-    2 * (((limb) ((s32) in2[1])) * ((s32) in[3]) +
-         ((limb) ((s32) in2[3])) * ((s32) in[1])) +
-    ((limb) ((s32) in2[0])) * ((s32) in[4]) +
-    ((limb) ((s32) in2[4])) * ((s32) in[0]);
-    output[5] =       ((limb) ((s32) in2[2])) * ((s32) in[3]) +
-    ((limb) ((s32) in2[3])) * ((s32) in[2]) +
-    ((limb) ((s32) in2[1])) * ((s32) in[4]) +
-    ((limb) ((s32) in2[4])) * ((s32) in[1]) +
-    ((limb) ((s32) in2[0])) * ((s32) in[5]) +
-    ((limb) ((s32) in2[5])) * ((s32) in[0]);
-    output[6] =  2 * (((limb) ((s32) in2[3])) * ((s32) in[3]) +
-                      ((limb) ((s32) in2[1])) * ((s32) in[5]) +
-                      ((limb) ((s32) in2[5])) * ((s32) in[1])) +
-    ((limb) ((s32) in2[2])) * ((s32) in[4]) +
-    ((limb) ((s32) in2[4])) * ((s32) in[2]) +
-    ((limb) ((s32) in2[0])) * ((s32) in[6]) +
-    ((limb) ((s32) in2[6])) * ((s32) in[0]);
-    output[7] =       ((limb) ((s32) in2[3])) * ((s32) in[4]) +
-    ((limb) ((s32) in2[4])) * ((s32) in[3]) +
-    ((limb) ((s32) in2[2])) * ((s32) in[5]) +
-    ((limb) ((s32) in2[5])) * ((s32) in[2]) +
-    ((limb) ((s32) in2[1])) * ((s32) in[6]) +
-    ((limb) ((s32) in2[6])) * ((s32) in[1]) +
-    ((limb) ((s32) in2[0])) * ((s32) in[7]) +
-    ((limb) ((s32) in2[7])) * ((s32) in[0]);
-    output[8] =       ((limb) ((s32) in2[4])) * ((s32) in[4]) +
-    2 * (((limb) ((s32) in2[3])) * ((s32) in[5]) +
-         ((limb) ((s32) in2[5])) * ((s32) in[3]) +
-         ((limb) ((s32) in2[1])) * ((s32) in[7]) +
-         ((limb) ((s32) in2[7])) * ((s32) in[1])) +
-    ((limb) ((s32) in2[2])) * ((s32) in[6]) +
-    ((limb) ((s32) in2[6])) * ((s32) in[2]) +
-    ((limb) ((s32) in2[0])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[0]);
-    output[9] =       ((limb) ((s32) in2[4])) * ((s32) in[5]) +
-    ((limb) ((s32) in2[5])) * ((s32) in[4]) +
-    ((limb) ((s32) in2[3])) * ((s32) in[6]) +
-    ((limb) ((s32) in2[6])) * ((s32) in[3]) +
-    ((limb) ((s32) in2[2])) * ((s32) in[7]) +
-    ((limb) ((s32) in2[7])) * ((s32) in[2]) +
-    ((limb) ((s32) in2[1])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[1]) +
-    ((limb) ((s32) in2[0])) * ((s32) in[9]) +
-    ((limb) ((s32) in2[9])) * ((s32) in[0]);
-    output[10] = 2 * (((limb) ((s32) in2[5])) * ((s32) in[5]) +
-                      ((limb) ((s32) in2[3])) * ((s32) in[7]) +
-                      ((limb) ((s32) in2[7])) * ((s32) in[3]) +
-                      ((limb) ((s32) in2[1])) * ((s32) in[9]) +
-                      ((limb) ((s32) in2[9])) * ((s32) in[1])) +
-    ((limb) ((s32) in2[4])) * ((s32) in[6]) +
-    ((limb) ((s32) in2[6])) * ((s32) in[4]) +
-    ((limb) ((s32) in2[2])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[2]);
-    output[11] =      ((limb) ((s32) in2[5])) * ((s32) in[6]) +
-    ((limb) ((s32) in2[6])) * ((s32) in[5]) +
-    ((limb) ((s32) in2[4])) * ((s32) in[7]) +
-    ((limb) ((s32) in2[7])) * ((s32) in[4]) +
-    ((limb) ((s32) in2[3])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[3]) +
-    ((limb) ((s32) in2[2])) * ((s32) in[9]) +
-    ((limb) ((s32) in2[9])) * ((s32) in[2]);
-    output[12] =      ((limb) ((s32) in2[6])) * ((s32) in[6]) +
-    2 * (((limb) ((s32) in2[5])) * ((s32) in[7]) +
-         ((limb) ((s32) in2[7])) * ((s32) in[5]) +
-         ((limb) ((s32) in2[3])) * ((s32) in[9]) +
-         ((limb) ((s32) in2[9])) * ((s32) in[3])) +
-    ((limb) ((s32) in2[4])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[4]);
-    output[13] =      ((limb) ((s32) in2[6])) * ((s32) in[7]) +
-    ((limb) ((s32) in2[7])) * ((s32) in[6]) +
-    ((limb) ((s32) in2[5])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[5]) +
-    ((limb) ((s32) in2[4])) * ((s32) in[9]) +
-    ((limb) ((s32) in2[9])) * ((s32) in[4]);
-    output[14] = 2 * (((limb) ((s32) in2[7])) * ((s32) in[7]) +
-                      ((limb) ((s32) in2[5])) * ((s32) in[9]) +
-                      ((limb) ((s32) in2[9])) * ((s32) in[5])) +
-    ((limb) ((s32) in2[6])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[6]);
-    output[15] =      ((limb) ((s32) in2[7])) * ((s32) in[8]) +
-    ((limb) ((s32) in2[8])) * ((s32) in[7]) +
-    ((limb) ((s32) in2[6])) * ((s32) in[9]) +
-    ((limb) ((s32) in2[9])) * ((s32) in[6]);
-    output[16] =      ((limb) ((s32) in2[8])) * ((s32) in[8]) +
-    2 * (((limb) ((s32) in2[7])) * ((s32) in[9]) +
-         ((limb) ((s32) in2[9])) * ((s32) in[7]));
-    output[17] =      ((limb) ((s32) in2[8])) * ((s32) in[9]) +
-    ((limb) ((s32) in2[9])) * ((s32) in[8]);
-    output[18] = 2 *  ((limb) ((s32) in2[9])) * ((s32) in[9]);
-}*/
+    output[0] =       ((limb) ((int32_t) in2[0])) * ((int32_t) in[0]);
+    output[1] =       ((limb) ((int32_t) in2[0])) * ((int32_t) in[1]) +
+    ((limb) ((int32_t) in2[1])) * ((int32_t) in[0]);
+    output[2] =  2 *  ((limb) ((int32_t) in2[1])) * ((int32_t) in[1]) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[2]) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[0]);
+    output[3] =       ((limb) ((int32_t) in2[1])) * ((int32_t) in[2]) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[1]) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[3]) +
+    ((limb) ((int32_t) in2[3])) * ((int32_t) in[0]);
+    output[4] =       ((limb) ((int32_t) in2[2])) * ((int32_t) in[2]) +
+    2 * (((limb) ((int32_t) in2[1])) * ((int32_t) in[3]) +
+         ((limb) ((int32_t) in2[3])) * ((int32_t) in[1])) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[4]) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[0]);
+    output[5] =       ((limb) ((int32_t) in2[2])) * ((int32_t) in[3]) +
+    ((limb) ((int32_t) in2[3])) * ((int32_t) in[2]) +
+    ((limb) ((int32_t) in2[1])) * ((int32_t) in[4]) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[1]) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[5]) +
+    ((limb) ((int32_t) in2[5])) * ((int32_t) in[0]);
+    output[6] =  2 * (((limb) ((int32_t) in2[3])) * ((int32_t) in[3]) +
+                      ((limb) ((int32_t) in2[1])) * ((int32_t) in[5]) +
+                      ((limb) ((int32_t) in2[5])) * ((int32_t) in[1])) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[4]) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[2]) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[6]) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[0]);
+    output[7] =       ((limb) ((int32_t) in2[3])) * ((int32_t) in[4]) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[3]) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[5]) +
+    ((limb) ((int32_t) in2[5])) * ((int32_t) in[2]) +
+    ((limb) ((int32_t) in2[1])) * ((int32_t) in[6]) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[1]) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[7]) +
+    ((limb) ((int32_t) in2[7])) * ((int32_t) in[0]);
+    output[8] =       ((limb) ((int32_t) in2[4])) * ((int32_t) in[4]) +
+    2 * (((limb) ((int32_t) in2[3])) * ((int32_t) in[5]) +
+         ((limb) ((int32_t) in2[5])) * ((int32_t) in[3]) +
+         ((limb) ((int32_t) in2[1])) * ((int32_t) in[7]) +
+         ((limb) ((int32_t) in2[7])) * ((int32_t) in[1])) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[6]) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[2]) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[0]);
+    output[9] =       ((limb) ((int32_t) in2[4])) * ((int32_t) in[5]) +
+    ((limb) ((int32_t) in2[5])) * ((int32_t) in[4]) +
+    ((limb) ((int32_t) in2[3])) * ((int32_t) in[6]) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[3]) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[7]) +
+    ((limb) ((int32_t) in2[7])) * ((int32_t) in[2]) +
+    ((limb) ((int32_t) in2[1])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[1]) +
+    ((limb) ((int32_t) in2[0])) * ((int32_t) in[9]) +
+    ((limb) ((int32_t) in2[9])) * ((int32_t) in[0]);
+    output[10] = 2 * (((limb) ((int32_t) in2[5])) * ((int32_t) in[5]) +
+                      ((limb) ((int32_t) in2[3])) * ((int32_t) in[7]) +
+                      ((limb) ((int32_t) in2[7])) * ((int32_t) in[3]) +
+                      ((limb) ((int32_t) in2[1])) * ((int32_t) in[9]) +
+                      ((limb) ((int32_t) in2[9])) * ((int32_t) in[1])) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[6]) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[4]) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[2]);
+    output[11] =      ((limb) ((int32_t) in2[5])) * ((int32_t) in[6]) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[5]) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[7]) +
+    ((limb) ((int32_t) in2[7])) * ((int32_t) in[4]) +
+    ((limb) ((int32_t) in2[3])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[3]) +
+    ((limb) ((int32_t) in2[2])) * ((int32_t) in[9]) +
+    ((limb) ((int32_t) in2[9])) * ((int32_t) in[2]);
+    output[12] =      ((limb) ((int32_t) in2[6])) * ((int32_t) in[6]) +
+    2 * (((limb) ((int32_t) in2[5])) * ((int32_t) in[7]) +
+         ((limb) ((int32_t) in2[7])) * ((int32_t) in[5]) +
+         ((limb) ((int32_t) in2[3])) * ((int32_t) in[9]) +
+         ((limb) ((int32_t) in2[9])) * ((int32_t) in[3])) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[4]);
+    output[13] =      ((limb) ((int32_t) in2[6])) * ((int32_t) in[7]) +
+    ((limb) ((int32_t) in2[7])) * ((int32_t) in[6]) +
+    ((limb) ((int32_t) in2[5])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[5]) +
+    ((limb) ((int32_t) in2[4])) * ((int32_t) in[9]) +
+    ((limb) ((int32_t) in2[9])) * ((int32_t) in[4]);
+    output[14] = 2 * (((limb) ((int32_t) in2[7])) * ((int32_t) in[7]) +
+                      ((limb) ((int32_t) in2[5])) * ((int32_t) in[9]) +
+                      ((limb) ((int32_t) in2[9])) * ((int32_t) in[5])) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[6]);
+    output[15] =      ((limb) ((int32_t) in2[7])) * ((int32_t) in[8]) +
+    ((limb) ((int32_t) in2[8])) * ((int32_t) in[7]) +
+    ((limb) ((int32_t) in2[6])) * ((int32_t) in[9]) +
+    ((limb) ((int32_t) in2[9])) * ((int32_t) in[6]);
+    output[16] =      ((limb) ((int32_t) in2[8])) * ((int32_t) in[8]) +
+    2 * (((limb) ((int32_t) in2[7])) * ((int32_t) in[9]) +
+         ((limb) ((int32_t) in2[9])) * ((int32_t) in[7]));
+    output[17] =      ((limb) ((int32_t) in2[8])) * ((int32_t) in[9]) +
+    ((limb) ((int32_t) in2[9])) * ((int32_t) in[8]);
+    output[18] = 2 *  ((limb) ((int32_t) in2[9])) * ((int32_t) in[9]);
+}
 
 /* Reduce a long form to a short form by taking the input mod 2^255 - 19.
  *
@@ -356,7 +357,7 @@ static void freduce_degree(limb *output) {
 /* return v / 2^26, using only shifts and adds.
  *
  * On entry: v can take any value. */
-static inline limb
+static limb
 div_by_2_26(const limb v)
 {
     /* High word of v; no shift needed. */
@@ -372,7 +373,7 @@ div_by_2_26(const limb v)
 /* return v / (2^25), using only shifts and adds.
  *
  * On entry: v can take any value. */
-static inline limb
+static limb
 div_by_2_25(const limb v)
 {
     /* High word of v; no shift needed*/
@@ -437,6 +438,7 @@ static void freduce_coefficients(limb *output) {
  *
  * output must be distinct to both inputs. The output is reduced degree
  * (indeed, one need only provide storage for 10 limbs) and |output[i]| < 2^26.
+ */
 static void fmul32(limb *output, const limb *in, const limb *in2)
 {
     limb t[19];
@@ -446,7 +448,7 @@ static void fmul32(limb *output, const limb *in, const limb *in2)
     freduce_coefficients(t);
     // |t[i]| < 2^26
     memcpy(output, t, sizeof(limb) * 10);
-}*/
+}
 
 /* Square a number: output = in**2
  *
@@ -709,7 +711,7 @@ bits320 bits320_limbs(limb limbs[10])
     return(output);
 }
 
-static inline bits320 fscalar_product(const bits320 in,const uint64_t scalar)
+static bits320 fscalar_product(const bits320 in,const uint64_t scalar)
 {
     limb output[10],input[10]; int32_t i;
     for (i=0; i<10; i++)
@@ -718,12 +720,12 @@ static inline bits320 fscalar_product(const bits320 in,const uint64_t scalar)
     return(bits320_limbs(output));
 }
 
-static inline bits320 fsquare_times(const bits320 in,uint64_t count)
+static bits320 fsquare_times(const bits320 in,uint64_t count)
 {
     limb output[10],input[10]; int32_t i;
     for (i=0; i<10; i++)
         input[i] = in.uints[i];
-    for (i=0; i<count; i++)
+    for (i=0; i<(int32_t)count; i++)
     {
         fsquare32(output,input);
         memcpy(input,output,sizeof(input));
@@ -745,17 +747,17 @@ bits256 fcontract(const bits320 in)
 
 bits320 fmul(const bits320 in,const bits320 in2)
 {
-    /*limb output[11],input[10],input2[10]; int32_t i;
+    limb output[11],input[10],input2[10]; int32_t i;
     for (i=0; i<10; i++)
     {
         input[i] = in.uints[i];
         input2[i] = in2.uints[i];
     }
     fmul32(output,input,input2);
-    return(bits320_limbs(output));*/
-    bits256 mulval;
-    mulval = fmul_donna(fcontract(in),fcontract(in2));
-    return(fexpand(mulval));
+    return(bits320_limbs(output));
+    //bits256 mulval;
+    //mulval = fmul_donna(fcontract(in),fcontract(in2));
+    //return(fexpand(mulval));
 }
 
 bits256 curve25519(bits256 mysecret,bits256 theirpublic)
@@ -774,7 +776,7 @@ bits256 curve25519(bits256 mysecret,bits256 theirpublic)
 // x2 z2: long form && x3 z3: long form
 // x z: short form, destroyed && xprime zprime: short form, destroyed
 // qmqp: short form, preserved
-static inline void
+static void
 fmonty(bits320 *x2, bits320 *z2, // output 2Q
        bits320 *x3, bits320 *z3, // output Q + Q'
        bits320 *x, bits320 *z,   // input Q
@@ -802,7 +804,7 @@ fmonty(bits320 *x2, bits320 *z2, // output 2Q
 // long. Perform the swap iff @swap is non-zero.
 // This function performs the swap without leaking any side-channel information.
 // -----------------------------------------------------------------------------
-static inline void swap_conditional(bits320 *a,bits320 *b,uint64_t iswap)
+static void swap_conditional(bits320 *a,bits320 *b,uint64_t iswap)
 {
     int32_t i; const uint64_t swap = -iswap;
     for (i=0; i<5; ++i)
@@ -844,7 +846,7 @@ void cmult(bits320 *resultx,bits320 *resultz,bits256 secret,const bits320 q)
 }
 
 // Shamelessly copied from donna's code that copied djb's code, changed a little
-inline bits320 crecip(const bits320 z)
+bits320 crecip(const bits320 z)
 {
     bits320 a,t0,b,c;
     /* 2 */ a = fsquare_times(z, 1); // a = 2
@@ -871,17 +873,6 @@ inline bits320 crecip(const bits320 z)
     /* 2^255 - 21 */ return(fmul(t0, a));
 }
 
-void OS_randombytes(unsigned char *x,long xlen);
-
-bits256 rand256(int32_t privkeyflag)
-{
-    bits256 randval;
-    OS_randombytes(randval.bytes,sizeof(randval));
-    if ( privkeyflag != 0 )
-        randval.bytes[0] &= 0xf8, randval.bytes[31] &= 0x7f, randval.bytes[31] |= 0x40;
-    return(randval);
-}
-
 bits256 curve25519_basepoint9()
 {
     bits256 basepoint;
@@ -890,14 +881,6 @@ bits256 curve25519_basepoint9()
     return(basepoint);
 }
 
-bits256 curve25519_keypair(bits256 *pubkeyp)
-{
-    bits256 privkey;
-    privkey = rand256(1);
-    *pubkeyp = curve25519(privkey,curve25519_basepoint9());
-    //printf("[%llx %llx] ",privkey.txid,(*pubkeyp).txid);
-    return(privkey);
-}
 
 // following is ported from libtom
 
@@ -957,7 +940,7 @@ bits256 curve25519_keypair(bits256 *pubkeyp)
 #define Gamma1(x)       (S(x, 17) ^ S(x, 19) ^ R(x, 10))
 #define MIN(x, y) ( ((x)<(y))?(x):(y) )
 
-static inline int32_t sha256_vcompress(struct sha256_vstate * md,uint8_t *buf)
+static int32_t sha256_vcompress(struct sha256_vstate * md,uint8_t *buf)
 {
     uint32_t S[8],W[64],t0,t1,i;
     for (i=0; i<8; i++) // copy state into S
@@ -1053,7 +1036,7 @@ h  = t0 + t1;
 #undef Gamma0
 #undef Gamma1
 
-static inline void sha256_vinit(struct sha256_vstate * md)
+static void sha256_vinit(struct sha256_vstate * md)
 {
     md->curlen = 0;
     md->length = 0;
@@ -1067,7 +1050,7 @@ static inline void sha256_vinit(struct sha256_vstate * md)
     md->state[7] = 0x5BE0CD19UL;
 }
 
-static inline int32_t sha256_vprocess(struct sha256_vstate *md,const uint8_t *in,uint64_t inlen)
+static int32_t sha256_vprocess(struct sha256_vstate *md,const uint8_t *in,uint64_t inlen)
 {
     uint64_t n; int32_t err;
     if ( md->curlen > sizeof(md->buf) )
@@ -1097,7 +1080,7 @@ static inline int32_t sha256_vprocess(struct sha256_vstate *md,const uint8_t *in
     return(0);
 }
 
-static inline int32_t sha256_vdone(struct sha256_vstate *md,uint8_t *out)
+static int32_t sha256_vdone(struct sha256_vstate *md,uint8_t *out)
 {
     int32_t i;
     if ( md->curlen >= sizeof(md->buf) )
@@ -1688,15 +1671,15 @@ bits256 curve25519_shared(bits256 privkey,bits256 otherpub)
     return(hash);
 }
 
-int32_t curve25519_donna(uint8_t *mypublic,const uint8_t *secret,const uint8_t *basepoint);
-/*{
+int32_t curve25519_donna(uint8_t *mypublic,const uint8_t *secret,const uint8_t *basepoint)
+{
     bits256 val,p,bp;
     memcpy(p.bytes,secret,sizeof(p));
     memcpy(bp.bytes,basepoint,sizeof(bp));
     val = curve25519(p,bp);
     memcpy(mypublic,val.bytes,sizeof(val));
     return(0);
-}*/
+}
 
 uint64_t conv_NXTpassword(unsigned char *mysecret,unsigned char *mypublic,uint8_t *pass,int32_t passlen)
 {
@@ -1711,9 +1694,30 @@ uint64_t conv_NXTpassword(unsigned char *mysecret,unsigned char *mypublic,uint8_
     return(addr);
 }
 
+#ifdef SUPERNET_ACCT
 #include <stdio.h>
 
 bits256 GENESIS_PUBKEY,GENESIS_PRIVKEY;
+
+void OS_randombytes(unsigned char *x,long xlen);
+
+bits256 rand256(int32_t privkeyflag)
+{
+    bits256 randval;
+    OS_randombytes(randval.bytes,sizeof(randval));
+    if ( privkeyflag != 0 )
+        randval.bytes[0] &= 0xf8, randval.bytes[31] &= 0x7f, randval.bytes[31] |= 0x40;
+    return(randval);
+}
+
+bits256 curve25519_keypair(bits256 *pubkeyp)
+{
+    bits256 privkey;
+    privkey = rand256(1);
+    *pubkeyp = curve25519(privkey,curve25519_basepoint9());
+    //printf("[%llx %llx] ",privkey.txid,(*pubkeyp).txid);
+    return(privkey);
+}
 
 bits256 acct777_pubkey(bits256 privkey)
 {
@@ -1889,5 +1893,6 @@ uint8_t *_SuperNET_decipher(uint8_t nonce[crypto_box_NONCEBYTES],uint8_t *cipher
     }
     return(0);
 }
+#endif
 
 //#undef force_inline
