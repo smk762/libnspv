@@ -16,6 +16,8 @@
 
 #include <curve25519.h>
 
+#if DISABLE_64bits__amd64__
+
 //#undef force_inline
 //#define force_inline  __attribute__((always_inline))
 
@@ -70,7 +72,6 @@ bits320 fexpand(bits256 basepoint)
     return(out);
 }
 
-#if DISABLE_64bits__amd64__
 // donna: special gcc mode for 128-bit integers. It's implemented on 64-bit platforms only as far as I know.
 typedef unsigned uint128_t __attribute__((mode(TI)));
 
