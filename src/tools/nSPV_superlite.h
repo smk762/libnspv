@@ -1675,6 +1675,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             // $MEMP_DEST - Destination Address
             // $MEMP_AMOUNT - Amount sent in this transaction
             // $MEMP_TXID - Transaction ID
+            iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)NSPV_mempoolresult.txid.bytes);
             for (i=NSPV_mempoolresult.numtxids-1; i>=0; i--)
             {
                 if ( (itemstr= clonestr(origitemstr)) != 0 )
@@ -1682,7 +1683,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     strcpy(replacestr,"<span class=\"badge badge-success\">IN</span>");
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_TYPE",replacestr);
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_DEST",NSPV_address);
-                    iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)NSPV_mempoolresult.txid.bytes);
                     sprintf(replacestr,"%.8f",dstr(satoshis));
                     NSPV_expand_variable(itembuf,&itemstr,"$MEMP_AMOUNT",replacestr);
                     bits256_str(replacestr,NSPV_mempoolresult.txids[i]);
@@ -1691,6 +1691,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     itembuf[0] = 0;
                     free(itemstr);
                 }
+                satoshis = 0;
             }
             NSPV_expand_variable(bigbuf,&filestr,"$MEMP_ROW_ARRAY",itemsbuf);
             didflag = 1;
