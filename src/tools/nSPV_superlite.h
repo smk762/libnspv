@@ -1695,7 +1695,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     // $MEMP_AMOUNT - Amount sent in this transaction
                     // $MEMP_TXID - Transaction ID
                     //iguana_rwnum(1,(uint8_t *)&satoshis,sizeof(satoshis),(void *)&NSPV_mempoolresult.txid.ulongs[7]);
-                    for (i=0; i<NSPV_mempoolresult.numtxids && i<1000; i--)
+                    for (i=0; i<NSPV_mempoolresult.numtxids && i<1000; i++)
                     {
                         if ( i < 4 )
                             satoshis = NSPV_mempoolresult.txid.ulongs[3-i];
