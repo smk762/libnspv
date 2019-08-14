@@ -1765,7 +1765,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         if ( ptr->height <= NSPV_lastntz.height )
                             strcat(replacestr,"  <span class=\"badge badge-info\">dPoW</span>");
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_DIR_ARRAY",replacestr);
-                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height);
+                        sprintf(replacestr,"%d",NSPV_inforesult.height-ptr->height+1);
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_CONFIRMS",replacestr);
                         sprintf(replacestr,"%.8f",dstr(satoshis));
                         NSPV_expand_variable(itembuf,&itemstr,"$TXHIST_AMOUNT",replacestr);
