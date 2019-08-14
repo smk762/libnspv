@@ -88,6 +88,14 @@
                         </div>
                       </td>
                     </tr>
+                    <tr>
+                      <td>
+                        <div class="row">
+                          <div class="col-md-6 col-sm-6 col-xs-12"><b>Network Bytes Received:</b><br>$NETBYTEIN</div>
+                          <div class="col-md-6 col-sm-6 col-xs-12"><b>Network Bytes Sent:</b><br>$NETBYTEOUT</div>
+                        </div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div> <!-- GetInfo body end -->
