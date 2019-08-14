@@ -611,7 +611,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     n += i;
     j = i = 0;
     filetype[0] = 0;
-    //printf("url.(%s) method.(%s)\n",&url[i],urlmethod);
+printf("url.(%s) method.(%s) postflag.%d\n",&url[i],urlmethod,*postflagp);
     snprintf(furl,sizeof(furl),"%s",url+1);
     if ( strncmp(&url[i],"/api",strlen("/api")) == 0 )
     {
@@ -635,7 +635,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
     else
     {
         int32_t j,f,matches; char fname[512],cmpstr[8192],cmpstr2[8192];
-        strcpy(cmpstr,&url[i]);
+        strncpy(cmpstr,&url[i],sizeof(cmpstr)-1);
         if ( cmpstr[strlen(cmpstr)-1] == '?' )
             cmpstr[strlen(cmpstr)-1] = 0;
         sprintf(cmpstr2,":%u%s",port,cmpstr);
@@ -676,6 +676,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
         }
         if ( filestr == 0 && strncmp("/method/",cmpstr,8) == 0 )
         {
+            //fprintf(stderr,"cmpstr[8] (%s)\n",cmpstr+8);
             for (f=0; f<(int32_t)(sizeof(methodfiles)/sizeof(*methodfiles)); f++)
             {
                 if ( strncmp(cmpstr+8,methodfiles[f],strlen(methodfiles[f])) == 0 )
@@ -683,7 +684,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     *jsonflagp = 1;
                     strcpy(filetype,"html");
                     sprintf(fname,"html/%s",methodfiles[f]);
-                    //fprintf(stderr,"open (%s)\n",fname);
+                    fprintf(stderr,"open (%s)\n",fname);
                     if ( (filestr= OS_filestr(&filesize,fname)) == 0 )
                         return(clonestr("{\"error\":\"cant find methodfile\"}"));
                     break;
@@ -773,7 +774,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
         {
             free_json(argjson);
             argjson = cJSON_Parse(data);
-            //printf("data.(%s)\n",data);
+    printf("data.(%s)\n",data);
         }
         if ( argjson != 0 )
         {
@@ -896,7 +897,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                     if ( is_cJSON_Array(arg) != 0 && cJSON_GetArraySize(arg) == 1 )
                         arg = jitem(arg,0);
                 } else arg = argjson;
-                //printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
+                printf("ARGJSON.(%s) filestr.%p\n",jprint(arg,0),filestr);
                 if ( userpass != 0 && jstr(arg,"userpass") == 0 )
                     jaddstr(arg,"userpass",userpass);
                 if ( strcmp(remoteaddr,"127.0.0.1") == 0 || strcmp(remoteaddr,NSPV_externalip) == 0 || LP_valid_remotemethod(arg) > 0 )
@@ -1102,7 +1103,8 @@ void *LP_rpc_processreq(void *_ptr)
             free(retstr);
         }
     }
-    //free(space);
+    memset(space,0,sizeof(space));
+    memset(space2,0,sizeof(space2));
     //printf("free jsonbuf.%p\n",jsonbuf);
     free(jsonbuf);
     closesocket(sock);
