@@ -838,6 +838,9 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     len += iguana_rwnum(1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
+    for (i=0; i<8; i++)
+        NSPV_req(client,0,msg,len,NODE_NSPV,NSPV_BROADCAST>>1);
+    sleep(1);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(client,0,msg,len,NODE_NSPV,NSPV_BROADCAST>>1) != 0 )
     {
@@ -1683,7 +1686,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 NSPV_coinaddr_inmempool(NSPV_client,"",NSPV_address,0);
                 if ( (origitemstr= OS_filestr(&fsize,"html/wallet_mempool_table_row.inc")) != 0 )
                 {
-                    fprintf(stderr,"inside loop with %d mempool\n",NSPV_mempoolresult.numtxids);
+                    int32_t z; for (z=0; z<32; z++) fprintf(stderr,"%02x",((uint8_t *)&NSPV_mempoolresult.txid)[z]);
+                    fprintf(stderr," inside loop with %d mempool\n",NSPV_mempoolresult.numtxids);
                     itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
                     // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
                     // $MEMP_TYPE - Type
