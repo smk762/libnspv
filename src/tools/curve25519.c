@@ -872,17 +872,6 @@ inline bits320 crecip(const bits320 z)
     /* 2^255 - 21 */ return(fmul(t0, a));
 }
 
-void OS_randombytes(unsigned char *x,long xlen);
-
-bits256 rand256(int32_t privkeyflag)
-{
-    bits256 randval;
-    OS_randombytes(randval.bytes,sizeof(randval));
-    if ( privkeyflag != 0 )
-        randval.bytes[0] &= 0xf8, randval.bytes[31] &= 0x7f, randval.bytes[31] |= 0x40;
-    return(randval);
-}
-
 bits256 curve25519_basepoint9()
 {
     bits256 basepoint;
@@ -891,14 +880,6 @@ bits256 curve25519_basepoint9()
     return(basepoint);
 }
 
-bits256 curve25519_keypair(bits256 *pubkeyp)
-{
-    bits256 privkey;
-    privkey = rand256(1);
-    *pubkeyp = curve25519(privkey,curve25519_basepoint9());
-    //printf("[%llx %llx] ",privkey.txid,(*pubkeyp).txid);
-    return(privkey);
-}
 
 // following is ported from libtom
 
@@ -1689,15 +1670,15 @@ bits256 curve25519_shared(bits256 privkey,bits256 otherpub)
     return(hash);
 }
 
-int32_t curve25519_donna(uint8_t *mypublic,const uint8_t *secret,const uint8_t *basepoint);
-/*{
+int32_t curve25519_donna(uint8_t *mypublic,const uint8_t *secret,const uint8_t *basepoint)
+{
     bits256 val,p,bp;
     memcpy(p.bytes,secret,sizeof(p));
     memcpy(bp.bytes,basepoint,sizeof(bp));
     val = curve25519(p,bp);
     memcpy(mypublic,val.bytes,sizeof(val));
     return(0);
-}*/
+}
 
 uint64_t conv_NXTpassword(unsigned char *mysecret,unsigned char *mypublic,uint8_t *pass,int32_t passlen)
 {
@@ -1712,9 +1693,30 @@ uint64_t conv_NXTpassword(unsigned char *mysecret,unsigned char *mypublic,uint8_
     return(addr);
 }
 
+#ifdef SUPERNET_ACCT
 #include <stdio.h>
 
 bits256 GENESIS_PUBKEY,GENESIS_PRIVKEY;
+
+void OS_randombytes(unsigned char *x,long xlen);
+
+bits256 rand256(int32_t privkeyflag)
+{
+    bits256 randval;
+    OS_randombytes(randval.bytes,sizeof(randval));
+    if ( privkeyflag != 0 )
+        randval.bytes[0] &= 0xf8, randval.bytes[31] &= 0x7f, randval.bytes[31] |= 0x40;
+    return(randval);
+}
+
+bits256 curve25519_keypair(bits256 *pubkeyp)
+{
+    bits256 privkey;
+    privkey = rand256(1);
+    *pubkeyp = curve25519(privkey,curve25519_basepoint9());
+    //printf("[%llx %llx] ",privkey.txid,(*pubkeyp).txid);
+    return(privkey);
+}
 
 bits256 acct777_pubkey(bits256 privkey)
 {
@@ -1890,5 +1892,6 @@ uint8_t *_SuperNET_decipher(uint8_t nonce[crypto_box_NONCEBYTES],uint8_t *cipher
     }
     return(0);
 }
+#endif
 
 //#undef force_inline
