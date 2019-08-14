@@ -801,6 +801,7 @@ char *NSPV_rpcparse(int32_t *contentlenp,char *retbuf,int32_t bufsize,int32_t *j
                 argjson = cJSON_CreateObject();
                 jaddstr(argjson,"method","login");
                 jaddstr(argjson,"wif",data+4);
+                memset(data,0,strlen(data));
             } else argjson = cJSON_Parse(data);
     //printf("data.(%s) -> (%s)\n",data,jprint(argjson,0));
         }
