@@ -53,11 +53,8 @@
 #define inline __inline
 #endif
 
-#ifndef u8
-//typedef uint8_t u8;
 typedef int32_t s32;
 typedef int64_t limb;
-#endif
 
 /* Field element representation:
  *
@@ -424,7 +421,7 @@ fsquare(limb *output, const limb *in) {
 }
 
 /* Take a little-endian, 32-byte number and expand it into polynomial form */
-static void fexpand32(limb *output, const u8 *input)
+static void fexpand32(limb *output, const uint8_t *input)
 {
 #define F(n,start,shift,mask) \
   output[n] = ((((limb) input[start + 0]) | \
@@ -471,7 +468,7 @@ static s32 s32_gte(s32 a, s32 b) {
  * little-endian, 32-byte array.
  *
  * On entry: |input_limbs[i]| < 2^26 */
-static void fcontract32(u8 *output, limb *input_limbs)
+static void fcontract32(uint8_t *output, limb *input_limbs)
 {
   int i;
   int j;
@@ -727,7 +724,7 @@ swap_conditional(limb a[19], limb b[19], limb iswap) {
  *   n: a little endian, 32-byte number
  *   q: a point of the curve (short form) */
 static void
-cmult32(limb *resultx, limb *resultz, const u8 *n, const limb *q) {
+cmult32(limb *resultx, limb *resultz, const uint8_t *n, const limb *q) {
   limb a[19] = {0}, b[19] = {1}, c[19] = {1}, d[19] = {0};
   limb *nqpqx = a, *nqpqz = b, *nqx = c, *nqz = d, *t;
   limb e[19] = {0}, f[19] = {1}, g[19] = {0}, h[19] = {1};
@@ -738,7 +735,7 @@ cmult32(limb *resultx, limb *resultz, const u8 *n, const limb *q) {
   memcpy(nqpqx, q, sizeof(limb) * 10);
 
   for (i = 0; i < 32; ++i) {
-    u8 byte = n[31 - i];
+    uint8_t byte = n[31 - i];
     for (j = 0; j < 8; ++j) {
       const limb bit = byte >> 7;
 
@@ -844,7 +841,7 @@ crecip32(limb *out, const limb *z) {
 }
 
 int
-curve25519_donna(u8 *mypublic, const u8 *secret, const u8 *basepoint) {
+curve25519_donna(uint8_t *mypublic, const uint8_t *secret, const uint8_t *basepoint) {
   limb bp[10], x[10], z[11], zmone[10];
   uint8_t e[32];
   int i;

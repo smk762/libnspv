@@ -193,11 +193,9 @@ bits256 curve25519(bits256 mysecret,bits256 basepoint)
 
 #else
 // from curve25519-donna.c
-#ifndef u8
-//typedef uint8_t u8;
+
 typedef int32_t s32;
 typedef int64_t limb;
-#endif
 
 /* Multiply a number by a scalar: output = in * scalar */
 static void fscalar_product32(limb *output, const limb *in, const limb scalar) {
@@ -564,7 +562,7 @@ static s32 s32_gte(s32 a, s32 b) {
  * little-endian, 32-byte array.
  *
  * On entry: |input_limbs[i]| < 2^26 */
-static void fcontract32(u8 *output, limb *input_limbs)
+static void fcontract32(uint8_t *output, limb *input_limbs)
 {
     int i;
     int j;
