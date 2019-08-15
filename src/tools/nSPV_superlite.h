@@ -968,7 +968,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
 
 cJSON *NSPV_setlanguage(char *lang)
 {
-    cJSON *result = cJSON_CreateObject(); char fname[512];
+    cJSON *result = cJSON_CreateObject(); char fname[512]; FILE *fp;
     if ( lang == 0 || lang[0] == 0 || strlen(lang) >= 64 )
     {
         jaddstr(result,"result","error");
@@ -982,7 +982,7 @@ cJSON *NSPV_setlanguage(char *lang)
         jaddstr(result,"error",lang);
         jaddstr(result,"status","cant find language.txt file");
         return(result);
-    }
+    } else fclose(fp);
     strcpy(NSPV_language,lang);
     jaddstr(result,"result","success");
     jaddstr(result,"language",lang);
