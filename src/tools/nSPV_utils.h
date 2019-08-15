@@ -39,47 +39,21 @@ btc_chainparams kmd_chainparams_main =
     1,1,0,
 };
 
-/*btc_chainparams nspv_chainparams_main =
-{
-    "NSPV",
-    60,
-    85,
-    "bc", // const char bech32_hrp[5]
-    188,
-    0x0488ADE4, // uint32_t b58prefix_bip32_privkey
-    0x0488B21E, // uint32_t b58prefix_bip32_pubkey
-    { 0x06, 0x65, 0x02, 0x98 }, //0x98, 0x02, 0x65, 0x06 },
-    { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 }, //{0x6f, 0xe2, 0x8c, 0x0a, 0xb6, 0xf1, 0xb3, 0x72, 0xc1, 0xa6, 0xa2, 0x46, 0xae, 0x63, 0xf7, 0x4f, 0x93, 0x1e, 0x83, 0x65, 0xe1, 0x5a, 0x08, 0x9c, 0x68, 0xd6, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00},
-    20266,20267,
-    {{"5.9.102.210, 5.9.253.195, 5.9.253.196, 5.9.253.197, 5.9.253.198, 5.9.253.199, 5.9.253.200, 5.9.253.201, 5.9.253.202, 5.9.253.203"}, 0},
-    60,
-    170007,
-    MAX_TX_SIZE_AFTER_SAPLING,
-    1,1,0,
-};
+int32_t unhex(char c);
 
-btc_chainparams iln_chainparams_main =
+bits256 NSPV_seed_to_wif(char *rawseed)
 {
-    "ILN",
-    60,
-    85,
-    "bc", // const char bech32_hrp[5]
-    188,
-    0x0488ADE4, // uint32_t b58prefix_bip32_privkey
-    0x0488B21E, // uint32_t b58prefix_bip32_pubkey
-    { 0xfe, 0xb4, 0xcb, 0x23 }, //23cbb4fe },
-    { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 },
-    12985,12986,
-    {{"5.9.102.210, 5.9.253.195, 5.9.253.196, 5.9.253.197, 5.9.253.198, 5.9.253.199, 5.9.253.200, 5.9.253.201, 5.9.253.202, 5.9.253.203"}, 0},
-    60,
-    170007,
-    MAX_TX_SIZE_AFTER_SAPLING,
-    1,1,0,
-};*/
-
-bits256 NSPV_seed_to_wif(char *seed)
-{
-    bits256 privkey;
+    bits256 privkey; int32_t a,b,c,n=0; char seed[8192],*dest = seed;
+    while ( n < sizeof(seed)-1 && (c= rawseed[n]) != 0 && c != 0 && c != '\r' && c != '\n' )
+    {
+        if ( c == '%' && (a= src[n+1]) != 0 && (b= src[n+2]) != 0 )
+            c = ((unhex(a) << 4) | unhex(b)), n += 2;
+        else if ( c == '+' )
+            c = ' ';
+        *dest++ = c;
+        n++;
+    }
+    seed[n] = 0;
     sha256_Raw((uint8_t *)seed,strlen(seed),privkey.bytes);
     privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
     int32_t j; for (j=0; j<32; j++)
