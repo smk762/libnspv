@@ -400,7 +400,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
                 {
                     revport = ((port >> 8) & 0xff) | ((port & 0xff) << 8);
                     sprintf(ipaddr+strlen(ipaddr),":%u",revport);
-                    //fprintf(stderr,"%d: %u %llx %s\n",i,timestamp,(long long)services,ipaddr);
+                    fprintf(stderr,"%d: %u %llx %s\n",i,timestamp,(long long)services,ipaddr);
                     tmpnode = btc_node_new();
                     if ( btc_node_set_ipport(tmpnode,ipaddr) > 0 )
                         btc_node_group_add_node(node->nodegroup,tmpnode);

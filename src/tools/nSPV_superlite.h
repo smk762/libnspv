@@ -294,7 +294,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 if  ( from->version < NSPV_PROTOCOL_VERSION )
                 {
                     from->banscore += 11;
-                    fprintf(stderr,"[%i] is old version.%d < %d \n",NSPV_inforesult.height,from->version, NSPV_PROTOCOL_VERSION);
+                    fprintf(stderr,"[%i] %s is old version.%d < %d \n",NSPV_inforesult.height,from->ipaddr,from->version, NSPV_PROTOCOL_VERSION);
                 }
                 // insert block header into array 
                 if ( NSPV_inforesult.hdrheight >= NSPV_lastntz.height && havehdr(hdrhash) == -1 )

@@ -270,7 +270,7 @@ void btc_node_disconnect(btc_node* node)
     if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
     {
         node->nodegroup->log_write_cb("Disconnect node %d\n", node->nodeid);
-        fprintf(stderr,"Disconnect node %d\n", node->nodeid);
+        fprintf(stderr,"Disconnect node %d %s\n", node->nodeid,node->ipaddr);
     }
     /* release buffer and timer event */
     btc_node_release_events(node);
@@ -443,7 +443,7 @@ void btc_node_connection_state_changed(btc_node *node)
     {
         if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
         {
-            fprintf(stderr,"misbehaved\n");
+            //fprintf(stderr,"misbehaved\n");
             btc_node_disconnect(node);
         }
     } else btc_node_send_version(node);
