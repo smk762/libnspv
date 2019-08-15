@@ -294,7 +294,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 if  ( from->version < NSPV_PROTOCOL_VERSION )
                 {
                     from->banscore += 11;
-                    fprintf(stderr,"[%i] is old version.%d < %d \n",NSPV_inforesult.height,from->version, NSPV_PROTOCOL_VERSION);
+                    fprintf(stderr,"[%i] %s is old version.%d < %d \n",NSPV_inforesult.height,from->ipaddr,from->version, NSPV_PROTOCOL_VERSION);
                 }
                 // insert block header into array 
                 if ( NSPV_inforesult.hdrheight >= NSPV_lastntz.height && havehdr(hdrhash) == -1 )
@@ -1657,7 +1657,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMECONSTART",replacestr);
                             sprintf(replacestr,"%u",juint(item,"time_last_request"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMELASTREQ",replacestr);
-                            sprintf(replacestr,"%llx",j64bits(item,"services"));
+                            sprintf(replacestr,"%llx",(long long)j64bits(item,"services"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_SERVICES",replacestr);
                             sprintf(replacestr,"%u",juint(item,"missbehavescore"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
@@ -1876,7 +1876,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDNLOCKTIME",(char *)replacestr);
                         sprintf(replacestr,"%d",juint(txobj,"nExpiryHeight"));
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDNEXPIRYHT",(char *)replacestr);
-                        sprintf(replacestr,"%lld",j64bits(txobj,"valueBalance"));
+                        sprintf(replacestr,"%lld",(long long)j64bits(txobj,"valueBalance"));
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDVALBAL",(char *)replacestr);
                         NSPV_expand_vinvout(bigbuf,&filestr,txobj,replacestr);
                     }

@@ -280,7 +280,7 @@ int main(int argc, char* argv[])
     }
     if ( port == 0 )
         port = chain->rpcport;
-    else memcpy(&chain->rpcport,&port,sizeof(chain->rpcport));
+    else memcpy((void *)&chain->rpcport,&port,sizeof(chain->rpcport));
     NSPV_chain = chain;
     if ( chain->komodo != 0 )
     {

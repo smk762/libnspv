@@ -202,7 +202,7 @@ void event_cb(struct bufferevent* ev, short type, void* ctx)
     }
     else if (type & BEV_EVENT_CONNECTED)
     {
-        //fprintf(stderr,"Successfull connected to node %d.\n", node->nodeid);
+        fprintf(stderr,"Successfull connected to node %d %s\n", node->nodeid,node->ipaddr);
         node->nodegroup->log_write_cb("Successfull connected to node %d.\n", node->nodeid);
         node->state |= NODE_CONNECTED;
         node->state &= ~NODE_CONNECTING;
@@ -270,7 +270,7 @@ void btc_node_disconnect(btc_node* node)
     if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
     {
         node->nodegroup->log_write_cb("Disconnect node %d\n", node->nodeid);
-        fprintf(stderr,"Disconnect node %d\n", node->nodeid);
+        fprintf(stderr,"Disconnect node %d %s\n", node->nodeid,node->ipaddr);
     }
     /* release buffer and timer event */
     btc_node_release_events(node);
@@ -412,7 +412,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             connected_at_least_to_one_node = true;
 
             node->nodegroup->log_write_cb("Trying to connect to %d...\n", node->nodeid);
-            //fprintf(stderr,"Trying to connect to %d...\n", node->nodeid);
+            fprintf(stderr,"Trying to connect to %d %s\n", node->nodeid,node->ipaddr);
 
             connect_amount--;
             if (connect_amount <= 0)
@@ -443,7 +443,7 @@ void btc_node_connection_state_changed(btc_node *node)
     {
         if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
         {
-            fprintf(stderr,"misbehaved\n");
+            //fprintf(stderr,"misbehaved\n");
             btc_node_disconnect(node);
         }
     } else btc_node_send_version(node);
