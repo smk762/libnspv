@@ -1452,6 +1452,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
+    // $LOGINDISPLAY - If Logged in set to "". Else "none"
+    // $LOGOUTDISPLAY - If NOT Logged in set to "". Else "none"
     if ( strcmp(NSPV_chain->name,"KMD") == 0 )
         NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
     else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
