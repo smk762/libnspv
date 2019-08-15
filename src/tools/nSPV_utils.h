@@ -62,7 +62,7 @@ bits256 NSPV_seed_to_wif(char *rawseed)
             fprintf(stderr,"%02x",privkey.bytes[j]);
         fprintf(stderr," <- (%s) ",seed);
         for (j=0; seed[j]!=0; j++)
-            fprintf(stderr,"%02x",seed[j]);
+            fprintf(stderr,"%02x",seed[j]&0xff);
         fprintf(stderr,"\n");
     }
     return(privkey);
