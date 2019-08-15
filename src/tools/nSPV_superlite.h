@@ -1547,7 +1547,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     {
         char *addr,*wif,*pub;
         retjson = NSPV_getnewaddress(NSPV_chain,jstr(argjson,"lang"));
-        fprintf(stderr,"lang=%s\n",jstr(argjson,"lang")!= 0 ?jstr(argjson,"lang") :"none");
         if ( retjson != 0 )
         {
             addr = jstr(retjson,"address");
