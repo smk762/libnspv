@@ -924,13 +924,18 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
             if ( GETBIT(key.privkey,i*11 + j) != 0 )
                 SETBIT(&ind,j);
         sprintf(wordstr,"%d",ind);
+        words[i] = ind;
         strcat(NSPV_walletseed,wordstr);
         if ( i < (int32_t)(sizeof(words)/sizeof(*words))-1 )
             strcat(NSPV_walletseed," ");
     }
     privkey = NSPV_seed_to_wif(NSPV_walletseed);
+    for (i=0; i<23; i++)
+        for (j=0; j<11; j++)
+            fprintf(stderr,"%d",GETBIT((uint8_t *)&ind,j) != 0);
+    fprintf(stderr," words[]\n");
     for (j=0; j<256; j++)
-        fprintf(stderr,"%d",GETBIT(privkey.bytes,j) != 0);
+        fprintf(stderr,"%d",GETBIT(key.privkey,j) != 0);
     fprintf(stderr," <- (%s)\n",NSPV_walletseed);
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
