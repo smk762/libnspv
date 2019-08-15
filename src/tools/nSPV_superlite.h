@@ -949,7 +949,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
         if ( i < (int32_t)(sizeof(words)/sizeof(*words))-1 )
             strcat(rawseed," ");
     }
-    privkey = NSPV_seed_to_wif(NSPV_tmpseed,rawseed);
+    privkey = NSPV_seed_to_wif(NSPV_tmpseed,(int32_t)sizeof(NSPV_tmpseed)-1,rawseed);
     if ( 0 )
     {
         for (i=0; i<23; i++)

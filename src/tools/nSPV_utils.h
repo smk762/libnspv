@@ -53,8 +53,8 @@ bits256 NSPV_seed_to_wif(char *newseed,int32_t maxlen,char *rawseed)
         *dest++ = c;
         n++;
     }
-    seed[n] = 0;
-    sha256_Raw((uint8_t *)newseed,strlen(seed),privkey.bytes);
+    newseed[n] = 0;
+    sha256_Raw((uint8_t *)newseed,strlen(newseed),privkey.bytes);
     privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
     if ( 1 )
     {
