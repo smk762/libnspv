@@ -936,7 +936,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key)
                 fprintf(stderr,"%d",GETBIT((uint8_t *)&words[i],j) != 0);
         fprintf(stderr," words[]\n");
         for (j=0; j<256; j++)
-            fprintf(stderr,"%d",GETBIT(key.privkey,j) != 0);
+            fprintf(stderr,"%d",GETBIT(key,j) != 0);
         fprintf(stderr," <- (%s)\n",NSPV_walletseed);
     }
     return(privkey);
