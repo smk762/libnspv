@@ -38,6 +38,8 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
 int32_t NSPV_didfirsttxproofs;
 char NSPV_tmpseed[4096],NSPV_walletseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
+char NSPV_language[64] = { "english" };
+
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
 int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
@@ -964,12 +966,35 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
     return(privkey);
 }
 
+cJSON *NSPV_setlanguage(char *lang)
+{
+    cJSON *result = cJSON_CreateObject(); char fname[512];
+    if ( lang == 0 || lang[0] == 0 || strlen(lang) >= 64 )
+    {
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","no lang");
+        return(result);
+    }
+    sprintf(fname,"seeds/%s.txt",lang);
+    if ( (fp= fopen(fname,"rb")) == 0 )
+    {
+        jaddstr(result,"result","error");
+        jaddstr(result,"error",lang);
+        jaddstr(result,"status","cant find language.txt file");
+        return(result);
+    }
+    strcpy(NSPV_language,lang);
+    jaddstr(result,"result","success");
+    jaddstr(result,"language",lang);
+    return(result);
+}
+
 cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100]; bits256 privkey;
     btc_random_bytes(key.privkey,32,0);
     if ( lang == 0 || lang[0] == 0 )
-        lang = "english";
+        lang = NSPV_language;
     privkey =  NSPV_bits_to_seed(key.privkey,lang);
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
@@ -1082,9 +1107,10 @@ struct NSPV_methodarg NSPV_methods[] =
     { "stop", { "", 0 } },
     { "help", { "", 0 } },
     { "logout", { "", 0 } },
-    { "getnewaddress", { "", 0 } },
+    { "getnewaddress", { "lang", NSPV_STR } },
     { "getpeerinfo", { "", 0 } },
     { "login", { { "wif", NSPV_STR } } },
+    { "language", { { "lang", NSPV_STR } } },
     { "broadcast", { { "hex", NSPV_STR } } },
     { "listunspent", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
     { "listtransactions", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "skipcount", NSPV_UINT }, { "filter", NSPV_UINT } } },
@@ -1251,6 +1277,8 @@ cJSON *_NSPV_JSON(cJSON *argjson)
     }
     else if ( strcmp(method,"getnewaddress") == 0 )
         return(NSPV_getnewaddress(NSPV_chain,jstr(argjson,"lang")));
+    else if ( strcmp(method,"language") == 0 )
+        return(NSPV_setlanguage(jstr(argjson,"lang")));
     else if ( strcmp(method,"broadcast") == 0 )
     {
         if ( hex == 0 )
