@@ -912,16 +912,15 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     return(result);
 }
 
-cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
+bits256 NSPV_bits_to_seed(uint8_t *key)
 {
-    cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100],wordstr[16]; bits256 privkey; int32_t ind,i,j,words[23];
-    btc_random_bytes(key.privkey,32,0);
+    bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[16];
     NSPV_walletseed[0] = 0;
     for (i=0; i<(int32_t)(sizeof(words)/sizeof(*words)); i++)
     {
         ind = 0;
         for (j=0; j<11; j++)
-            if ( GETBIT(key.privkey,i*11 + j) != 0 )
+            if ( GETBIT(key,i*11 + j) != 0 )
                 SETBIT(&ind,j);
         sprintf(wordstr,"%d",ind);
         words[i] = ind;
@@ -930,13 +929,24 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
             strcat(NSPV_walletseed," ");
     }
     privkey = NSPV_seed_to_wif(NSPV_walletseed);
-    for (i=0; i<23; i++)
-        for (j=0; j<11; j++)
-            fprintf(stderr,"%d",GETBIT((uint8_t *)&words[i],j) != 0);
-    fprintf(stderr," words[]\n");
-    for (j=0; j<256; j++)
-        fprintf(stderr,"%d",GETBIT(key.privkey,j) != 0);
-    fprintf(stderr," <- (%s)\n",NSPV_walletseed);
+    if ( 0 )
+    {
+        for (i=0; i<23; i++)
+            for (j=0; j<11; j++)
+                fprintf(stderr,"%d",GETBIT((uint8_t *)&words[i],j) != 0);
+        fprintf(stderr," words[]\n");
+        for (j=0; j<256; j++)
+            fprintf(stderr,"%d",GETBIT(key.privkey,j) != 0);
+        fprintf(stderr," <- (%s)\n",NSPV_walletseed);
+    }
+    return(privkey);
+}
+
+cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
+{
+    cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100]; bits256 privkey;
+    btc_random_bytes(key.privkey,32,0);
+    privkey =  NSPV_bits_to_seed(key.privkey);
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
     btc_pubkey_from_key(&key,&pubkey);
