@@ -914,7 +914,6 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 
 bits256 NSPV_bits_to_seed(uint8_t *key)
 {
-    static 
     bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[16];
     NSPV_walletseed[0] = 0;
     for (i=0; i<(int32_t)(sizeof(words)/sizeof(*words)); i++)
