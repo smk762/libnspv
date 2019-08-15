@@ -947,7 +947,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
                 SETBIT(&ind,j);
         if ( wordptrs[ind] == 0 )
             sprintf(wordstr,"%d",ind);
-        else strcpy(wordstr,wordptr[ind]);
+        else strcpy(wordstr,wordptrs[ind]);
         words[i] = ind;
         strcat(NSPV_walletseed,wordstr);
         if ( i < (int32_t)(sizeof(words)/sizeof(*words))-1 )
