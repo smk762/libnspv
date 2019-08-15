@@ -46,7 +46,7 @@ bits256 NSPV_seed_to_wif(char *rawseed)
     bits256 privkey; int32_t a,b,c,n=0; char seed[8192],*dest = seed;
     while ( n < sizeof(seed)-1 && (c= rawseed[n]) != 0 && c != 0 && c != '\r' && c != '\n' )
     {
-        if ( c == '%' && (a= src[n+1]) != 0 && (b= src[n+2]) != 0 )
+        if ( c == '%' && (a= rawseed[n+1]) != 0 && (b= rawseed[n+2]) != 0 )
             c = ((unhex(a) << 4) | unhex(b)), n += 2;
         else if ( c == '+' )
             c = ' ';
