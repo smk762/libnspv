@@ -62,45 +62,55 @@
             <!-- login form start -->
             <div class="login-section" style="display: $LOGOUTDISPLAY;">
               <h4>To continue, log in to your account.</h4>
-            <!--<form action="$URL/method/login" method="get">
+            <form action="$URL/method/login" method="get" style="display: none;">
               <div class="form-group">
                 Select a .jpg image file: <input type="file" name="jpg_image" accept=".jpg">
-                <input type="password" class="form-control" id="nspv_password" name="jpg_password" aria-describedby="nspvUserpassHelp" placeholder="Password" readonly>
+                <input type="password" class="form-control mt-2" id="nspv_password" name="jpg_password" aria-describedby="nspvUserpassHelp" placeholder="Password">
                 <small id="nspvPasswordHelp" class="form-text text-muted">Password (any random string) is used for session login. (disabled for now in debug versions)</small>
               </div>
               <button type="submit" class="btn btn-primary">Login with image + password</button>
-            </form>-->
+            </form>
             <form action="$URL/method/login" method="post">
-              <!--<div class="divider">
+              <div class="divider" style="display: none;">
                 <strong class="divider-title">or</strong>
-              </div>-->
+              </div>
               <div class="form-group">
                 <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key or Wallet Seed">
                 <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
               </div>
               <button type="submit" class="btn btn-primary">Login with Wallet Seed or WIF key</button>
                 <div class="alert alert-info" role="alert" style="margin-top: 10px;"><b>NOTICE: </b>Your login session will last for 777 seconds.</div>
-              <div class="divider"></div>
-              <h4>Don't have an account?</h4>
-              <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
+              <!--<div class="divider"></div>-->
             </form>
           </div>
           <!-- login form end -->
         </div>
         <!-- Get New Address section start -->
         <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $LOGOUTDISPLAY;;"> <!-- Get New Address div start -->
+            <div class="text-center mb-2">
+              <h4>If you dont like the seed or address displayed, just click to make a different one</h4>
+              <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
+            </div>
             <div class="card text-white bg-dark"> <!-- Get New Address card start -->
               <div class="card-body"> <!-- Get New Address card body start -->
-                <div class="alert alert-danger" role="alert"><b>IMPORTANT NOTICE: </b>Please take backup of the "Private Key" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing WIF/Private key. You HAVE to use this address's Private key to login, view transactions and use it's funds.</div>
-                <dl class="row" style="margin-bottom: 0;">
+                <div class="alert alert-danger" role="alert"><b>IMPORTANT NOTICE: </b>Please take backup of both your "Wallet Seed" and the "Private Key" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing Seed/WIF/Private key. You HAVE to use this address's Walelt Seed or WIF/Private key to login, view transactions and use it's funds.</div>
+                <dl class="row" style="background-color: #00000024; padding: 10px 0;">
+                  <dt class="col-sm-3">Wallet Seed:<br><span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
+                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white mb-0">$WALLETSEED</pre>
+                    <small id="nspvWifHelp" class="form-text text-muted mb-2 mt-0">Take backup this Wallet Seed.</small></dd>
+
                   <dt class="col-sm-3">Here is your new address:</dt>
-                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">$NEW_WALLETADDR</pre></dd>
+                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white mb-0" style="font-size: 120%;">$NEW_WALLETADDR</pre></dd>
                   
-                  <dt class="col-sm-3">Private Key (WIF Key) <span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
-                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white">$NEW_WIFKEY</pre></dd>
+                </dl>
+                <h4>Advanced Info:</h4>
+                <dl class="row" style="margin-bottom: 0; background-color: #00000024; padding: 10px 0;">
+                  <dt class="col-sm-3">Private Key (WIF Key):<br><span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
+                  <dd class="col-sm-9"><pre class="text-break text-wrap text-white mb-0">$NEW_WIFKEY</pre>
+                    <small id="nspvWifHelp" class="form-text text-muted mb-2 mt-0">Take backup this Private Key (WIF Key).</small></dd>
 
                   <dt class="col-sm-3" style="margin-bottom: 0;">Public Key</dt>
-                  <dd class="col-sm-9" style="margin-bottom: 0;"><pre class="text-break text-wrap text-white" style="margin-bottom: 0;">$NEW_PUBKEY</pre></dd>
+                  <dd class="col-sm-9" style="margin-bottom: 0;"><pre class="text-break text-wrap text-white mb-0" style="margin-bottom: 0;">$NEW_PUBKEY</pre></dd>
                 </dl>
               </div> <!-- Get New Address card body end -->
             </div> <!-- Get New Address card end -->
