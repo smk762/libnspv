@@ -56,7 +56,7 @@
         <div class="col-md-4 col-sm-12 text-center">
             <!-- active login section start -->
             <div class="active-login" style="display: $LOGINDISPLAY;">
-              <h4>Your login session will expire in $LOGINSECCONDS seconds.</h4>
+              <h4>Your login session will expire in $AUTOLOGOUT seconds.</h4>
             </div>
             <!-- active login section end -->
             <!-- login form start -->
