@@ -914,8 +914,8 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 
 bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
 {
-    static char *wordptrs[2048],language[16];
-    bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[256]; FILE *fp;
+    static char *wordptrs[2048],language[64];
+    bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[256],fname[64]; FILE *fp;
     if ( wordptrs[0] == 0 || strcmp(lang,language) != 0 )
     {
         for (i=0; i<(int32_t)(sizeof(wordptrs)/sizeof(*wordptrs)); i++)
@@ -923,19 +923,14 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
                 free(wordptrs[i]);
         memset(wordptrs,0,sizeof(wordptrs));
         strcpy(language,lang);
-        if ( strcmp(lang,"en") == 0 )
+        sprintf(fname,"seeds/%s.txt",lang);
+        if ( (fp= fopen(fname,"rb")) != 0 )
         {
-            if ( (fp= fopen("seeds/english.txt","rb")) != 0 )
-            {
-                memset(wordstr,0,sizeof(wordstr));
-                i = 0;
-                while ( OS_getline(1,wordstr,(int32_t)sizeof(wordstr)-1,0,fp) > 0 )
-                {
-                    fprintf(stderr,"%d (%s)\n",i,wordstr);
-                    i++;
-                }
-                fclose(fp);
-            }
+            memset(wordstr,0,sizeof(wordstr));
+            i = 0;
+            while ( OS_getline(1,wordstr,(int32_t)sizeof(wordstr)-1,0,fp) > 0 )
+                wordptrs[i++] = clonestr(wordstr);
+            fclose(fp);
         }
     }
     NSPV_walletseed[0] = 0;
@@ -967,11 +962,13 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
     return(privkey);
 }
 
-cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
+cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100]; bits256 privkey;
     btc_random_bytes(key.privkey,32,0);
-    privkey =  NSPV_bits_to_seed(key.privkey,"en");
+    if ( lang == 0 || lang[0] == 0 )
+        lang = "english";
+    privkey =  NSPV_bits_to_seed(key.privkey,lang);
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
     btc_pubkey_from_key(&key,&pubkey);
@@ -1250,7 +1247,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         }
     }
     else if ( strcmp(method,"getnewaddress") == 0 )
-        return(NSPV_getnewaddress(NSPV_chain));
+        return(NSPV_getnewaddress(NSPV_chain,jstr(argjson,"lang")));
     else if ( strcmp(method,"broadcast") == 0 )
     {
         if ( hex == 0 )
@@ -1518,7 +1515,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
 
     {
         char *addr,*wif,*pub;
-        retjson = NSPV_getnewaddress(NSPV_chain);
+        retjson = NSPV_getnewaddress(NSPV_chain,jstr(argjson,"lang"));
         if ( retjson != 0 )
         {
             addr = jstr(retjson,"address");
