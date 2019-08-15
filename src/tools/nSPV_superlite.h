@@ -37,7 +37,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
 int32_t NSPV_didfirsttxproofs;
-char NSPV_walletseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
+char NSPV_tmpseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
 int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
@@ -877,6 +877,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         jaddnum(result,"wifprefix",(int64_t)data[0]);
         jaddnum(result,"expected",(int64_t)chain->b58prefix_secret_address);
         return(result);*/
+        strcpy(NSPV_walletseed,wifstr);
         privkey = NSPV_seed_to_wif(wifstr);
         memcpy(NSPV_key.privkey,privkey.bytes,sizeof(privkey));
         sz2 = sizeof(wif2);
@@ -933,7 +934,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
             fclose(fp);
         }
     }
-    NSPV_walletseed[0] = 0;
+    NSPV_tmpseed[0] = 0;
     for (i=0; i<(int32_t)(sizeof(words)/sizeof(*words)); i++)
     {
         ind = 0;
@@ -944,11 +945,11 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
             sprintf(wordstr,"%d",ind);
         else strcpy(wordstr,wordptrs[ind]);
         words[i] = ind;
-        strcat(NSPV_walletseed,wordstr);
+        strcat(NSPV_tmpseed,wordstr);
         if ( i < (int32_t)(sizeof(words)/sizeof(*words))-1 )
-            strcat(NSPV_walletseed," ");
+            strcat(NSPV_tmpseed," ");
     }
-    privkey = NSPV_seed_to_wif(NSPV_walletseed);
+    privkey = NSPV_seed_to_wif(NSPV_tmpseed);
     if ( 0 )
     {
         for (i=0; i<23; i++)
@@ -957,7 +958,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
         fprintf(stderr," words[]\n");
         for (j=0; j<256; j++)
             fprintf(stderr,"%d",GETBIT(key,j) != 0);
-        fprintf(stderr," <- (%s)\n",NSPV_walletseed);
+        fprintf(stderr," <- (%s)\n",NSPV_tmpseed);
     }
     return(privkey);
 }
@@ -977,7 +978,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
     btc_pubkey_getaddr_p2pkh(&pubkey,chain,address);
     sz = sizeof(wifstr);
     btc_privkey_encode_wif(&key,chain,wifstr,&sz);
-    jaddstr(result,"seed",NSPV_walletseed);
+    jaddstr(result,"seed",NSPV_tmpseed);
     jaddstr(result,"wif",wifstr);
     jaddstr(result,"address",address);
     jaddstr(result,"pubkey",pubkeystr);
@@ -1961,7 +1962,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$LOGOUTDISPLAY",NSPV_logintime==0?"":"none");
     sprintf(replacestr,"%d",NSPV_AUTOLOGOUT - (int32_t)(time(NULL)-NSPV_logintime));
     NSPV_expand_variable(bigbuf,&filestr,"$AUTOLOGOUT",replacestr);
-    NSPV_expand_variable(bigbuf,&filestr,"$WALLETSEED",NSPV_walletseed);
+    NSPV_expand_variable(bigbuf,&filestr,"$WALLETSEED",NSPV_tmpseed);
 
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
