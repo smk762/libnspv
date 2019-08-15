@@ -1845,8 +1845,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         if ( dest != 0 && satoshis != 0 )
         {
             NSPV_expand_variable(bigbuf,&filestr,"$TOADDR",dest);
-            if ( satoshis > (NSPV_utxosresult.total+NSPV_utxosresult.interest-20000) )
-                satoshis = (NSPV_utxosresult.total+NSPV_utxosresult.interest-20000);
+            if ( satoshis > (NSPV_utxosresult.total+NSPV_utxosresult.interest-10000) )
+                satoshis = (NSPV_utxosresult.total+NSPV_utxosresult.interest-10000);
             sprintf(replacestr,"%.8f",dstr(satoshis));
             NSPV_expand_variable(bigbuf,&filestr,"$SENDAMOUNT",replacestr);
             if ( strcmp(method,"send_validate") == 0 )
