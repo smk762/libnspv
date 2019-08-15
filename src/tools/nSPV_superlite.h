@@ -967,7 +967,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
     cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100]; bits256 privkey;
     btc_random_bytes(key.privkey,32,0);
     if ( lang == 0 || lang[0] == 0 )
-        lang = "english";
+        lang = "korean";
     privkey =  NSPV_bits_to_seed(key.privkey,lang);
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
@@ -977,6 +977,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
     btc_pubkey_getaddr_p2pkh(&pubkey,chain,address);
     sz = sizeof(wifstr);
     btc_privkey_encode_wif(&key,chain,wifstr,&sz);
+    jaddstr(result,"seed",NSPV_walletseed);
     jaddstr(result,"wif",wifstr);
     jaddstr(result,"address",address);
     jaddstr(result,"pubkey",pubkeystr);
