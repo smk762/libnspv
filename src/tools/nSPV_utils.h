@@ -68,6 +68,42 @@ bits256 NSPV_seed_to_wif(char *rawseed)
     return(privkey);
 }
 
+int32_t OS_getline(int32_t waitflag,char *line,int32_t max,char *dispstr)
+{
+    if ( dispstr != 0 && dispstr[0] != 0 )
+        fprintf(stderr,"%s",dispstr);
+    line[0] = 0;
+#ifndef _WIN32
+    if ( waitflag == 0 )
+    {
+        static char prevline[1024];
+        struct timeval timeout;
+        fd_set fdset;
+        int32_t s;
+        line[0] = 0;
+        FD_ZERO(&fdset);
+        FD_SET(STDIN_FILENO,&fdset);
+        timeout.tv_sec = 0, timeout.tv_usec = 10000;
+        if ( (s= select(1,&fdset,NULL,NULL,&timeout)) < 0 )
+            fprintf(stderr,"wait_for_input: error select s.%d\n",s);
+        else
+        {
+            if ( FD_ISSET(STDIN_FILENO,&fdset) > 0 && fgets(line,max,stdin) == line )
+            {
+                line[strlen(line)-1] = 0;
+                if ( line[0] == 0 || (line[0] == '.' && line[1] == 0) )
+                    strcpy(line,prevline);
+                else strcpy(prevline,line);
+            }
+        }
+        return((int32_t)strlen(line));
+    }
+#endif
+    if ( fgets(line,max,stdin) != 0 )
+        line[strlen(line)-1] = 0;
+    return((int32_t)strlen(line));
+}
+
 char *bits256_str(char *buf,bits256 hash)
 {
     int32_t i;

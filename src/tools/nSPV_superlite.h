@@ -912,10 +912,32 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     return(result);
 }
 
-bits256 NSPV_bits_to_seed(uint8_t *key)
+bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
 {
-   // static words[2048][64];
-    bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[16];
+    static char *wordptrs[2048],language[16];
+    bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[256]; FILE *fp;
+    if ( wordptrs[0] == 0 || strcmp(lang,language) != 0 )
+    {
+        for (i=0; i<(int32_t)(sizeof(wordptrs)/sizeof(*wordptrs)); i++)
+            if ( wordptrs[i] != 0 )
+                free(wordptrs[i]);
+        memset(wordptrs,0,sizeof(wordptrs));
+        strcpy(language,lang);
+        if ( strcmp(lang,"en") == 0 )
+        {
+            if ( (fp= fopen("seeds/english.txt","rb")) != 0 )
+            {
+                memset(wordstr,0,sizeof(wordstr)));
+                i = 0;
+                while ( OS_getline(1,wordstr,(int32_t)sizeof(wordstr)-1,0) > 0 )
+                {
+                    fprintf(stderr,"%d (%s)\n",i,wordstr);
+                    i++;
+                }
+                fclose(fp);
+            }
+        }
+    }
     NSPV_walletseed[0] = 0;
     for (i=0; i<(int32_t)(sizeof(words)/sizeof(*words)); i++)
     {
@@ -923,7 +945,9 @@ bits256 NSPV_bits_to_seed(uint8_t *key)
         for (j=0; j<11; j++)
             if ( GETBIT(key,i*11 + j) != 0 )
                 SETBIT(&ind,j);
-        sprintf(wordstr,"%d",ind);
+        if ( wordptrs[ind] == 0 )
+            sprintf(wordstr,"%d",ind);
+        else strcpy(wordstr,wordptr[ind]);
         words[i] = ind;
         strcat(NSPV_walletseed,wordstr);
         if ( i < (int32_t)(sizeof(words)/sizeof(*words))-1 )
@@ -947,7 +971,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 {
     cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100]; bits256 privkey;
     btc_random_bytes(key.privkey,32,0);
-    privkey =  NSPV_bits_to_seed(key.privkey);
+    privkey =  NSPV_bits_to_seed(key.privkey,"en");
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
     btc_pubkey_from_key(&key,&pubkey);
