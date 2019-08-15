@@ -37,7 +37,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
 int32_t NSPV_didfirsttxproofs;
-char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
+char NSPV_walletseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
 int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
@@ -914,8 +914,23 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 
 cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
 {
-    cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100];
+    cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100],wordstr[16]; bits256 privkey; int32_t ind,i,j,words[23];
     btc_random_bytes(key.privkey,32,0);
+    NSPV_walletseed[0] = 0;
+    for (i=0; i<(int32_t)(sizeof(words)/sizeof(*words)); i++)
+    {
+        ind = 0;
+        for (j=0; j<11; j++)
+            if ( GETBIT(key.privkey,i*11 + j) != 0 )
+                SETBIT(&ind,j);
+        sprintf(wordstr,"%d",ind);
+        strcat(NSPV_walletseed,wordstr);
+        if ( i < (int32_t)(sizeof(words)/sizeof(*words))-1 )
+            strcat(NSPV_walletseed," ");
+    }
+    privkey = NSPV_seed_to_wif(NSPV_walletseed);
+    memcpy(key.privkey,privkey.bytes,sizeof(privkey));
+
     btc_pubkey_from_key(&key,&pubkey);
     sz = sizeof(pubkeystr);
     btc_pubkey_get_hex(&pubkey,pubkeystr,&sz);
@@ -1905,6 +1920,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$LOGOUTDISPLAY",NSPV_logintime==0?"":"none");
     sprintf(replacestr,"%d",NSPV_AUTOLOGOUT - (int32_t)(time(NULL)-NSPV_logintime));
     NSPV_expand_variable(bigbuf,&filestr,"$AUTOLOGOUT",replacestr);
+    NSPV_expand_variable(bigbuf,&filestr,"$WALLETSEED",NSPV_walletseed);
 
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
