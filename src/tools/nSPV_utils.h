@@ -48,7 +48,7 @@ bits256 NSPV_seed_to_wif(char *rawseed)
     {
         if ( c == '+' )
             c = ' ';
-        else if ( 0 && c == '%' && (a= rawseed[n+1]) != 0 && (b= rawseed[n+2]) != 0 )
+        else if ( c == '%' && (a= rawseed[n+1]) != 0 && (b= rawseed[n+2]) != 0 )
             c = ((unhex(a) << 4) | unhex(b)), n += 2;
         *dest++ = c;
         n++;
