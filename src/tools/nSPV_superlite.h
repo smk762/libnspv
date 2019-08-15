@@ -929,6 +929,9 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
             strcat(NSPV_walletseed," ");
     }
     privkey = NSPV_seed_to_wif(NSPV_walletseed);
+    for (j=0; j<32; j++)
+        fprintf(stderr,"%02x",privkey.bytes[j]);
+    fprintf(stderr," <- (%s)\n",NSPV_walletseed);
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
     btc_pubkey_from_key(&key,&pubkey);
