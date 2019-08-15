@@ -44,6 +44,7 @@
                 <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
               </div>
               <button type="submit" class="btn btn-primary">Login with Wallet Seed or WIF key</button>
+                <div class="alert alert-info" role="alert" style="margin-top: 10px;"><b>NOTICE: </b>Your login session will last for 777 seconds.</div>
               <div class="divider"></div>
               <h4>Don't have an account?</h4>
               <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
