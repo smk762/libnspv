@@ -1547,6 +1547,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     {
         char *addr,*wif,*pub;
         retjson = NSPV_getnewaddress(NSPV_chain,jstr(argjson,"lang"));
+        fprintf(stderr,"lang=%s\n",jstr(argjson,"lang")!= 0 ?,jstr(argjson,"lang") :"none");
         if ( retjson != 0 )
         {
             addr = jstr(retjson,"address");
@@ -1560,6 +1561,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                 NSPV_expand_variable(bigbuf,&filestr,"$NEW_WIFKEY",replacestr);
                 strcpy(replacestr,pub);
                 NSPV_expand_variable(bigbuf,&filestr,"$NEW_PUBKEY",replacestr);
+                NSPV_expand_variable(bigbuf,&filestr,"$WALLETSEED",NSPV_tmpseed);
             }
             free_json(retjson);
         }
@@ -1991,7 +1993,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$LOGOUTDISPLAY",NSPV_logintime==0?"":"none");
     sprintf(replacestr,"%d",NSPV_AUTOLOGOUT - (int32_t)(time(NULL)-NSPV_logintime));
     NSPV_expand_variable(bigbuf,&filestr,"$AUTOLOGOUT",replacestr);
-    NSPV_expand_variable(bigbuf,&filestr,"$WALLETSEED",NSPV_tmpseed);
 
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
