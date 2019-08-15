@@ -1901,7 +1901,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEIN",(char *)replacestr);
     NSPV_expand_variable(bigbuf,&filestr,"$LOGINDISPLAY",NSPV_logintime!=0?"":"none");
     NSPV_expand_variable(bigbuf,&filestr,"$LOGOUTDISPLAY",NSPV_logintime==0?"":"none");
-    
+    sprintf(replacestr,"%d",(int32_t)(time(NULL)-NSPV_logintime)-NSPV_AUTOLOGOUT);
+    NSPV_expand_variable(bigbuf,&filestr,"$LOGINSECCONDS",replacestr);
+
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
 
