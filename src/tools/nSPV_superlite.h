@@ -1655,7 +1655,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMECONSTART",replacestr);
                             sprintf(replacestr,"%u",juint(item,"time_last_request"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMELASTREQ",replacestr);
-                            sprintf(replacestr,"%llx",j64bits(item,"services"));
+                            sprintf(replacestr,"%llx",(long long)j64bits(item,"services"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_SERVICES",replacestr);
                             sprintf(replacestr,"%u",juint(item,"missbehavescore"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
@@ -1874,7 +1874,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDNLOCKTIME",(char *)replacestr);
                         sprintf(replacestr,"%d",juint(txobj,"nExpiryHeight"));
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDNEXPIRYHT",(char *)replacestr);
-                        sprintf(replacestr,"%lld",j64bits(txobj,"valueBalance"));
+                        sprintf(replacestr,"%lld",(long long)j64bits(txobj,"valueBalance"));
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDVALBAL",(char *)replacestr);
                         NSPV_expand_vinvout(bigbuf,&filestr,txobj,replacestr);
                     }
