@@ -929,7 +929,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
             {
                 memset(wordstr,0,sizeof(wordstr));
                 i = 0;
-                while ( OS_getline(1,wordstr,(int32_t)sizeof(wordstr)-1,0) > 0 )
+                while ( OS_getline(1,wordstr,(int32_t)sizeof(wordstr)-1,0,fp) > 0 )
                 {
                     fprintf(stderr,"%d (%s)\n",i,wordstr);
                     i++;

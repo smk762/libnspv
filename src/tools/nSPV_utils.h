@@ -68,7 +68,7 @@ bits256 NSPV_seed_to_wif(char *rawseed)
     return(privkey);
 }
 
-int32_t OS_getline(int32_t waitflag,char *line,int32_t max,char *dispstr)
+int32_t OS_getline(int32_t waitflag,char *line,int32_t max,char *dispstr,FILE *fp)
 {
     if ( dispstr != 0 && dispstr[0] != 0 )
         fprintf(stderr,"%s",dispstr);
@@ -99,7 +99,7 @@ int32_t OS_getline(int32_t waitflag,char *line,int32_t max,char *dispstr)
         return((int32_t)strlen(line));
     }
 #endif
-    if ( fgets(line,max,stdin) != 0 )
+    if ( fgets(line,max,fp) != 0 )
         line[strlen(line)-1] = 0;
     return((int32_t)strlen(line));
 }
