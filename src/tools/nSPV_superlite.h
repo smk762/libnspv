@@ -157,6 +157,7 @@ void NSPV_logout()
     memset(NSPV_txproof_cache,0,sizeof(NSPV_txproof_cache));
     memset(NSPV_ntzsresp_cache,0,sizeof(NSPV_ntzsresp_cache));
     memset(NSPV_wifstr,0,sizeof(NSPV_wifstr));
+    memset(NSPV_walletseed,0,sizeof(NSPV_walletseed));
     memset(&NSPV_key,0,sizeof(NSPV_key));
     NSPV_didfirstutxos = NSPV_logintime = 0;
     NSPV_didfirsttxproofs = 0;
