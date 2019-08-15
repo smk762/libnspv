@@ -932,7 +932,7 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain)
     privkey = NSPV_seed_to_wif(NSPV_walletseed);
     for (i=0; i<23; i++)
         for (j=0; j<11; j++)
-            fprintf(stderr,"%d",GETBIT((uint8_t *)&ind,j) != 0);
+            fprintf(stderr,"%d",GETBIT((uint8_t *)&ind,10-j) != 0);
     fprintf(stderr," words[]\n");
     for (j=0; j<256; j++)
         fprintf(stderr,"%d",GETBIT(key.privkey,j) != 0);
