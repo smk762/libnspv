@@ -294,7 +294,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 if  ( from->version < NSPV_PROTOCOL_VERSION )
                 {
                     from->banscore += 11;
-                    fprintf(stderr,"[%i] is old version.%d < %d \n",NSPV_inforesult.height,from->version, NSPV_PROTOCOL_VERSION);
+                    fprintf(stderr,"[%i] %s is old version.%d < %d \n",NSPV_inforesult.height,from->ipaddr,from->version, NSPV_PROTOCOL_VERSION);
                 }
                 // insert block header into array 
                 if ( NSPV_inforesult.hdrheight >= NSPV_lastntz.height && havehdr(hdrhash) == -1 )
@@ -1452,6 +1452,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $NEW_WALLETADDR - New wallet address
     // $NEW_WIFKEY - New wallet address's Private/WIF key
     // $NEW_PUBKEY - New wallet address's Public key
+    // $LOGINDISPLAY - If Logged in set to "". Else "none"
+    // $LOGOUTDISPLAY - If NOT Logged in set to "". Else "none"
     if ( strcmp(NSPV_chain->name,"KMD") == 0 )
         NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
     else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
@@ -1655,7 +1657,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMECONSTART",replacestr);
                             sprintf(replacestr,"%u",juint(item,"time_last_request"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_TIMELASTREQ",replacestr);
-                            sprintf(replacestr,"%llx",j64bits(item,"services"));
+                            sprintf(replacestr,"%llx",(long long)j64bits(item,"services"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_SERVICES",replacestr);
                             sprintf(replacestr,"%u",juint(item,"missbehavescore"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
@@ -1874,7 +1876,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDNLOCKTIME",(char *)replacestr);
                         sprintf(replacestr,"%d",juint(txobj,"nExpiryHeight"));
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDNEXPIRYHT",(char *)replacestr);
-                        sprintf(replacestr,"%lld",j64bits(txobj,"valueBalance"));
+                        sprintf(replacestr,"%lld",(long long)j64bits(txobj,"valueBalance"));
                         NSPV_expand_variable(bigbuf,&filestr,"$SENDVALBAL",(char *)replacestr);
                         NSPV_expand_vinvout(bigbuf,&filestr,txobj,replacestr);
                     }
@@ -1897,6 +1899,10 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEOUT",(char *)replacestr);
     sprintf(replacestr,"%llu",(long long)NSPV_totalrecv);
     NSPV_expand_variable(bigbuf,&filestr,"$NETBYTEIN",(char *)replacestr);
+    NSPV_expand_variable(bigbuf,&filestr,"$LOGINDISPLAY",NSPV_logintime!=0?"":"none");
+    NSPV_expand_variable(bigbuf,&filestr,"$LOGOUTDISPLAY",NSPV_logintime==0?"":"none");
+    sprintf(replacestr,"%d",NSPV_AUTOLOGOUT - (int32_t)(time(NULL)-NSPV_logintime));
+    NSPV_expand_variable(bigbuf,&filestr,"$AUTOLOGOUT",replacestr);
 
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error

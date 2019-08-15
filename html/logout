@@ -14,6 +14,19 @@
   <body class="login-body">
     <nav class="navbar navbar-dark bg-dark">
       <a class="navbar-brand"><img src="images/antara150x150.png" class="logo"/> Antara Superlite</a>
+      <!-- only if logged in - start -->
+      <form class="form-row send_form" action="$URL/method/send_confirm" method="get" style="display: $LOGINDISPLAY;">
+          <div class="col-lg-6 col-sm-6 col-xs-12">
+            <input class="form-control form-control-sm" type="text" placeholder="Address" name="address" aria-label="ToAddress">
+          </div>
+          <div class="col-lg-3 col-sm-3 col-xs-3">
+            <input class="form-control form-control-sm" type="text" placeholder="Amount" name="amount" aria-label="SendAmount">
+          </div>
+          <div class="col-lg-3 col-lg-3 col-xs-3">
+          <button class="btn btn-outline-warning btn-sm" type="submit">Send $COIN</button>
+        </div>
+      </form>
+      <!-- only if logged in - end -->
       <form class="form-inline">
         $MENU_BUTTON_ARRAY
         <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
@@ -22,10 +35,32 @@
     </nav>
 
     <div class="container-fluid" style="margin-top: 15px;">
+      <!-- only if logged in - start -->
+      <div class="row" style="margin-bottom: 1em; display: $LOGINDISPLAY;">
+        <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
+            <div class="card text-white bg-dark"> <!-- coin info card start -->
+              <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
+                <div class="row">
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>Coin:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>Balance:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>Rewards:</b><br> $REWARDS $COIN</span>
+                  <span class="col-lg-3 col-sm-12 col-xs-12"><b>Your Address:</b><br> $WALLETADDR</span>
+                </div>
+              </div> <!-- coin info body end -->
+            </div> <!-- coin info card end -->
+        </div> <!-- coin info div end -->
+      </div>
+      <!-- only if logged in - end -->
+
       <div class="row justify-content-md-center">
         <div class="col-md-4 col-sm-12 text-center">
+            <!-- active login section start -->
+            <div class="active-login" style="display: $LOGINDISPLAY;">
+              <h4>Your login session will expire in $AUTOLOGOUT seconds.</h4>
+            </div>
+            <!-- active login section end -->
             <!-- login form start -->
-            <div class="login-section">
+            <div class="login-section" style="display: $LOGOUTDISPLAY;">
               <h4>To continue, log in to your account.</h4>
             <!--<form action="$URL/method/login" method="get">
               <div class="form-group">
@@ -44,6 +79,7 @@
                 <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
               </div>
               <button type="submit" class="btn btn-primary">Login with Wallet Seed or WIF key</button>
+                <div class="alert alert-info" role="alert" style="margin-top: 10px;"><b>NOTICE: </b>Your login session will last for 777 seconds.</div>
               <div class="divider"></div>
               <h4>Don't have an account?</h4>
               <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
@@ -52,7 +88,7 @@
           <!-- login form end -->
         </div>
         <!-- Get New Address section start -->
-        <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $GENADDR;"> <!-- Get New Address div start -->
+        <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $LOGOUTDISPLAY;;"> <!-- Get New Address div start -->
             <div class="card text-white bg-dark"> <!-- Get New Address card start -->
               <div class="card-body"> <!-- Get New Address card body start -->
                 <div class="alert alert-danger" role="alert"><b>IMPORTANT NOTICE: </b>Please take backup of the "Private Key" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing WIF/Private key. You HAVE to use this address's Private key to login, view transactions and use it's funds.</div>
