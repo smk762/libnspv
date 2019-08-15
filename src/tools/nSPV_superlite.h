@@ -37,7 +37,7 @@ btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKM
 
 uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
 int32_t NSPV_didfirsttxproofs;
-char NSPV_tmpseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
+char NSPV_tmpseed[4096],NSPV_walletseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 btc_spv_client *NSPV_client;
 const btc_chainparams *NSPV_chain;
 int64_t NSPV_balance,NSPV_rewards,NSPV_totalsent,NSPV_totalrecv;
@@ -904,6 +904,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     sz2 = sizeof(NSPV_pubkeystr);
     btc_pubkey_get_hex(&NSPV_pubkey,NSPV_pubkeystr,&sz2);
     btc_pubkey_getaddr_p2pkh(&NSPV_pubkey,chain,NSPV_address);
+    jaddstr(result,"seed",NSPV_walletseed);
     jaddstr(result,"address",NSPV_address);
     jaddstr(result,"pubkey",NSPV_pubkeystr);
     jaddnum(result,"wifprefix",(int64_t)data[0]);
