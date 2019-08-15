@@ -927,7 +927,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
         {
             if ( (fp= fopen("seeds/english.txt","rb")) != 0 )
             {
-                memset(wordstr,0,sizeof(wordstr)));
+                memset(wordstr,0,sizeof(wordstr));
                 i = 0;
                 while ( OS_getline(1,wordstr,(int32_t)sizeof(wordstr)-1,0) > 0 )
                 {
