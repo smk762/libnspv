@@ -877,8 +877,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
         jaddnum(result,"wifprefix",(int64_t)data[0]);
         jaddnum(result,"expected",(int64_t)chain->b58prefix_secret_address);
         return(result);*/
-        strcpy(NSPV_walletseed,wifstr);
-        privkey = NSPV_seed_to_wif(wifstr);
+        privkey = NSPV_seed_to_wif(NSPV_walletseed,(int32_t)sizeof(NSPV_walletseed)-1,wifstr);
         memcpy(NSPV_key.privkey,privkey.bytes,sizeof(privkey));
         sz2 = sizeof(wif2);
         btc_privkey_encode_wif(&NSPV_key,chain,wif2,&sz2);
@@ -917,7 +916,7 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
 {
     static char *wordptrs[2048],language[64];
-    bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[256],fname[64]; FILE *fp;
+    bits256 privkey; int32_t ind,i,j,words[23]; char wordstr[256],fname[64],rawseed[4096]; FILE *fp;
     if ( wordptrs[0] == 0 || strcmp(lang,language) != 0 )
     {
         for (i=0; i<(int32_t)(sizeof(wordptrs)/sizeof(*wordptrs)); i++)
@@ -935,7 +934,7 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
             fclose(fp);
         }
     }
-    NSPV_tmpseed[0] = 0;
+    rawseed[0] = 0;
     for (i=0; i<(int32_t)(sizeof(words)/sizeof(*words)); i++)
     {
         ind = 0;
@@ -946,11 +945,11 @@ bits256 NSPV_bits_to_seed(uint8_t *key,char *lang)
             sprintf(wordstr,"%d",ind);
         else strcpy(wordstr,wordptrs[ind]);
         words[i] = ind;
-        strcat(NSPV_tmpseed,wordstr);
+        strcat(rawseed,wordstr);
         if ( i < (int32_t)(sizeof(words)/sizeof(*words))-1 )
-            strcat(NSPV_tmpseed," ");
+            strcat(rawseed," ");
     }
-    privkey = NSPV_seed_to_wif(NSPV_tmpseed);
+    privkey = NSPV_seed_to_wif(NSPV_tmpseed,rawseed);
     if ( 0 )
     {
         for (i=0; i<23; i++)

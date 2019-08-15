@@ -41,10 +41,10 @@ btc_chainparams kmd_chainparams_main =
 
 int32_t unhex(char c);
 
-bits256 NSPV_seed_to_wif(char *rawseed)
+bits256 NSPV_seed_to_wif(char *newseed,int32_t maxlen,char *rawseed)
 {
-    bits256 privkey; int32_t a,b,c,n=0; char seed[8192],*dest = seed;
-    while ( n < (int32_t)sizeof(seed)-1 && (c= rawseed[n]) != 0 && c != 0 && c != '\r' && c != '\n' )
+    bits256 privkey; int32_t a,b,c,n=0; char *dest = newseed;
+    while ( n < maxlen && (c= rawseed[n]) != 0 && c != 0 && c != '\r' && c != '\n' )
     {
         if ( c == '%' && (a= rawseed[n+1]) != 0 && (b= rawseed[n+2]) != 0 )
             c = ((unhex(a) << 4) | unhex(b)), n += 2;
@@ -54,15 +54,15 @@ bits256 NSPV_seed_to_wif(char *rawseed)
         n++;
     }
     seed[n] = 0;
-    sha256_Raw((uint8_t *)seed,strlen(seed),privkey.bytes);
+    sha256_Raw((uint8_t *)newseed,strlen(seed),privkey.bytes);
     privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
     if ( 1 )
     {
         int32_t j; for (j=0; j<32; j++)
             fprintf(stderr,"%02x",privkey.bytes[j]);
-        fprintf(stderr," <- (%s) ",seed);
-        for (j=0; seed[j]!=0; j++)
-            fprintf(stderr,"%02x",seed[j]&0xff);
+        fprintf(stderr," <- (%s) ",newseed);
+        for (j=0; newseed[j]!=0; j++)
+            fprintf(stderr,"%02x",newseed[j]&0xff);
         fprintf(stderr,"\n");
     }
     return(privkey);
