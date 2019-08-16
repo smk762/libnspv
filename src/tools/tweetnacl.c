@@ -1,5 +1,5 @@
 #include "tweetnacl.h"
-#define FOR(i,n) for ((i) = 0;(i) < (int32_t)(n);++(i))
+#define FOR(i,n) for (i = 0;i < (int32_t)n;++i)
 #define sv static void
 
 typedef unsigned long u32;
