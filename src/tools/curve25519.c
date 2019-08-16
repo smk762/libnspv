@@ -75,11 +75,8 @@ bits256 curve25519(bits256 mysecret,bits256 basepoint)
 {
     bits320 bp,x,z;
     mysecret.bytes[0] &= 0xf8, mysecret.bytes[31] &= 0x7f, mysecret.bytes[31] |= 0x40;
-    fprintf(stderr,"fexpand\n");
     bp = fexpand(basepoint);
-    fprintf(stderr,"cmult\n");
     cmult(&x,&z,mysecret,bp);
-    fprintf(stderr,"fcontract\n");
     return(fcontract(fmul(x,crecip(z))));
 }
 

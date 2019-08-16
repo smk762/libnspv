@@ -2018,14 +2018,20 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                             filestr = OS_filestr(&fsize,"html/wallet");
                             method = "wallet";
                             {
-                                char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t len = (int32_t)strlen(NSPV_wifstr);
+                                char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t power2=3,len = (int32_t)strlen(NSPV_wifstr);
                                 init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
                                 //fprintf(stderr,"login.(%s) -> %s\n",NSPV_wifstr,srcstr);
                                 ind = 0;
-                                if ( (retstr= LP_jpg("test.jpg","dest.jpg",3,passphrase,srcstr,len*8,&ind)) != 0 )
+                                if ( (retstr= LP_jpg("test.jpg","dest.jpg",power2,passphrase,srcstr,len*8,&ind)) != 0 )
                                 {
                                     fprintf(stderr,"jpeg -> (%s)\n",retstr);
                                     free(retstr);
+                                    ind = 0;
+                                    if ( (retstr= LP_jpg("dest.jpg",0,power2,passphrase,0,len*8,&ind)) != 0 )
+                                    {
+                                        fprintf(stderr,"decode (%s) ind.%u\n",retstr,ind);
+                                        free(retstr);
+                                    }
                                 }
                             }
 
