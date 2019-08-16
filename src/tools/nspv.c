@@ -110,6 +110,7 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
 #include "nSPV_CCtx.h"
+#include "curve25519.c"
 #include "nSPV_jpeg.h"
 #include "nSPV_superlite.h"
 #include "nSPV_wallet.h"

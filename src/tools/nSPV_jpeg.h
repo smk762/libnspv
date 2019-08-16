@@ -36,8 +36,8 @@ int32_t JPG_encrypt(uint16_t ind,uint8_t encoded[JPG_ENCRYPTED_MAXSIZE],uint8_t 
     encoded[0] = msglen & 0xff;
     encoded[1] = (msglen >> 8) & 0xff;
     //int32_t i; for (i=0; i<msglen; i++)
-    //    printf("%02x",encoded[i]);
-    //printf(" encoded.%d\n",msglen);
+    //    fprintf(stderr,"%02x",encoded[i]);
+    //fprintf(stderr," encoded.%d\n",msglen);
     return(msglen);
 }
 
@@ -57,13 +57,13 @@ uint8_t *JPG_decrypt(uint16_t *indp,int32_t *recvlenp,uint8_t space[JPG_ENCRYPTE
         if ( (extracted= _SuperNET_decipher(nonce,cipher,space,cipherlen,pubkey,privkey)) != 0 )
         {
             //int32_t i; for (i=0; i<msglen&&i<64; i++)
-            //    printf("%02x",extracted[i]);
-            //printf(" extracted\n");
+            //    fprintf(stderr,"%02x",extracted[i]);
+            //fprintf(stderr," extracted\n");
             msglen = (cipherlen - crypto_box_ZEROBYTES);
             *recvlenp = msglen;
             *indp = ind;
         }
-    } //else printf("cipher.%d too big for %d\n",cipherlen,JPG_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES);
+    } //else fprintf(stderr,"cipher.%d too big for %d\n",cipherlen,JPG_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES);
     return(extracted);
 }
 
@@ -125,7 +125,7 @@ int32_t stegmain(char *inputfname,char *outputfname,uint8_t *decoded,uint8_t *da
             }
         }
     }
-    printf("capacity %d required.%d\n",capacity,required);
+    fprintf(stderr,"capacity %d required.%d\n",capacity,required);
     if ( data != 0 && capacity > required )
     {
         if ((output_file = fopen(outputfname, WRITE_BINARY)) == NULL) {
@@ -143,7 +143,7 @@ int32_t stegmain(char *inputfname,char *outputfname,uint8_t *decoded,uint8_t *da
             {
                 for (blocknum=0; blocknum<width_in_blocks[compnum]; blocknum++)
                 {
-                    //printf("\n\nComponent: %i, Row:%i, Column: %i\n", compnum, rownum, blocknum);
+                    //fprintf(stderr,"\n\nComponent: %i, Row:%i, Column: %i\n", compnum, rownum, blocknum);
                     for (i=0; i<DCTSIZE2; i++)
                     {
                         val = coef_buffers[compnum][rownum][blocknum][i];
@@ -155,12 +155,12 @@ int32_t stegmain(char *inputfname,char *outputfname,uint8_t *decoded,uint8_t *da
                             emit++;
                         }
                         coef_buffers[compnum][rownum][blocknum][i] = val;
-                        //printf("%i,", coef_buffers[compnum][rownum][blocknum][i]);
+                        //fprintf(stderr,"%i,", coef_buffers[compnum][rownum][blocknum][i]);
                     }
                 }
             }
         }
-        //printf("\n\n");
+        //fprintf(stderr,"\n\n");
         
         /* Output the new DCT coeffs to a JPEG file */
         modified = 0;
@@ -189,7 +189,7 @@ int32_t stegmain(char *inputfname,char *outputfname,uint8_t *decoded,uint8_t *da
     fclose(input_file);
     if ( modified != 0 )
     {
-        //printf("New DCT coefficients successfully written to %s, capacity %d modifiedrows.%d/%d emit.%d\n",outputfname,capacity,modified,totalrows,emit);
+        //fprintf(stderr,"New DCT coefficients successfully written to %s, capacity %d modifiedrows.%d/%d emit.%d\n",outputfname,capacity,modified,totalrows,emit);
     }
     //exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
     return 0;            /* suppress no-return-value warnings */
@@ -220,7 +220,8 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
         if ( required/8 > JPG_ENCRYPTED_MAXSIZE-60 )
             return(-1);
         data = calloc(1,required/8+512);
-        vcalc_sha256(0,privkey.bytes,(uint8_t *)password,(int32_t)strlen(password));
+        sha256_Raw((uint8_t *)password,(int32_t)strlen(password),privkey.bytes);
+        //vcalc_sha256(0,privkey.bytes,(uint8_t *)password,(int32_t)strlen(password));
         if ( origdata != 0 )
         {
             msglen = JPG_encrypt(*indp,data,origdata,required/8,privkey);
@@ -229,12 +230,12 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
             {
                 space = calloc(1,JPG_ENCRYPTED_MAXSIZE);
                 if ( (decrypted= JPG_decrypt(&checkind,&recvlen,space,data,privkey)) == 0 || recvlen != origrequired/8 || checkind != *indp || memcmp(decrypted,origdata,origrequired/8) != 0 )
-                    printf("A decryption error: checkind.%d vs %d, recvlen.%d vs %d, decrypted.%p\n",checkind,*indp,recvlen,origrequired/8,decrypted);
+                    fprintf(stderr,"A decryption error: checkind.%d vs %d, recvlen.%d vs %d, decrypted.%p\n",checkind,*indp,recvlen,origrequired/8,(void *)decrypted);
                 else if ( (1) )
                 {
                     for (i=0; i<recvlen&&i<16; i++)
-                        printf("%02x",decrypted[i]);
-                    printf(" VERIFIED decryption.%d ind.%d msglen.%d required.%d\n",recvlen,*indp,msglen,required);
+                        fprintf(stderr,"%02x",decrypted[i]);
+                    fprintf(stderr," VERIFIED decryption.%d ind.%d msglen.%d required.%d\n",recvlen,*indp,msglen,required);
                 }
                 free(space);
             }
@@ -244,8 +245,8 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     {
         data = origdata;
         //for (i=0; i<required/8+1; i++)
-        //    printf("%02x",data[i]);
-        //printf(" origdata.[%d]\n",required);
+        //    fprintf(stderr,"%02x",data[i]);
+        //fprintf(stderr," origdata.[%d]\n",required);
     }
     if ( power2 < 0 || power2 > 30 )
         power2 = 7;
@@ -294,7 +295,7 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
                         {
                             if ( (val & 1) != 0 )
                                 SETBIT(decoded,(*capacityp));
-                            //printf("%c",(val&1)!=0?'1':'0');
+                            //fprintf(stderr,"%c",(val&1)!=0?'1':'0');
                         }
                         (*capacityp)++;
                     }
@@ -312,18 +313,18 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
             for (i=0; i<recvlen; i++)
             {
                 //if ( i < 64 )
-                //    printf("%02x",decrypted[i]);
+                //    fprintf(stderr,"%02x",decrypted[i]);
                 decoded[i] = decrypted[i];
             }
-            //printf(" decrypted.%d ind.%d required.%d capacity.%d\n",recvlen,*indp,required,*capacityp);
+            //fprintf(stderr," decrypted.%d ind.%d required.%d capacity.%d\n",recvlen,*indp,required,*capacityp);
         }
         free(space);
     }
-    //printf(" capacity %d required.%d power2.%d limit.%d\n",*capacityp,required,power2,limit);
+    //fprintf(stderr," capacity %d required.%d power2.%d limit.%d\n",*capacityp,required,power2,limit);
     if ( *capacityp > required && outputfname != 0 && outputfname[0] != 0 )
     {
         if ((output_file = fopen(outputfname, WRITE_BINARY)) == NULL) {
-            fprintf(stderr, "Can't open %s\n", outputfname);
+            ffprintf(stderr,stderr, "Can't open %s\n", outputfname);
             if ( data != origdata )
                 free(data);
             return(-1);
@@ -339,7 +340,7 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
             {
                 for (blocknum=0; blocknum<width_in_blocks[compnum]; blocknum++)
                 {
-                    //printf("\n\nComponent: %i, Row:%i, Column: %i\n", compnum, rownum, blocknum);
+                    //fprintf(stderr,"\n\nComponent: %i, Row:%i, Column: %i\n", compnum, rownum, blocknum);
                     for (i=0; i<DCTSIZE2&&emit<required; i++)
                     {
                         val = coef_buffers[compnum][rownum][blocknum][i];
@@ -348,16 +349,16 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
                             val &= ~1;
                             if ( GETBIT(data,emit) != 0 )//|| (emit >= required && (rand() & 1) != 0) )
                                 val |= 1;
-                            //printf("%c",(val&1)!=0?'1':'0');
+                            //fprintf(stderr,"%c",(val&1)!=0?'1':'0');
                             coef_buffers[compnum][rownum][blocknum][i] = val;
                             emit++;
                         }
-                        //printf("%i,", coef_buffers[compnum][rownum][blocknum][i]);
+                        //fprintf(stderr,"%i,", coef_buffers[compnum][rownum][blocknum][i]);
                     }
                 }
             }
         }
-        //printf(" emit.%d\n",emit);
+        //fprintf(stderr," emit.%d\n",emit);
         // Output the new DCT coeffs to a JPEG file
         modified = 0;
         for (compnum=0; compnum<num_components; compnum++)
@@ -385,7 +386,7 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     fclose(input_file);
     if ( modified != 0 )
     {
-        //printf("New DCT coefficients successfully written to %s, capacity %d modifiedrows.%d/%d emit.%d\n",outputfname,*capacityp,modified,totalrows,emit);
+        //fprintf(stderr,"New DCT coefficients successfully written to %s, capacity %d modifiedrows.%d/%d emit.%d\n",outputfname,*capacityp,modified,totalrows,emit);
     }
     free(block_row_size);
     free(width_in_blocks);
@@ -410,8 +411,8 @@ char *LP_jpg(char *srcfile,char *destfile,int32_t power2,char *passphrase,char *
                 decode_hex(data,len,datastr);
                 //required = len * 8;
                 //int32_t i; for (i=0; i<required; i++)
-                //    printf("%c",'0'+(GETBIT(data,i)!=0));
-                //printf(" datastr.%d %s\n",required,datastr);
+                //    fprintf(stderr,"%c",'0'+(GETBIT(data,i)!=0));
+                //fprintf(stderr," datastr.%d %s\n",required,datastr);
             }
         }
         if ( data == 0 )
@@ -434,7 +435,7 @@ char *LP_jpg(char *srcfile,char *destfile,int32_t power2,char *passphrase,char *
         {
             if ( capacity > 0 )
             {
-                //printf("len.%d required.%d capacity.%d\n",len,required,capacity);
+                //fprintf(stderr,"len.%d required.%d capacity.%d\n",len,required,capacity);
                 decodedstr = calloc(1,(len+required)*2+1);
                 init_hexbytes_noT(decodedstr,decoded,required/8);
                 jaddstr(retjson,"decoded",decodedstr);
