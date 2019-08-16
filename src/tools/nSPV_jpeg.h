@@ -127,7 +127,7 @@ int32_t stegmain(char *inputfname,char *outputfname,uint8_t *decoded,uint8_t *da
     printf("capacity %d required.%d\n",capacity,required);
     if ( data != 0 && capacity > required )
     {
-        if ((output_file = myfopen(outputfname, WRITE_BINARY)) == NULL) {
+        if ((output_file = fopen(outputfname, WRITE_BINARY)) == NULL) {
             fprintf(stderr, "Can't open outputfname (%s)\n", outputfname);
             exit(EXIT_FAILURE);
         }
