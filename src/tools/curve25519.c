@@ -775,14 +775,14 @@ bits320 fmul(const bits320 in,const bits320 in2)
     //return(fexpand(mulval));
 }
 
-bits256 curve25519(bits256 mysecret,bits256 theirpublic)
+/*bits256 curve25519(bits256 mysecret,bits256 theirpublic)
 {
     int32_t curve25519_donna(uint8_t *mypublic,const uint8_t *secret,const uint8_t *basepoint);
     bits256 rawkey;
     mysecret.bytes[0] &= 0xf8, mysecret.bytes[31] &= 0x7f, mysecret.bytes[31] |= 0x40;
     curve25519_donna(&rawkey.bytes[0],&mysecret.bytes[0],&theirpublic.bytes[0]);
     return(rawkey);
-}
+}*/
 
 #endif
 
@@ -1686,7 +1686,7 @@ bits256 curve25519_shared(bits256 privkey,bits256 otherpub)
     return(hash);
 }
 
-int32_t curve25519_donna(uint8_t *mypublic,const uint8_t *secret,const uint8_t *basepoint)
+/*int32_t curve25519_donna(uint8_t *mypublic,const uint8_t *secret,const uint8_t *basepoint)
 {
     bits256 val,p,bp;
     memcpy(p.bytes,secret,sizeof(p));
@@ -1707,15 +1707,16 @@ uint64_t conv_NXTpassword(unsigned char *mysecret,unsigned char *mypublic,uint8_
     vcalc_sha256(0,hash,mypublic,32);
     memcpy(&addr,hash,sizeof(addr));
     return(addr);
-}
+}*/
 
 bits256 acct777_pubkey(bits256 privkey)
 {
     static uint8_t basepoint[32] = {9};
-    bits256 pubkey;
+    bits256 bp;
     privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
-    curve25519_donna(pubkey.bytes,privkey.bytes,basepoint);
-    return(pubkey);
+    //curve25519_donna(pubkey.bytes,privkey.bytes,basepoint);
+    memcpy(bp.bytes,basepoint,sizeof(bp));
+    return(curve25519(privkey,bp));
 }
 
 int32_t _SuperNET_cipher(uint8_t nonce[crypto_box_NONCEBYTES],uint8_t *cipher,uint8_t *message,int32_t len,bits256 destpub,bits256 srcpriv,uint8_t *buf)
