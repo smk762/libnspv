@@ -2018,7 +2018,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                             filestr = OS_filestr(&fsize,"html/wallet");
                             method = "wallet";
                             {
-                                char srcstr[512],*retstr,*passphrase = clonestr("secret"); uint16_t ind; int32_t len = (int32_t)strlen(NSPV_wifstr);
+                                char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t len = (int32_t)strlen(NSPV_wifstr);
                                 init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
                                 fprintf(stderr,"login.(%s) -> %s\n",NSPV_wifstr,srcstr);
                                 ind = 0;

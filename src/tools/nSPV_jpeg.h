@@ -226,7 +226,7 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
         {
             msglen = JPG_encrypt(*indp,data,origdata,required/8,privkey);
             required = msglen * 8;
-            if ( (0) )
+            if ( (1) )
             {
                 space = calloc(1,JPG_ENCRYPTED_MAXSIZE);
                 if ( (decrypted= JPG_decrypt(&checkind,&recvlen,space,data,privkey)) == 0 || recvlen != origrequired/8 || checkind != *indp || memcmp(decrypted,origdata,origrequired/8) != 0 )
@@ -244,9 +244,9 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     else
     {
         data = origdata;
-        //for (i=0; i<required/8+1; i++)
-        //    fprintf(stderr,"%02x",data[i]);
-        //fprintf(stderr," origdata.[%d]\n",required);
+        for (i=0; i<required/8+1; i++)
+            fprintf(stderr,"%02x",data[i]);
+        fprintf(stderr," origdata.[%d]\n",required);
     }
     if ( power2 < 0 || power2 > 30 )
         power2 = 7;
@@ -435,7 +435,7 @@ char *LP_jpg(char *srcfile,char *destfile,int32_t power2,char *passphrase,char *
         {
             if ( capacity > 0 )
             {
-                //fprintf(stderr,"len.%d required.%d capacity.%d\n",len,required,capacity);
+fprintf(stderr,"len.%d required.%d capacity.%d\n",len,required,capacity);
                 decodedstr = calloc(1,(len+required)*2+1);
                 init_hexbytes_noT(decodedstr,decoded,required/8);
                 jaddstr(retjson,"decoded",decodedstr);
