@@ -418,6 +418,7 @@ char *LP_jpg(char *srcfile,char *destfile,int32_t power2,char *passphrase,char *
         if ( data == 0 )
             data = calloc(1,required/8+1);
         decoded = calloc(1,len+required);
+        fprintf(stderr,"call process\n");
         if ( (modified= LP_jpg_process(&num,&capacity,srcfile,destfile,decoded,data,required,power2,passphrase,indp)) < 0 )
             jaddstr(retjson,"error","file not found");
         else
