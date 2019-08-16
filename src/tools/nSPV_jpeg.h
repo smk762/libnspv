@@ -80,7 +80,7 @@ int32_t stegmain(char *inputfname,char *outputfname,uint8_t *decoded,uint8_t *da
     JBLOCKARRAY coef_buffers[MAX_COMPONENTS];
     JBLOCKARRAY row_ptrs[MAX_COMPONENTS];
     FILE *input_file,*output_file; int32_t val,modified,emit,totalrows;
-    if ((input_file = myfopen(inputfname, READ_BINARY)) == NULL) {
+    if ((input_file = fopen(inputfname, READ_BINARY)) == NULL) {
         fprintf(stderr, "Can't open inputfname (%s)\n", inputfname);
         exit(EXIT_FAILURE);
     }
@@ -181,11 +181,11 @@ int32_t stegmain(char *inputfname,char *outputfname,uint8_t *decoded,uint8_t *da
         // Finish compression and release memory
         jpeg_finish_compress(&outputinfo);
         jpeg_destroy_compress(&outputinfo);
-        myfclose(output_file);
+        fclose(output_file);
     }
     jpeg_finish_decompress(&inputinfo);
     jpeg_destroy_decompress(&inputinfo);
-    myfclose(input_file);
+    fclose(input_file);
     if ( modified != 0 )
     {
         //printf("New DCT coefficients successfully written to %s, capacity %d modifiedrows.%d/%d emit.%d\n",outputfname,capacity,modified,totalrows,emit);
@@ -206,7 +206,7 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     JBLOCKARRAY row_ptrs[MAX_COMPONENTS];
     bits256 privkey; FILE *input_file,*output_file; int32_t recvlen,msglen,val,modified,emit,totalrows,limit,required; uint16_t checkind; uint8_t *decrypted,*space,*data=0;
     *recvp = 0;
-    if ((input_file = myfopen(inputfname, READ_BINARY)) == NULL)
+    if ((input_file = fopen(inputfname, READ_BINARY)) == NULL)
     {
         fprintf(stderr, "Can't open %s\n", inputfname);
         //exit(EXIT_FAILURE);
@@ -321,7 +321,7 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     //printf(" capacity %d required.%d power2.%d limit.%d\n",*capacityp,required,power2,limit);
     if ( *capacityp > required && outputfname != 0 && outputfname[0] != 0 )
     {
-        if ((output_file = myfopen(outputfname, WRITE_BINARY)) == NULL) {
+        if ((output_file = fopen(outputfname, WRITE_BINARY)) == NULL) {
             fprintf(stderr, "Can't open %s\n", outputfname);
             if ( data != origdata )
                 free(data);
@@ -377,11 +377,11 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
         // Finish compression and release memory
         jpeg_finish_compress(&outputinfo);
         jpeg_destroy_compress(&outputinfo);
-        myfclose(output_file);
+        fclose(output_file);
     }
     jpeg_finish_decompress(&inputinfo);
     jpeg_destroy_decompress(&inputinfo);
-    myfclose(input_file);
+    fclose(input_file);
     if ( modified != 0 )
     {
         //printf("New DCT coefficients successfully written to %s, capacity %d modifiedrows.%d/%d emit.%d\n",outputfname,*capacityp,modified,totalrows,emit);
