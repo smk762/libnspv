@@ -22,25 +22,22 @@
 int32_t JPG_encrypt(uint16_t ind,uint8_t encoded[JPG_ENCRYPTED_MAXSIZE],uint8_t *msg,int32_t msglen,bits256 privkey)
 {
     bits256 pubkey; int32_t len = 2; uint8_t space[JPG_ENCRYPTED_MAXSIZE],*nonce,*cipher;
-    fprintf(stderr,"call acct777_pubkey\n");
     pubkey = acct777_pubkey(privkey);
     encoded[len++] = ind & 0xff;
     encoded[len++] = (ind >> 8) & 0xff;
     nonce = &encoded[len];
-    fprintf(stderr,"call random\n");
     btc_random_bytes(nonce,crypto_box_NONCEBYTES,0);
     //OS_randombytes(nonce,crypto_box_NONCEBYTES);
     cipher = &encoded[len + crypto_box_NONCEBYTES];
-    fprintf(stderr,"call cipher\n");
     msglen = _SuperNET_cipher(nonce,&encoded[len + crypto_box_NONCEBYTES],msg,msglen,pubkey,privkey,space);
     msglen += crypto_box_NONCEBYTES;
     msg = encoded;
     msglen += len;
     encoded[0] = msglen & 0xff;
     encoded[1] = (msglen >> 8) & 0xff;
-    int32_t i; for (i=0; i<msglen; i++)
-        fprintf(stderr,"%02x",encoded[i]);
-    fprintf(stderr," encoded.%d\n",msglen);
+    //int32_t i; for (i=0; i<msglen; i++)
+    //    fprintf(stderr,"%02x",encoded[i]);
+    //fprintf(stderr," encoded.%d\n",msglen);
     return(msglen);
 }
 
@@ -223,15 +220,11 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
         if ( required/8 > JPG_ENCRYPTED_MAXSIZE-60 )
             return(-1);
         data = calloc(1,required/8+512);
-        fprintf(stderr,"call sha\n");
         sha256_Raw((uint8_t *)password,(int32_t)strlen(password),privkey.bytes);
         //vcalc_sha256(0,privkey.bytes,(uint8_t *)password,(int32_t)strlen(password));
-        fprintf(stderr,"back sha\n");
         if ( origdata != 0 )
         {
-            fprintf(stderr,"JPG_encrypt\n");
             msglen = JPG_encrypt(*indp,data,origdata,required/8,privkey);
-            fprintf(stderr,"msglen.%d\n",msglen);
             required = msglen * 8;
             if ( (1) )
             {
@@ -425,7 +418,6 @@ char *LP_jpg(char *srcfile,char *destfile,int32_t power2,char *passphrase,char *
         if ( data == 0 )
             data = calloc(1,required/8+1);
         decoded = calloc(1,len+required);
-        fprintf(stderr,"call process\n");
         if ( (modified= LP_jpg_process(&num,&capacity,srcfile,destfile,decoded,data,required,power2,passphrase,indp)) < 0 )
             jaddstr(retjson,"error","file not found");
         else
