@@ -2022,7 +2022,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                                 init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
                                 fprintf(stderr,"login.(%s) -> %s\n",NSPV_wifstr,srcstr);
                                 ind = 0;
-                                if ( (retstr= LP_jpg("dest.jpg","test.jpg",3,passphrase,srcstr,len*8,&ind)) != 0 )
+                                if ( (retstr= LP_jpg("test.jpg","dest.jpg",3,passphrase,srcstr,len*8,&ind)) != 0 )
                                 {
                                     fprintf(stderr,"jpeg -> (%s)\n",retstr);
                                     free(retstr);
