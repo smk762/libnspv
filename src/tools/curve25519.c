@@ -71,6 +71,18 @@ bits320 fexpand(bits256 basepoint)
     return(out);
 }
 
+bits256 curve25519(bits256 mysecret,bits256 basepoint)
+{
+    bits320 bp,x,z;
+    mysecret.bytes[0] &= 0xf8, mysecret.bytes[31] &= 0x7f, mysecret.bytes[31] |= 0x40;
+    fprintf(stderr,"fexpand\n");
+    bp = fexpand(basepoint);
+    fprintf(stderr,"cmult\n");
+    cmult(&x,&z,mysecret,bp);
+    fprintf(stderr,"fcontract\n");
+    return(fcontract(fmul(x,crecip(z))));
+}
+
 #if DISABLE_64bits__amd64__
 // donna: special gcc mode for 128-bit integers. It's implemented on 64-bit platforms only as far as I know.
 typedef unsigned uint128_t __attribute__((mode(TI)));
@@ -186,8 +198,11 @@ bits256 curve25519(bits256 mysecret,bits256 basepoint)
 {
     bits320 bp,x,z;
     mysecret.bytes[0] &= 0xf8, mysecret.bytes[31] &= 0x7f, mysecret.bytes[31] |= 0x40;
+    fprintf(stderr,"fexpand\n");
     bp = fexpand(basepoint);
+    fprintf(stderr,"cmult\n");
     cmult(&x,&z,mysecret,bp);
+    fprintf(stderr,"fcontract\n");
     return(fcontract(fmul(x,crecip(z))));
 }
 
