@@ -194,7 +194,7 @@ nspv_LDADD = libbtc.la -lpthread -lsodium
 nspv_SOURCES = \
 src/tools/nspv.c \
 src/tools/jpeg/jaricom.c src/tools/jpeg/jcapimin.c src/tools/jpeg/jcapistd.c src/tools/jpeg/jcarith.c src/tools/jpeg/jccoefct.c src/tools/jpeg/jccolor.c src/tools/jpeg/jcdctmgr.c src/tools/jpeg/jchuff.c src/tools/jpeg/jcinit.c src/tools/jpeg/jcmainct.c src/tools/jpeg/jcmarker.c src/tools/jpeg/jcmaster.c src/tools/jpeg/jcomapi.c src/tools/jpeg/jcparam.c src/tools/jpeg/jcprepct.c src/tools/jpeg/jcsample.c src/tools/jpeg/jctrans.c src/tools/jpeg/jdapimin.c src/tools/jpeg/jdapistd.c src/tools/jpeg/jdarith.c src/tools/jpeg/jdatadst.c src/tools/jpeg/jdatasrc.c src/tools/jpeg/jdcoefct.c src/tools/jpeg/jdcolor.c src/tools/jpeg/jddctmgr.c src/tools/jpeg/jdhuff.c src/tools/jpeg/jdinput.c src/tools/jpeg/jdmainct.c src/tools/jpeg/jdmarker.c src/tools/jpeg/jdmaster.c src/tools/jpeg/jdmerge.c src/tools/jpeg/jdpostct.c src/tools/jpeg/jdsample.c src/tools/jpeg/jdtrans.c src/tools/jpeg/jerror.c src/tools/jpeg/jfdctflt.c src/tools/jpeg/jfdctfst.c src/tools/jpeg/jfdctint.c src/tools/jpeg/jidctflt.c src/tools/jpeg/jidctfst.c src/tools/jpeg/jidctint.c src/tools/jpeg/jquant1.c src/tools/jpeg/jquant2.c src/tools/jpeg/jutils.c src/tools/jpeg/misc/jmemnobs.c src/tools/jpeg/jmemmgr.c
-nspv_CFLAGS = $(libbtc_la_CFLAGS) -O2
+nspv_CFLAGS = $(libbtc_la_CFLAGS) -O2  -Wnounused-parameter
 nspv_CPPFLAGS = -I$(top_srcdir)/src
 nspv_LDFLAGS = -static
 
