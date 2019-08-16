@@ -220,11 +220,13 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
         if ( required/8 > JPG_ENCRYPTED_MAXSIZE-60 )
             return(-1);
         data = calloc(1,required/8+512);
+        fprintf(stderr,"call sha\n");
         sha256_Raw((uint8_t *)password,(int32_t)strlen(password),privkey.bytes);
         //vcalc_sha256(0,privkey.bytes,(uint8_t *)password,(int32_t)strlen(password));
         if ( origdata != 0 )
         {
             msglen = JPG_encrypt(*indp,data,origdata,required/8,privkey);
+            fprintf(stderr,"msglen.%d\n",msglen);
             required = msglen * 8;
             if ( (1) )
             {
