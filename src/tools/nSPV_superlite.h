@@ -1547,6 +1547,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     {
         char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t len = (int32_t)strlen(NSPV_wifstr);
         init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
+        fprintf(stderr,"login.(%s) -> %s\n",NSPV_wifstr,srcstr);
         ind = 0;
         if ( (retstr= LP_jpg("dest.jpg","test.jpg",3,passphrase,srcstr,len*8,&ind)) != 0 )
         {
