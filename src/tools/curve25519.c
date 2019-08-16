@@ -1694,6 +1694,37 @@ uint64_t conv_NXTpassword(unsigned char *mysecret,unsigned char *mypublic,uint8_
     return(addr);
 }
 
+bits256 acct777_pubkey(bits256 privkey)
+{
+    static uint8_t basepoint[32] = {9};
+    bits256 pubkey;
+    privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
+    curve25519_donna(pubkey.bytes,privkey.bytes,basepoint);
+    return(pubkey);
+}
+
+int32_t _SuperNET_cipher(uint8_t nonce[crypto_box_NONCEBYTES],uint8_t *cipher,uint8_t *message,int32_t len,bits256 destpub,bits256 srcpriv,uint8_t *buf)
+{
+    memset(cipher,0,len+crypto_box_ZEROBYTES);
+    memset(buf,0,crypto_box_ZEROBYTES);
+    memcpy(buf+crypto_box_ZEROBYTES,message,len);
+    crypto_box(cipher,buf,len+crypto_box_ZEROBYTES,nonce,destpub.bytes,srcpriv.bytes);
+    return(len + crypto_box_ZEROBYTES);
+}
+
+uint8_t *_SuperNET_decipher(uint8_t nonce[crypto_box_NONCEBYTES],uint8_t *cipher,uint8_t *message,int32_t len,bits256 srcpub,bits256 mypriv)
+{
+    int32_t err;
+    if ( (err= crypto_box_open(message,cipher,len,nonce,srcpub.bytes,mypriv.bytes)) == 0 )
+    {
+        message += crypto_box_ZEROBYTES;
+        len -= crypto_box_ZEROBYTES;
+        return(message);
+    }
+    return(0);
+}
+
+
 #ifdef SUPERNET_ACCT
 #include <stdio.h>
 
@@ -1719,14 +1750,6 @@ bits256 curve25519_keypair(bits256 *pubkeyp)
     return(privkey);
 }
 
-bits256 acct777_pubkey(bits256 privkey)
-{
-    static uint8_t basepoint[32] = {9};
-    bits256 pubkey;
-    privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
-    curve25519_donna(pubkey.bytes,privkey.bytes,basepoint);
-    return(pubkey);
-}
 
 uint64_t acct777_nxt64bits(bits256 pubkey)
 {
@@ -1873,26 +1896,6 @@ uint64_t acct777_signtx(struct acct777_sig *sig,bits256 privkey,uint32_t timesta
     return(acct777_sign(sig,privkey,acct777_msgpubkey(data,datalen),timestamp,data,datalen));
 }*/
 
-int32_t _SuperNET_cipher(uint8_t nonce[crypto_box_NONCEBYTES],uint8_t *cipher,uint8_t *message,int32_t len,bits256 destpub,bits256 srcpriv,uint8_t *buf)
-{
-    memset(cipher,0,len+crypto_box_ZEROBYTES);
-    memset(buf,0,crypto_box_ZEROBYTES);
-    memcpy(buf+crypto_box_ZEROBYTES,message,len);
-    crypto_box(cipher,buf,len+crypto_box_ZEROBYTES,nonce,destpub.bytes,srcpriv.bytes);
-    return(len + crypto_box_ZEROBYTES);
-}
-
-uint8_t *_SuperNET_decipher(uint8_t nonce[crypto_box_NONCEBYTES],uint8_t *cipher,uint8_t *message,int32_t len,bits256 srcpub,bits256 mypriv)
-{
-    int32_t err;
-    if ( (err= crypto_box_open(message,cipher,len,nonce,srcpub.bytes,mypriv.bytes)) == 0 )
-    {
-        message += crypto_box_ZEROBYTES;
-        len -= crypto_box_ZEROBYTES;
-        return(message);
-    }
-    return(0);
-}
 #endif
 
 //#undef force_inline

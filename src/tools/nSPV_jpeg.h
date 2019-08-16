@@ -324,7 +324,7 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     if ( *capacityp > required && outputfname != 0 && outputfname[0] != 0 )
     {
         if ((output_file = fopen(outputfname, WRITE_BINARY)) == NULL) {
-            ffprintf(stderr,stderr, "Can't open %s\n", outputfname);
+            fprintf(stderr, "Can't open %s\n", outputfname);
             if ( data != origdata )
                 free(data);
             return(-1);
