@@ -43,8 +43,8 @@
                 <div class="row">
                   <span class="col-lg-3 col-sm-4 col-xs-12"><b>Coin:</b><br> $COINNAME ($COIN)<br></span>
                   <span class="col-lg-3 col-sm-4 col-xs-12"><b>Balance:</b><br> $BALANCE $COIN</span>
-                  <span class="col-lg-3 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>Rewards:</b><br> $REWARDS $COIN</span>
-                  <span class="col-lg-3 col-sm-12 col-xs-12"><b>Your Address:</b><br> $WALLETADDR</span>
+                  <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>Rewards:</b><br> $REWARDS $COIN</span>
+                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>Your Address:</b><br> $WALLETADDR</span>
                 </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
