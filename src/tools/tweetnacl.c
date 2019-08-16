@@ -1,12 +1,12 @@
 #include "tweetnacl.h"
-#define FOR(i,n) for (i = 0;i < n;++i)
+#define FOR(i,n) for ((i) = 0;(i) < (int32_t)(n);++(i))
 #define sv static void
 
 typedef unsigned long u32;
 typedef unsigned long long u64;
 typedef long long i64;
 typedef i64 gf[16];
-void OS_randombytes(unsigned char *x,long xlen);
+//void OS_randombytes(unsigned char *x,long xlen);
 
 static const uint8_t
 _0[16],
@@ -448,7 +448,8 @@ int crypto_scalarmult_base(uint8_t *q,const uint8_t *n)
 
 int crypto_box_keypair(uint8_t *y,uint8_t *x)
 {
-    OS_randombytes(x,32);
+    //OS_randombytes(x,32);
+    btc_random_bytes(x,32,0);
     return crypto_scalarmult_base(y,x);
 }
 
@@ -663,7 +664,8 @@ int crypto_sign_keypair(uint8_t *pk, uint8_t *sk)
     gf p[4];
     int i;
     
-    OS_randombytes(sk, 32);
+    btc_random_bytes(sk,32,0);
+    //OS_randombytes(sk, 32);
     crypto_hash(d, sk, 32);
     d[0] &= 248;
     d[31] &= 127;

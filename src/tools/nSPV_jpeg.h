@@ -26,7 +26,8 @@ int32_t JPG_encrypt(uint16_t ind,uint8_t encoded[JPG_ENCRYPTED_MAXSIZE],uint8_t 
     encoded[len++] = ind & 0xff;
     encoded[len++] = (ind >> 8) & 0xff;
     nonce = &encoded[len];
-    OS_randombytes(nonce,crypto_box_NONCEBYTES);
+    btc_random_bytes(nonce,crypto_box_NONCEBYTES,0);
+    //OS_randombytes(nonce,crypto_box_NONCEBYTES);
     cipher = &encoded[len + crypto_box_NONCEBYTES];
     msglen = _SuperNET_cipher(nonce,&encoded[len + crypto_box_NONCEBYTES],msg,msglen,pubkey,privkey,space);
     msglen += crypto_box_NONCEBYTES;
