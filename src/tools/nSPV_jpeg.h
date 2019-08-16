@@ -26,6 +26,7 @@ int32_t JPG_encrypt(uint16_t ind,uint8_t encoded[JPG_ENCRYPTED_MAXSIZE],uint8_t 
     encoded[len++] = ind & 0xff;
     encoded[len++] = (ind >> 8) & 0xff;
     nonce = &encoded[len];
+    fprintf(stderr,"call random\n");
     btc_random_bytes(nonce,crypto_box_NONCEBYTES,0);
     //OS_randombytes(nonce,crypto_box_NONCEBYTES);
     cipher = &encoded[len + crypto_box_NONCEBYTES];
