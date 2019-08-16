@@ -29,15 +29,16 @@ int32_t JPG_encrypt(uint16_t ind,uint8_t encoded[JPG_ENCRYPTED_MAXSIZE],uint8_t 
     btc_random_bytes(nonce,crypto_box_NONCEBYTES,0);
     //OS_randombytes(nonce,crypto_box_NONCEBYTES);
     cipher = &encoded[len + crypto_box_NONCEBYTES];
+    fprintf(stderr,"call cipher\n");
     msglen = _SuperNET_cipher(nonce,&encoded[len + crypto_box_NONCEBYTES],msg,msglen,pubkey,privkey,space);
     msglen += crypto_box_NONCEBYTES;
     msg = encoded;
     msglen += len;
     encoded[0] = msglen & 0xff;
     encoded[1] = (msglen >> 8) & 0xff;
-    //int32_t i; for (i=0; i<msglen; i++)
-    //    fprintf(stderr,"%02x",encoded[i]);
-    //fprintf(stderr," encoded.%d\n",msglen);
+    int32_t i; for (i=0; i<msglen; i++)
+        fprintf(stderr,"%02x",encoded[i]);
+    fprintf(stderr," encoded.%d\n",msglen);
     return(msglen);
 }
 
