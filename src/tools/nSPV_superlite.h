@@ -1545,7 +1545,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
     if ( strcmp(method,"login") == 0 )
     {
-        char srcstr[512],*retstr,*passphrase = "secret"; int32_t ind,len = (int32_t)strlen(NSPV_wifstr);
+        char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t len = (int32_t)strlen(NSPV_wifstr);
         init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
         ind = 0;
         if ( (retstr= LP_jpg("dest.jpg","test.jpg",3,passphrase,srcstr,len*8,&ind)) != 0 )
