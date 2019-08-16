@@ -22,6 +22,7 @@
 int32_t JPG_encrypt(uint16_t ind,uint8_t encoded[JPG_ENCRYPTED_MAXSIZE],uint8_t *msg,int32_t msglen,bits256 privkey)
 {
     bits256 pubkey; int32_t len = 2; uint8_t space[JPG_ENCRYPTED_MAXSIZE],*nonce,*cipher;
+    fprintf(stderr,"call acct777_pubkey\n");
     pubkey = acct777_pubkey(privkey);
     encoded[len++] = ind & 0xff;
     encoded[len++] = (ind >> 8) & 0xff;
