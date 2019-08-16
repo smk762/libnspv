@@ -1543,18 +1543,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     if ( strcmp(NSPV_chain->name,"KMD") == 0 )
         NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","");
     else NSPV_expand_variable(bigbuf,&filestr,"$REWARDS_DISPLAY_KMD","none");
-    if ( strcmp(method,"login") == 0 )
-    {
-        char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t len = (int32_t)strlen(NSPV_wifstr);
-        init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
-        fprintf(stderr,"login.(%s) -> %s\n",NSPV_wifstr,srcstr);
-        ind = 0;
-        if ( (retstr= LP_jpg("dest.jpg","test.jpg",3,passphrase,srcstr,len*8,&ind)) != 0 )
-        {
-            fprintf(stderr,"jpeg -> (%s)\n",retstr);
-            free(retstr);
-        }
-    }
     {
         char *addr,*wif,*pub;
         retjson = NSPV_getnewaddress(NSPV_chain,jstr(argjson,"lang"));
@@ -2029,6 +2017,18 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                             free(filestr);
                             filestr = OS_filestr(&fsize,"html/wallet");
                             method = "wallet";
+                            {
+                                char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t len = (int32_t)strlen(NSPV_wifstr);
+                                init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
+                                fprintf(stderr,"login.(%s) -> %s\n",NSPV_wifstr,srcstr);
+                                ind = 0;
+                                if ( (retstr= LP_jpg("dest.jpg","test.jpg",3,passphrase,srcstr,len*8,&ind)) != 0 )
+                                {
+                                    fprintf(stderr,"jpeg -> (%s)\n",retstr);
+                                    free(retstr);
+                                }
+                            }
+
                         } else fprintf(stderr,"login error with wif.(%s)\n",wifstr);
                         memset(wifstr,0,strlen(wifstr));
                         free_json(retjson);
