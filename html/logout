@@ -89,7 +89,9 @@
         <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $LOGOUTDISPLAY;;"> <!-- Get New Address div start -->
             <div class="text-center mb-2">
               <h4>If you dont like the seed or address displayed, just click to make a different one</h4>
-              <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
+              <form>
+                <button class="btn btn-info" formaction="$URL/method/index?nexturl=genaddr" formmethod="post">Generate New Address</button>
+              </form>
             </div>
             <div class="card text-white bg-dark"> <!-- Get New Address card start -->
               <div class="card-body"> <!-- Get New Address card body start -->
