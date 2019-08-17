@@ -396,7 +396,7 @@ void btc_net_spv_post_cmd(btc_node *node, btc_p2p_msg_hdr *hdr, struct const_buf
                 deser_bytes(ipdata,buf,sizeof(ipdata));
                 deser_u16(&port,buf);
                 expand_ipbits(ipaddr,*(uint32_t *)&ipdata[12]);
-                if ( (services & NODE_NSPV) != 0 )
+                if ( 0 && (services & NODE_NSPV) != 0 )
                 {
                     revport = ((port >> 8) & 0xff) | ((port & 0xff) << 8);
                     sprintf(ipaddr+strlen(ipaddr),":%u",revport);

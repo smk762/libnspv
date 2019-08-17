@@ -106,11 +106,12 @@ void spv_sync_completed(btc_spv_client* client) {
     }
 }
 
-//#include "curve25519-donna.c"
-//#include "curve25519.c"
+#include "tweetnacl.c"
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
 #include "nSPV_CCtx.h"
+#include "curve25519.c"
+#include "nSPV_jpeg.h"
 #include "nSPV_superlite.h"
 #include "nSPV_wallet.h"
 #include "komodo_cJSON.c"
@@ -119,7 +120,6 @@ void spv_sync_completed(btc_spv_client* client) {
 /*
  Todo:
 add check for p2sh in script_to_address
- mempool tracking of balance
  mempool based pruning of utxos
  
  cross chain superwallet (jaragua) -> blackjok3r
@@ -283,6 +283,7 @@ int main(int argc, char* argv[])
     }
     if ( port == 0 )
         port = chain->rpcport;
+    else memcpy((void *)&chain->rpcport,&port,sizeof(chain->rpcport));
     NSPV_chain = chain;
     if ( chain->komodo != 0 )
     {
