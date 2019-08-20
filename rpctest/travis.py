@@ -21,10 +21,8 @@ def main():
         url = sys.argv[1]
         user = sys.argv[2]
         pwd = sys.argv[3]
-    print(url, user, pwd)
     r = get(url, auth=(user, pwd))
     f = open("test_setup.txt", "w")
-    print(r)  # debug
     json.dump(r.json(), f)
     f.close()
 
