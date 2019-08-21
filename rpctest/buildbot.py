@@ -25,7 +25,7 @@ def main():
 
     command1 = ["./nspv", coin]
     print("command: ", command1)
-    command2 = ["/usr/bin/python3", "-m", "pytest", "./test_nspv.py", "-s"]
+    command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
 
     nspv = subprocess.Popen(command1, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if nspv.poll():
