@@ -23,7 +23,7 @@ def main():
     if not coin:
         raise Exception("Invalid setup file")
 
-    command1 = ["wine64 nspv.exe", coin]
+    command1 = ["wine64", "nspv.exe", coin]
     print("command: ", command1)
     command2 = ["/usr/bin/python3", "-m", "pytest", "./test_nspv.py", "-s"]
 
