@@ -24,22 +24,22 @@ def main():
         raise Exception("Invalid setup file")
 
     command1 = ["wine64", "nspv.exe", coin]
-    print("command: ", command1)
-    command2 = ["/usr/bin/python3", "-m", "pytest", "./test_nspv.py", "-s"]
+    command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
 
     nspv = subprocess.Popen(command1, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if nspv.poll():
         print("nspv not running")
     else:
         print("nspv is running")
+    print("poll was here", nspv.poll())
     time.sleep(15)
     test = subprocess.Popen(command2, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     while True:
         output = test.stdout.readline()
+        print(output.strip().decode("utf-8"))
         if test.poll() is not None:
+            print("caught error")
             break
-        if output:
-            print(output.strip().decode("utf-8"))
     rc = test.poll()
     if rc != 0:
         raise RuntimeError("tests return code: ", rc)
