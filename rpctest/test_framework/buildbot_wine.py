@@ -9,7 +9,7 @@ import json
 
 """
     steps:
-    1. run nspv, wait 10 seconds to find good peers
+    1. run nspv in wine, wait 10 seconds to find good peers
     2. run tests, write log
     3. wait 4 seconds for tests to start and write log to stdout with tail
 """
