@@ -90,17 +90,17 @@ bench_internal_CPPFLAGS = -DSECP256K1_BUILD $(SECP_INCLUDES)
 endif
 
 TESTS =
-if USE_TESTS
-noinst_PROGRAMS += tests
-tests_SOURCES = src/tests.c
-tests_CPPFLAGS = -DSECP256K1_BUILD -I$(top_srcdir)/src -I$(top_srcdir)/include $(SECP_INCLUDES) $(SECP_TEST_INCLUDES)
-if !ENABLE_COVERAGE
-tests_CPPFLAGS += -DVERIFY
-endif
-tests_LDADD = $(SECP_LIBS) $(SECP_TEST_LIBS) $(COMMON_LIB)
-tests_LDFLAGS = -static
-TESTS += tests
-endif
+#if USE_TESTS
+#noinst_PROGRAMS += tests
+#tests_SOURCES = src/tests.c
+#tests_CPPFLAGS = -DSECP256K1_BUILD -I$(top_srcdir)/src -I$(top_srcdir)/include $(SECP_INCLUDES) $(SECP_TEST_INCLUDES)
+#if !ENABLE_COVERAGE
+#tests_CPPFLAGS += -DVERIFY
+#endif
+#tests_LDADD = $(SECP_LIBS) $(SECP_TEST_LIBS) $(COMMON_LIB)
+#tests_LDFLAGS = -static
+#TESTS += tests
+#endif
 
 if USE_EXHAUSTIVE_TESTS
 noinst_PROGRAMS += exhaustive_tests
@@ -136,12 +136,12 @@ $(JAVA_GUAVA):
 	$(AM_V_at)$(CLASSPATH_ENV) javac $^
 	@touch $@
 
-if USE_TESTS
-
-check-java: libsecp256k1.la $(JAVA_GUAVA) .stamp-java
-	$(AM_V_at)java -Djava.library.path="./:./src:./src/.libs:.libs/" -cp "$(JAVA_GUAVA):$(JAVAROOT)" $(JAVAORG)/NativeSecp256k1Test
-
-endif
+#if USE_TESTS
+#
+#check-java: libsecp256k1.la $(JAVA_GUAVA) .stamp-java
+#	$(AM_V_at)java -Djava.library.path="./:./src:./src/.libs:.libs/" -cp "$(JAVA_GUAVA):$(JAVAROOT)" $(JAVAORG)/NativeSecp256k1Test
+#
+#endif
 endif
 
 if USE_ECMULT_STATIC_PRECOMPUTATION
