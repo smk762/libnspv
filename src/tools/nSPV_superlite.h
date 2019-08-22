@@ -1020,7 +1020,7 @@ cJSON *NSPV_addnode(const btc_chainparams *chain,char *ipaddr)
         else jaddstr(result,"status","ipaddr already there");
     }
     jaddstr(result,"ipaddr",nodeaddr);
-    return(restult);
+    return(result);
 }
 
 
