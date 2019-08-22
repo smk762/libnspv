@@ -989,7 +989,7 @@ cJSON *NSPV_setlanguage(char *lang)
     return(result);
 }
 
-cJSON *NSPV_addnode(const btc_chainparams *chain,char *ipaddr)
+cJSON *NSPV_addnode(btc_spv_client *client,char *ipaddr)
 {
     cJSON *result = cJSON_CreateObject(); char nodeaddr[128]; btc_node *node; int32_t i,retval = -1;
     for (i=0; ipaddr[i] != 0; i++)
@@ -997,11 +997,11 @@ cJSON *NSPV_addnode(const btc_chainparams *chain,char *ipaddr)
             break;
     if ( ipaddr[i] == ':' )
         strncpy(nodeaddr,ipaddr,sizeof(nodeaddr)-1);
-    else sprintf(nodeaddr,"%s:%u",ipaddr,chain->default_port);
+    else sprintf(nodeaddr,"%s:%u",ipaddr,client->params->default_port);
     node = btc_node_new();
     if ( btc_node_set_ipport(node,nodeaddr) > 0 )
     {
-        if ( btc_node_group_add_node(node->nodegroup,node) != node )
+        if ( btc_node_group_add_node(client->nodegroup,node) != node )
         {
             btc_node_free(node);
             retval = 1;
@@ -1312,7 +1312,7 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         }
     }
     else if ( strcmp(method,"addnode") == 0 )
-        return(NSPV_addnode(NSPV_chain,jstr(argjson,"ipaddr")));
+        return(NSPV_addnode(NSPV_client,jstr(argjson,"ipaddr")));
     else if ( strcmp(method,"getnewaddress") == 0 )
         return(NSPV_getnewaddress(NSPV_chain,jstr(argjson,"lang")));
     else if ( strcmp(method,"language") == 0 )
