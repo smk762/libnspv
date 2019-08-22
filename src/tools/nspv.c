@@ -123,8 +123,7 @@ void spv_sync_completed(btc_spv_client* client) {
  mempool based pruning of utxos
  
  cross chain superwallet (jaragua) -> blackjok3r
- 
- enhance cc/funcid filter in listtransactions/listunspent -> mihailo
+ add CC signing
  
  */
 

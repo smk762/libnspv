@@ -992,6 +992,12 @@ cJSON *NSPV_setlanguage(char *lang)
 cJSON *NSPV_addnode(btc_spv_client *client,char *ipaddr)
 {
     cJSON *result = cJSON_CreateObject(); char nodeaddr[128]; btc_node *node; int32_t i,retval = -1;
+    if ( ipaddr == 0 || ipaddr[0] == 0 )
+    {
+        jaddstr(result,"result","error");
+        jaddstr(result,"error","no ipaddr field");
+        return(result);
+    }
     for (i=0; ipaddr[i] != 0; i++)
         if ( ipaddr[i] == ':' )
             break;
