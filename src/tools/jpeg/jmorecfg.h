@@ -175,7 +175,7 @@ typedef long INT32;
  * can change this datatype.
  */
 
-typedef int32_t JDIMENSION;
+typedef int JDIMENSION;
 
 #define JPEG_MAX_DIMENSION  65500L  /* a tad under 64K to prevent overflows */
 

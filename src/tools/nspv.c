@@ -114,17 +114,16 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "nSPV_jpeg.h"
 #include "nSPV_superlite.h"
 #include "nSPV_wallet.h"
+#include "nSPV_htmlgui.h"
 #include "komodo_cJSON.c"
 #include "nSPV_rpc.h"
 
 /*
  Todo:
-add check for p2sh in script_to_address
  mempool based pruning of utxos
  
  cross chain superwallet (jaragua) -> blackjok3r
- 
- enhance cc/funcid filter in listtransactions/listunspent -> mihailo
+ add CC signing
  
  */
 
