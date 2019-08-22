@@ -140,7 +140,7 @@ LIBBTC_API void btc_node_group_free(btc_node_group* group);
 LIBBTC_API void btc_node_group_shutdown(btc_node_group* group);
 
 /* add a node to a node group */
-LIBBTC_API void btc_node_group_add_node(btc_node_group* group, btc_node* node);
+LIBBTC_API btc_node *btc_node_group_add_node(btc_node_group* group, btc_node* node);
 
 /* start node groups event loop */
 LIBBTC_API void btc_node_group_event_loop(btc_node_group* group);
