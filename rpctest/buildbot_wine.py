@@ -31,7 +31,6 @@ def main():
         print("nspv not running")
     else:
         print("nspv is running")
-    print("poll was here", nspv.poll())
     time.sleep(15)
     test = subprocess.Popen(command2, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     while True:

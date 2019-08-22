@@ -3,10 +3,15 @@ export HOST=x86_64-w64-mingw32
 CXX=x86_64-w64-mingw32-g++-posix
 CC=x86_64-w64-mingw32-gcc-posix
 PREFIX="$(pwd)/depends/$HOST"
+FILE=./nspv.exe
 
 set -eu -o pipefail
 
 set -x
+
+if test -f "$FILE"; then
+    make clean
+fi
 
 cd depends/ && make HOST=$HOST V=1 NO_QT=1
 cd ../
