@@ -997,7 +997,7 @@ cJSON *NSPV_addnode(const btc_chainparams *chain,char *ipaddr)
             break;
     if ( ipaddr[i] == ':' )
         strncpy(nodeaddr,ipaddr,sizeof(nodeaddr)-1);
-    else sprintf(nodeaddr,"%s:%u",chain->default_port);
+    else sprintf(nodeaddr,"%s:%u",ipaddr,chain->default_port);
     node = btc_node_new();
     if ( btc_node_set_ipport(node,nodeaddr) > 0 )
     {
