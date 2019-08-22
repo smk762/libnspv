@@ -7,7 +7,7 @@ include_HEADERS = include/cryptoconditions.h
 # Have a separate build target for cryptoconditions that does not contain secp256k1
 
 libcryptoconditions_la_SOURCES = include/cryptoconditions.h
-libcryptoconditions_la_LIBADD = $(CRYPTOCONDITIONS_CORE) #$(LIBSECP256K1)
+libcryptoconditions_la_LIBADD = $(CRYPTOCONDITIONS_CORE) $(LIBSECP256K1)
 
 AM_CFLAGS = -I$(top_srcdir)/src/asn -I$(top_srcdir)/include -I$(top_srcdir)/src/include \
 			-Wall -Wno-pointer-sign -Wno-discarded-qualifiers
