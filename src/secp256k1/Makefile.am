@@ -87,6 +87,7 @@ bench_internal_LDADD = $(SECP_LIBS) $(COMMON_LIB)
 bench_internal_CPPFLAGS = -DSECP256K1_BUILD $(SECP_INCLUDES)
 endif
 
+USE_TESTS=0
 if USE_TESTS
 noinst_PROGRAMS += tests
 tests_SOURCES = src/tests.c
