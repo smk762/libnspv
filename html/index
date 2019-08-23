@@ -23,8 +23,8 @@
             <input class="form-control form-control-sm" type="text" placeholder="Amount" name="amount" aria-label="SendAmount">
           </div>
           <div class="col-lg-3 col-lg-3 col-xs-3">
-          <button class="btn btn-outline-warning btn-sm" type="submit">Send $COIN</button>
-        </div>
+            <button class="btn btn-outline-warning btn-sm" type="submit">Send $COIN</button>
+          </div>
       </form>
       <!-- only if logged in - end -->
       <form class="form-inline">
@@ -62,31 +62,41 @@
             <!-- login form start -->
             <div class="login-section" style="display: $LOGOUTDISPLAY;">
               <h4>To continue, log in to your account.</h4>
-            <form action="$URL/method/login" method="get" style="display: none;">
+            <form action="$URL/method/login" method="post" style="display: $LOGOUTDISPLAY;">
               <div class="form-group">
-                Select a .jpg image file: <input type="file" name="jpg_image" accept=".jpg">
-                <input type="password" class="form-control mt-2" id="nspv_password" name="jpg_password" aria-describedby="nspvUserpassHelp" placeholder="Password">
-                <small id="nspvPasswordHelp" class="form-text text-muted">Password (any random string) is used for session login. (disabled for now in debug versions)</small>
+                Select a .jpg image file: <input type="file" name="fname" accept=".jpg">
+                <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="WIF Key or Wallet Seed">
+                <small id="nspvImageFileWifHelp" class="form-text text-muted">Password (any random string) is used for session login.</small>
               </div>
               <button type="submit" class="btn btn-primary">Login with image + password</button>
             </form>
             <form action="$URL/method/login" method="post">
-              <div class="divider" style="display: none;">
+              <div class="divider" style="display: $LOGOUTDISPLAY;">
                 <strong class="divider-title">or</strong>
               </div>
               <div class="form-group">
                 <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key or Wallet Seed">
                 <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
               </div>
+              <!--<div class="form-group">
+                <select class="custom-select mr-sm-2" id="lang" name="lang">
+                  <option selected>Language</option>
+                  <option value="english">English</option>
+                  <option value="french">French</option>
+                  <option value="japanese">Japanese</option>
+                  <option value="chinese_simplified">Chinese (Simplified)</option>
+                  <option value="chinese_traditional">Chinese (Traditional)</option>
+                </select>
+              </div>-->
               <button type="submit" class="btn btn-primary">Login with Wallet Seed or WIF key</button>
-                <div class="alert alert-info" role="alert" style="margin-top: 10px;"><b>NOTICE: </b>Your login session will last for 777 seconds.</div>
+              <div class="alert alert-info" role="alert" style="margin-top: 10px;"><b>NOTICE: </b>Your login session will last for 777 seconds.</div>
               <!--<div class="divider"></div>-->
             </form>
           </div>
           <!-- login form end -->
         </div>
         <!-- Get New Address section start -->
-        <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $LOGOUTDISPLAY;;"> <!-- Get New Address div start -->
+        <div class="col-md-8 col-sm-12" style="padding-right: 7.5px; display: $LOGOUTDISPLAY;"> <!-- Get New Address div start -->
             <div class="text-center mb-2">
               <h4>If you dont like the seed or address displayed, just click to make a different one</h4>
               <form>
@@ -118,6 +128,45 @@
             </div> <!-- Get New Address card end -->
         </div> <!-- Get New Address div end -->
         <!-- Get New Address section end -->
+
+        <!-- Create login image section start -->
+        <div class="col-md-12 col-sm-12" style="padding-right: 7.5px; display: $LOGINDISPLAY;"> <!-- Create login image div start -->
+            <div class="card text-white bg-dark"> <!-- Create login image card start -->
+              <form action="$URL/method/index?nexturl=createimage" method="get">
+                <div class="card-header">
+                  <h4>Create secure login image</h4>
+                </div>
+              <div class="card-body"> <!-- Create login image card body start -->
+                <div class="alert alert-success" role="alert">
+                  <ol class="mb-0">
+                    <li>Select a large size .jpg image file on your device.</li>
+                    <li>Fill in a strong password. Ideally a combination of alphabets, numbers and special characters.</li>
+                    <li>When ready, press "Make Secure Image" button to proceed.</li>
+                  </ol>
+                </div>
+                
+
+                <div class="form-row">
+                  <input type="text" name="nexturl" hidden value="createimage">
+                <div class="">
+                  <input type="file" name="fname" id="fname" accept=".jpg" style="margin: 10px 10px 10px 0;">
+                  <small id="nspvImageFileHelp" class="form-text text-muted">Select a .jpg image file from your device</small>
+                </div>
+                <div class="">
+                  <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="Password">
+                  <small id="nspvImageFileWifHelp" class="form-text text-muted">Password for the selected image file.</small>
+                </div>
+              </div>
+                
+              </div> <!-- Create login image card body end -->
+              <div class="card-footer">
+                <button class="btn btn-info" type="submit">Make Secure Image</button>
+              </div>
+              </form>
+            </div> <!-- Create login image card end -->
+        </div> <!-- Create login image div end -->
+        <!-- Create login image section end -->
+
       </div>
     </div>
   
