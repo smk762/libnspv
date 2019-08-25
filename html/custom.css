@@ -1,7 +1,10 @@
 body {
 	background-color: #1e2938;
 	color: #fff;
-	font-family: 'Rubik', sans-serif;
+}
+
+.logo{
+	width: 25px;
 }
 
 .bg-dark {
@@ -19,7 +22,7 @@ body {
 .login-body {
 	background-image: url("images/sub-header-logo-min.png");
 	background-size: auto auto;
-	text-align: center;
+	/*text-align: center;*/
 	background-color: #1e2938;
 	background-repeat: no-repeat;
 	position: relative;
@@ -46,4 +49,8 @@ body {
 
 .login-hr {
 	border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.send_form {
+	width: 665px;
 }

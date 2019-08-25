@@ -94,7 +94,6 @@ typedef struct btc_node_ {
 
     cstring* recvBuffer;
     uint64_t nonce;
-    uint64_t services;
     uint32_t state;
     int missbehavescore;
     btc_bool version_handshake;
@@ -107,6 +106,7 @@ typedef struct btc_node_ {
     uint32_t hints; /* can be use for user defined state */
     uint64_t nServices;
     uint32_t prevtimes[16],gotaddrs;
+    char ipaddr[64];
 } btc_node;
 
 LIBBTC_API int net_write_log_printf(const char* format, ...);
@@ -140,7 +140,7 @@ LIBBTC_API void btc_node_group_free(btc_node_group* group);
 LIBBTC_API void btc_node_group_shutdown(btc_node_group* group);
 
 /* add a node to a node group */
-LIBBTC_API void btc_node_group_add_node(btc_node_group* group, btc_node* node);
+LIBBTC_API btc_node *btc_node_group_add_node(btc_node_group* group, btc_node* node);
 
 /* start node groups event loop */
 LIBBTC_API void btc_node_group_event_loop(btc_node_group* group);

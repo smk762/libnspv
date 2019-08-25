@@ -17,7 +17,7 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
-#define NSPV_PROTOCOL_VERSION 0x00000002
+#define NSPV_PROTOCOL_VERSION 0x00000003
 #define NSPV_MAXPACKETSIZE (4096 * 1024)
 #define NSPV_MAXSCRIPTSIZE 10000
 #define MAX_TX_SIZE_BEFORE_SAPLING 100000
@@ -42,6 +42,9 @@ typedef union _bits256 bits256;
 #define portable_mutex_lock pthread_mutex_lock
 #define portable_mutex_unlock pthread_mutex_unlock
 #define OS_thread_create pthread_create
+#define SETBIT(bits,bitoffset) (((uint8_t *)bits)[(bitoffset) >> 3] |= (1 << ((bitoffset) & 7)))
+#define GETBIT(bits,bitoffset) (((uint8_t *)bits)[(bitoffset) >> 3] & (1 << ((bitoffset) & 7)))
+#define CLEARBIT(bits,bitoffset) (((uint8_t *)bits)[(bitoffset) >> 3] &= ~(1 << ((bitoffset) & 7)))
 
 
 struct rpcrequest_info
@@ -258,7 +261,7 @@ extern struct NSPV_broadcastresp NSPV_broadcastresult;
 
 extern struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
 extern struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
-extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 4];
+extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 10];
 
 // validation 
 extern struct NSPV_ntz NSPV_lastntz;
@@ -266,5 +269,6 @@ extern struct NSPV_header NSPV_blockheaders[128]; // limitation here is that 100
 extern int32_t NSPV_num_headers;
 extern int32_t NSPV_hdrheight_counter;
 extern int32_t IS_IN_SYNC;
+extern int64_t NSPV_totalsent,NSPV_totalrecv;
 
 #endif // KOMODO_NSPV_DEFSH
