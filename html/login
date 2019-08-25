@@ -23,7 +23,7 @@
             <input class="form-control form-control-sm" type="text" placeholder="Amount" name="amount" aria-label="SendAmount">
           </div>
           <div class="col-lg-3 col-lg-3 col-xs-3">
-            <button class="btn btn-outline-warning btn-sm" type="submit">Send $COIN</button>
+            <button class="btn btn-outline-warning btn-sm" type="submit">$COMMON_BTN_SEND $COIN</button>
           </div>
       </form>
       <!-- only if logged in - end -->
@@ -60,20 +60,20 @@
             <form action="$URL/method/login" method="post" style="display: $LOGOUTDISPLAY;">
               <div class="form-group">
                 Select a .jpg image file: <input type="file" name="fname" accept=".jpg">
-                <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="WIF Key or Wallet Seed">
+                <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="$LOGIN_PLACEHOLDER_WIF_SEED">
                 <small id="nspvImageFileWifHelp" class="form-text text-muted">Password (any random string) is used for session login.</small>
               </div>
-              <button type="submit" class="btn btn-primary">Login with image + password</button>
+              <button type="submit" class="btn btn-primary">$LOGIN_BTN_LOGIN_IMG_PASS</button>
             </form>
             <form action="$URL/method/login" method="post">
               <div class="divider" style="display: $LOGOUTDISPLAY;">
                 <strong class="divider-title">or</strong>
               </div>
               <div class="form-group">
-                <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="WIF Key or Wallet Seed">
+                <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="$LOGIN_PLACEHOLDER_WIF_SEED">
                 <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
               </div>
-              <button type="submit" class="btn btn-primary">Login with Wallet Seed or WIF key</button>
+              <button type="submit" class="btn btn-primary">$LOGIN_BTN_LOGIN_SEED_WIF</button>
               <div class="alert alert-info" role="alert" style="margin-top: 10px;"><b>NOTICE: </b>Your login session will last for 777 seconds.</div>
               <!--<div class="divider"></div>-->
             </form>
