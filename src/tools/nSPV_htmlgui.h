@@ -187,7 +187,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // Top menu buttons HTML tags variables to use with
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
-     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-1\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-1\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
+     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" href=\"$URL/method/wallet?nexturl=wallet\">$MENU_MENU_WALLET</a> <a class=\"btn btn-outline-info mr-sm-1\" href=\"$URL/method/getinfo?nexturl=info\">$MENU_MENU_INFO</a> <a class=\"btn btn-outline-secondary mr-sm-1\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">$MENU_MENU_PEERS</a> <a class=\"btn btn-outline-success mr-sm-1\" href=\"$URL/method/index?nexturl=index\">$MENU_MENU_ACCOUNT</a> <a class=\"btn btn-outline-danger mr-sm-1\" href=\"$URL/method/logout?nexturl=index\">$MENU_MENU_LOGOUT</a>");
 
     // == Coin specific gloabal variable
     // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
