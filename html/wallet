@@ -58,7 +58,7 @@
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- mempool transactions reresh button form start -->
-                    <a class="btn btn-outline-light btn-sm" href="$URL/method/wallet?nexturl=wallet&update=1">Update</a>
+                    <a class="btn btn-outline-light btn-sm" href="$URL/method/wallet?nexturl=wallet&update=1">$COMMON_BTN_UPDATE</a>
                   </form> <!-- mempool transactions reresh button form end -->
                 </div>
               </div>
@@ -94,7 +94,7 @@
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- tx history reresh button form start -->
-                    <a class="btn btn-outline-light btn-sm" href="$URL/method/wallet?nexturl=wallet&refresh=1" formmethod="get">Refresh</a>
+                    <a class="btn btn-outline-light btn-sm" href="$URL/method/wallet?nexturl=wallet&refresh=1" formmethod="get">$COMMON_BTN_REFRESH</a>
                   </form> <!-- tx history reresh button form end -->
                 </div>
               </div>

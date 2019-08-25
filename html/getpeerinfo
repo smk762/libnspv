@@ -58,7 +58,7 @@
                   </div>
                   <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                     <form> <!-- GetPeerInfo reresh button form start -->
-                      <button class="btn btn-outline-light btn-sm" formaction="$URL/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Refresh</button>
+                      <button class="btn btn-outline-light btn-sm" formaction="$URL/method/getpeerinfo?nexturl=peerinfo" formmethod="get">$COMMON_BTN_REFRESH</button>
                     </form> <!-- GetPeerInfo reresh button form end -->
                   </div>
                 </div>

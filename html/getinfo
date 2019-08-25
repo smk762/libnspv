@@ -58,7 +58,7 @@
                   </div>
                   <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                     <form> <!-- GetInfo reresh button form start -->
-                      <button class="btn btn-outline-light btn-sm" formaction="$URL/method/getinfo?nexturl=info" formmethod="get">Refresh</button>
+                      <button class="btn btn-outline-light btn-sm" formaction="$URL/method/getinfo?nexturl=info" formmethod="get">$COMMON_BTN_REFRESH</button>
                     </form> <!-- GetInfo reresh button form end -->
                   </div>
                 </div>
