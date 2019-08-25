@@ -675,6 +675,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     sprintf(replacestr,"%d",NSPV_AUTOLOGOUT - (int32_t)(time(NULL)-NSPV_logintime));
     NSPV_expand_variable(bigbuf,&filestr,"$AUTOLOGOUT",replacestr);
 
+    // == Account Settings ==
+    // $WALLET_LANG_OPTIONS_LIST - main array to list languages in drop down options
+    // $WALLETLANG - name of the language file
+    // $WALLETLANG_NAME - name from the language file. From key Langinfo.name
+
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
 

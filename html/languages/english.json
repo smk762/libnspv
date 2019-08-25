@@ -1,0 +1,45 @@
+{
+	"Langinfo": {
+		"name": "English (US)",
+		"author": "Satinder Grewal",
+		"author_email": "satinder@komodoplatform.com"
+	},
+	"Common": {
+		"btn_send": "Send",
+		"btn_receive": "Receive",
+		"btn_update": "Update",
+		"btn_refresh": "Refresh",
+		"label_rewards": "Rewards"
+	},
+	"Menu": {
+		"menu_wallet": "Wallet",
+		"menu_info": "Info",
+		"menu_peers": "Peers",
+		"menu_account": "Account",
+		"menu_logout": "Logout"
+	},
+	"Coininfo":{
+		"label_coin": "Coin",
+		"label_balance": "Balance",
+		"label_your_address": "Your Address"
+	},
+	"Login": {
+		"btn_login_img_pass": "Login with image + password",
+		"btn_login_seed_wif": "Login with Wallet Seed or WIF Key",
+		"placeholder_wif_seed": "WIF Key or Wallet Seed",
+	},
+	"Send":{
+		"label_from": "From Address",
+		"label_to": "To Address",
+		"label_amount_info": "Amount Info",
+		"label_amount": "Amount",
+		"label_fees": "Fees",
+		"label_total": "Total",
+		"label_rewards_info": "Rewards Info",
+		"label_validated": "Validated",
+		"label_txid": "txid",
+		"label_hex": "hex",
+		"btn_broadcast_tx": "Broadcast Transaction",
+		"btn_create_tx": "Create Transaction"
+	}
+}

@@ -53,12 +53,7 @@
       <!-- only if logged in - end -->
 
       <div class="row justify-content-md-center">
-        <div class="col-md-4 col-sm-12 text-center">
-            <!-- active login section start -->
-            <div class="active-login" style="display: $LOGINDISPLAY;">
-              <h4>Your login session will expire in $AUTOLOGOUT seconds.</h4>
-            </div>
-            <!-- active login section end -->
+        <div class="col-md-4 col-sm-12 text-center" style="display: $LOGOUTDISPLAY">
             <!-- login form start -->
             <div class="login-section" style="display: $LOGOUTDISPLAY;">
               <h4>To continue, log in to your account.</h4>
@@ -141,8 +136,42 @@
         </div> <!-- Get New Address div end -->
         <!-- Get New Address section end -->
 
+
+
+        <div class="col-md-6 col-sm-12" style="display: $LOGINDISPLAY;">
+          <div class="card text-white bg-dark"> <!-- Create login image card start -->
+            <div class="card-header">
+              <h4>Account Settings</h4>
+            </div>
+            <div class="card-body">
+              <form>
+                <div class="form-group row">
+                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">Session</label>
+                  <div class="col-auto">
+                    <label class="col-form-label">Your login session will expire in $AUTOLOGOUT seconds.</label>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">Wallet Language</label>
+                  <div class="col pr-sm-1">
+                    <select class="custom-select mr-sm-2" id="walletlang" name="walletlang">
+                      <option value="" selected>Select Wallet Language </option>
+                      $WALLET_LANG_OPTIONS_LIST
+                    </select> 
+                  </div>
+                  <div class="col pl-sm-1">
+                    <button class="btn btn-primary mr-sm-2" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">Change</button>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
         <!-- Create login image section start -->
-        <div class="col-md-12 col-sm-12" style="padding-right: 7.5px; display: $LOGINDISPLAY;"> <!-- Create login image div start -->
+        <div class="col-md-6 col-sm-12" style="padding-right: 7.5px; display: $LOGINDISPLAY;"> <!-- Create login image div start -->
             <div class="card text-white bg-dark"> <!-- Create login image card start -->
               <form action="$URL/method/index?nexturl=createimage" method="get">
                 <div class="card-header">
