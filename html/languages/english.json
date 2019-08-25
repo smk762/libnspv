@@ -25,7 +25,7 @@
 	"LOGIN": {
 		"BTN_LOGIN_IMG_PASS": "Login with image + password",
 		"BTN_LOGIN_SEED_WIF": "Login with Wallet Seed or WIF Key",
-		"PLACEHOLDER_WIF_SEED": "WIF Key or Wallet Seed",
+		"PLACEHOLDER_WIF_SEED": "WIF Key or Wallet Seed"
 	},
 	"SEND":{
 		"LABEL_FROM": "From Address",
