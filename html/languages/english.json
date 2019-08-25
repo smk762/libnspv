@@ -6,7 +6,6 @@
 	},
 	"COMMON": {
 		"BTN_SEND": "Send",
-		"BTN_RECEIVE": "Receive",
 		"BTN_UPDATE": "Update",
 		"BTN_REFRESH": "Refresh",
 		"LABEL_REWARDS": "Rewards"
