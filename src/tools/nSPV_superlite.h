@@ -326,6 +326,8 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     if ( NSPV_inforesult.hdrheight > NSPV_longestchain )
                         NSPV_longestchain = NSPV_inforesult.hdrheight;
                 }
+                if ( I.height > from->bestknownheight )
+                    from->bestknownheight = I.heught;
                 if ( (lag= I.height-NSPV_inforesult.height) > 0 )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d lag.%i\n",timestamp,len,NSPV_inforesult.height,lag);
@@ -488,7 +490,7 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
             jaddnum(node_json,"time_last_request",(int64_t)node->time_last_request);
             jaddnum(node_json,"services",(int64_t)node->nServices);
             jaddnum(node_json,"missbehavescore",(int64_t)node->banscore);
-            //jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight); // 
+            jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight); 
             jaddnum(node_json,"last_validated_header", (int64_t)node->lastvalidatedheight);
             jaddi(result,node_json);     
         }
