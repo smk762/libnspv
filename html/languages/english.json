@@ -58,7 +58,26 @@
 			{ "LABEL_TXID": "txid" },
 			{ "LABEL_HEX": "hex" },
 			{ "BTN_BROADCAST_TX": "Broadcast Transaction" },
-			{ "BTN_CREATE_TX": "Create Transaction" }]
+			{ "BTN_CREATE_TX": "Create Transaction" },
+			{ "CONF_DETAILS": "Confirm Details before sending"},
+			{ "CONF_NOTICE": 
+			"<b>NOTICE:</b> Creating transaction needs to make network request, so depending on the transaction, and your connections with the network nodes this might take some time. Please be patient while the process finishes."},
+			{ "RETCODES": "retcodes"},
+			{ "VALIDATED_HELP": "Locally calculated value of rewards to match with the value from network."},
+			{ "TXID_HELP": "This <kbd>txid</kbd> will only be available on blockchain explorers after your broadcast the transaction to network."},
+			{ "HEX_HELP": "You can also just copy this hex string and broadcast through another computer if you wish."},
+			{ "ADVANCE_DETAILS": "Other Advanced Details"},
+			{ "NVERSION": "nVersion"},
+			{ "NLOCKTIME": "nLockTime"},
+			{ "EXPIRYTIME": "nExpiryHeight"},
+			{ "VALBALANCE": "valueBalance"},
+			{ "TXVIN_H5": "Tx - vin"},
+			{ "TXVOUT_H5": "Tx - vout"},
+			{ "VOUT": "vout"},
+			{ "SCRIPTSIG": "scriptSig"},
+			{ "SEQUENCEID": "sequenceid"},
+			{ "VALUE": "Value"},
+			{ "ADDRESS": "Address"}]
 	},
 	{ "WALLET": [
 			{ "UNCONF_TX": "Unconfirmed Transactions" },
