@@ -127,5 +127,15 @@
 			{ "EXPECTED": "Expected"},
 			{ "BROADCAST": "Broadcast"},
 			{ "RETURNCODE": "Returned Code"}]
+	},
+	{ "TXINFO": [
+			{ "TX_ID_INFO": "Transaction ID Info"},
+			{ "SPENT_TX_INFO": "Spent Transaction Info"},
+			{ "SPENT_TX_HEIGHT": "Spent Transaction Height"},
+			{ "SPENT_TX_ID": "Spent Transaction ID"},
+			{ "SPENT_VINI": "Spent vini"},
+			{ "SPENT_TX_LEN": "Spent Transaction Length"},
+			{ "SPENT_PROOF_LEN": "Spent Transaction Proof Length"},
+			{ "PROOF": "proof"}]
 	}
 ]

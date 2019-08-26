@@ -52,7 +52,7 @@
         <div class="col-md-6 col-sm-12 pr-sm-1" style="margin-bottom: 1em;">
           <div class="card text-white bg-dark">
             <div class="card-header">
-              <h5>Tx - vin</h5>
+              <h5>$SEND_TXVIN_H5</h5>
             </div>
             <div class="card-body" style="padding: 0;">
               <table class="table table-striped table-dark" style="margin-bottom: 0;">
@@ -67,7 +67,7 @@
         <div class="col-md-6 col-sm-12 pl-sm-1" style="margin-bottom: 1em;">
           <div class="card text-white bg-dark">
             <div class="card-header">
-              <h5>Tx - vout</h5>
+              <h5>$SEND_TXVOUT_H5</h5>
             </div>
             <div class="card-body" style="padding: 0;">
               <table class="table table-striped table-dark" style="margin-bottom: 0;">
@@ -86,7 +86,7 @@
               <div class="card-header"> <!-- TxidInfo header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
-                    <h6 class="card-title" style="vertical-align: ">Transaction ID Info</h6>
+                    <h6 class="card-title" style="vertical-align: ">$TXINFO_TX_ID_INFO</h6>
                   </div>
                 </div>
               </div> <!-- TxidInfo header end -->
@@ -94,11 +94,11 @@
                 <table class="table table-striped table-dark" style="margin-bottom: 0;">
                   <tbody>
                     <tr>
-                      <th style="width: 200px;">Spent Transaction Info</th>
+                      <th style="width: 200px;">$TXINFO_SPENT_TX_INFO</th>
                       <td>
                         <div class="row">
-                          <div class="col-md-6 col-sm-12"><b>Spent Transaction Height</b><br>$TXINFO_SPENTHT</div>
-                          <div class="col-md-6 col-sm-12 text-break text-wrap"><b>Spent Transaction ID</b><br><a href="$URL/method/txidinfo?txid=$TXINFO_SPENTTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$TXINFO_SPENTTXID</a></div>
+                          <div class="col-md-6 col-sm-12"><b>$TXINFO_SPENT_TX_HEIGHT</b><br>$TXINFO_SPENTHT</div>
+                          <div class="col-md-6 col-sm-12 text-break text-wrap"><b>$TXINFO_SPENT_TX_ID</b><br><a href="$URL/method/txidinfo?txid=$TXINFO_SPENTTXID&vout=1&nexturl=txidinfo" class="text-break text-wrap">$TXINFO_SPENTTXID</a></div>
                         </div>
                       </td>
                     </tr>
@@ -106,26 +106,26 @@
                       <th></th>
                       <td>
                         <div class="row">
-                          <div class="col-md-4 col-sm-12"><b>Spent vini</b><br>$TXINFO_SPENTVINI</div>
-                          <div class="col-md-4 col-sm-12"><b>Spent Transaction Length</b><br>$TXINFO_SPENTTXLEN</div>
-                          <div class="col-md-4 col-sm-12"><b>Spent Transaction Proof Length</b><br>$TXINFO_SPENTTXPROOFLEN</div>
+                          <div class="col-md-4 col-sm-12"><b>$TXINFO_SPENT_VINI</b><br>$TXINFO_SPENTVINI</div>
+                          <div class="col-md-4 col-sm-12"><b>$TXINFO_SPENT_TX_LEN</b><br>$TXINFO_SPENTTXLEN</div>
+                          <div class="col-md-4 col-sm-12"><b>$TXINFO_SPENT_PROOF_LEN</b><br>$TXINFO_SPENTTXPROOFLEN</div>
                         </div>
                       </td>
                     </tr>
                     <tr>
-                      <th>hex</th>
+                      <th>$SEND_LABEL_HEX</th>
                         <td>
                           <pre class="text-break text-wrap text-white">$TXIDHEX</pre>
                         </td>
                     </tr>
                     <tr>
-                      <th>proof</th>
+                      <th>$TXINFO_PROOF</th>
                         <td>
                           <pre class="text-break text-wrap text-white">$TXIDPROOF</pre>
                         </td>
                     </tr>
                     <tr>
-                      <td>Last Peer</td>
+                      <td>$INFO_LAST_PEER</td>
                       <td>$LASTPEER</td>
                     </tr>
                   </tbody>
