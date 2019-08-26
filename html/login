@@ -41,10 +41,10 @@
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
                 <div class="row">
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
                   <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>$COMMON_LABEL_REWARDS:</b><br> $REWARDS $COIN</span>
-                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$COININFO_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
+                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$INFOCOIN_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
                 </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
@@ -56,12 +56,12 @@
         <div class="col-md-4 col-sm-12 text-center" style="display: $LOGOUTDISPLAY">
             <!-- login form start -->
             <div class="login-section" style="display: $LOGOUTDISPLAY;">
-              <h4>To continue, log in to your account.</h4>
+              <h4>$LOGIN_LOGOIN_TO_ACCOUNT</h4>
             <form action="$URL/method/login" method="post" style="display: $LOGOUTDISPLAY;">
               <div class="form-group">
-                Select a .jpg image file: <input type="file" name="fname" accept=".jpg">
+                $LOGIN_SELECT_JPG <input type="file" name="fname" accept=".jpg">
                 <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="$LOGIN_PLACEHOLDER_WIF_SEED">
-                <small id="nspvImageFileWifHelp" class="form-text text-muted">Password (any random string) is used for session login.</small>
+                <small id="nspvImageFileWifHelp" class="form-text text-muted">$LOGIN_IMG_PASS_HELP</small>
               </div>
               <button type="submit" class="btn btn-primary">$LOGIN_BTN_LOGIN_IMG_PASS</button>
             </form>
@@ -71,10 +71,10 @@
               </div>
               <div class="form-group">
                 <input type="password" class="form-control" id="nspv_wif" name="wif" aria-describedby="nspvWifHelp" placeholder="$LOGIN_PLACEHOLDER_WIF_SEED">
-                <small id="nspvWifHelp" class="form-text text-muted">Enter Wallet Seed or WIF key (private key) of an address.</small>
+                <small id="nspvWifHelp" class="form-text text-muted">$LOGIN_SEED_WIF_HELP</small>
               </div>
               <button type="submit" class="btn btn-primary">$LOGIN_BTN_LOGIN_SEED_WIF</button>
-              <div class="alert alert-info" role="alert" style="margin-top: 10px;"><b>NOTICE: </b>Your login session will last for 777 seconds.</div>
+              <div class="alert alert-info" role="alert" style="margin-top: 10px;">$LOGIN_NOTICE_777_SECONDS</div>
               <!--<div class="divider"></div>-->
             </form>
           </div>
@@ -86,49 +86,49 @@
             <div class="card text-white bg-dark"> <!-- Get New Address card start -->
               <div class="card-header">
                 <div class="text-center mb-2">
-                  <h4>If you dont like the seed or address displayed, just click to make a different one</h4>
+                  <h4>$LOGIN_SEED_GEN_H4</h4>
 
                   <div class="row justify-content-md-center">
                   <form class="form-row" action="$URL/method/index" method="get">
                       <div class="col-auto">
                         <select class="custom-select mr-sm-2" id="lang" name="lang">
-                          <option value="" selected>Select Seed Language </option>
+                          <option value="" selected>$LOGIN_SEED_LANG</option>
                           <option value="english">English</option>
-                          <option value="french">French</option>
-                          <option value="italian">Italian</option>
-                          <option value="chinese_simplified">Chinese (Simplified)</option>
-                          <option value="chinese_traditional">Chinese (Traditional)</option>
-                          <option value="japanese">Japanese</option>
-                          <option value="korean">Korean</option>
-                          <option value="russian">Russian</option>
-                          <option value="spanish">Spanish</option>
+                          <option value="french">Français</option>
+                          <option value="italian">Italiano</option>
+                          <option value="chinese_simplified">简体中文</option>
+                          <option value="chinese_traditional">中國傳統的</option>
+                          <option value="japanese">日本人</option>
+                          <option value="korean">한국어</option>
+                          <option value="russian">русский</option>
+                          <option value="spanish">Español</option>
                         </select>
                       </div>
                       <div class="col-auto">
-                        <button class="btn btn-info mr-sm-2" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">Generate New Address</button>
+                        <button class="btn btn-info mr-sm-2" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">$LOGIN_BTN_GEN_ADDR</button>
                       </div>
                   </form>
                   </div>
                 </div>
               </div>
               <div class="card-body"> <!-- Get New Address card body start -->
-                <div class="alert alert-danger" role="alert"><b>IMPORTANT NOTICE: </b>Please take backup of both your "Wallet Seed" and the "Private Key" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing Seed/WIF/Private key. You HAVE to use this address's Walelt Seed or WIF/Private key to login, view transactions and use it's funds.</div>
+                <div class="alert alert-danger" role="alert">$LOGIN_SEED_NOTICE</div>
                 <dl class="row" style="background-color: #00000024; padding: 10px 0;">
-                  <dt class="col-sm-3">Wallet Seed:<br><span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
+                  <dt class="col-sm-3">$LOGIN_WALLET_SEED:<br><span class="badge badge-info">$LOGIN_COPY_IT</span> <span class="badge badge-danger">$LOGIN_VERY_IMP</span></dt>
                   <dd class="col-sm-9"><pre class="text-break text-wrap text-white mb-0">$WALLETSEED</pre>
-                    <small id="nspvWifHelp" class="form-text text-muted mb-2 mt-0">Take backup this Wallet Seed.</small></dd>
+                    <small id="nspvWifHelp" class="form-text text-muted mb-2 mt-0">$LOGIN_SEED_HELP</small></dd>
 
-                  <dt class="col-sm-3">Here is your new address:</dt>
+                  <dt class="col-sm-3">$LOGIN_NEW_ADDR:</dt>
                   <dd class="col-sm-9"><pre class="text-break text-wrap text-white mb-0" style="font-size: 120%;">$NEW_WALLETADDR</pre></dd>
                   
                 </dl>
-                <h4>Advanced Info:</h4>
+                <h4>$LOGIN_SEED_ADVANCE_INFO:</h4>
                 <dl class="row" style="margin-bottom: 0; background-color: #00000024; padding: 10px 0;">
-                  <dt class="col-sm-3">Private Key (WIF Key):<br><span class="badge badge-info">COPY IT!</span> <span class="badge badge-danger">VERY IMPORTANT</span></dt>
+                  <dt class="col-sm-3">$LOGIN_PRIV_KEY:<br><span class="badge badge-info">$LOGIN_COPY_IT</span> <span class="badge badge-danger">$LOGIN_VERY_IMP</span></dt>
                   <dd class="col-sm-9"><pre class="text-break text-wrap text-white mb-0">$NEW_WIFKEY</pre>
-                    <small id="nspvWifHelp" class="form-text text-muted mb-2 mt-0">Take backup this Private Key (WIF Key).</small></dd>
+                    <small id="nspvWifHelp" class="form-text text-muted mb-2 mt-0">$LOGIN_PRIVKEY_HELP</small></dd>
 
-                  <dt class="col-sm-3" style="margin-bottom: 0;">Public Key</dt>
+                  <dt class="col-sm-3" style="margin-bottom: 0;">$LOGIN_PUB_KEY</dt>
                   <dd class="col-sm-9" style="margin-bottom: 0;"><pre class="text-break text-wrap text-white mb-0" style="margin-bottom: 0;">$NEW_PUBKEY</pre></dd>
                 </dl>
               </div> <!-- Get New Address card body end -->
@@ -141,26 +141,34 @@
         <div class="col-md-6 col-sm-12" style="display: $LOGINDISPLAY;">
           <div class="card text-white bg-dark"> <!-- Create login image card start -->
             <div class="card-header">
-              <h4>Account Settings</h4>
+              <h4>$ACCOUNT_SETTINGS</h4>
             </div>
             <div class="card-body">
               <form>
                 <div class="form-group row">
-                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">Session</label>
+                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">$ACCOUNT_SESSION</label>
                   <div class="col-auto">
-                    <label class="col-form-label">Your login session will expire in $AUTOLOGOUT seconds.</label>
+                    <label class="col-form-label">$ACCOUNT_EXPIRE_IN $AUTOLOGOUT $ACCOUNT_SECONDS</label>
                   </div>
                 </div>
                 <div class="form-group row">
-                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">Wallet Language</label>
+                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">$ACCOUNT_WALLETLANG</label>
                   <div class="col pr-sm-1">
                     <select class="custom-select mr-sm-2" id="walletlang" name="walletlang">
-                      <option value="" selected>Select Wallet Language </option>
-                      $WALLET_LANG_OPTIONS_LIST
+                      <option value="" selected>$ACCOUNT_SELECT_WALLETLANG</option>
+                      <option value="english">English</option>
+                      <option value="french">Français</option>
+                      <option value="italian">Italiano</option>
+                      <option value="chinese_simplified">简体中文</option>
+                      <option value="chinese_traditional">中國傳統的</option>
+                      <option value="japanese">日本人</option>
+                      <option value="korean">한국어</option>
+                      <option value="russian">русский</option>
+                      <option value="spanish">Español</option>
                     </select> 
                   </div>
                   <div class="col pl-sm-1">
-                    <button class="btn btn-primary mr-sm-2" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">Change</button>
+                    <button class="btn btn-primary mr-sm-2" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">$ACCOUNT_CHANGE</button>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -175,14 +183,15 @@
             <div class="card text-white bg-dark"> <!-- Create login image card start -->
               <form action="$URL/method/index?nexturl=createimage" method="get">
                 <div class="card-header">
-                  <h4>Create secure login image</h4>
+                  <h4>$ACCOUNT_CREATE_LOGIN_IMG</h4>
                 </div>
               <div class="card-body"> <!-- Create login image card body start -->
                 <div class="alert alert-success" role="alert">
+                  <b>$ACCOUNT_INSTRUC</b>
                   <ol class="mb-0">
-                    <li>Select a large size .jpg image file on your device.</li>
-                    <li>Fill in a strong password. Ideally a combination of alphabets, numbers and special characters.</li>
-                    <li>When ready, press "Make Secure Image" button to proceed.</li>
+                    <li>$ACCOUNT_STEP01</li>
+                    <li>$ACCOUNT_STEP02</li>
+                    <li>$ACCOUNT_STEP03</li>
                   </ol>
                 </div>
                 
@@ -191,17 +200,17 @@
                   <input type="text" name="nexturl" hidden value="createimage">
                 <div class="">
                   <input type="file" name="fname" id="fname" accept=".jpg" style="margin: 10px 10px 10px 0;">
-                  <small id="nspvImageFileHelp" class="form-text text-muted">Select a .jpg image file from your device</small>
+                  <small id="nspvImageFileHelp" class="form-text text-muted">$ACCOUNT_JPG_HELP</small>
                 </div>
                 <div class="">
-                  <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="Password">
-                  <small id="nspvImageFileWifHelp" class="form-text text-muted">Password for the selected image file.</small>
+                  <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="$ACCOUNT_PASSWORD">
+                  <small id="nspvImageFileWifHelp" class="form-text text-muted">$ACCOUNT_PASS_HELP</small>
                 </div>
               </div>
                 
               </div> <!-- Create login image card body end -->
               <div class="card-footer">
-                <button class="btn btn-info" type="submit">Make Secure Image</button>
+                <button class="btn btn-info" type="submit">$ACCOUNT_BTN_MAKE_IMG</button>
               </div>
               </form>
             </div> <!-- Create login image card end -->
