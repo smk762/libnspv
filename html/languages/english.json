@@ -161,7 +161,7 @@
 			{ "CHANGE": "Change"},
 			{ "CREATE_LOGIN_IMG": "Create secure login image"},
 			{ "INSTRUC": "INSTRUCTIONS"},
-			{ "STEP01": "Select a large size .jpg image file on your device."},
+			{ "STEP01": "Select a .jpg image file on your device that is larger than 64kb."},
 			{ "STEP02": "Fill in a strong password. Ideally a combination of alphabets, numbers and special characters."},
 			{ "STEP03": "When ready, press \"Make Secure Image\" button to proceed."},
 			{ "PASSWORD": "Password"},
