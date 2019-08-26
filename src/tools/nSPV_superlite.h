@@ -1050,10 +1050,16 @@ cJSON *NSPV_addnode(btc_spv_client *client,char *ipaddr)
 
 cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
 {
+    static char *lastlang;
     cJSON *result = cJSON_CreateObject(); size_t sz; btc_key key; btc_pubkey pubkey; char address[64],pubkeystr[67],wifstr[100]; bits256 privkey;
     btc_random_bytes(key.privkey,32,0);
     if ( lang == 0 || lang[0] == 0 )
-        lang = NSPV_language;
+    {
+        if ( (lang= lastlang) == 0 )
+            lang = NSPV_language;
+    }
+    if ( lang != 0 )
+        lastlang = lang;
     privkey =  NSPV_bits_to_seed(key.privkey,lang);
     memcpy(key.privkey,privkey.bytes,sizeof(privkey));
 
