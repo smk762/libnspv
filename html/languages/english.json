@@ -117,6 +117,19 @@
 			{ "INPUT_HEX": "Input hex string here" },
 			{ "HEX_STR_HELP": "You can broadcast a transaction to network without login if you have the transaction hex made through other source." }]
 	},
+	{ "PEERS": [
+			{ "INFO": "Connected Peers Info"},
+			{ "NODEID": "nodeid"},
+			{ "IPADDR": "IP Address"},
+			{ "PORT": "Port"},
+			{ "LASTPING": "Last Ping"},
+			{ "CONNSTART": "Time Started Conn."},
+			{ "LASTREQ": "Time Last Req."},
+			{ "SERVICES": "Services"},
+			{ "MISBEHAVE": "Missbehave Score"},
+			{ "BEST_HEIGHT": "Best Known Height"},
+			{ "IN_SYNC": "In Sync"}]
+	},
 	{ "ERROR": [
 			{ "OOPS": "Opps! Something went wrong..."},
 			{ "ERR": "Error"}]
