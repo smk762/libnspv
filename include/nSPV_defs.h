@@ -26,6 +26,7 @@
 #define NSPV_KOMODO_ENDOFERA 7777777
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
 #define NSPV_MAX_BLOCK_HEADERS 128
+#define NSPV_GETADDRESS_TIMEOUT 600
 
 #include <time.h>
 #ifndef __MINGW
@@ -235,7 +236,7 @@ bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr);
 extern int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 extern int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
 extern int32_t NSPV_periodic(btc_node *node);
-extern int32_t check_headers();
+extern int32_t check_headers(int32_t dispflag);
 extern void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
 extern uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight);
 extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);

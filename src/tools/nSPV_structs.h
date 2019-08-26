@@ -590,7 +590,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     else 
     {
         jaddstr(result,"sync_status", "not_synced");
-        jaddnum(result,"estimated_headers_left", check_headers());
+        jaddnum(result,"estimated_headers_left", check_headers(1));
     }
     
     return(result);
