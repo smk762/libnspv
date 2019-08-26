@@ -1059,7 +1059,6 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
             lang = NSPV_language;
         else lang = lastlang;
     }
-    fprintf(stderr,"%p lang.(%s) lastlang.(%s)\n",lang,lang,lastlang);
     if ( lang != lastlang )
         strcpy(lastlang,lang);
     privkey =  NSPV_bits_to_seed(key.privkey,lang);
