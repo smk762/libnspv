@@ -1,45 +1,45 @@
 [
-	"LANGINFO": {
-		"NAME": "English (US)",
-		"AUTHOR": "Satinder Grewal",
-		"AUTHOR_EMAIL": "satinder@komodoplatform.com"
+    { "LANGINFO": [
+        { "NAME": "English (US)" },
+        { "AUTHOR": "Satinder Grewal" },
+        {"AUTHOR_EMAIL": "satinder@komodoplatform.com" }]
 	},
-	"COMMON": {
-		"BTN_SEND": "Send",
-		"BTN_UPDATE": "Update",
-		"BTN_REFRESH": "Refresh",
-		"LABEL_REWARDS": "Rewards"
+    { "COMMON": [
+        { "BTN_SEND": "Send" },
+        { "BTN_UPDATE": "Update" },
+        { "BTN_REFRESH": "Refresh" },
+        { "LABEL_REWARDS": "Rewards" } ]
 	},
-	"MENU": {
-		"MENU_WALLET": "Wallet",
-		"MENU_INFO": "Info",
-		"MENU_PEERS": "Peers",
-		"MENU_ACCOUNT": "Account",
-		"MENU_LOGOUT": "Logout"
+    { "MENU": [
+        { "MENU_WALLET": "Wallet" },
+        { "MENU_INFO": "Info" },
+        { "MENU_PEERS": "Peers" },
+        { "MENU_ACCOUNT": "Account" },
+        { "MENU_LOGOUT": "Logout" } ]
 	},
-	"COININFO":{
-		"LABEL_COIN": "Coin",
-		"LABEL_BALANCE": "Balance",
-		"LABEL_YOUR_ADDRESS": "Your Address"
+    { "COININFO": [
+        { "LABEL_COIN": "Coin" },
+        { "LABEL_BALANCE": "Balance" },
+        { "LABEL_YOUR_ADDRESS": "Your Address" } ]
 	},
-	"LOGIN": {
-		"BTN_LOGIN_IMG_PASS": "Login with image + password",
-		"BTN_LOGIN_SEED_WIF": "Login with Wallet Seed or WIF Key",
-		"PLACEHOLDER_WIF_SEED": "WIF Key or Wallet Seed"
+    { "LOGIN": [
+        { "BTN_LOGIN_IMG_PASS": "Login with image + password" },
+        { "BTN_LOGIN_SEED_WIF": "Login with Wallet Seed or WIF Key" },
+        { "PLACEHOLDER_WIF_SEED": "WIF Key or Wallet Seed" } ]
 	},
-	"SEND":{
-		"LABEL_FROM": "From Address",
-		"LABEL_TO": "To Address",
-		"LABEL_AMOUNT_INFO": "Amount Info",
-		"LABEL_AMOUNT": "Amount",
-		"LABEL_FEES": "Transaction Fees",
-		"LABEL_TOTAL_AMOUNT": "Total amount being sent",
-		"LABEL_CHANGE_AMOUNT": "Change Amount",
-		"LABEL_REWARDS_INFO": "Rewards Info",
-		"LABEL_VALIDATED": "Validated",
-		"LABEL_TXID": "txid",
-		"LABEL_HEX": "hex",
-		"BTN_BROADCAST_TX": "Broadcast Transaction",
-		"BTN_CREATE_TX": "Create Transaction"
+    { "SEND":[
+        { "LABEL_FROM": "From Address" },
+        { "LABEL_TO": "To Address" },
+        { "LABEL_AMOUNT_INFO": "Amount Info" },
+        { "LABEL_AMOUNT": "Amount" },
+        { "LABEL_FEES": "Transaction Fees" },
+        { "LABEL_TOTAL_AMOUNT": "Total amount being sent" },
+        { "LABEL_CHANGE_AMOUNT": "Change Amount" },
+        { "LABEL_REWARDS_INFO": "Rewards Info" },
+        { "LABEL_VALIDATED": "Validated" },
+        { "LABEL_TXID": "txid" },
+        { "LABEL_HEX": "hex" },
+        { "BTN_BROADCAST_TX": "Broadcast Transaction" },
+        { "BTN_CREATE_TX": "Create Transaction" } ]
 	}
 ]
