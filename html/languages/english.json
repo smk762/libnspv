@@ -62,7 +62,14 @@
 	},
 	{ "WALLET": [
 			{ "UNCONF_TX": "Unconfirmed Transactions" },
-			{ "HISTORY_TX": "Transaction History" }]
+			{ "HISTORY_TX": "Transaction History" },
+			{ "TYPE": "Type"},
+			{ "DEST": "Destination"},
+			{ "AMOUNT": "Amount"},
+			{ "TXID": "TxID"},
+			{ "DIRECTION": "Direction"},
+			{ "CONFS": "Confs."},
+			{ "HEIGHT": "Height"}]
 	},
 	{ "INFO": [
 			{ "NET_INFO": "Network Info" },
