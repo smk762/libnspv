@@ -60,6 +60,7 @@ typedef struct btc_node_group_ {
     vector* nodes; /* the groups nodes */
     char clientstr[1024];
     int desired_amount_connected_nodes;
+    int32_t NSPV_num_connected_nodes;
     const btc_chainparams* chainparams;
 
     /* callbacks */
