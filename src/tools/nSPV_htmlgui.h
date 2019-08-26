@@ -698,6 +698,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     {
                         array = jitem(langjson,i);
                         aname = get_cJSON_fieldname(array);
+                        array = jobj(array,aname);
                         fprintf(stderr,"(%s)\n",jprint(array,0));
                         if ( (m= cJSON_GetArraySize(array)) > 0 )
                         {
