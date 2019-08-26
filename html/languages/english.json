@@ -105,7 +105,7 @@
 			{ "NET_OUT": "Network Bytes Sent" },
 			{ "NOTARI_BLKHASH": "Notarized Blockhash" },
 			{ "NOTARI_TXID": "Notarized Txid" },
-			{ "NOTARI_TX_ID_HEIGHT": "Notarization Txid Height" },
+			{ "NOTARI_TXID_HEIGHT": "Notarization Txid Height" },
 			{ "NOTARI_DEST_TXID": "Notarization Destination Txid" },
 			{ "HEADER": "Header" },
 			{ "BLKHASH": "Blockhash" },

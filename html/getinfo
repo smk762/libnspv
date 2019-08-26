@@ -117,7 +117,7 @@
                       <td><a href="$URL/method/txidinfo?txid=$NTZTXID&height=$NTZTXIDHT&vout=0&nexturl=txidinfo" class="text-break text-wrap">$NTZTXID</a></td>
                     </tr>
                     <tr>
-                      <td scope="row">$INFO_NOTARI_TX_ID_HEIGHT</td>
+                      <td scope="row">$INFO_NOTARI_TXID_HEIGHT</td>
                       <td>$NTZTXIDHT</td>
                     </tr>
                     <tr>
