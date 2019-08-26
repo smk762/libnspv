@@ -156,7 +156,7 @@
                   <div class="col pr-sm-1">
                     <select class="custom-select mr-sm-2" id="walletlang" name="walletlang">
                       <option value="" selected>Select Wallet Language </option>
-                      $WALLET_LANG_OPTIONS_LIST
+                      <option value="english">English</option>
                     </select> 
                   </div>
                   <div class="col pl-sm-1">
