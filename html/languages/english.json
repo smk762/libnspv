@@ -96,6 +96,6 @@
 			{ "NBITS": "nBits" },
 			{ "HEXSTR": "Hex string" },
 			{ "INPUT_HEX": "Input hex string here" },
-			{ "HEXSTR_HELP": "You can broadcast a transaction to network without login if you have the transaction hex made through other source." }]
+			{ "HEX_STR_HELP": "You can broadcast a transaction to network without login if you have the transaction hex made through other source." }]
 	}
 ]

@@ -208,7 +208,7 @@
                 <div class="form-group">
                   <label for="nspv_hexstring">$INFO_HEXSTR</label>
                   <input type="text" class="form-control" id="nspv_hexstring" name="hex" aria-describedby="nspvWifHelp" placeholder="$INFO_INPUT_HEX">
-                  <small id="nspvWifHelp" class="form-text text-muted">$INFO_HEXSTR_HELP</small>
+                  <small id="nspvWifHelp" class="form-text text-muted">$INFO_HEX_STR_HELP</small>
                 </div>
                 <button type="submit" class="btn btn-primary">$SEND_BTN_BROADCAST_TX</button>
               </form>
