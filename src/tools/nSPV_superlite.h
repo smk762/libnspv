@@ -326,7 +326,7 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     if ( NSPV_inforesult.hdrheight > NSPV_longestchain )
                         NSPV_longestchain = NSPV_inforesult.hdrheight;
                 }
-                if ( I.height > from->bestknownheight )
+                if ( I.height > (int32_t)from->bestknownheight )
                     from->bestknownheight = I.heught;
                 if ( (lag= I.height-NSPV_inforesult.height) > 0 )
                 {
