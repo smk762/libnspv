@@ -580,6 +580,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
         jaddnum(result,"wifexpires",expiration);
     }
     jaddnum(result,"height",ptr->height);
+    jaddnum(result,"longestchain",NSPV_longestchain);
     jaddbits256(result,"chaintip",ptr->blockhash);
     jadd(result,"notarization",NSPV_ntz_json(&ptr->notarization));
     jadd(result,"header",NSPV_header_json(&ptr->H,ptr->hdrheight));

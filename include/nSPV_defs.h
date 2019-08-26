@@ -26,7 +26,6 @@
 #define NSPV_KOMODO_ENDOFERA 7777777
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
 #define NSPV_MAX_BLOCK_HEADERS 128
-#define NSPV_GETADDRESS_TIMEOUT 600
 
 #include <time.h>
 #ifndef __MINGW
@@ -270,7 +269,7 @@ extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 10];
 extern struct NSPV_ntz NSPV_lastntz;
 extern struct NSPV_header NSPV_blockheaders[128]; // limitation here is that 100 block history is maximum. no nota for 100 blocks and we cant sync back to the notarizatio, we can wait for the next one. 
 extern int32_t NSPV_num_headers;
-extern int32_t NSPV_hdrheight_counter;
+extern int32_t NSPV_hdrheight_counter,NSPV_longestchain;
 extern int32_t IS_IN_SYNC;
 extern int64_t NSPV_totalsent,NSPV_totalrecv;
 
