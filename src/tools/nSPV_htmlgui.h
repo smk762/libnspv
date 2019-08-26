@@ -181,6 +181,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         free(bigbuf);
         return(filestr);
     }
+    fprintf(stderr,"do the expand\n");
     // == Menu Buttons array variables ==
     // $MENU_BUTTON_ARRAY - Main array variable defined in ALL pages to show buttons conditionally
     //
@@ -690,6 +691,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         sprintf(langfname,"html/languages/%s.json",NSPV_language);
         if ( (langstr= OS_filestr(&fsize,langfname)) != 0 )
         {
+            fprintf(stderr,"%s opened\n",langfname);
             if ( (langjson= cJSON_Parse(langstr)) != 0 )
             {
                 if ( (n= cJSON_GetArraySize(langjson)) > 0 )
