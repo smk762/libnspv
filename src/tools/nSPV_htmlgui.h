@@ -686,7 +686,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $ERROR_OUTPUT - use it for displaying any error
 
     {
-        char langfname[256]; char *langstr,*aname,*field; long fsize; int32_t j,m; cJSON *langjson,*array,*item,*map;
+        char langfname[256]; char *langstr,*aname,*field,var[512]; long fsize; int32_t j,m; cJSON *langjson,*array,*item,*map;
         sprintf(langfname,"html/languages/%s.json",NSPV_language);
         if ( (langstr= OS_filestr(&fsize,langfname)) != 0 )
         {
@@ -699,15 +699,14 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                         array = jitem(langjson,i);
                         aname = get_cJSON_fieldname(array);
                         array = jobj(array,aname);
-                        fprintf(stderr,"(%s)\n",jprint(array,0));
                         if ( (m= cJSON_GetArraySize(array)) > 0 )
                         {
                             for (j=0; j<m; j++)
                             {
                                 map = jitem(array,j);
-                                fprintf(stderr,"(%s)\n",jprint(map,0));
                                 field = get_cJSON_fieldname(map);
-                                fprintf(stderr,"$%s_%s -> (%s)\n",aname,field,jstr(map,field));
+                                sprintf(var,"$%s_%s",aname,field);
+                                NSPV_expand_variable(bigbuf,&filestr,var,jstr(map,field));
                             }
                         }
                     }
