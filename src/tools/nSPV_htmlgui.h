@@ -256,7 +256,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         
         sprintf(replacestr,"%08x",NSPV_PROTOCOL_VERSION);
         NSPV_expand_variable(bigbuf,&filestr,"$PROTOVER",replacestr);
-        sprintf(replacestr,"%u", NSPV_inforesult.height);
+        sprintf(replacestr,"%u", NSPV_longestchain);
         NSPV_expand_variable(bigbuf,&filestr,"$CURHEIGHT",replacestr);
         
         sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);
@@ -402,7 +402,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $PEER_INSYNC - In Sync
     else if ( strcmp(method,"getpeerinfo") == 0 )
     {
-        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; long fsize;
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; long fsize; int32_t lastht;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
             if ( (retjson= NSPV_getpeerinfo(NSPV_client)) != 0 )
@@ -432,7 +432,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
                             sprintf(replacestr,"%u",juint(item,"bestknownheight"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_BESTKNOWNHT",replacestr);
-                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",jstr(item,"in_sync"));
+                            lastht = juint(item,"last_validated_header");
+                            sprintf(replacestr,"%u",lastht);
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",replacestr);
                             strcat(itemsbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
@@ -683,6 +685,37 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
 
+    {
+        char langfname[256]; char *langstr,*aname,*field,var[512]; long fsize; int32_t j,m; cJSON *langjson,*array,*item,*map;
+        sprintf(langfname,"html/languages/%s.json",NSPV_language);
+        if ( (langstr= OS_filestr(&fsize,langfname)) != 0 )
+        {
+            if ( (langjson= cJSON_Parse(langstr)) != 0 )
+            {
+                if ( (n= cJSON_GetArraySize(langjson)) > 0 )
+                {
+                    for (i=0; i<n; i++)
+                    {
+                        array = jitem(langjson,i);
+                        aname = get_cJSON_fieldname(array);
+                        array = jobj(array,aname);
+                        if ( (m= cJSON_GetArraySize(array)) > 0 )
+                        {
+                            for (j=0; j<m; j++)
+                            {
+                                map = jitem(array,j);
+                                field = get_cJSON_fieldname(map);
+                                sprintf(var,"$%s_%s",aname,field);
+                                NSPV_expand_variable(bigbuf,&filestr,var,jstr(map,field));
+                            }
+                        }
+                    }
+                }
+                free_json(langjson);
+            } else fprintf(stderr,"cant parse (%s)\n",langstr);
+            free(langstr);
+        } else fprintf(stderr,"cant open (%s)\n",langfname);
+    }
     free(bigbuf);
     return(filestr);
 }

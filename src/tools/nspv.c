@@ -68,7 +68,7 @@ static void print_version()
 static void print_usage()
 {
     print_version();
-    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-s[--timeout] <secs>) <command>\n");
+    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-l=langauge) (-s[--timeout] <secs>) <command>\n");
     printf("Supported commands:\n");
     printf("        scan      (scan blocks up to the tip, creates header.db file)\n");
     printf("\nExamples: \n");
@@ -117,15 +117,6 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "nSPV_htmlgui.h"
 #include "komodo_cJSON.c"
 #include "nSPV_rpc.h"
-
-/*
- Todo:
- mempool based pruning of utxos
- 
- cross chain superwallet (jaragua) -> blackjok3r
- add CC signing
- 
- */
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
 {
@@ -266,6 +257,13 @@ int main(int argc, char* argv[])
             {
                 NSPV_externalip = clonestr(optarg+1);
                 fprintf(stderr,"set external ip to %s\n",NSPV_externalip);
+            }
+            break;
+        case 'l':
+            if ( optarg != 0 )
+            {
+                strcpy(NSPV_language,optarg+1);
+                fprintf(stderr,"set language to (%s)\n",NSPV_language);
             }
             break;
         case 'f':
