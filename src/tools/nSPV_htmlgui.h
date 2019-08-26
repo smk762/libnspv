@@ -187,7 +187,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // Top menu buttons HTML tags variables to use with
     // conditional logic to show/hide in cases when user is logged in or logged out
     //
-     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" href=\"$URL/method/wallet?nexturl=wallet\">Wallet</a> <a class=\"btn btn-outline-info mr-sm-1\" href=\"$URL/method/getinfo?nexturl=info\">Info</a> <a class=\"btn btn-outline-secondary mr-sm-1\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">Peers</a> <a class=\"btn btn-outline-success mr-sm-1\" href=\"$URL/method/index?nexturl=index\">Account</a> <a class=\"btn btn-outline-danger mr-sm-1\" href=\"$URL/method/logout?nexturl=index\">Logout</a>");
+     NSPV_expand_variable(bigbuf,&filestr,"$MENU_BUTTON_ARRAY","<a class=\"btn btn-outline-primary mr-sm-1\" href=\"$URL/method/wallet?nexturl=wallet\">$MENU_MENU_WALLET</a> <a class=\"btn btn-outline-info mr-sm-1\" href=\"$URL/method/getinfo?nexturl=info\">$MENU_MENU_INFO</a> <a class=\"btn btn-outline-secondary mr-sm-1\" href=\"$URL/method/getpeerinfo?nexturl=peerinfo\">$MENU_MENU_PEERS</a> <a class=\"btn btn-outline-success mr-sm-1\" href=\"$URL/method/index?nexturl=index\">$MENU_MENU_ACCOUNT</a> <a class=\"btn btn-outline-danger mr-sm-1\" href=\"$URL/method/logout?nexturl=index\">$MENU_MENU_LOGOUT</a>");
 
     // == Coin specific gloabal variable
     // $COINNAME - Display name from the "coins" file. The JSON object "fname" need to be used to display full name of the coin
@@ -256,7 +256,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         
         sprintf(replacestr,"%08x",NSPV_PROTOCOL_VERSION);
         NSPV_expand_variable(bigbuf,&filestr,"$PROTOVER",replacestr);
-        sprintf(replacestr,"%u", NSPV_inforesult.height);
+        sprintf(replacestr,"%u", NSPV_longestchain);
         NSPV_expand_variable(bigbuf,&filestr,"$CURHEIGHT",replacestr);
         
         sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);
@@ -402,7 +402,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $PEER_INSYNC - In Sync
     else if ( strcmp(method,"getpeerinfo") == 0 )
     {
-        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; long fsize;
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; long fsize; int32_t lastht;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
             if ( (retjson= NSPV_getpeerinfo(NSPV_client)) != 0 )
@@ -432,7 +432,9 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
                             sprintf(replacestr,"%u",juint(item,"bestknownheight"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_BESTKNOWNHT",replacestr);
-                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",jstr(item,"in_sync"));
+                            lastht = juint(item,"last_validated_header");
+                            sprintf(replacestr,"%u",lastht);
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",replacestr);
                             strcat(itemsbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
@@ -675,9 +677,43 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     sprintf(replacestr,"%d",NSPV_AUTOLOGOUT - (int32_t)(time(NULL)-NSPV_logintime));
     NSPV_expand_variable(bigbuf,&filestr,"$AUTOLOGOUT",replacestr);
 
+    // == Account Settings ==
+    // $WALLET_LANG_OPTIONS_LIST - main array to list languages in drop down options
+    // $WALLETLANG - name of the language file
+    // $WALLETLANG_NAME - name from the language file. From key Langinfo.name
+
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
 
+    {
+        char langfname[256]; char *langstr,*aname,*field; long fsize; int32_t j,m; cJSON *langjson,*array,*item,*map;
+        sprintf(langfname,"html/languages/%s.json",NSPV_language);
+        if ( (langstr= OS_filestr(&fsize,langfname)) != 0 )
+        {
+            if ( (langjson= cJSON_Parse(langstr)) != 0 )
+            {
+                if ( (n= cJSON_GetArraySize(langjson)) > 0 )
+                {
+                    for (i=0; i<n; i++)
+                    {
+                        array = jitem(langjson,i);
+                        aname = get_cJSON_fieldname(array);
+                        if ( (m= cJSON_GetArraySize(array)) > 0 )
+                        {
+                            for (j=0; j<m; j++)
+                            {
+                                map = jitem(array,j);
+                                field = get_cJSON_fieldname(map);
+                                fprintf(stderr,"$%s_%s -> (%s)\n",aname,field,jstr(map,field));
+                            }
+                        }
+                    }
+                }
+                free_json(langjson);
+            }
+            free(langstr);
+        }
+    }
     free(bigbuf);
     return(filestr);
 }

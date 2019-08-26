@@ -36,7 +36,7 @@ void expand_ipbits(char *ipaddr,uint64_t ipbits);
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump);
 
 uint32_t NSPV_logintime,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
-int32_t NSPV_didfirsttxproofs;
+int32_t NSPV_didfirsttxproofs,NSPV_longestchain;
 char NSPV_tmpseed[4096],NSPV_walletseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 char NSPV_language[64] = { "english" };
 
@@ -333,6 +333,10 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
                     NSPV_num_headers++;
                 }
+                if ( I.height > (int32_t)from->bestknownheight )
+                    from->bestknownheight = I.height;
+                if ( I.height > NSPV_longestchain )
+                    NSPV_longestchain = I.height;
                 if ( (lag= I.height-NSPV_inforesult.height) > 0 )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d lag.%i\n",timestamp,len,NSPV_inforesult.height,lag);
@@ -495,7 +499,7 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
             jaddnum(node_json,"time_last_request",(int64_t)node->time_last_request);
             jaddnum(node_json,"services",(int64_t)node->nServices);
             jaddnum(node_json,"missbehavescore",(int64_t)node->banscore);
-            jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight);
+            jaddnum(node_json,"bestknownheight",(int64_t)node->bestknownheight); 
             jaddnum(node_json,"last_validated_header", (int64_t)node->lastvalidatedheight);
             jaddi(result,node_json);     
         }

@@ -16,13 +16,13 @@
       <a class="navbar-brand"><img src="images/antara150x150.png" class="logo"/> Antara Superlite</a>
       <form class="form-row send_form" action="$URL/method/send_confirm" method="get">
           <div class="col-lg-6 col-sm-6 col-xs-12">
-            <input class="form-control form-control-sm" type="text" placeholder="Address" name="address" aria-label="ToAddress">
+            <input class="form-control form-control-sm" type="text" placeholder="$SEND_LABEL_TO" name="address" aria-label="ToAddress">
           </div>
           <div class="col-lg-3 col-sm-3 col-xs-3">
-            <input class="form-control form-control-sm" type="text" placeholder="Amount" name="amount" aria-label="SendAmount">
+            <input class="form-control form-control-sm" type="text" placeholder="$SEND_LABEL_AMOUNT" name="amount" aria-label="SendAmount">
           </div>
           <div class="col-lg-3 col-lg-3 col-xs-3">
-          <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">Send $COIN</button>
+          <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">$COMMON_BTN_SEND $COIN</button>
         </div>
       </form>
       <form class="form-inline">
@@ -38,10 +38,10 @@
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
                 <div class="row">
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>Coin:</b><br> $COINNAME ($COIN)<br></span>
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>Balance:</b><br> $BALANCE $COIN</span>
-                  <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>Rewards:</b><br> $REWARDS $COIN</span>
-                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>Your Address:</b><br> $WALLETADDR</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>$COMMON_LABEL_REWARDS:</b><br> $REWARDS $COIN</span>
+                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$COININFO_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
                 </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
@@ -58,7 +58,7 @@
                     <h6 class="card-title" style="vertical-align: ">Confirm Details before sending</h6>
                   </div>
                   <div class="col-md-6 col-sm-6 col-xs-6 text-right">
-                    <button type="submit" class="btn btn-primary">Broadcast Transaction</button>
+                    <button type="submit" class="btn btn-primary">$SEND_BTN_BROADCAST_TX</button>
                   </div>
                 </div>
               </div> <!-- Send page header end -->
@@ -74,41 +74,41 @@
                         </td>
                       </tr>
                       <tr style="display: $REWARDS_DISPLAY_KMD;">
-                        <th>Rewards Info</th>
+                        <th>$SEND_LABEL_REWARDS_INFO</th>
                         <td>
                           <div class="row">
-                            <div class="col-md-6">Rewards<br>$REWARDSEXT $COIN</div>
-                            <div class="col-md-6"><b>Validated</b><br>$REWARDSVLD $COIN
+                            <div class="col-md-6">$COMMON_LABEL_REWARDS<br>$REWARDSEXT $COIN</div>
+                            <div class="col-md-6"><b>$SEND_LABEL_VALIDATED</b><br>$REWARDSVLD $COIN
                           <small id="validatedHelp" class="form-text text-muted">Locally calculated value of rewards to match with the value from network.</small></div>
                           </div>
                         </td>
                       </tr>
                       <tr>
-                        <th>From Address</th>
+                        <th>$SEND_LABEL_FROM</th>
                         <td>$WALLETADDR</td>
                       </tr>
                       <tr>
-                        <th>To Address</th>
+                        <th>$SEND_LABEL_TO</th>
                         <td colspan="3">$TOADDR</td>
                       </tr>
                       <tr>
-                        <th>Amount Info</th>
+                        <th>$SEND_LABEL_AMOUNT_INFO</th>
                         <td>
                           <div class="row">
-                            <div class="col-md-3">Amount<br>$SENDAMOUNT $COIN</div>
-                            <div class="col-md-3"><b>Transaction Fees</b><br>$TXFEE $COIN</div>
-                            <div class="col-md-3"><b>Total amount being sent</b><br>$TOTALAMOUNT $COIN</div>
-                            <div class="col-md-3"><b>Change Amount</b><br>$CHANGEAMOUNT $COIN</div>
+                            <div class="col-md-3">$SEND_LABEL_AMOUNT<br>$SENDAMOUNT $COIN</div>
+                            <div class="col-md-3"><b>$SEND_LABEL_FEES</b><br>$TXFEE $COIN</div>
+                            <div class="col-md-3"><b>$SEND_LABEL_TOTAL_AMOUNT</b><br>$TOTALAMOUNT $COIN</div>
+                            <div class="col-md-3"><b>$SEND_LABEL_CHANGE_AMOUNT</b><br>$CHANGEAMOUNT $COIN</div>
                           </div>
                         </td>
                       </tr>
                       <tr>
-                        <th>txid</th>
+                        <th>$SEND_LABEL_TXID</th>
                         <td class="text-break text-wrap">$SENDTXID
                           <small id="txidHelp" class="form-text text-muted">This <kbd>txid</kbd> will only be available on blockchain explorers after your broadcast the transaction to network.</small></td>
                       </tr>
                       <tr>
-                        <th>hex</th>
+                        <th>$SEND_LABEL_HEX</th>
                         <td>
                           <input type="text" class="form-control-plaintext text-white" id="hex" name="hex" aria-describedby="sendfromaddrHelp" value="$SENDHEX" readonly style="display: none;">
                           <pre class="text-break text-wrap text-white">$SENDHEX</pre>
