@@ -723,6 +723,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
     char *retstr,*method,*wifstr; long fsize; cJSON *retjson = 0;
     if ( filestr != 0 && apiflag == 0 )
     {
+        fprintf(stderr,"NSPV_JSON\n");
         if ( (method= jstr(argjson,"method")) != 0 )
         {
             if ( strcmp(method,"login") == 0 )
@@ -761,11 +762,9 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                     }
                 }
             }
+            fprintf(stderr,"expand\n");
             return(NSPV_expand_variables(calloc(4096,4096),filestr,method,argjson));
         }
-        //fprintf(stderr,"NSPV filestr.%s\n",filestr);
-        // extract data from retjson and put into filestr template
-        //return(filestr);
     }
     if ( (strcmp(remoteaddr,"127.0.0.1") != 0 && strcmp(remoteaddr,NSPV_externalip) != 0) || port == 0 )
         fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);
