@@ -704,7 +704,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             {
                                 map = jitem(array,j);
                                 field = get_cJSON_fieldname(map);
-                                fprintf(stderr,"$%s_%s -> (%s)\n",aname,field,jstr(field,map));
+                                fprintf(stderr,"$%s_%s -> (%s)\n",aname,field,jstr(map,field));
                             }
                         }
                     }
