@@ -116,5 +116,9 @@
 			{ "HEXSTR": "Hex string" },
 			{ "INPUT_HEX": "Input hex string here" },
 			{ "HEX_STR_HELP": "You can broadcast a transaction to network without login if you have the transaction hex made through other source." }]
+	},
+	{ "ERROR": [
+			{"OOPS": "Opps! Something went wrong..."},
+			{"ERR": "Error"}]
 	}
 ]

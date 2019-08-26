@@ -29,8 +29,8 @@
     <div class="container-fluid" style="margin-top: 15px;">
       <div class="row justify-content-md-center" style="margin-bottom: 1em;">
         <div class="col-12 text-center" style="margin-bottom: 10px;"> <!-- GetInfo div start -->
-            <h1>Opps! Something went wrong...</h1>
-            <h2>Error: </h2>
+            <h1>$ERROR_OOPS</h1>
+            <h2>$ERROR_ERR:</h2>
             <p>$ERROR_OUTPUT</p>
         </div> <!-- GetInfo div end -->
       </div>
