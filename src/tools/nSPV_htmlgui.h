@@ -432,7 +432,8 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
                             sprintf(replacestr,"%u",juint(item,"bestknownheight"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_BESTKNOWNHT",replacestr);
-                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",jstr(item,"in_sync"));
+                            sprintf(replacestr,"%u",juint(item,"last_validated_header"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",replacestr);
                             strcat(itemsbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);

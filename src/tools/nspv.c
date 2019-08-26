@@ -118,15 +118,6 @@ void spv_sync_completed(btc_spv_client* client) {
 #include "komodo_cJSON.c"
 #include "nSPV_rpc.h"
 
-/*
- Todo:
- mempool based pruning of utxos
- 
- cross chain superwallet (jaragua) -> blackjok3r
- add CC signing
- 
- */
-
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
 {
     btc_chainparams *chain = 0; char *filestr,*name,*seeds,*magic; int32_t i,n; cJSON *array,*coin; long filesize;
