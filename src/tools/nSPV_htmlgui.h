@@ -181,7 +181,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         free(bigbuf);
         return(filestr);
     }
-    fprintf(stderr,"do the expand\n");
     // == Menu Buttons array variables ==
     // $MENU_BUTTON_ARRAY - Main array variable defined in ALL pages to show buttons conditionally
     //
@@ -691,7 +690,6 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         sprintf(langfname,"html/languages/%s.json",NSPV_language);
         if ( (langstr= OS_filestr(&fsize,langfname)) != 0 )
         {
-            fprintf(stderr,"%s opened\n",langfname);
             if ( (langjson= cJSON_Parse(langstr)) != 0 )
             {
                 if ( (n= cJSON_GetArraySize(langjson)) > 0 )
@@ -725,7 +723,6 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
     char *retstr,*method,*wifstr; long fsize; cJSON *retjson = 0;
     if ( filestr != 0 && apiflag == 0 )
     {
-        fprintf(stderr,"NSPV_JSON\n");
         if ( (method= jstr(argjson,"method")) != 0 )
         {
             if ( strcmp(method,"login") == 0 )
@@ -764,9 +761,11 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                     }
                 }
             }
-            fprintf(stderr,"expand\n");
             return(NSPV_expand_variables(calloc(4096,4096),filestr,method,argjson));
         }
+        //fprintf(stderr,"NSPV filestr.%s\n",filestr);
+        // extract data from retjson and put into filestr template
+        //return(filestr);
     }
     if ( (strcmp(remoteaddr,"127.0.0.1") != 0 && strcmp(remoteaddr,NSPV_externalip) != 0) || port == 0 )
         fprintf(stderr,"remoteaddr %s:%u\n",remoteaddr,port);

@@ -1,4 +1,4 @@
-{
+[
 	"LANGINFO": {
 		"NAME": "English (US)",
 		"AUTHOR": "Satinder Grewal",
@@ -42,4 +42,4 @@
 		"BTN_BROADCAST_TX": "Broadcast Transaction",
 		"BTN_CREATE_TX": "Create Transaction"
 	}
-}
+]
