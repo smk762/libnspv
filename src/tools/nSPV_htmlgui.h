@@ -256,7 +256,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
         
         sprintf(replacestr,"%08x",NSPV_PROTOCOL_VERSION);
         NSPV_expand_variable(bigbuf,&filestr,"$PROTOVER",replacestr);
-        sprintf(replacestr,"%u", NSPV_inforesult.height);
+        sprintf(replacestr,"%u", NSPV_longestchain);
         NSPV_expand_variable(bigbuf,&filestr,"$CURHEIGHT",replacestr);
         
         sprintf(replacestr,"%u", NSPV_inforesult.notarization.height);

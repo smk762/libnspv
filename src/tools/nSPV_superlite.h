@@ -323,11 +323,11 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     NSPV_blockheaders[NSPV_num_headers].blockhash = hdrhash;
                     NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
                     NSPV_num_headers++;
-                    if ( NSPV_inforesult.hdrheight > NSPV_longestchain )
-                        NSPV_longestchain = NSPV_inforesult.hdrheight;
                 }
                 if ( I.height > (int32_t)from->bestknownheight )
                     from->bestknownheight = I.height;
+                if ( I.height > NSPV_longestchain )
+                    NSPV_longestchain = I.height;
                 if ( (lag= I.height-NSPV_inforesult.height) > 0 )
                 {
                     fprintf(stderr,"got old info response %u size.%d height.%d lag.%i\n",timestamp,len,NSPV_inforesult.height,lag);
