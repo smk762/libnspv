@@ -12,32 +12,40 @@
     <title>Antara Superlite</title>
   </head>
   <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand"><img src="images/antara150x150.png" class="logo"/> Antara Superlite</a>
+      <form class="form-row send_form" action="$URL/method/send_confirm" method="get">
+          <div class="col-lg-6 col-sm-6 col-xs-12">
+            <input class="form-control form-control-sm" type="text" placeholder="$SEND_LABEL_TO" name="address" aria-label="ToAddress">
+          </div>
+          <div class="col-lg-3 col-sm-3 col-xs-3">
+            <input class="form-control form-control-sm" type="text" placeholder="$SEND_LABEL_AMOUNT" name="amount" aria-label="SendAmount">
+          </div>
+          <div class="col-lg-3 col-lg-3 col-xs-3">
+          <button class="btn btn-outline-warning btn-sm my-2 my-sm-0" type="submit">$COMMON_BTN_SEND $COIN</button>
+        </div>
+      </form>
+      <form class="form-inline">
+        $MENU_BUTTON_ARRAY
+        <!--<input class="form-control mr-sm-2" type="search" placeholder="Search Block, Txid, Address" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+      </form>
+    </nav>
 
-    <h1 class="text-center"><img src="images/antara150x150.png" style="width: 25px;" /> Antara Superlite</h1>
-    <div class="container-fluid">
+    <div class="container-fluid" style="margin-top: 15px;">
       <div class="row" style="margin-bottom: 1em;">
-        <div class="col-4" style="padding-right: 7.5px;"> <!-- coin info div start -->
+        <div class="col-12" style="padding-right: 7.5px;"> <!-- coin info div start -->
             <div class="card text-white bg-dark"> <!-- coin info card start -->
-              <div class="card-body"> <!-- coin info body start -->
-                <span>Coin: $COIN</span><br>
+              <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
+                <div class="row">
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>$COMMON_LABEL_REWARDS:</b><br> $REWARDS $COIN</span>
+                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$INFOCOIN_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
+                </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
         </div> <!-- coin info div end -->
-        <div class="col-8" style="padding-left: 7.5px;">
-          <div class="card text-white bg-dark"> <!-- wallet buttons card start -->
-            <div class="card-body text-right"> <!-- wallet buttons body start -->
-              <form> <!-- coin info buttons form start -->
-                <button class="btn btn-info btn-sm" formaction="$URL/method/getinfo?nexturl=info" formmethod="get">Info</button>
-                <button class="btn btn-warning btn-sm" formaction="$URL/method/getpeerinfo?nexturl=peerinfo" formmethod="get">Peer Info</button>
-                <button class="btn btn-primary btn-sm" formaction="$URL/method/getnewaddress?nexturl=genaddr" formmethod="get">Generate New Address</button>
-                <button class="btn btn-secondary btn-sm" formaction="$URL/method/wallet?nexturl=wallet" formmethod="get">Transactions</button>
-                <button class="btn btn-warning btn-sm" formaction="$URL/method/send?nexturl=send" formmethod="get">Send</button>
-                <button class="btn btn-danger btn-sm" formaction="$URL/method/logout?nexturl=login" formmethod="get">Logout</button>
-                <button class="btn btn-success btn-sm" formaction="$URL/method/login?nexturl=login" formmethod="get">Login</button>
-              </form> <!-- coin info buttons form end -->
-            </div> <!-- wallet buttons body end -->
-          </div> <!-- wallet buttons card start -->
-        </div>
       </div>
 
       <div class="row" style="margin-bottom: 1em;">
@@ -46,35 +54,37 @@
               <div class="card-header"> <!-- Send page header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
-                    <h6 class="card-title" style="vertical-align: ">Confirm Details before sending</h6>
+                    <h6 class="card-title" style="vertical-align: ">$SEND_CONF_DETAILS</h6>
                   </div>
                 </div>
               </div> <!-- Send page header end -->
-              <form action="$URL/method/send_validate?hex=0400008085202f890155c894ada147bf184bb7dff790ca429e6860775d3bb471dc0f69a28f080977e0010000006a47304402206774ff903a8a4b73bcd5a79fe5c744f34d2263160cd8877c198c2228c66a8a42022063e1d2d6403c395e3472a6a509f01cbff0b90e3413bc6f7bc492649302a4a64001210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ffffffff0200e1f505000000001976a9144726f2838fc4d6ac66615e10604e18926e9b556e88ac48f804060000000023210217a6aa6c0fe017f9e469c3c00de5b3aa164ca410e632d1c04169fd7040e20e06ace77e395d000000000000000000000000000000&nexturl=broadcast" method="get"> <!-- Send form start -->
+              <form action="$URL/method/send_validate?hex=$SENDHEX&nexturl=broadcast" method="get"> <!-- Send form start -->
                 <div class="card-body" style="padding: 0;"> <!-- Send page body start -->
                   <table class="table table-striped table-dark">
                     <tbody>
-                      <tr>
-                        <th style="width: 220px;">Rewards</th>
-                        <td>0.00000000</td>
+                      <tr style="display: $REWARDS_DISPLAY_KMD">
+                        <th style="width: 220px;">$COMMON_LABEL_REWARDS</th>
+                        <td>$REWARDS</td>
                       </tr>
                       <tr>
-                        <th>From Address</th>
-                        <td>RFLYiCnCDr9r5ky4fksFKtAcHGpu4N7qRH</td>
+                        <th>$SEND_LABEL_FROM</th>
+                        <td>$WALLETADDR $COIN</td>
                       </tr>
                       <tr>
-                        <th>To Address</th>
-                        <td>RRBnGReBxqG6RhdsWivZUV6NeLhXqUF3ut</td>
+                        <th>$SEND_LABEL_TO</th>
+                        <td><input type="text" class="form-control-plaintext text-white" id="address" name="address" value="$TOADDR" readonly>
+                        </td>
                       </tr>
                       <tr>
-                        <th>Amount</th>
-                        <td>1.00000000 KMD</td>
+                        <th>$SEND_LABEL_AMOUNT</th>
+                        <td><input type="text" class="form-control-plaintext text-white" id="amount" name="amount" value="$SENDAMOUNT" readonly></td>
                       </tr>
                     </tbody>
                   </table>
+                  <div class="alert alert-info" role="alert" style="margin: 10px;">$SEND_CONF_NOTICE</div>
                 </div> <!-- Send page body end -->
                 <div class="card-footer text-right">
-                  <button type="submit" class="btn btn-primary">Confirm Transaction</button>
+                  <button type="submit" class="btn btn-primary">$SEND_BTN_CREATE_TX</button>
                 </div>
               </form> <!-- Send form send -->
             </div> <!-- Send page card end -->

@@ -502,11 +502,16 @@ void NSPV_broadcast_purge(struct NSPV_broadcastresp *ptr)
 
 cJSON *NSPV_txproof_json(struct NSPV_txproof *ptr)
 {
-    cJSON *result = cJSON_CreateObject();
+    char *hexstr; cJSON *result = cJSON_CreateObject();
     jaddbits256(result,"txid",ptr->txid);
     jaddnum(result,"height",ptr->height);
     jaddnum(result,"txlen",ptr->txlen);
     jaddnum(result,"txprooflen",ptr->txprooflen);
+    hexstr = malloc((ptr->txlen+ptr->txprooflen)*2+1);
+    utils_bin_to_hex(ptr->tx,ptr->txlen,hexstr);
+    jaddstr(result,"hex",hexstr);
+    utils_bin_to_hex(ptr->txproof,ptr->txprooflen,hexstr);
+    jaddstr(result,"proof",hexstr);
     jaddstr(result,"lastpeer",NSPV_lastpeer);
     return(result);
 }
@@ -562,6 +567,8 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     cJSON *result = cJSON_CreateObject(); int32_t expiration; uint32_t timestamp = (uint32_t)time(NULL);
     jaddstr(result,"result","success");
     jaddstr(result,"nSPV","superlite");
+    jaddnum(result,"totalsent",NSPV_totalsent);
+    jaddnum(result,"totalreceived",NSPV_totalrecv);
     if ( NSPV_address[0] != 0 )
     {
         jaddstr(result,"address",NSPV_address);
@@ -583,7 +590,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     else 
     {
         jaddstr(result,"sync_status", "not_synced");
-        jaddnum(result,"estimated_headers_left", (int64_t)NSPV_inforesult.height-NSPV_lastntz.height-NSPV_num_headers);
+        jaddnum(result,"estimated_headers_left", check_headers(1));
     }
     
     return(result);
@@ -622,18 +629,18 @@ cJSON *NSPV_utxosresp_json(struct NSPV_utxosresp *ptr)
     return(result);
 }
 
-cJSON *NSPV_txidresp_json(struct NSPV_txidresp *utxos,int32_t numutxos)
+cJSON *NSPV_txidresp_json(struct NSPV_txidresp *txids,int32_t numutxos)
 {
     int32_t i; cJSON *item,*array = cJSON_CreateArray();
     for (i=0; i<numutxos; i++)
     {
         item = cJSON_CreateObject();
-        jaddnum(item,"height",utxos[i].height);
-        jaddbits256(item,"txid",utxos[i].txid);
-        jaddnum(item,"value",(double)utxos[i].satoshis/COIN);
-        if ( utxos[i].satoshis > 0 )
-            jaddnum(item,"vout",utxos[i].vout);
-        else jaddnum(item,"vin",utxos[i].vout);
+        jaddnum(item,"height",txids[i].height);
+        jaddbits256(item,"txid",txids[i].txid);
+        jaddnum(item,"value",(double)txids[i].satoshis/COIN);
+        if ( txids[i].satoshis > 0 )
+            jaddnum(item,"vout",txids[i].vout);
+        else jaddnum(item,"vin",txids[i].vout);
         jaddi(array,item);
     }
     return(array);

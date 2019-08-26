@@ -377,9 +377,9 @@ uint8_t *NSPV_getrawtx(CTransaction &tx,uint256 &hashBlock,int32_t *txlenp,uint2
 
 int32_t NSPV_sendrawtransaction(struct NSPV_broadcastresp *ptr,uint8_t *data,int32_t n)
 {
-    CTransaction tx;
+    CTransaction tx; btc_tx *btctx = 0;
     ptr->retcode = 0;
-    if ( NSPV_txextract(tx,data,n) == 0 )
+    if ( (btctx= NSPV_txextract(tx,data,n)) == 0 )
     {
         //LOCK(cs_main);
         ptr->txid = tx.GetHash();
@@ -394,7 +394,12 @@ int32_t NSPV_sendrawtransaction(struct NSPV_broadcastresp *ptr,uint8_t *data,int
             RelayTransaction(tx);
         } else ptr->retcode = -3;
 
-    } else ptr->retcode = -1;
+    }
+    else
+    {
+        ptr->retcode = -1;
+        btc_tx_free(btctx);
+    }
     return(sizeof(*ptr));
 }
 

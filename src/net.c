@@ -202,7 +202,7 @@ void event_cb(struct bufferevent* ev, short type, void* ctx)
     }
     else if (type & BEV_EVENT_CONNECTED)
     {
-        //fprintf(stderr,"Successfull connected to node %d.\n", node->nodeid);
+        fprintf(stderr,"Connected to node %d %s\n", node->nodeid,node->ipaddr);
         node->nodegroup->log_write_cb("Successfull connected to node %d.\n", node->nodeid);
         node->state |= NODE_CONNECTED;
         node->state &= ~NODE_CONNECTING;
@@ -220,12 +220,13 @@ btc_node* btc_node_new()
     node->version_handshake = false;
     node->state = 0;
     node->nonce = 0;
-    node->services = 0;
+    node->nServices = 0;
     node->lastping = 0;
     node->time_started_con = 0;
     node->time_last_request = 0;
-    node->synced = 0;
+    node->lastvalidatedheight = 0;
     node->banscore = 0;
+    node->lastgetinfo = 0;
     btc_hash_clear(node->last_requested_inv);
 
     node->recvBuffer = cstr_new_sz(BTC_P2P_MESSAGE_CHUNK_SIZE);
@@ -238,6 +239,7 @@ btc_bool btc_node_set_ipport(btc_node* node, const char* ipport)
     int outlen = (int)sizeof(node->addr);
 
     //return true in case of success (0 == no error)
+    strncpy(node->ipaddr,ipport,sizeof(node->ipaddr)-1);
     return (evutil_parse_sockaddr_port(ipport, &node->addr, &outlen) == 0);
 }
 
@@ -269,7 +271,7 @@ void btc_node_disconnect(btc_node* node)
     if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
     {
         node->nodegroup->log_write_cb("Disconnect node %d\n", node->nodeid);
-        fprintf(stderr,"Disconnect node %d\n", node->nodeid);
+        fprintf(stderr,"Disconnect node %d %s\n", node->nodeid,node->ipaddr);
     }
     /* release buffer and timer event */
     btc_node_release_events(node);
@@ -306,6 +308,7 @@ btc_node_group* btc_node_group_new(const btc_chainparams* chainparams)
     node_group->nodes = vector_new(1, btc_node_free_cb);
     node_group->chainparams = (chainparams ? chainparams : &btc_chainparams_main);
     node_group->parse_cmd_cb = NULL;
+    node_group->NSPV_num_connected_nodes = 0;
     strcpy(node_group->clientstr, "libnspv 0.1");
 
     /* nullify callbacks */
@@ -346,20 +349,18 @@ void btc_node_group_event_loop(btc_node_group* group)
     event_base_dispatch(group->event_base);
 }
 
-void btc_node_group_add_node(btc_node_group* group, btc_node* node)
+btc_node *btc_node_group_add_node(btc_node_group* group, btc_node* node)
 {
     size_t j;
     for ( j = 0; j < group->nodes->len; j++) {
         btc_node* existing_node = vector_idx(group->nodes, j);
         if ( memcmp(&((struct sockaddr_in*)&existing_node->addr)->sin_addr, &((struct sockaddr_in*)&node->addr)->sin_addr, sizeof(&((struct sockaddr_in*)&existing_node->addr)->sin_addr)) == 0 ) 
-            break;
+            return(existing_node);
     }
-    if ( j == group->nodes->len )
-    {
-        vector_add(group->nodes, node);
-        node->nodegroup = group;
-        node->nodeid = group->nodes->len;
-    }
+    vector_add(group->nodes, node);
+    node->nodegroup = group;
+    node->nodeid = group->nodes->len;
+    return(node);
 }
 
 int btc_node_group_amount_of_connected_nodes(btc_node_group* group, enum NODE_STATE state)
@@ -376,7 +377,7 @@ int btc_node_group_amount_of_connected_nodes(btc_node_group* group, enum NODE_ST
 btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
 {
     btc_bool connected_at_least_to_one_node = false;
-    int connect_amount = group->desired_amount_connected_nodes - btc_node_group_amount_of_connected_nodes(group, NODE_CONNECTED);
+    int connect_amount = group->desired_amount_connected_nodes - (group->NSPV_num_connected_nodes != 0 ? group->NSPV_num_connected_nodes : btc_node_group_amount_of_connected_nodes(group, NODE_CONNECTED));
     if (connect_amount <= 0)
         return true;
      
@@ -411,7 +412,7 @@ btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
             connected_at_least_to_one_node = true;
 
             node->nodegroup->log_write_cb("Trying to connect to %d...\n", node->nodeid);
-            //fprintf(stderr,"Trying to connect to %d...\n", node->nodeid);
+            fprintf(stderr,"Trying to connect to %d %s\n", node->nodeid,node->ipaddr);
 
             connect_amount--;
             if (connect_amount <= 0)
@@ -442,7 +443,7 @@ void btc_node_connection_state_changed(btc_node *node)
     {
         if ((node->state & NODE_CONNECTED) == NODE_CONNECTED || (node->state & NODE_CONNECTING) == NODE_CONNECTING)
         {
-            fprintf(stderr,"misbehaved\n");
+            //fprintf(stderr,"misbehaved\n");
             btc_node_disconnect(node);
         }
     } else btc_node_send_version(node);
@@ -612,10 +613,12 @@ btc_bool btc_node_group_add_peers_by_ip_or_seed(btc_node_group *group, const cha
 
             /* create a node */
             btc_node* node = btc_node_new();
-            if (btc_node_set_ipport(node, ip) > 0) {
+            if (btc_node_set_ipport(node, ip) > 0)
+            {
                 /* add the node to the group */
-                btc_node_group_add_node(group, node);
-            }
+                if ( btc_node_group_add_node(group, node) != node )
+                    btc_node_free(node);
+            } else btc_node_free(node);
         }
         vector_free(ips_dns, true);
     } else {
@@ -629,9 +632,11 @@ btc_bool btc_node_group_add_peers_by_ip_or_seed(btc_node_group *group, const cha
                 
                 sprintf(ipaddr,"%s:%u",working_str,group->chainparams->default_port);
                 //fprintf(stderr,"setnode.(%s) -> %s\n",working_str,ipaddr);
-                if (btc_node_set_ipport(node, ipaddr) > 0) {
-                    btc_node_group_add_node(group, node);
-                }
+                if ( btc_node_set_ipport(node, ipaddr) > 0)
+                {
+                    if (btc_node_group_add_node(group, node) != node )
+                        btc_node_free(node);
+                } else btc_node_free(node);
                 offset = 0;
                 memset(working_str, 0, sizeof(working_str));
             } else if (ips[i] != ' ' && offset < sizeof(working_str)) {
