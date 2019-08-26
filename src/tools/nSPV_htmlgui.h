@@ -703,6 +703,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             for (j=0; j<m; j++)
                             {
                                 map = jitem(array,j);
+                                fprintf(stderr,"(%s)\n",jprint(map,0));
                                 field = get_cJSON_fieldname(map);
                                 fprintf(stderr,"$%s_%s -> (%s)\n",aname,field,jstr(map,field));
                             }
