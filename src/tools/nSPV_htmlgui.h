@@ -710,7 +710,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     }
                 }
                 free_json(langjson);
-            }
+            } else fprintf(stderr,"cant parse (%s)\n",langstr);
             free(langstr);
         } else fprintf(stderr,"cant open (%s)\n",langfname);
     }
