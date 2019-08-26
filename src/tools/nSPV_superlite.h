@@ -36,7 +36,7 @@ void expand_ipbits(char *ipaddr,uint64_t ipbits);
 btc_tx *NSPV_gettransaction(btc_spv_client *client,int32_t *retvalp,int32_t isKMD,int32_t skipvalidation,int32_t v,bits256 txid,int32_t height,int64_t extradata,uint32_t tiptime,int64_t *rewardsump);
 
 uint32_t NSPV_logintime,NSPV_tiptime,NSPV_didfirstutxos,NSPV_didfirsttxids;
-int32_t NSPV_didfirsttxproofs;
+int32_t NSPV_didfirsttxproofs,NSPV_longestchain;
 char NSPV_tmpseed[4096],NSPV_walletseed[4096],NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64],NSPV_fullname[64];
 char NSPV_language[64] = { "english" };
 
@@ -323,6 +323,8 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                     NSPV_blockheaders[NSPV_num_headers].blockhash = hdrhash;
                     NSPV_blockheaders[NSPV_num_headers].hashPrevBlock = NSPV_inforesult.H.hashPrevBlock;
                     NSPV_num_headers++;
+                    if ( NSPV_inforesult.hdrheight > NSPV_longestchain )
+                        NSPV_longestchain = NSPV_inforesult.hdrheight;
                 }
                 if ( (lag= I.height-NSPV_inforesult.height) > 0 )
                 {

@@ -402,7 +402,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // $PEER_INSYNC - In Sync
     else if ( strcmp(method,"getpeerinfo") == 0 )
     {
-        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; long fsize;
+        char *origitemstr,*itemstr,itembuf[1024],*itemsbuf; long fsize; int32_t lastht;
         if ( (origitemstr= OS_filestr(&fsize,"html/getpeerinfo_table_row.inc")) != 0 )
         {
             if ( (retjson= NSPV_getpeerinfo(NSPV_client)) != 0 )
@@ -430,10 +430,11 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_SERVICES",replacestr);
                             sprintf(replacestr,"%u",juint(item,"missbehavescore"));
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_MISBEHAVESCORE",replacestr);
-                            sprintf(replacestr,"%u",juint(item,"bestknownheight"));
+                            lastht = juint(item,"last_validated_header");
+                            sprintf(replacestr,"%u",lastht);
                             NSPV_expand_variable(itembuf,&itemstr,"$PEER_BESTKNOWNHT",replacestr);
-                            sprintf(replacestr,"%u",juint(item,"last_validated_header"));
-                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",replacestr);
+                            //sprintf(replacestr,"%u",juint(item,"last_validated_header"));
+                            NSPV_expand_variable(itembuf,&itemstr,"$PEER_INSYNC",lastht<NSPV_longestchain?"no":"yes");
                             strcat(itemsbuf,itemstr);
                             itembuf[0] = 0;
                             free(itemstr);
