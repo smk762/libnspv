@@ -685,6 +685,35 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
     // == Error page variable ==
     // $ERROR_OUTPUT - use it for displaying any error
 
+    {
+        char langfname[256]; char *langstr,*aname,*field; long fsize; int32_t j,m; cJSON *langjson,*array,*item,*map;
+        sprintf(langfname,"html/languages/%s.json",NSPV_language);
+        if ( (langstr= OS_filestr(&fsize,langfname)) != 0 )
+        {
+            if ( (langjson= cJSON_Parse(langstr)) != 0 )
+            {
+                if ( (n= cJSON_GetArraySize(langjson)) > 0 )
+                {
+                    for (i=0; i<n; i++)
+                    {
+                        array = jitem(langjson,i);
+                        aname = get_cJSON_fieldname(array);
+                        if ( (m= cJSON_GetArraySize(array)) > 0 )
+                        {
+                            for (j=0; j<m; j++)
+                            {
+                                map = jitem(array,j);
+                                field = get_cJSON_fieldname(map);
+                                fprintf(stderr,"$%s_%s -> (%s)\n",aname,field,jstr(field,map));
+                            }
+                        }
+                    }
+                }
+                free_json(langjson);
+            }
+            free(langstr);
+        }
+    }
     free(bigbuf);
     return(filestr);
 }

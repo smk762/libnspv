@@ -68,7 +68,7 @@ static void print_version()
 static void print_usage()
 {
     print_version();
-    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-s[--timeout] <secs>) <command>\n");
+    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-l=langauge) (-s[--timeout] <secs>) <command>\n");
     printf("Supported commands:\n");
     printf("        scan      (scan blocks up to the tip, creates header.db file)\n");
     printf("\nExamples: \n");
@@ -257,6 +257,13 @@ int main(int argc, char* argv[])
             {
                 NSPV_externalip = clonestr(optarg+1);
                 fprintf(stderr,"set external ip to %s\n",NSPV_externalip);
+            }
+            break;
+        case 'l':
+            if ( optarg != 0 )
+            {
+                strcpy(NSPV_language,optarg+1);
+                fprintf(stderr,"set language to (%s)\n",NSPV_language);
             }
             break;
         case 'f':
