@@ -165,6 +165,7 @@
                       <option value="korean">한국어</option>
                       <option value="russian">русский</option>
                       <option value="spanish">Español</option>
+                      <option value="hindi">हिंदी</option>
                     </select> 
                   </div>
                   <div class="col pl-sm-1">

@@ -1049,6 +1049,16 @@ cJSON *NSPV_addnode(btc_spv_client *client,char *ipaddr)
     return(result);
 }
 
+static char *biplangs[] = { "chinese_simplified", "english", "italian", "korean", "spanish", "chinese_traditional", "french", "japanese", "russian" };
+
+int32_t NSPV_bip_lang(char *lang)
+{
+    int32_t i;
+    for (i=0; i<(int32_t)(sizeof(biplangs)/sizeof(*biplangs)); i++)
+        if ( strcmp(biplangs[i],lang) == 0 )
+            return(1);
+    return(0);
+}
 
 cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
 {
@@ -1058,7 +1068,11 @@ cJSON *NSPV_getnewaddress(const btc_chainparams *chain,char *lang)
     if ( lang == 0 || lang[0] == 0 )
     {
         if ( lastlang[0] == 0 )
-            lang = NSPV_language;
+        {
+            if ( NSPV_bip_lang(NSPV_language) > 0 )
+                lang = NSPV_language;
+            else lang = "english";
+        }
         else lang = lastlang;
     }
     if ( lang != lastlang )
