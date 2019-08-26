@@ -100,7 +100,6 @@ typedef struct btc_node_ {
     btc_bool version_handshake;
 
     uint32_t bestknownheight;
-    uint32_t lastvalidatedheight;
     int32_t banscore;
     uint32_t version;
 
