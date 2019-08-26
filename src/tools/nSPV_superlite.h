@@ -1052,7 +1052,7 @@ static char *biplangs[] = { "chinese_simplified", "english", "italian", "korean"
 int32_t NSPV_bip_lang(char *lang)
 {
     int32_t i;
-    for (i=0; i<sizeof(int32_t)(sizeof(biplangs)/sizeof(*biplangs)); i++)
+    for (i=0; i<(int32_t)(sizeof(biplangs)/sizeof(*biplangs)); i++)
         if ( strcmp(biplangs[i],lang) == 0 )
             return(1);
     return(0);
