@@ -224,8 +224,9 @@ btc_node* btc_node_new()
     node->lastping = 0;
     node->time_started_con = 0;
     node->time_last_request = 0;
-    node->synced = 0;
+    node->lastvalidatedheight = 0;
     node->banscore = 0;
+    node->lastgetinfo = 0;
     btc_hash_clear(node->last_requested_inv);
 
     node->recvBuffer = cstr_new_sz(BTC_P2P_MESSAGE_CHUNK_SIZE);
@@ -307,6 +308,7 @@ btc_node_group* btc_node_group_new(const btc_chainparams* chainparams)
     node_group->nodes = vector_new(1, btc_node_free_cb);
     node_group->chainparams = (chainparams ? chainparams : &btc_chainparams_main);
     node_group->parse_cmd_cb = NULL;
+    node_group->NSPV_num_connected_nodes = 0;
     strcpy(node_group->clientstr, "libnspv 0.1");
 
     /* nullify callbacks */
@@ -375,7 +377,7 @@ int btc_node_group_amount_of_connected_nodes(btc_node_group* group, enum NODE_ST
 btc_bool btc_node_group_connect_next_nodes(btc_node_group* group)
 {
     btc_bool connected_at_least_to_one_node = false;
-    int connect_amount = group->desired_amount_connected_nodes - btc_node_group_amount_of_connected_nodes(group, NODE_CONNECTED);
+    int connect_amount = group->desired_amount_connected_nodes - (group->NSPV_num_connected_nodes != 0 ? group->NSPV_num_connected_nodes : btc_node_group_amount_of_connected_nodes(group, NODE_CONNECTED));
     if (connect_amount <= 0)
         return true;
      

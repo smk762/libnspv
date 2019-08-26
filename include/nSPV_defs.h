@@ -25,6 +25,8 @@
 #define NSPV_LOCKTIME_THRESHOLD 500000000
 #define NSPV_KOMODO_ENDOFERA 7777777
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
+#define NSPV_MAX_BLOCK_HEADERS 128
+#define NSPV_GETADDRESS_TIMEOUT 600
 
 #include <time.h>
 #ifndef __MINGW
@@ -227,13 +229,14 @@ struct NSPV_header
 };
 
 extern portable_mutex_t NSPV_netmutex;
-extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime,NSPV_lastinfo;
+extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime; 
 extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
 bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr);
 
 extern int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 extern int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
 extern int32_t NSPV_periodic(btc_node *node);
+extern int32_t check_headers(int32_t dispflag);
 extern void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
 extern uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight);
 extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
@@ -242,7 +245,7 @@ extern int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equ
 extern bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen);
 
 extern int32_t IS_IN_SYNC;
-extern uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
+extern uint32_t NSPV_logintime,NSPV_tiptime;
 extern char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
 extern btc_spv_client *NSPV_client;
 extern const btc_chainparams *NSPV_chain;
