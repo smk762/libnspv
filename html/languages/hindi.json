@@ -31,7 +31,7 @@
 			{ "LOGOIN_TO_ACCOUNT": "जारी रखने के लिए, अपने खाते में प्रवेश करें।" },
 			{ "SELECT_JPG": "एक .jpg छवि फ़ाइल का चयन करें:" },
 			{ "NOTICE_777_SECONDS": "<b>सूचना:</b> आपका लॉगिन सत्र 777 सेकंड तक चलेगा।" },
-			{ "SEED_NOTICE": "<b>जरूरी सूचना:</b> Please take backup of both your \"Wallet Seed\" and the \"Private Key\" by copying it's text and saving it on your system or preferably on a USB device in a file before using the address. This address will not be showing up again if you logged in with existing Seed/WIF/Private key. You HAVE to use this address's Walelt Seed or WIF/Private key to login, view transactions and use it's funds." },
+			{ "SEED_NOTICE": "<b>जरूरी सूचना:</b> कृपया अपने \"बटुआ बीज\" और \"निजी कुंजी\" को कॉपी करें और अपने सिस्टम पर कहीं सुरक्षित जगह पर सेव करें। उस से भी अच्छा होगा के अगर आप इन दोनों का बैकअप किसी USB पेन ड्राइव में ले लें। अगर आप किसी और \"बटुआ बीज\" यां \"निजी कुंजी\" का इस्तेमाल करेंगे तो यही बटुआ पता नहीं पाएंगे। आपको यही \"बटुआ बीज\" यां  \"निजी कुंजी\" इस्तेमाल करनी पड़ेगी आगर आप इसी बटुए के पते में रखी राशि और पुराना लेनदेन का इतिहास देखना हैं।" },
 			{ "BTN_GEN_ADDR": "नया पता बनाएँ" },
 			{ "SEED_LANG": "बीज भाषा का चयन करें" },
 			{ "SEED_GEN_H4": "यदि आपको प्रदर्शित बीज या पता पसंद नहीं है, तो बस एक अलग बनाने के लिए क्लिक करें" },
@@ -61,11 +61,11 @@
 			{ "BTN_CREATE_TX": "लेन-देन बनाएँ" },
 			{ "CONF_DETAILS": "भेजने से पहले विवरण की पुष्टि करें"},
 			{ "CONF_NOTICE": 
-			"<b>सूचना:</b> Creating transaction needs to make network request, so depending on the transaction, and your connections with the network nodes this might take some time. Please be patient while the process finishes."},
+			"<b>सूचना:</b> लेन-देन बनाने के लिए नेटवर्क अनुरोध करने की आवश्यकता होती है, इसलिए लेन-देन इस पर निर्भर करता है की आपका कनेक्शन बाकी नेटवर्क नोड्स के साथ कितना अच्छा है, जिसकी वजह से इस प्रक्रिया में कुछ समय लग सकता है। कृपया प्रक्रिया समाप्त होने पर धैर्य रखें।"},
 			{ "RETCODES": "retcodes"},
-			{ "VALIDATED_HELP": "Locally calculated value of rewards to match with the value from network."},
-			{ "TXID_HELP": "This <kbd>txid</kbd> will only be available on blockchain explorers after your broadcast the transaction to network."},
-			{ "HEX_HELP": "You can also just copy this hex string and broadcast through another computer if you wish."},
+			{ "VALIDATED_HELP": "नेटवर्क से मूल्य के साथ मिलान के लिए स्थानीय स्तर पर ब्याज की गणना।"},
+			{ "TXID_HELP": "यह <kbd>txid</ kbd> आपके नेटवर्क पर लेनदेन को प्रसारित करने के बाद केवल ब्लॉकचेन खोजकर्ताओं पर उपलब्ध होगा।"},
+			{ "HEX_HELP": "आप इस हेक्स स्ट्रिंग को भी कॉपी कर सकते हैं और चाहें तो दूसरे कंप्यूटर के माध्यम से प्रसारित कर सकते हैं।"},
 			{ "ADVANCE_DETAILS": "अन्य उन्नत विवरण"},
 			{ "NVERSION": "nVersion"},
 			{ "NLOCKTIME": "nLockTime"},
@@ -115,7 +115,7 @@
 			{ "NBITS": "nBits" },
 			{ "HEXSTR": "Hex string" },
 			{ "INPUT_HEX": "हेक्स स्ट्रिंग यहाँ डालें" },
-			{ "HEX_STR_HELP": "You can broadcast a transaction to network without login if you have the transaction hex made through other source." }]
+			{ "HEX_STR_HELP": "यदि आप लेन-देन हेक्स अन्य स्रोत के माध्यम से किया है, तो आप लॉगिन के बिना नेटवर्क के लिए एक प्रसारण प्रसारित कर सकते हैं।" }]
 	},
 	{ "PEERS": [
 			{ "INFO": "जुड़े हुए सहकर्मी जानकारी"},
@@ -164,7 +164,7 @@
 			{ "STEP01": "अपने डिवाइस पर एक बड़े आकार की .jpg छवि फ़ाइल चुनें।"},
 			{ "STEP02": "एक मजबूत पासवर्ड भरें। आदर्श रूप से अक्षर, संख्या और विशेष वर्णों का एक संयोजन।"},
 			{ "STEP03": "तैयार होने पर, \"सुरक्षित छवि बनाएं\" बटन को दबाएं।"},
-			{ "PASSWORD": "Password"},
+			{ "PASSWORD": "पासवर्ड"},
 			{ "JPG_HELP": "अपने डिवाइस से एक .jpg छवि फ़ाइल का चयन करें"},
 			{ "PASS_HELP": "चयनित छवि फ़ाइल के लिए पासवर्ड।"},
 			{ "BTN_MAKE_IMG": "सुरक्षित छवि बनाएं"}]
