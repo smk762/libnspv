@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
 
 #include <nSPV_defs.h>
 // stubs for link compatibility
-uint32_t NSPV_logintime,NSPV_lastinfo;
+uint32_t NSPV_logintime;
 portable_mutex_t NSPV_netmutex;
 
 int32_t NSPV_periodic(btc_node *node)
@@ -268,4 +268,3 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
         
     }
 }
-

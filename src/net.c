@@ -224,8 +224,9 @@ btc_node* btc_node_new()
     node->lastping = 0;
     node->time_started_con = 0;
     node->time_last_request = 0;
-    node->synced = 0;
+    node->lastvalidatedheight = 0;
     node->banscore = 0;
+    node->lastgetinfo = 0;
     btc_hash_clear(node->last_requested_inv);
 
     node->recvBuffer = cstr_new_sz(BTC_P2P_MESSAGE_CHUNK_SIZE);

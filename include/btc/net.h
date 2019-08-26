@@ -98,14 +98,15 @@ typedef struct btc_node_ {
     int missbehavescore;
     btc_bool version_handshake;
 
-    unsigned int bestknownheight;
-    int32_t synced;
+    uint32_t bestknownheight;
+    uint32_t lastvalidatedheight;
     int32_t banscore;
     uint32_t version;
 
     uint32_t hints; /* can be use for user defined state */
     uint64_t nServices;
     uint32_t prevtimes[16],gotaddrs;
+    uint32_t lastgetinfo;
     char ipaddr[64];
 } btc_node;
 
