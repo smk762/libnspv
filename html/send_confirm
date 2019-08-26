@@ -38,10 +38,10 @@
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
                 <div class="row">
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
                   <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>$COMMON_LABEL_REWARDS:</b><br> $REWARDS $COIN</span>
-                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$COININFO_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
+                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$INFOCOIN_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
                 </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
@@ -54,7 +54,7 @@
               <div class="card-header"> <!-- Send page header start -->
                 <div class="row">
                   <div class="col-md-6 col-sm-6 col-xs-6">
-                    <h6 class="card-title" style="vertical-align: ">Confirm Details before sending</h6>
+                    <h6 class="card-title" style="vertical-align: ">$SEND_CONF_DETAILS</h6>
                   </div>
                 </div>
               </div> <!-- Send page header end -->
@@ -81,7 +81,7 @@
                       </tr>
                     </tbody>
                   </table>
-                  <div class="alert alert-info" role="alert" style="margin: 10px;"><b>NOTICE:</b> Creating transaction needs to make network request, so depending on the transaction, and your connections with the network nodes this might take some time. Please be patient while the process finishes.</div>
+                  <div class="alert alert-info" role="alert" style="margin: 10px;">$SEND_CONF_NOTICE</div>
                 </div> <!-- Send page body end -->
                 <div class="card-footer text-right">
                   <button type="submit" class="btn btn-primary">$SEND_BTN_CREATE_TX</button>

@@ -38,10 +38,10 @@
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
                 <div class="row">
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
                   <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>$COMMON_LABEL_REWARDS:</b><br> $REWARDS $COIN</span>
-                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$COININFO_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
+                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$INFOCOIN_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
                 </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
@@ -66,14 +66,6 @@
             <div class="card-body" style="padding: 0;"> <!-- wallet mempool transactions card body start -->
               <form> <!-- mempool transactions table form start -->
                 <table class="table table-striped table-dark" style="margin-bottom: 0;">
-                  <!--<thead>
-                    <tr>
-                      <th scope="col-md">Type</th>
-                      <th scope="col-md">Dest. Addr.</th>
-                      <th scope="col-md">Amount</th>
-                      <th scope="col-md">TxID</th>
-                    </tr>
-                  </thead>-->
                   <tbody>
                     $MEMP_ROW_ARRAY
                   </tbody>
@@ -102,15 +94,6 @@
             <div class="card-body" style="padding: 0;"> <!-- wallet card body start -->
               <form> <!-- tx history table form start -->
                 <table class="table table-striped table-dark" style="margin-bottom: 0;">
-                  <!--<thead>
-                    <tr>
-                      <th scope="col-md">Direction</th>
-                      <th scope="col-md">Confirmations</th>
-                      <th scope="col-md">Amount</th>
-                      <th scope="col-md">Height</th>
-                      <th scope="col-md">TxID</th>
-                    </tr>
-                  </thead>-->
                   <tbody>
                     $TXHIST_ROW_ARRAY
                   </tbody>

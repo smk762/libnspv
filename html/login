@@ -41,10 +41,10 @@
             <div class="card text-white bg-dark"> <!-- coin info card start -->
               <div class="card-body" style="font-size: 18px;"> <!-- coin info body start -->
                 <div class="row">
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
-                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$COININFO_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_COIN:</b><br> $COINNAME ($COIN)<br></span>
+                  <span class="col-lg-3 col-sm-4 col-xs-12"><b>$INFOCOIN_LABEL_BALANCE:</b><br> $BALANCE $COIN</span>
                   <span class="col-lg-2 col-sm-4 col-xs-12" style="display: $REWARDS_DISPLAY_KMD;"><b>$COMMON_LABEL_REWARDS:</b><br> $REWARDS $COIN</span>
-                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$COININFO_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
+                  <span class="col-lg-4 col-sm-12 col-xs-12"><b>$INFOCOIN_LABEL_YOUR_ADDRESS:</b><br> $WALLETADDR</span>
                 </div>
               </div> <!-- coin info body end -->
             </div> <!-- coin info card end -->
@@ -141,26 +141,34 @@
         <div class="col-md-6 col-sm-12" style="display: $LOGINDISPLAY;">
           <div class="card text-white bg-dark"> <!-- Create login image card start -->
             <div class="card-header">
-              <h4>Account Settings</h4>
+              <h4>$ACCOUNT_SETTINGS</h4>
             </div>
             <div class="card-body">
               <form>
                 <div class="form-group row">
-                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">Session</label>
+                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">$ACCOUNT_SESSION</label>
                   <div class="col-auto">
-                    <label class="col-form-label">Your login session will expire in $AUTOLOGOUT seconds.</label>
+                    <label class="col-form-label">$ACCOUNT_EXPIRE_IN $AUTOLOGOUT $ACCOUNT_SECONDS</label>
                   </div>
                 </div>
                 <div class="form-group row">
-                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">Wallet Language</label>
+                  <label for="LoginSessionInfo" class="col-sm-4 col-form-label">$ACCOUNT_WALLETLANG</label>
                   <div class="col pr-sm-1">
                     <select class="custom-select mr-sm-2" id="walletlang" name="walletlang">
-                      <option value="" selected>Select Wallet Language </option>
+                      <option value="" selected>$ACCOUNT_SELECT_WALLETLANG</option>
                       <option value="english">English</option>
+                      <option value="french">French</option>
+                      <option value="italian">Italian</option>
+                      <option value="chinese_simplified">Chinese (Simplified)</option>
+                      <option value="chinese_traditional">Chinese (Traditional)</option>
+                      <option value="japanese">Japanese</option>
+                      <option value="korean">Korean</option>
+                      <option value="russian">Russian</option>
+                      <option value="spanish">Spanish</option>
                     </select> 
                   </div>
                   <div class="col pl-sm-1">
-                    <button class="btn btn-primary mr-sm-2" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">Change</button>
+                    <button class="btn btn-primary mr-sm-2" formaction="$URL/method/index?nexturl=genaddr" formmethod="get">$ACCOUNT_CHANGE</button>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -175,14 +183,15 @@
             <div class="card text-white bg-dark"> <!-- Create login image card start -->
               <form action="$URL/method/index?nexturl=createimage" method="get">
                 <div class="card-header">
-                  <h4>Create secure login image</h4>
+                  <h4>$ACCOUNT_CREATE_LOGIN_IMG</h4>
                 </div>
               <div class="card-body"> <!-- Create login image card body start -->
                 <div class="alert alert-success" role="alert">
+                  <b>$ACCOUNT_INSTRUC</b>
                   <ol class="mb-0">
-                    <li>Select a large size .jpg image file on your device.</li>
-                    <li>Fill in a strong password. Ideally a combination of alphabets, numbers and special characters.</li>
-                    <li>When ready, press "Make Secure Image" button to proceed.</li>
+                    <li>$ACCOUNT_STEP01</li>
+                    <li>$ACCOUNT_STEP02</li>
+                    <li>$ACCOUNT_STEP03</li>
                   </ol>
                 </div>
                 
@@ -191,17 +200,17 @@
                   <input type="text" name="nexturl" hidden value="createimage">
                 <div class="">
                   <input type="file" name="fname" id="fname" accept=".jpg" style="margin: 10px 10px 10px 0;">
-                  <small id="nspvImageFileHelp" class="form-text text-muted">Select a .jpg image file from your device</small>
+                  <small id="nspvImageFileHelp" class="form-text text-muted">$ACCOUNT_JPG_HELP</small>
                 </div>
                 <div class="">
-                  <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="Password">
-                  <small id="nspvImageFileWifHelp" class="form-text text-muted">Password for the selected image file.</small>
+                  <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="$ACCOUNT_PASSWORD">
+                  <small id="nspvImageFileWifHelp" class="form-text text-muted">$ACCOUNT_PASS_HELP</small>
                 </div>
               </div>
                 
               </div> <!-- Create login image card body end -->
               <div class="card-footer">
-                <button class="btn btn-info" type="submit">Make Secure Image</button>
+                <button class="btn btn-info" type="submit">$ACCOUNT_BTN_MAKE_IMG</button>
               </div>
               </form>
             </div> <!-- Create login image card end -->

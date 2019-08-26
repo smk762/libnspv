@@ -17,7 +17,7 @@
 			{ "MENU_ACCOUNT": "Account" },
 			{ "MENU_LOGOUT": "Logout" }]
 	},
-	{ "COININFO": [
+	{ "INFOCOIN": [
 			{ "LABEL_COIN": "Coin" },
 			{ "LABEL_BALANCE": "Balance" },
 			{ "LABEL_YOUR_ADDRESS": "Your Address" }]
@@ -58,11 +58,37 @@
 			{ "LABEL_TXID": "txid" },
 			{ "LABEL_HEX": "hex" },
 			{ "BTN_BROADCAST_TX": "Broadcast Transaction" },
-			{ "BTN_CREATE_TX": "Create Transaction" }]
+			{ "BTN_CREATE_TX": "Create Transaction" },
+			{ "CONF_DETAILS": "Confirm Details before sending"},
+			{ "CONF_NOTICE": 
+			"<b>NOTICE:</b> Creating transaction needs to make network request, so depending on the transaction, and your connections with the network nodes this might take some time. Please be patient while the process finishes."},
+			{ "RETCODES": "retcodes"},
+			{ "VALIDATED_HELP": "Locally calculated value of rewards to match with the value from network."},
+			{ "TXID_HELP": "This <kbd>txid</kbd> will only be available on blockchain explorers after your broadcast the transaction to network."},
+			{ "HEX_HELP": "You can also just copy this hex string and broadcast through another computer if you wish."},
+			{ "ADVANCE_DETAILS": "Other Advanced Details"},
+			{ "NVERSION": "nVersion"},
+			{ "NLOCKTIME": "nLockTime"},
+			{ "EXPIRYTIME": "nExpiryHeight"},
+			{ "VALBALANCE": "valueBalance"},
+			{ "TXVIN_H5": "Tx - vin"},
+			{ "TXVOUT_H5": "Tx - vout"},
+			{ "VOUT": "vout"},
+			{ "SCRIPTSIG": "scriptSig"},
+			{ "SEQUENCEID": "sequenceid"},
+			{ "VALUE": "Value"},
+			{ "ADDRESS": "Address"}]
 	},
 	{ "WALLET": [
 			{ "UNCONF_TX": "Unconfirmed Transactions" },
-			{ "HISTORY_TX": "Transaction History" }]
+			{ "HISTORY_TX": "Transaction History" },
+			{ "TYPE": "Type"},
+			{ "DEST": "Destination"},
+			{ "AMOUNT": "Amount"},
+			{ "TXID": "TxID"},
+			{ "DIRECTION": "Direction"},
+			{ "CONFS": "Confs."},
+			{ "HEIGHT": "Height"}]
 	},
 	{ "INFO": [
 			{ "NET_INFO": "Network Info" },
@@ -89,6 +115,58 @@
 			{ "NBITS": "nBits" },
 			{ "HEXSTR": "Hex string" },
 			{ "INPUT_HEX": "Input hex string here" },
-			{ "HEXSTR_HELP": "You can broadcast a transaction to network without login if you have the transaction hex made through other source." }]
+			{ "HEX_STR_HELP": "You can broadcast a transaction to network without login if you have the transaction hex made through other source." }]
+	},
+	{ "PEERS": [
+			{ "INFO": "Connected Peers Info"},
+			{ "NODEID": "nodeid"},
+			{ "IPADDR": "IP Address"},
+			{ "PORT": "Port"},
+			{ "LASTPING": "Last Ping"},
+			{ "CONNSTART": "Time Started Conn."},
+			{ "LASTREQ": "Time Last Req."},
+			{ "SERVICES": "Services"},
+			{ "MISBEHAVE": "Missbehave Score"},
+			{ "BEST_HEIGHT": "Best Known Height"},
+			{ "IN_SYNC": "In Sync"}]
+	},
+	{ "ERROR": [
+			{ "OOPS": "Opps! Something went wrong..."},
+			{ "ERR": "Error"}]
+	},
+	{ "BCAST": [
+			{ "TXINFO": "Broadcasted Transaction Info"},
+			{ "RESULT": "Result"},
+			{ "EXPECTED": "Expected"},
+			{ "BROADCAST": "Broadcast"},
+			{ "RETURNCODE": "Returned Code"}]
+	},
+	{ "TXINFO": [
+			{ "TX_ID_INFO": "Transaction ID Info"},
+			{ "SPENT_TX_INFO": "Spent Transaction Info"},
+			{ "SPENT_TX_HEIGHT": "Spent Transaction Height"},
+			{ "SPENT_TX_ID": "Spent Transaction ID"},
+			{ "SPENT_VINI": "Spent vini"},
+			{ "SPENT_TX_LEN": "Spent Transaction Length"},
+			{ "SPENT_PROOF_LEN": "Spent Transaction Proof Length"},
+			{ "PROOF": "proof"}]
+	},
+	{ "ACCOUNT": [
+			{ "SETTINGS": "Account Settings"},
+			{ "SESSION": "Session"},
+			{ "EXPIRE_IN": "Your login session will expire in"},
+			{ "SECONDS": "seconds."},
+			{ "WALLETLANG": "Wallet Language"},
+			{ "SELECT_WALLETLANG": "Select Wallet Language"},
+			{ "CHANGE": "Change"},
+			{ "CREATE_LOGIN_IMG": "Create secure login image"},
+			{ "INSTRUC": "INSTRUCTIONS"},
+			{ "STEP01": "Select a large size .jpg image file on your device."},
+			{ "STEP02": "Fill in a strong password. Ideally a combination of alphabets, numbers and special characters."},
+			{ "STEP03": "When ready, press \"Make Secure Image\" button to proceed."},
+			{ "PASSWORD": "Password"},
+			{ "JPG_HELP": "Select a .jpg image file from your device"},
+			{ "PASS_HELP": "Password for the selected image file."},
+			{ "BTN_MAKE_IMG": "Make Secure Image"}]
 	}
 ]
