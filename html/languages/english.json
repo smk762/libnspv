@@ -17,7 +17,7 @@
 			{ "MENU_ACCOUNT": "Account" },
 			{ "MENU_LOGOUT": "Logout" }]
 	},
-	{ "COININFO": [
+	{ "INFOCOIN": [
 			{ "LABEL_COIN": "Coin" },
 			{ "LABEL_BALANCE": "Balance" },
 			{ "LABEL_YOUR_ADDRESS": "Your Address" }]
