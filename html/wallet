@@ -54,7 +54,7 @@
             <div class="card-header"> <!-- wallet mempool transactions card header start -->
               <div class="row">
                 <div class="col-md-6 col-sm-6 col-xs-6">
-                  <h6 class="card-title">Unconfirmed Transactions</h6>
+                  <h6 class="card-title">$WALLET_UNCONF_TX</h6>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- mempool transactions reresh button form start -->
@@ -90,7 +90,7 @@
             <div class="card-header"> <!-- wallet card header start -->
               <div class="row">
                 <div class="col-md-6 col-sm-6 col-xs-6">
-                  <h6 class="card-title">Transaction History</h6>
+                  <h6 class="card-title">$WALLET_HISTORY_TX</h6>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-6 text-right">
                   <form> <!-- tx history reresh button form start -->
