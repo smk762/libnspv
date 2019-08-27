@@ -393,7 +393,7 @@ char *clonestr(char *str)
 #endif
         str = (char *)"<nullstr>";
     }
-    clone = (char *)malloc(strlen(str)+16);
+    clone = (char *)malloc(strlen(str)+32);
     strcpy(clone,str);
     return(clone);
 }
