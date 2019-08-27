@@ -296,7 +296,8 @@ int32_t validate_notarization(bits256 notarization, uint32_t timestamp)
 
 void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len) 
 {
-    struct NSPV_inforesp I; char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
+    struct NSPV_inforesp I; struct NSPV_txproof tmp_txproofresult;
+    char str[65],str2[65]; uint32_t timestamp = (uint32_t)time(NULL);
     const btc_chainparams *chain = from->nodegroup->chainparams; int32_t lag;
     //sprintf(NSPV_lastpeer,"nodeid.%d",from->nodeid);
     strcpy(NSPV_lastpeer,from->ipaddr);
@@ -429,21 +430,25 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 fprintf(stderr,"got ntzproof response %u size.%d prev.%d next.%d\n",timestamp,len,NSPV_ntzsproofresult.common.prevht,NSPV_ntzsproofresult.common.nextht);
                 break;
             case NSPV_TXPROOFRESP:
+                tmp_txproofresult = NSPV_txproofresult;
                 NSPV_txproof_purge(&NSPV_txproofresult);
                 NSPV_rwtxproof(0,&response[1],&NSPV_txproofresult);
-                // validate the notarization transaction that was fetched. 
-                if ( bits256_cmp(NSPV_txproofresult.txid, NSPV_inforesult.notarization.txid) == 0 ) 
+                if ( bits256_nonz(NSPV_txproofresult.txid) != 0 )
                 {
-                    if ( validate_notarization(NSPV_inforesult.notarization.txid, NSPV_inforesult.notarization.timestamp) != 0 )
+                    // validate the notarization transaction that was fetched. 
+                    if ( bits256_cmp(NSPV_txproofresult.txid, NSPV_inforesult.notarization.txid) == 0 ) 
                     {
-                        NSPV_lastntz = NSPV_inforesult.notarization;
-                        NSPV_hdrheight_counter = NSPV_lastntz.height;
-                        reset_headers(NSPV_lastntz.height);
-                        fprintf(stderr, "new notarization at height.%i\n", NSPV_lastntz.height);
-                    } 
-                }
-                else if ( NSPV_txproof_find(NSPV_txproofresult.txid,NSPV_txproofresult.height) == 0 )
-                    NSPV_txproof_add(&NSPV_txproofresult);
+                        if ( validate_notarization(NSPV_inforesult.notarization.txid, NSPV_inforesult.notarization.timestamp) != 0 )
+                        {
+                            NSPV_lastntz = NSPV_inforesult.notarization;
+                            NSPV_hdrheight_counter = NSPV_lastntz.height;
+                            reset_headers(NSPV_lastntz.height);
+                            fprintf(stderr, "new notarization at height.%i\n", NSPV_lastntz.height);
+                        }
+                    }
+                    else if ( NSPV_txproof_find(NSPV_txproofresult.txid,NSPV_txproofresult.height) == 0 )
+                        NSPV_txproof_add(&NSPV_txproofresult);
+                } else NSPV_txproofresult = tmp_txproofresult;
                 fprintf(stderr,"got txproof response %u size.%d %s ht.%d\n",timestamp,len,bits256_str(str,NSPV_txproofresult.txid),NSPV_txproofresult.height);
                 break;
             case NSPV_SPENTINFORESP:
@@ -1153,6 +1158,7 @@ int32_t NSPV_periodic(btc_node *node) // called periodically
         }
     }
     k = (IS_IN_SYNC == 0)+(node->nodegroup->desired_amount_connected_nodes/(node->nodegroup->NSPV_num_connected_nodes > 0 ? node->nodegroup->NSPV_num_connected_nodes : 1));
+    k = (k == 0 ? 1 : k);
     if ( timestamp > (node->lastgetinfo+((client->chainparams->blocktime/4)*(2+(IS_IN_SYNC != 0)))+(rand()%(client->chainparams->blocktime/k))) )
     {
         int32_t reqht = 0, j = 0, n = 0; static int32_t didinit = 0;
