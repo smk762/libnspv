@@ -47,11 +47,11 @@
 	},
 	{ "SEND": [
 			{ "LABEL_FROM": "इस पते से" },
+			{ "LABEL_TOTAL_AMOUNT": "कुल राशि भेजी जा रही है" },
 			{ "LABEL_TO": "इस पते पर" },
 			{ "LABEL_AMOUNT_INFO": "राशि की जानकारी" },
 			{ "LABEL_AMOUNT": "राशि" },
 			{ "LABEL_FEES": "लेनदेन शुल्क" },
-			{ "LABEL_TOTAL_AMOUNT": "कुल राशि भेजी जा रही है" },
 			{ "LABEL_CHANGE_AMOUNT": "शेष राशि" },
 			{ "LABEL_REWARDS_INFO": "ब्याज जानकारी" },
 			{ "LABEL_VALIDATED": "मान्य" },
