@@ -47,11 +47,11 @@
 	},
 	{ "SEND": [
 			{ "LABEL_FROM": "Von Adresse" },
+			{ "LABEL_TOTAL_AMOUNT": "Gesamtbetrag der versendet wird" },
 			{ "LABEL_TO": "Zu Adresse" },
 			{ "LABEL_AMOUNT_INFO": "Betrag Informationen" },
 			{ "LABEL_AMOUNT": "Betrag" },
 			{ "LABEL_FEES": "Transaktions Gebühren" },
-			{ "LABEL_TOTAL_AMOUNT": "Gesamtbetrag der versendet wird" },
 			{ "LABEL_CHANGE_AMOUNT": "Betrag ändern" },
 			{ "LABEL_REWARDS_INFO": "Reward Informationen" },
 			{ "LABEL_VALIDATED": "Bestätigt" },
