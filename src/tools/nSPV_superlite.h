@@ -857,7 +857,7 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     data = (uint8_t *)malloc(n);
     decode_hex(data,n,hex);
     txid = bits256_doublesha256(data,n);
-    msg = (uint8_t *)malloc(3 + sizeof(txid) + sizeof(n) + n);
+    msg = (uint8_t *)malloc(4 + sizeof(txid) + sizeof(n) + n);
     msg[0] = msg[1] = msg[2] = 0;
     msg[len++] = NSPV_BROADCAST;
     len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);

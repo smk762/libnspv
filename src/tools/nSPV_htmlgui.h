@@ -536,7 +536,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             //
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
-                itemsbuf = calloc(NSPV_txidsresult.numtxids+1,1024);
+                itemsbuf = calloc(NSPV_txidsresult.numtxids+1,2048);
                 for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
                     if ( i < NSPV_txidsresult.numtxids-1000 )
