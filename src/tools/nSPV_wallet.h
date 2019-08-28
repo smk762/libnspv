@@ -657,6 +657,7 @@ cJSON *NSPV_spend(btc_spv_client *client,char *srcaddr,char *destaddr,int64_t sa
         jaddstr(result,"lastpeer",NSPV_lastpeer);
         return(result);
     }
+    return(0);
 }
 
 #ifdef SUPPORT_CC

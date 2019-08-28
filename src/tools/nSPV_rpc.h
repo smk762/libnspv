@@ -1076,7 +1076,7 @@ void *LP_rpc_processreq(void *_ptr)
     }
     if ( retstr != 0 )
     {
-        char *response,*acceptstr="",hdrs[1024]; int32_t crflag = 1;
+        char *response,*acceptstr="",hdrs[1024]={0}; int32_t crflag = 1;
         //printf("RETURN.(%s) jsonflag.%d postflag.%d\n",retstr,jsonflag,postflag);
         if ( jsonflag != 0 || postflag != 0 )
         {
