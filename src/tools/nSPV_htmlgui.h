@@ -464,7 +464,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     int32_t z;
                     //for (z=0; z<4; z++) fprintf(stderr,"%016llx ",(long long)NSPV_mempoolresult.txid.ulongs[z]);
                     //fprintf(stderr," inside loop with %d mempool\n",NSPV_mempoolresult.numtxids);
-                    itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
+                    itemsbuf = calloc(NSPV_mempoolresult.numtxids+1,1024);
                     // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
                     // $MEMP_TYPE - Type
                     // $MEMP_DEST - Destination Address
@@ -536,7 +536,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             //
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
-                itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
+                itemsbuf = calloc(NSPV_txidsresult.numtxids+1,1024);
                 for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
                     if ( i < NSPV_txidsresult.numtxids-1000 )

@@ -158,7 +158,8 @@
                       <option value="" selected>$ACCOUNT_SELECT_WALLETLANG</option>
                       <option value="english">English</option>
                       <option value="french">Français</option>
-                      <option value="italian">Italiano</option>
+                    <option value="german">Deutsch</option>
+                    <option value="italian">Italiano</option>
                       <option value="chinese_simplified">简体中文</option>
                       <option value="chinese_traditional">中國傳統的</option>
                       <option value="japanese">日本人</option>
