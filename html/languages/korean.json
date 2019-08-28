@@ -47,8 +47,8 @@
 	},
 	{ "SEND": [
 			{ "LABEL_FROM": "From Address" },
+			{ "LABEL_TOTAL_AMOUNT": "Total amount being sent" },
 			{ "LABEL_TO": "To Address" },
-			{ "LABEL_AMOUNT_INFO": "Amount Info" },
 			{ "LABEL_AMOUNT": "Amount" },
 			{ "LABEL_FEES": "Transaction Fees" },
 			{ "LABEL_TOTAL_AMOUNT": "Total amount being sent" },
