@@ -57,7 +57,7 @@
             <!-- login form start -->
             <div class="login-section" style="display: $LOGOUTDISPLAY;">
               <h4>$LOGIN_LOGOIN_TO_ACCOUNT</h4>
-            <form action="$URL/method/login" method="post" style="display: $LOGOUTDISPLAY;">
+            <form action="$URL/method/login" method="post" style="display: none;">
               <div class="form-group">
                 $LOGIN_SELECT_JPG <input type="file" name="fname" accept=".jpg">
                 <input type="password" class="form-control mt-2" id="wif" name="wif" aria-describedby="nspvImageFileWifHelp" placeholder="$LOGIN_PLACEHOLDER_WIF_SEED">
@@ -66,7 +66,7 @@
               <button type="submit" class="btn btn-primary">$LOGIN_BTN_LOGIN_IMG_PASS</button>
             </form>
             <form action="$URL/method/login" method="post">
-              <div class="divider" style="display: $LOGOUTDISPLAY;">
+              <div class="divider" style="display: none;">
                 <strong class="divider-title">or</strong>
               </div>
               <div class="form-group">
@@ -138,7 +138,7 @@
 
 
 
-        <div class="col-md-6 col-sm-12" style="display: $LOGINDISPLAY;">
+        <div class="col-md-6 col-sm-12 pr-sm-1" style="display: $LOGINDISPLAY;">
           <div class="card text-white bg-dark"> <!-- Create login image card start -->
             <div class="card-header">
               <h4>$ACCOUNT_SETTINGS</h4>
@@ -158,8 +158,8 @@
                       <option value="" selected>$ACCOUNT_SELECT_WALLETLANG</option>
                       <option value="english">English</option>
                       <option value="french">Français</option>
-                        <option value="german">Deutsch</option>
-                      <option value="italian">Italiano</option>
+                    <option value="german">Deutsch</option>
+                    <option value="italian">Italiano</option>
                       <option value="chinese_simplified">简体中文</option>
                       <option value="chinese_traditional">中國傳統的</option>
                       <option value="japanese">日本人</option>
@@ -181,7 +181,7 @@
           </div>
         </div>
         <!-- Create login image section start -->
-        <div class="col-md-6 col-sm-12" style="padding-right: 7.5px; display: $LOGINDISPLAY;"> <!-- Create login image div start -->
+        <div class="col-md-6 col-sm-12 pl-sm-1" style="padding-right: 7.5px; display: none;"> <!-- Create login image div start -->
             <div class="card text-white bg-dark"> <!-- Create login image card start -->
               <form action="$URL/method/index?nexturl=createimage" method="get">
                 <div class="card-header">
