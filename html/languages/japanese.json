@@ -1,8 +1,8 @@
 [
 	{ "LANGINFO": [
 			{"NAME": "日本語"},
-			{"AUTHOR": "Satinder Grewal"},
-			{"AUTHOR_EMAIL": "satinder@komodoplatform.com"}]
+			{"AUTHOR": "CrisF"},
+			{"AUTHOR_EMAIL": "CrisFell@pm.me"}]
 	},
 	{ "COMMON": [
 			{ "BTN_SEND": "送信" },
