@@ -26,6 +26,7 @@
 #define NSPV_KOMODO_ENDOFERA 7777777
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
 #define NSPV_MAX_BLOCK_HEADERS 128
+#define NSPV_ENCRYPTED_MAXSIZE 8192
 
 #include <time.h>
 #ifndef __MINGW

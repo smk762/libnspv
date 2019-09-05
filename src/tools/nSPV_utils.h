@@ -1106,4 +1106,52 @@ int32_t NSPV_notariescount(CTransaction tx,uint8_t elected[64][33])
 #endif
 
 
+int32_t NSPV_encrypt(uint16_t ind,uint8_t encoded[NSPV_ENCRYPTED_MAXSIZE],uint8_t *msg,int32_t msglen,bits256 privkey)
+{
+    bits256 pubkey; int32_t len = 2; uint8_t space[NSPV_ENCRYPTED_MAXSIZE],*nonce,*cipher;
+    pubkey = acct777_pubkey(privkey);
+    encoded[len++] = ind & 0xff;
+    encoded[len++] = (ind >> 8) & 0xff;
+    nonce = &encoded[len];
+    btc_random_bytes(nonce,crypto_box_NONCEBYTES,0);
+    //OS_randombytes(nonce,crypto_box_NONCEBYTES);
+    cipher = &encoded[len + crypto_box_NONCEBYTES];
+    msglen = _SuperNET_cipher(nonce,&encoded[len + crypto_box_NONCEBYTES],msg,msglen,pubkey,privkey,space);
+    msglen += crypto_box_NONCEBYTES;
+    msg = encoded;
+    msglen += len;
+    encoded[0] = msglen & 0xff;
+    encoded[1] = (msglen >> 8) & 0xff;
+    //int32_t i; for (i=0; i<msglen; i++)
+    //    fprintf(stderr,"%02x",encoded[i]);
+    //fprintf(stderr," encoded.%d\n",msglen);
+    return(msglen);
+}
+
+uint8_t *NSPV_decrypt(uint16_t *indp,int32_t *recvlenp,uint8_t space[NSPV_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES],uint8_t *encoded,bits256 privkey)
+{
+    bits256 pubkey; uint8_t *extracted=0,*nonce,*cipher; uint16_t msglen,ind; int32_t cipherlen,len = 4;
+    *recvlenp = 0;
+    *indp = -1;
+    pubkey = acct777_pubkey(privkey);
+    msglen = ((int32_t)encoded[1] << 8) | encoded[0];
+    ind = ((int32_t)encoded[3] << 8) | encoded[2];
+    nonce = &encoded[len];
+    cipher = &encoded[len + crypto_box_NONCEBYTES];
+    cipherlen = msglen - (len + crypto_box_NONCEBYTES);
+    if ( cipherlen > 0 && cipherlen <= NSPV_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES )
+    {
+        if ( (extracted= _SuperNET_decipher(nonce,cipher,space,cipherlen,pubkey,privkey)) != 0 )
+        {
+            //int32_t i; for (i=0; i<msglen&&i<64; i++)
+            //    fprintf(stderr,"%02x",extracted[i]);
+            //fprintf(stderr," extracted\n");
+            msglen = (cipherlen - crypto_box_ZEROBYTES);
+            *recvlenp = msglen;
+            *indp = ind;
+        }
+    } //else fprintf(stderr,"cipher.%d too big for %d\n",cipherlen,NSPV_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES);
+    return(extracted);
+}
+
 #endif // NSPV_UTILS_H
