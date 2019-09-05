@@ -68,7 +68,7 @@ static void print_version()
 static void print_usage()
 {
     print_version();
-    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-s[--timeout] <secs>) <command>\n");
+    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-l=langauge) (-s[--timeout] <secs>) <command>\n");
     printf("Supported commands:\n");
     printf("        scan      (scan blocks up to the tip, creates header.db file)\n");
     printf("\nExamples: \n");
@@ -106,24 +106,17 @@ void spv_sync_completed(btc_spv_client* client) {
     }
 }
 
+#include "tweetnacl.c"
+#include "curve25519.c"
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
 #include "nSPV_CCtx.h"
+//#include "nSPV_jpeg.h"
 #include "nSPV_superlite.h"
 #include "nSPV_wallet.h"
+#include "nSPV_htmlgui.h"
 #include "komodo_cJSON.c"
 #include "nSPV_rpc.h"
-
-/*
- Todo:
-add check for p2sh in script_to_address
- mempool based pruning of utxos
- 
- cross chain superwallet (jaragua) -> blackjok3r
- 
- enhance cc/funcid filter in listtransactions/listunspent -> mihailo
- 
- */
 
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
 {
@@ -232,7 +225,7 @@ int main(int argc, char* argv[])
     strcpy(NSPV_symbol,chain->name);
     // get arguments
     uint16_t port = 0;
-    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:x:", long_options, &long_index)) != -1) {
+    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:x:l:", long_options, &long_index)) != -1) {
         switch (opt) {
         case 'c':
             quit_when_synced = false;
@@ -264,6 +257,13 @@ int main(int argc, char* argv[])
             {
                 NSPV_externalip = clonestr(optarg+1);
                 fprintf(stderr,"set external ip to %s\n",NSPV_externalip);
+            }
+            break;
+        case 'l':
+            if ( optarg != 0 )
+            {
+                strcpy(NSPV_language,optarg+1);
+                fprintf(stderr,"set language to (%s)\n",NSPV_language);
             }
             break;
         case 'f':
