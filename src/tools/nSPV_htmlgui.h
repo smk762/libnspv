@@ -740,7 +740,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                             free(filestr);
                             filestr = OS_filestr(&fsize,"html/wallet");
                             method = "wallet";
-                            if ( (0) )
+                            /*if ( (0) )
                             {
                                 char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t power2=3,len = (int32_t)strlen(NSPV_wifstr);
                                 init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
@@ -757,8 +757,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                                         free(retstr);
                                     }
                                 }
-                            }
-
+                            }*/
                         } else fprintf(stderr,"login error with wif.(%s)\n",wifstr);
                         memset(wifstr,0,strlen(wifstr));
                         free_json(retjson);
