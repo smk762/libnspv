@@ -60,6 +60,7 @@ typedef struct btc_node_group_ {
     vector* nodes; /* the groups nodes */
     char clientstr[1024];
     int desired_amount_connected_nodes;
+    int32_t NSPV_num_connected_nodes;
     const btc_chainparams* chainparams;
 
     /* callbacks */
@@ -98,14 +99,14 @@ typedef struct btc_node_ {
     int missbehavescore;
     btc_bool version_handshake;
 
-    unsigned int bestknownheight;
-    int32_t synced;
+    uint32_t bestknownheight;
     int32_t banscore;
     uint32_t version;
 
     uint32_t hints; /* can be use for user defined state */
     uint64_t nServices;
     uint32_t prevtimes[16],gotaddrs;
+    uint32_t lastgetinfo;
     char ipaddr[64];
 } btc_node;
 
@@ -140,7 +141,7 @@ LIBBTC_API void btc_node_group_free(btc_node_group* group);
 LIBBTC_API void btc_node_group_shutdown(btc_node_group* group);
 
 /* add a node to a node group */
-LIBBTC_API void btc_node_group_add_node(btc_node_group* group, btc_node* node);
+LIBBTC_API btc_node *btc_node_group_add_node(btc_node_group* group, btc_node* node);
 
 /* start node groups event loop */
 LIBBTC_API void btc_node_group_event_loop(btc_node_group* group);
