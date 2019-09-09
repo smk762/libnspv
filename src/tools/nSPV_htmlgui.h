@@ -464,7 +464,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
                     int32_t z;
                     //for (z=0; z<4; z++) fprintf(stderr,"%016llx ",(long long)NSPV_mempoolresult.txid.ulongs[z]);
                     //fprintf(stderr," inside loop with %d mempool\n",NSPV_mempoolresult.numtxids);
-                    itemsbuf = calloc(NSPV_mempoolresult.numtxids,1024);
+                    itemsbuf = calloc(NSPV_mempoolresult.numtxids+1,1024);
                     // $MEMP_ROW_ARRAY - Main array variable defined in wallet page for Mempool transactions table
                     // $MEMP_TYPE - Type
                     // $MEMP_DEST - Destination Address
@@ -536,7 +536,7 @@ char *NSPV_expand_variables(char *bigbuf,char *filestr,char *method,cJSON *argjs
             //
             if ( strcmp(NSPV_address,NSPV_txidsresult.coinaddr) == 0 )
             {
-                itemsbuf = calloc(NSPV_txidsresult.numtxids,1024);
+                itemsbuf = calloc(NSPV_txidsresult.numtxids+1,2048);
                 for (i=NSPV_txidsresult.numtxids-1; i>=0; i--)
                 {
                     if ( i < NSPV_txidsresult.numtxids-1000 )
@@ -740,6 +740,8 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                             free(filestr);
                             filestr = OS_filestr(&fsize,"html/wallet");
                             method = "wallet";
+#ifdef ENABLE_JPEG
+                            if ( (0) )
                             {
                                 char srcstr[512],*retstr,*passphrase = "secret"; uint16_t ind; int32_t power2=3,len = (int32_t)strlen(NSPV_wifstr);
                                 init_hexbytes_noT(srcstr,(uint8_t *)NSPV_wifstr,len);
@@ -757,7 +759,7 @@ char *NSPV_JSON(cJSON *argjson,char *remoteaddr,uint16_t port,char *filestr,int3
                                     }
                                 }
                             }
-
+#endif
                         } else fprintf(stderr,"login error with wif.(%s)\n",wifstr);
                         memset(wifstr,0,strlen(wifstr));
                         free_json(retjson);

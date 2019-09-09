@@ -134,7 +134,7 @@ AM_CONDITIONAL([WITH_WALLET], [test "x$with_wallet" = "xyes"])
 AM_CONDITIONAL([WITH_NET], [test "x$with_net" = "xyes"])
 
 ac_configure_args="${ac_configure_args} --enable-module-recovery"
-AC_CONFIG_SUBDIRS([src/secp256k1])
+AC_CONFIG_SUBDIRS([src/secp256k1 src/tools/cryptoconditions])
 
 dnl make sure nothing new is exported so that we don't break the cache
 PKGCONFIG_PATH_TEMP="$PKG_CONFIG_PATH"

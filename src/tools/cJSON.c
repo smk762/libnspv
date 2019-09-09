@@ -128,7 +128,7 @@ static unsigned char* cJSON_strdup(const unsigned char* string, const internal_h
         return NULL;
     }
 
-    length = strlen((const char*)string) + sizeof("");
+    length = strlen((const char*)string) + 4;
     if (!(copy = (unsigned char*)hooks->allocate(length)))
     {
         return NULL;

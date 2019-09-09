@@ -1,6 +1,12 @@
 <img src="http://libbtc.github.io/images/libbtc/logo@2x.png" alt="Icon" style="width:64px;"/>
 
-libbtc – A fast, clean and small bitcoin C library
+**Documentation update in progress**
+
+libnspv – a portable C library for creating and manipulating data structures and interacting with the p2p network on
+Komodo-compatible Smart Chains including the KMD main chain.
+
+**Based on Libbtc**
+
 =============================================================
 
 [![Build Status](https://travis-ci.org/libbtc/libbtc.svg?branch=master)](https://travis-ci.org/libbtc/libbtc)  [![Coverage Status](https://coveralls.io/repos/libbtc/libbtc/badge.svg?branch=master&service=github)](https://coveralls.io/github/libbtc/libbtc?branch=master)
@@ -100,20 +106,28 @@ The application will try to connect to max 6 peers, send the transaction two two
 How to Build
 ----------------
 
-You will need to have some dev tools prior to building libnspv for your system. 
+You will need to have some dev tools prior to building libnspv for your system.
 
 ## Prepare system before building
 
 #### MacOS
+
 ```shell
 # Install brew
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 # Install Xcode, opens a pop-up window to install CLT without installing the entire Xcode package
-xcode-select --install 
+xcode-select --install
 # Update brew and install dependencies
 brew update
 brew upgrade
 brew install libsodium libevent cmake git wget
+```
+
+##### Intall using brew
+
+```shell
+brew tap jl777/homebrew-libnspv
+brew install libnspv
 ```
 
 #### Android
@@ -127,7 +141,8 @@ pkg install build-essential git wget libsodium libevent
 
 #### Linux
 ```shell
-sudo apt-get install build-essential pkg-config libc6-dev m4 autoconf libtool unzip git wget automake
+sudo apt-get -y install build-essential pkg-config libc6-dev m4 autoconf \
+libtool unzip git wget automake
 ```
 
 ## Clone repository using Git
@@ -176,7 +191,7 @@ of the superlite if it is a komodo "asset" and also has the following fields:
 "magic":"feb4cb23",
 "nSPV":"5.9.102.210, 5.9.253.195, 5.9.253.196, 5.9.253.197, 5.9.253.198, 5.9.253.199, 5.9.253.200, 5.9.253.201, 5.9.253.202, 5.9.253.203"
 
-the "p2p" field is the coins peer to peer port, the "magic" is the netmagic of that chain. the decimal value of this can be 
+the "p2p" field is the coins peer to peer port, the "magic" is the netmagic of that chain. the decimal value of this can be
 obtained from the getinfo call, convert to hex and serialize it into the 4 hexbytes. if you got the direction wrong, just flip
 it around.
 finally, the "nSPV" field is a list of one or more ip addresses of a nSPV fullnode
@@ -185,4 +200,41 @@ the JSON api is very simple and almost a direct mapping of the nSPV=1 rpc comman
 file at ~/libnspv/src/tools/testvectors will show specifically how to call it using curl. any other method to post the JSON
 to the rpc port will suffice.
 
-https://docs.komodoplatform.com/nSPV has initial docs 
+https://docs.komodoplatform.com/nSPV has initial docs
+
+How To build in Termux on Android:
+-------------------------------------
+
+#### Check if your device will use the new Termux repos: https://github.com/termux/termux-packages#information-for-android-7-users
+
+#### Update and install required packages
+
+```shell
+pkg upgrade && pkg install build-essential git wget libsodium libevent
+```
+
+*Other packages may be required.*
+
+#### Clone and enter the repo
+
+```shell
+git clone https://github.com/jl777/libnspv/
+cd libnspv
+```
+
+#### Update scripts so target environment determined (from https://wiki.termux.com/wiki/Building_packages):
+
+```shell
+find . -name 'config.sub' -exec chmod u+w '{}' \; -exec cp -f "${PREFIX}/share/libtool/build-aux/config.sub" '{}' \;
+find . -name 'config.guess' -exec chmod u+w '{}' \; -exec cp -f "${PREFIX}/share/libtool/build-aux/config.guess" '{}' \;
+```
+
+#### Then the usual:
+
+```shell
+./autogen.sh
+./configure
+make
+```
+
+Then visit 127.0.0.1:7771 in your Android browser.

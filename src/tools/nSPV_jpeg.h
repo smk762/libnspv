@@ -17,57 +17,6 @@
 #ifndef NSPV_JPEG_H
 #define NSPV_JPEG_H
 
-#define JPG_ENCRYPTED_MAXSIZE 32768
-
-int32_t JPG_encrypt(uint16_t ind,uint8_t encoded[JPG_ENCRYPTED_MAXSIZE],uint8_t *msg,int32_t msglen,bits256 privkey)
-{
-    bits256 pubkey; int32_t len = 2; uint8_t space[JPG_ENCRYPTED_MAXSIZE],*nonce,*cipher;
-    pubkey = acct777_pubkey(privkey);
-    encoded[len++] = ind & 0xff;
-    encoded[len++] = (ind >> 8) & 0xff;
-    nonce = &encoded[len];
-    btc_random_bytes(nonce,crypto_box_NONCEBYTES,0);
-    //OS_randombytes(nonce,crypto_box_NONCEBYTES);
-    cipher = &encoded[len + crypto_box_NONCEBYTES];
-    msglen = _SuperNET_cipher(nonce,&encoded[len + crypto_box_NONCEBYTES],msg,msglen,pubkey,privkey,space);
-    msglen += crypto_box_NONCEBYTES;
-    msg = encoded;
-    msglen += len;
-    encoded[0] = msglen & 0xff;
-    encoded[1] = (msglen >> 8) & 0xff;
-    //int32_t i; for (i=0; i<msglen; i++)
-    //    fprintf(stderr,"%02x",encoded[i]);
-    //fprintf(stderr," encoded.%d\n",msglen);
-    return(msglen);
-}
-
-uint8_t *JPG_decrypt(uint16_t *indp,int32_t *recvlenp,uint8_t space[JPG_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES],uint8_t *encoded,bits256 privkey)
-{
-    bits256 pubkey; uint8_t *extracted=0,*nonce,*cipher; uint16_t msglen,ind; int32_t cipherlen,len = 4;
-    *recvlenp = 0;
-    *indp = -1;
-    pubkey = acct777_pubkey(privkey);
-    msglen = ((int32_t)encoded[1] << 8) | encoded[0];
-    ind = ((int32_t)encoded[3] << 8) | encoded[2];
-    nonce = &encoded[len];
-    cipher = &encoded[len + crypto_box_NONCEBYTES];
-    cipherlen = msglen - (len + crypto_box_NONCEBYTES);
-    if ( cipherlen > 0 && cipherlen <= JPG_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES )
-    {
-        if ( (extracted= _SuperNET_decipher(nonce,cipher,space,cipherlen,pubkey,privkey)) != 0 )
-        {
-            //int32_t i; for (i=0; i<msglen&&i<64; i++)
-            //    fprintf(stderr,"%02x",extracted[i]);
-            //fprintf(stderr," extracted\n");
-            msglen = (cipherlen - crypto_box_ZEROBYTES);
-            *recvlenp = msglen;
-            *indp = ind;
-        }
-    } //else fprintf(stderr,"cipher.%d too big for %d\n",cipherlen,JPG_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES);
-    return(extracted);
-}
-
-
 // from https://github.com/owencm/C-Steganography-Framework
 #include "jpeg/cdjpeg.h"        /* Common decls for compressing and decompressing jpegs */
 
@@ -93,19 +42,19 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     memset(privkey.bytes,0,sizeof(privkey));
     if ( password != 0 && password[0] != 0 )
     {
-        if ( required/8 > JPG_ENCRYPTED_MAXSIZE-60 )
+        if ( required/8 > NSPV_ENCRYPTED_MAXSIZE-60 )
             return(-1);
         data = calloc(1,required/8+512);
         sha256_Raw((uint8_t *)password,(int32_t)strlen(password),privkey.bytes);
         //vcalc_sha256(0,privkey.bytes,(uint8_t *)password,(int32_t)strlen(password));
         if ( origdata != 0 )
         {
-            msglen = JPG_encrypt(*indp,data,origdata,required/8,privkey);
+            msglen = NSPV_encrypt(*indp,data,origdata,required/8,privkey);
             required = msglen * 8;
             if ( (0) )
             {
-                space = calloc(1,JPG_ENCRYPTED_MAXSIZE);
-                if ( (decrypted= JPG_decrypt(&checkind,&recvlen,space,data,privkey)) == 0 || recvlen != origrequired/8 || checkind != *indp || memcmp(decrypted,origdata,origrequired/8) != 0 )
+                space = calloc(1,NSPV_ENCRYPTED_MAXSIZE);
+                if ( (decrypted= NSPV_decrypt(&checkind,&recvlen,space,data,privkey)) == 0 || recvlen != origrequired/8 || checkind != *indp || memcmp(decrypted,origdata,origrequired/8) != 0 )
                     fprintf(stderr,"A decryption error: checkind.%d vs %d, recvlen.%d vs %d, decrypted.%p\n",checkind,*indp,recvlen,origrequired/8,(void *)decrypted);
                 else if ( (1) )
                 {
@@ -182,8 +131,8 @@ int32_t LP_jpg_process(int32_t *recvp,int32_t *capacityp,char *inputfname,char *
     }
     if ( password != 0 && password[0] != 0 )
     {
-        space = calloc(1,JPG_ENCRYPTED_MAXSIZE);
-        if ( (decrypted= JPG_decrypt(indp,&recvlen,space,decoded,privkey)) != 0 && recvlen == origrequired/8 )
+        space = calloc(1,NSPV_ENCRYPTED_MAXSIZE);
+        if ( (decrypted= NSPV_decrypt(indp,&recvlen,space,decoded,privkey)) != 0 && recvlen == origrequired/8 )
         {
             *recvp = recvlen;
             for (i=0; i<recvlen; i++)
