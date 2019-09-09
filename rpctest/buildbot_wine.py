@@ -6,6 +6,8 @@
 import subprocess
 import time
 import json
+import requests
+import sys
 
 """
     steps:
@@ -25,7 +27,16 @@ def main():
 
     command1 = ["wine64", "nspv.exe", coin]
     command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
-
+    
+    # win lib download
+    if sys.argv[3]:
+        link = sys.argv[1]
+        user = sys.argv[2]
+        passwd = sys.argv[3]
+        dll = requests.get(link, auth=(user, passwd))
+        with open('libwinpthread-1.dll', 'wb') as f:
+            f.write(dll.content)
+    
     nspv = subprocess.Popen(command1, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if nspv.poll():
         print("nspv not running")
