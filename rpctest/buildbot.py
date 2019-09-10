@@ -19,6 +19,18 @@ from pathlib import Path
 """
 
 
+def write_dll():
+    try:
+        passwd = sys.argv[3]
+        user = sys.argv[2]
+        link = sys.argv[1]
+        dll = requests.get(link, auth=(user, passwd))
+        with open('libwinpthread-1.dll', 'wb') as f:
+            f.write(dll.content)
+    except IndexError:
+        pass
+
+
 def main():
     f = open("test_setup.txt", "r")
     test_setup = json.load(f)
@@ -32,15 +44,7 @@ def main():
         if sys.platform == 'linux':
             # check for wine case:
             if Path("./nspv.exe"):
-                if sys.argv[3]:
-                    link = sys.argv[1]
-                    user = sys.argv[2]
-                    passwd = sys.argv[3]
-                    dll = requests.get(link, auth=(user, passwd))
-                    with open('libwinpthread-1.dll', 'wb') as f:
-                        f.write(dll.content)
-                else:
-                    print("No arguments passed")
+                write_dll()
                 command1 = ["wine64", "nspv.exe", coin]
                 command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
             else:
@@ -50,13 +54,7 @@ def main():
             command1 = ["./nspv", coin]
             command2 = ["/usr/local/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
     else:
-        if sys.argv[3]:
-            link = sys.argv[1]
-            user = sys.argv[2]
-            passwd = sys.argv[3]
-            dll = requests.get(link, auth=(user, passwd))
-            with open('libwinpthread-1.dll', 'wb') as f:
-                f.write(dll.content)
+        write_dll()
         command1 = ["nspv.exe", coin]
         command2 = ["python3", "-m", "pytest", "rpctest\\test_nspv.py", "-s"]
 
