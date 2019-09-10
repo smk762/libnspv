@@ -9,6 +9,7 @@ import json
 import os
 import sys
 import requests
+from pathlib import Path
 
 """
     steps:
@@ -29,8 +30,22 @@ def main():
     # os deps:
     if os.name == 'posix':
         if sys.platform == 'linux':
-            command1 = ["./nspv", coin]
-            command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
+            # check for wine case:
+            if Path("./nspv.exe"):
+                if sys.argv[3]:
+                    link = sys.argv[1]
+                    user = sys.argv[2]
+                    passwd = sys.argv[3]
+                    dll = requests.get(link, auth=(user, passwd))
+                    with open('libwinpthread-1.dll', 'wb') as f:
+                        f.write(dll.content)
+                else:
+                    print("No arguments passed")
+                command1 = ["wine64", "nspv.exe", coin]
+                command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
+            else:
+                command1 = ["./nspv", coin]
+                command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
         else:
             command1 = ["./nspv", coin]
             command2 = ["/usr/local/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
@@ -42,8 +57,8 @@ def main():
             dll = requests.get(link, auth=(user, passwd))
             with open('libwinpthread-1.dll', 'wb') as f:
                 f.write(dll.content)
-        command1 = ["wine64", "nspv.exe", coin]
-        command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
+        command1 = ["nspv.exe", coin]
+        command2 = ["python3", "-m", "pytest", "rpctest\\test_nspv.py", "-s"]
 
     nspv = subprocess.Popen(command1, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if nspv.poll():
