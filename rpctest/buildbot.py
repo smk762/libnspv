@@ -43,7 +43,7 @@ def main():
     if os.name == 'posix':
         if sys.platform == 'linux':
             # check for wine case:
-            if Path("./nspv.exe"):
+            if Path("./nspv.exe").is_file():
                 write_dll()
                 command1 = ["wine64", "nspv.exe", coin]
                 command2 = ["/usr/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
