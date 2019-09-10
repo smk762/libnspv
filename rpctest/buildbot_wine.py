@@ -33,9 +33,6 @@ def main():
         link = sys.argv[1]
         user = sys.argv[2]
         passwd = sys.argv[3]
-        print("link: ", link)
-        print("user: ", user)
-        print("passwd: ", passwd)
         dll = requests.get(link, auth=(user, passwd))
         with open('libwinpthread-1.dll', 'wb') as f:
             f.write(dll.content)
