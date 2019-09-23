@@ -424,12 +424,13 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
         sigerr = -1;
     else
     {
-        for (i=0; i<(int32_t)siglen; i++)
-            fprintf(stderr,"%02x",sig[i]);
+        // for (i=0; i<(int32_t)siglen; i++)
+        //     fprintf(stderr,"%02x",sig[i]);
         vin = btc_tx_vin(mtx,vini);
         if ( scriptPubKey->len == 25 )
             extralen = 34;
         else extralen = 0;
+        if (vin->script_sig) cstr_free(vin->script_sig,1);
         vin->script_sig = cstr_new_sz(siglen+2+extralen);
         vin->script_sig->str[0] = siglen+1;
         memcpy(vin->script_sig->str+1,sig,siglen);
@@ -440,7 +441,7 @@ bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKe
             memcpy(vin->script_sig->str+2+siglen+1,NSPV_pubkey.pubkey,extralen-1);
         }
         vin->script_sig->len = siglen+2+extralen;
-        fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:(int32_t)siglen);
+        //fprintf(stderr," sighash %s, sigerr.%d siglen.%d\n",bits256_str(str,sighash),sigerr,vin!=0?(int32_t)vin->script_sig->len:(int32_t)siglen);
     }
     return(true);
 }
