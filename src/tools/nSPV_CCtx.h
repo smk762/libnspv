@@ -24,7 +24,6 @@
 // please make a new way of doing CC tx that wont lead to complaints later. let us start with faucetget
 
 extern bool NSPV_SignTx(btc_tx *mtx,int32_t vini,int64_t utxovalue,cstring *scriptPubKey,uint32_t nTime);
-#define FAUCETSIZE (COIN / 10)
 
 cstring *FinalizeCCtx(btc_spv_client *client, cJSON *txdata )
 {
