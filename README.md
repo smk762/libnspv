@@ -162,11 +162,8 @@ make check
 ```
 
 #### Pure library without wallet support
-```
-./autogen.sh
-./configure --disable-wallet --disable-tools
-make check
-```
+
+the nspv client won't follow the options `--disable-wallet --disable-tools` as it needs some of the wallet functoins as all the nspv api is always supported
 
 #### Updating libnspv
 ```shell
