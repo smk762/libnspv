@@ -56,6 +56,7 @@ struct NSPV_ntzsresp NSPV_ntzsresult;
 struct NSPV_ntzsproofresp NSPV_ntzsproofresult;
 struct NSPV_txproof NSPV_txproofresult;
 struct NSPV_broadcastresp NSPV_broadcastresult;
+struct NSPV_remoterpcresp NSPV_remoterpcresult;
 
 struct NSPV_ntzsresp NSPV_ntzsresp_cache[NSPV_MAXVINS];
 struct NSPV_ntzsproofresp NSPV_ntzsproofresp_cache[NSPV_MAXVINS * 2];
@@ -459,6 +460,11 @@ void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len)
                 NSPV_rwbroadcastresp(0,&response[1],&NSPV_broadcastresult);
                 fprintf(stderr,"got broadcast response %u size.%d %s retcode.%d\n",timestamp,len,bits256_str(str,NSPV_broadcastresult.txid),NSPV_broadcastresult.retcode);
                 break;
+            case NSPV_REMOTERPCRESP:
+                NSPV_remoterpc_purge(&NSPV_remoterpcresult);
+                NSPV_rwremoterpcresp(0,&response[1],&NSPV_remoterpcresult,len-1);
+                fprintf(stderr,"got remoterpc response %u size.%d %s\n",timestamp,len,NSPV_remoterpcresult.method);
+                break;
             default: fprintf(stderr,"unexpected response %02x size.%d at %u\n",response[0],len,timestamp);
                 break;
         }
@@ -512,7 +518,7 @@ cJSON *NSPV_getpeerinfo(btc_spv_client *client)
     return(result);
 }
 
-cJSON *NSPV_gettransaction2(btc_spv_client *client,bits256 txid,int32_t v,int32_t height)
+btc_tx *NSPV_gettx(btc_spv_client *client,bits256 txid,int32_t v,int32_t height)
 {
     int32_t retval = 0, isKMD, skipvalidation = 0; int64_t extradata = 0; int64_t rewardsum = 0; btc_tx* tx = NULL;
     cJSON *result = cJSON_CreateObject();
@@ -520,6 +526,14 @@ cJSON *NSPV_gettransaction2(btc_spv_client *client,bits256 txid,int32_t v,int32_
     if ( height == 0 )
         height = NSPV_lastntz.height;
     tx = NSPV_gettransaction(client,&retval,isKMD,skipvalidation,v,txid,height,extradata,NSPV_tiptime,&rewardsum);
+    return(tx);
+}
+
+cJSON *NSPV_gettransaction2(btc_spv_client *client,bits256 txid,int32_t v,int32_t height)
+{
+    int32_t retval = 0; int64_t rewardsum = 0; cJSON *result = cJSON_CreateObject(); btc_tx *tx;
+
+    tx = NSPV_gettx(client,txid,v,height);
     if ( tx == NULL )
     {
         jaddstr(result,"result","error");
@@ -886,6 +900,41 @@ cJSON *NSPV_broadcast(btc_spv_client *client,char *hex)
     return(NSPV_broadcast_json(&B,txid));
 }
 
+cJSON *NSPV_remoterpccall(btc_spv_client *client, char* method, cJSON *request)
+{
+    uint8_t *msg; int32_t i,iter,len = 3,slen;
+    char *pubkey=utils_uint8_to_hex(NSPV_pubkey.pubkey,33);
+
+    jaddstr(request,"mypk",pubkey);
+    NSPV_remoterpc_purge(&NSPV_remoterpcresult);
+    char *json=cJSON_Print(request);
+    if (!json) return (NULL);
+    slen = (int32_t)strlen(json);
+    msg = (uint8_t *)malloc(4 + sizeof(slen) + slen);
+    msg[0] = msg[1] = msg[2] = 0;
+    msg[len++] = NSPV_REMOTERPC;
+    len += iguana_rwnum(1,&msg[len],sizeof(slen),&slen);
+    memcpy(&msg[len],json,slen), len += slen;
+    free(json);
+    for (iter=0; iter<3; iter++)
+    if ( NSPV_req(client,0,msg,len,NODE_NSPV,NSPV_REMOTERPC>>1) != 0 )
+    {
+        for (i=0; i<NSPV_POLLITERS; i++)
+        {
+            usleep(NSPV_POLLMICROS);
+            if ( strcmp(NSPV_remoterpcresult.method,method) == 0)
+            {
+                cJSON *result=cJSON_Parse(NSPV_remoterpcresult.json);
+                NSPV_remoterpc_purge(&NSPV_remoterpcresult);
+                free(msg);
+                return(result);
+            }
+        }
+    } else sleep(1);
+    free(msg);
+    return (NULL);
+}
+
 cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
 {
     cJSON *result = cJSON_CreateObject(); char coinaddr[64],wif2[64]; uint8_t data[128]; int32_t valid = 0; size_t sz=0,sz2; bits256 privkey;
@@ -934,7 +983,9 @@ cJSON *NSPV_login(const btc_chainparams *chain,char *wifstr)
     jaddstr(result,"pubkey",NSPV_pubkeystr);
     jaddnum(result,"wifprefix",(int64_t)data[0]);
     jaddnum(result,"compressed",(int64_t)(data[sz-5] == 1));
-    fprintf(stderr,"result (%s)\n",jprint(result,0));
+    char *res=jprint(result,0);
+    fprintf(stderr,"result (%s)\n",res);
+    free(res);
     memset(data,0,sizeof(data));
     return(result);
 }
@@ -1232,7 +1283,6 @@ struct NSPV_methodarg NSPV_methods[] =
     { "spentinfo", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT } } },
     { "spend", { { "address", NSPV_STR }, { "amount", NSPV_FLOAT } } },
     { "mempool", { { "address", NSPV_STR }, { "isCC", NSPV_UINT }, { "memfunc", NSPV_UINT }, { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "evalcode", NSPV_UINT }, { "CCfunc", NSPV_UINT }, } },
-    { "faucetget", { "", 0 } },
     { "gettransaction", { { "txid", NSPV_HASH }, { "vout", NSPV_UINT }, { "height", NSPV_UINT } } },
 };
 
@@ -1325,12 +1375,13 @@ void NSPV_argjson_addfields(char *method,cJSON *argjson,cJSON *params)
             }
         }
     }
-    fprintf(stderr,"new argjson.(%s)\n",jprint(argjson,0));
+    //fprintf(stderr,"new argjson.(%s)\n",cJSON_Print(argjson));
 }
 
 cJSON *_NSPV_JSON(cJSON *argjson)
 {
-    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex; int32_t vout,prevheight,nextheight,skipcount,height,hdrheight,numargs; uint8_t CCflag,memfunc; cJSON *params;
+    char *method; bits256 txid; int64_t satoshis; char *symbol,*coinaddr,*wifstr,*hex;
+    int32_t vout,prevheight,nextheight,skipcount,height,hdrheight,numargs; uint8_t CCflag,memfunc; cJSON *params,*result,*req;
 //fprintf(stderr,"_NEW_JSON.(%s)\n",jprint(argjson,0));
     if ( (method= jstr(argjson,"method")) == 0 )
         return(cJSON_Parse("{\"error\":\"no method\"}"));
@@ -1451,9 +1502,23 @@ cJSON *_NSPV_JSON(cJSON *argjson)
         }
         return(NSPV_mempooltxids(NSPV_client,coinaddr,CCflag,memfunc,txid,vout));
     }
-    else if ( strcmp(method,"faucetget") == 0 )
-        return(NSPV_CC_faucetget());
-    else return(cJSON_Parse("{\"error\":\"invalid method\"}"));
+    else if ((req=NSPV_remoterpccall(NSPV_client,method,argjson))!=NULL)
+    {
+        cJSON *result=jobj(req,"result");
+        if (!cJSON_IsNull(result) && cJSON_HasObjectItem(result,"result") && strcmp(jstr(result,"result"),"success")==0 && (jstr(result,"hex"))!=0 && jobj(result,"SigData")!=NULL)
+        {     
+            cstring *hex=FinalizeCCtx(NSPV_client,result);
+            result=cJSON_CreateObject();
+            jaddstr(result,"result","success");
+            jaddstr(result,"hex",hex->str);
+            cstr_free(hex,1);
+            cJSON_Delete(req);  
+            return(result);
+        }
+        else return (req);
+    }
+    else
+        return(cJSON_Parse("{\"error\":\"invalid method\"}"));
 }
 
 #endif // KOMODO_NSPVSUPERLITE_H
