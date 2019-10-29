@@ -32,7 +32,7 @@ def setup_module():
     coin = os.environ('CHAIN')
 
     if not addr_send or not wif_real:
-        pytest.exit("Please check test wif and address in test_setup.txt")
+        pytest.exit("Please check test wif and address variables availability")
 
     chain_params = {"KMD": {
                             'tx_list_address': 'RGShWG446Pv24CKzzxjA23obrzYwNbs1kA',
