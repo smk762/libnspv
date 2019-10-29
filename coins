@@ -107,6 +107,16 @@
     "nSPV": "27.102.107.29, 27.102.107.28, 27.102.107.27"
   },
     {
+    "coin": "BTCH",
+    "asset": "BTCH",
+    "fname": "Bitcoin Hush",
+    "rpcport": 8800,
+    "mm2": 1,
+    "p2p": 8799,
+    "magic":"f41c5eff",
+    "nSPV":"136.243.58.134"
+    },
+    {
     "coin": "NSPV",
     "asset": "NSPV",
     "fname": "NSPV",
@@ -2101,12 +2111,6 @@
     "txfee": 100000
   },
   {
-    "coin": "BTCH",
-    "asset": "BTCH",
-    "fname": "Bitcoin Hush",
-    "rpcport": 8800
-  },
-  {
     "coin": "ETOMIC",
     "asset": "ETOMIC",
     "fname": "ETOMIC",
@@ -2773,6 +2777,9 @@
     "asset": "HUSH3",
     "fname": "Hush",
     "rpcport": 18031,
+    "p2p": 18030,
+    "magic":"6ed394d3",
+    "nSPV":"188.165.212.101",
     "mm2": 1
   },
   {

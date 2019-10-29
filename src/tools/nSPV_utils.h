@@ -32,50 +32,77 @@ btc_chainparams kmd_chainparams_main =
     { 0xf9, 0xee, 0xe4, 0x8d },
     { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 }, //{0x6f, 0xe2, 0x8c, 0x0a, 0xb6, 0xf1, 0xb3, 0x72, 0xc1, 0xa6, 0xa2, 0x46, 0xae, 0x63, 0xf7, 0x4f, 0x93, 0x1e, 0x83, 0x65, 0xe1, 0x5a, 0x08, 0x9c, 0x68, 0xd6, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00},
     7770,7771,
-    {{"5.9.253.195, 5.9.253.196, 5.9.253.197, 5.9.253.198, 5.9.253.199, 5.9.253.200, 5.9.253.201, 5.9.253.202, 5.9.253.203"}, 0},
+    {{"5.9.102.210, 45.32.19.196, 5.9.253.195, 78.47.196.146, 23.254.165.16, 136.243.58.134, 5.9.253.196, 5.9.253.197, 5.9.253.198, 5.9.253.199, 5.9.253.200, 5.9.253.201, 5.9.253.202, 5.9.253.203"}, 0},
     60,
     170007,
     MAX_TX_SIZE_AFTER_SAPLING,
     1,1,0,
 };
 
-/*btc_chainparams nspv_chainparams_main =
-{
-    "NSPV",
-    60,
-    85,
-    "bc", // const char bech32_hrp[5]
-    188,
-    0x0488ADE4, // uint32_t b58prefix_bip32_privkey
-    0x0488B21E, // uint32_t b58prefix_bip32_pubkey
-    { 0x06, 0x65, 0x02, 0x98 }, //0x98, 0x02, 0x65, 0x06 },
-    { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 }, //{0x6f, 0xe2, 0x8c, 0x0a, 0xb6, 0xf1, 0xb3, 0x72, 0xc1, 0xa6, 0xa2, 0x46, 0xae, 0x63, 0xf7, 0x4f, 0x93, 0x1e, 0x83, 0x65, 0xe1, 0x5a, 0x08, 0x9c, 0x68, 0xd6, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00},
-    20266,20267,
-    {{"5.9.102.210, 5.9.253.195, 5.9.253.196, 5.9.253.197, 5.9.253.198, 5.9.253.199, 5.9.253.200, 5.9.253.201, 5.9.253.202, 5.9.253.203"}, 0},
-    60,
-    170007,
-    MAX_TX_SIZE_AFTER_SAPLING,
-    1,1,0,
-};
+int32_t unhex(char c);
 
-btc_chainparams iln_chainparams_main =
+bits256 NSPV_seed_to_wif(char *newseed,int32_t maxlen,char *rawseed)
 {
-    "ILN",
-    60,
-    85,
-    "bc", // const char bech32_hrp[5]
-    188,
-    0x0488ADE4, // uint32_t b58prefix_bip32_privkey
-    0x0488B21E, // uint32_t b58prefix_bip32_pubkey
-    { 0xfe, 0xb4, 0xcb, 0x23 }, //23cbb4fe },
-    { 0x02, 0x7e, 0x37, 0x58, 0xc3, 0xa6, 0x5b, 0x12, 0xaa, 0x10, 0x46, 0x46, 0x2b, 0x48, 0x6d, 0x0a, 0x63, 0xbf, 0xa1, 0xbe, 0xae, 0x32, 0x78, 0x97, 0xf5, 0x6c, 0x5c, 0xfb, 0x7d, 0xaa, 0xae, 0x71 },
-    12985,12986,
-    {{"5.9.102.210, 5.9.253.195, 5.9.253.196, 5.9.253.197, 5.9.253.198, 5.9.253.199, 5.9.253.200, 5.9.253.201, 5.9.253.202, 5.9.253.203"}, 0},
-    60,
-    170007,
-    MAX_TX_SIZE_AFTER_SAPLING,
-    1,1,0,
-};*/
+    bits256 privkey; int32_t a,b,c,n=0; char *dest = newseed;
+    while ( n < maxlen && (c= rawseed[n]) != 0 && c != 0 && c != '\r' && c != '\n' )
+    {
+        if ( c == '%' && (a= rawseed[n+1]) != 0 && (b= rawseed[n+2]) != 0 )
+            c = ((unhex(a) << 4) | unhex(b)), n += 2;
+        if ( c == '+' )
+            c = ' ';
+        *dest++ = c;
+        n++;
+    }
+    newseed[n] = 0;
+    sha256_Raw((uint8_t *)newseed,strlen(newseed),privkey.bytes);
+    privkey.bytes[0] &= 248, privkey.bytes[31] &= 127, privkey.bytes[31] |= 64;
+    if ( 0 )
+    {
+        int32_t j; for (j=0; j<32; j++)
+            fprintf(stderr,"%02x",privkey.bytes[j]);
+        fprintf(stderr," <- (%s) ",newseed);
+        for (j=0; newseed[j]!=0; j++)
+            fprintf(stderr,"%02x",newseed[j]&0xff);
+        fprintf(stderr,"\n");
+    }
+    return(privkey);
+}
+
+int32_t OS_getline(int32_t waitflag,char *line,int32_t max,char *dispstr,FILE *fp)
+{
+    if ( dispstr != 0 && dispstr[0] != 0 )
+        fprintf(stderr,"%s",dispstr);
+    line[0] = 0;
+#ifndef _WIN32
+    if ( waitflag == 0 )
+    {
+        static char prevline[1024];
+        struct timeval timeout;
+        fd_set fdset;
+        int32_t s;
+        line[0] = 0;
+        FD_ZERO(&fdset);
+        FD_SET(STDIN_FILENO,&fdset);
+        timeout.tv_sec = 0, timeout.tv_usec = 10000;
+        if ( (s= select(1,&fdset,NULL,NULL,&timeout)) < 0 )
+            fprintf(stderr,"wait_for_input: error select s.%d\n",s);
+        else
+        {
+            if ( FD_ISSET(STDIN_FILENO,&fdset) > 0 && fgets(line,max,stdin) == line )
+            {
+                line[strlen(line)-1] = 0;
+                if ( line[0] == 0 || (line[0] == '.' && line[1] == 0) )
+                    strcpy(line,prevline);
+                else strcpy(prevline,line);
+            }
+        }
+        return((int32_t)strlen(line));
+    }
+#endif
+    if ( fgets(line,max,fp) != 0 )
+        line[strlen(line)-1] = 0;
+    return((int32_t)strlen(line));
+}
 
 char *bits256_str(char *buf,bits256 hash)
 {
@@ -113,6 +140,35 @@ bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr)
     len = NSPV_rwequihdr(1,H,hdr,1);
     hash = bits256_doublesha256(H,len);
     return(hash);
+}
+
+char hexbyte(int32_t c)
+{
+    c &= 0xf;
+    if ( c < 10 )
+        return('0'+c);
+    else if ( c < 16 )
+        return('a'+c-10);
+    else return(0);
+}
+
+int32_t init_hexbytes_noT(char *hexbytes,unsigned char *message,long len)
+{
+    int32_t i;
+    if ( len <= 0 )
+    {
+        hexbytes[0] = 0;
+        return(1);
+    }
+    for (i=0; i<len; i++)
+    {
+        hexbytes[i*2] = hexbyte((message[i]>>4) & 0xf);
+        hexbytes[i*2 + 1] = hexbyte(message[i] & 0xf);
+        //printf("i.%d (%02x) [%c%c]\n",i,message[i],hexbytes[i*2],hexbytes[i*2+1]);
+    }
+    hexbytes[len*2] = 0;
+    //printf("len.%ld\n",len*2+1);
+    return((int32_t)len*2+1);
 }
 
 void touppercase(char *str)
@@ -337,7 +393,7 @@ char *clonestr(char *str)
 #endif
         str = (char *)"<nullstr>";
     }
-    clone = (char *)malloc(strlen(str)+16);
+    clone = (char *)malloc(strlen(str)+32);
     strcpy(clone,str);
     return(clone);
 }
@@ -1049,5 +1105,53 @@ int32_t NSPV_notariescount(CTransaction tx,uint8_t elected[64][33])
 
 #endif
 
+
+int32_t NSPV_encrypt(uint16_t ind,uint8_t encoded[NSPV_ENCRYPTED_MAXSIZE],uint8_t *msg,int32_t msglen,bits256 privkey)
+{
+    bits256 pubkey; int32_t len = 2; uint8_t space[NSPV_ENCRYPTED_MAXSIZE],*nonce,*cipher;
+    pubkey = acct777_pubkey(privkey);
+    encoded[len++] = ind & 0xff;
+    encoded[len++] = (ind >> 8) & 0xff;
+    nonce = &encoded[len];
+    btc_random_bytes(nonce,crypto_box_NONCEBYTES,0);
+    //OS_randombytes(nonce,crypto_box_NONCEBYTES);
+    cipher = &encoded[len + crypto_box_NONCEBYTES];
+    msglen = _SuperNET_cipher(nonce,&encoded[len + crypto_box_NONCEBYTES],msg,msglen,pubkey,privkey,space);
+    msglen += crypto_box_NONCEBYTES;
+    msg = encoded;
+    msglen += len;
+    encoded[0] = msglen & 0xff;
+    encoded[1] = (msglen >> 8) & 0xff;
+    //int32_t i; for (i=0; i<msglen; i++)
+    //    fprintf(stderr,"%02x",encoded[i]);
+    //fprintf(stderr," encoded.%d\n",msglen);
+    return(msglen);
+}
+
+uint8_t *NSPV_decrypt(uint16_t *indp,int32_t *recvlenp,uint8_t space[NSPV_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES],uint8_t *encoded,bits256 privkey)
+{
+    bits256 pubkey; uint8_t *extracted=0,*nonce,*cipher; uint16_t msglen,ind; int32_t cipherlen,len = 4;
+    *recvlenp = 0;
+    *indp = -1;
+    pubkey = acct777_pubkey(privkey);
+    msglen = ((int32_t)encoded[1] << 8) | encoded[0];
+    ind = ((int32_t)encoded[3] << 8) | encoded[2];
+    nonce = &encoded[len];
+    cipher = &encoded[len + crypto_box_NONCEBYTES];
+    cipherlen = msglen - (len + crypto_box_NONCEBYTES);
+    if ( cipherlen > 0 && cipherlen <= NSPV_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES )
+    {
+        if ( (extracted= _SuperNET_decipher(nonce,cipher,space,cipherlen,pubkey,privkey)) != 0 )
+        {
+            //int32_t i; for (i=0; i<msglen&&i<64; i++)
+            //    fprintf(stderr,"%02x",extracted[i]);
+            //fprintf(stderr," extracted\n");
+            msglen = (cipherlen - crypto_box_ZEROBYTES);
+            *recvlenp = msglen;
+            *indp = ind;
+        }
+    } //else fprintf(stderr,"cipher.%d too big for %d\n",cipherlen,NSPV_ENCRYPTED_MAXSIZE + crypto_box_ZEROBYTES);
+    return(extracted);
+}
 
 #endif // NSPV_UTILS_H

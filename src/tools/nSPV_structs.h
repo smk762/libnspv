@@ -500,6 +500,20 @@ void NSPV_broadcast_purge(struct NSPV_broadcastresp *ptr)
         memset(ptr,0,sizeof(*ptr));
 }
 
+int32_t NSPV_rwremoterpcresp(int32_t rwflag,uint8_t *serialized,struct NSPV_remoterpcresp *ptr, int32_t slen)
+{
+    int32_t len = 0;
+    len+=iguana_rwbuf(rwflag,&serialized[len],sizeof(ptr->method),(uint8_t *)ptr->method);
+    len+=iguana_rwbuf(rwflag,&serialized[len],slen-len,(uint8_t *)ptr->json);
+    return(len);
+}
+
+void NSPV_remoterpc_purge(struct NSPV_remoterpcresp *ptr)
+{
+    if ( ptr != 0 )
+        memset(ptr,0,sizeof(*ptr));
+}
+
 cJSON *NSPV_txproof_json(struct NSPV_txproof *ptr)
 {
     char *hexstr; cJSON *result = cJSON_CreateObject();
@@ -507,7 +521,7 @@ cJSON *NSPV_txproof_json(struct NSPV_txproof *ptr)
     jaddnum(result,"height",ptr->height);
     jaddnum(result,"txlen",ptr->txlen);
     jaddnum(result,"txprooflen",ptr->txprooflen);
-    hexstr = malloc((ptr->txlen+ptr->txprooflen)*2+1);
+    hexstr = malloc((ptr->txlen+ptr->txprooflen)*2+4);
     utils_bin_to_hex(ptr->tx,ptr->txlen,hexstr);
     jaddstr(result,"hex",hexstr);
     utils_bin_to_hex(ptr->txproof,ptr->txprooflen,hexstr);
@@ -567,6 +581,8 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     cJSON *result = cJSON_CreateObject(); int32_t expiration; uint32_t timestamp = (uint32_t)time(NULL);
     jaddstr(result,"result","success");
     jaddstr(result,"nSPV","superlite");
+    jaddnum(result,"totalsent",NSPV_totalsent);
+    jaddnum(result,"totalreceived",NSPV_totalrecv);
     if ( NSPV_address[0] != 0 )
     {
         jaddstr(result,"address",NSPV_address);
@@ -578,6 +594,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
         jaddnum(result,"wifexpires",expiration);
     }
     jaddnum(result,"height",ptr->height);
+    jaddnum(result,"longestchain",NSPV_longestchain);
     jaddbits256(result,"chaintip",ptr->blockhash);
     jadd(result,"notarization",NSPV_ntz_json(&ptr->notarization));
     jadd(result,"header",NSPV_header_json(&ptr->H,ptr->hdrheight));
@@ -588,7 +605,7 @@ cJSON *NSPV_getinfo_json(struct NSPV_inforesp *ptr)
     else 
     {
         jaddstr(result,"sync_status", "not_synced");
-        jaddnum(result,"estimated_headers_left", (int64_t)NSPV_inforesult.height-NSPV_lastntz.height-NSPV_num_headers);
+        jaddnum(result,"estimated_headers_left", check_headers(1));
     }
     
     return(result);

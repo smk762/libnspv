@@ -17,7 +17,7 @@
 #ifndef KOMODO_NSPV_DEFSH
 #define KOMODO_NSPV_DEFSH
 
-#define NSPV_PROTOCOL_VERSION 0x00000002
+#define NSPV_PROTOCOL_VERSION 0x00000003
 #define NSPV_MAXPACKETSIZE (4096 * 1024)
 #define NSPV_MAXSCRIPTSIZE 10000
 #define MAX_TX_SIZE_BEFORE_SAPLING 100000
@@ -25,6 +25,8 @@
 #define NSPV_LOCKTIME_THRESHOLD 500000000
 #define NSPV_KOMODO_ENDOFERA 7777777
 #define NSPV_KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
+#define NSPV_MAX_BLOCK_HEADERS 128
+#define NSPV_ENCRYPTED_MAXSIZE 8192
 
 #include <time.h>
 #ifndef __MINGW
@@ -42,6 +44,9 @@ typedef union _bits256 bits256;
 #define portable_mutex_lock pthread_mutex_lock
 #define portable_mutex_unlock pthread_mutex_unlock
 #define OS_thread_create pthread_create
+#define SETBIT(bits,bitoffset) (((uint8_t *)bits)[(bitoffset) >> 3] |= (1 << ((bitoffset) & 7)))
+#define GETBIT(bits,bitoffset) (((uint8_t *)bits)[(bitoffset) >> 3] & (1 << ((bitoffset) & 7)))
+#define CLEARBIT(bits,bitoffset) (((uint8_t *)bits)[(bitoffset) >> 3] &= ~(1 << ((bitoffset) & 7)))
 
 
 struct rpcrequest_info
@@ -85,11 +90,16 @@ struct rpcrequest_info
 #define NSPV_TXIDSRESP 0x0f
 #define NSPV_MEMPOOL 0x10
 #define NSPV_MEMPOOLRESP 0x11
+#define NSPV_CCMODULEUTXOS 0x12
+#define NSPV_CCMODULEUTXOSRESP 0x13
 #define NSPV_MEMPOOL_ALL 0
 #define NSPV_MEMPOOL_ADDRESS 1
 #define NSPV_MEMPOOL_ISSPENT 2
 #define NSPV_MEMPOOL_INMEMPOOL 3
 #define NSPV_MEMPOOL_CCEVALCODE 4
+#define NSPV_CC_TXIDS 16
+#define NSPV_REMOTERPC 0x14
+#define NSPV_REMOTERPCRESP 0x15
 
 #define COIN SATOSHIDEN
 
@@ -216,6 +226,12 @@ struct NSPV_CCmtxinfo
     struct NSPV_utxoresp used[NSPV_MAXVINS];
 };
 
+struct NSPV_remoterpcresp
+{
+    char method[64];
+    char json[11000];
+};
+
 struct NSPV_header
 {
     int32_t height;
@@ -224,13 +240,14 @@ struct NSPV_header
 };
 
 extern portable_mutex_t NSPV_netmutex;
-extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime,NSPV_lastinfo;
+extern uint32_t NSPV_STOP_RECEIVED,NSPV_logintime; 
 extern char NSPV_lastpeer[],NSPV_pubkeystr[],NSPV_wifstr[],NSPV_address[];
 bits256 NSPV_hdrhash(struct NSPV_equihdr *hdr);
 
 extern int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 extern int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
 extern int32_t NSPV_periodic(btc_node *node);
+extern int32_t check_headers(int32_t dispflag);
 extern void komodo_nSPVresp(btc_node *from,uint8_t *response,int32_t len);
 extern uint32_t NSPV_blocktime(btc_spv_client *client,int32_t hdrheight);
 extern int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
@@ -239,7 +256,7 @@ extern int32_t NSPV_rwequihdr(int32_t rwflag,uint8_t *serialized,struct NSPV_equ
 extern bits256 NSPV_sapling_sighash(btc_tx *tx,int32_t vini,int64_t spendamount,uint8_t *spendscript,int32_t spendlen);
 
 extern int32_t IS_IN_SYNC;
-extern uint32_t NSPV_logintime,NSPV_lastinfo,NSPV_tiptime;
+extern uint32_t NSPV_logintime,NSPV_tiptime;
 extern char NSPV_lastpeer[64],NSPV_address[64],NSPV_wifstr[64],NSPV_pubkeystr[67],NSPV_symbol[64];
 extern btc_spv_client *NSPV_client;
 extern const btc_chainparams *NSPV_chain;
@@ -264,7 +281,8 @@ extern struct NSPV_txproof NSPV_txproof_cache[NSPV_MAXVINS * 10];
 extern struct NSPV_ntz NSPV_lastntz;
 extern struct NSPV_header NSPV_blockheaders[128]; // limitation here is that 100 block history is maximum. no nota for 100 blocks and we cant sync back to the notarizatio, we can wait for the next one. 
 extern int32_t NSPV_num_headers;
-extern int32_t NSPV_hdrheight_counter;
+extern int32_t NSPV_hdrheight_counter,NSPV_longestchain;
 extern int32_t IS_IN_SYNC;
+extern int64_t NSPV_totalsent,NSPV_totalrecv;
 
 #endif // KOMODO_NSPV_DEFSH

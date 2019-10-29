@@ -68,7 +68,7 @@ static void print_version()
 static void print_usage()
 {
     print_version();
-    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-s[--timeout] <secs>) <command>\n");
+    printf("Usage: nspv [COIN defaults to NSPV] (-c|continuous) (-i|-ips <ip,ip,...]>) (-m[--maxpeers] <int>) (-t[--testnet]) (-f <headersfile|0 for in mem only>) (-p <rpcport>) (-r[--regtest]) (-d[--debug]) (-x=<externalip>) (-l=langauge) (-s[--timeout] <secs>) <command>\n");
     printf("Supported commands:\n");
     printf("        scan      (scan blocks up to the tip, creates header.db file)\n");
     printf("\nExamples: \n");
@@ -106,29 +106,21 @@ void spv_sync_completed(btc_spv_client* client) {
     }
 }
 
+#include "tweetnacl.c"
+#include "curve25519.c"
 #include "nSPV_utils.h"
 #include "nSPV_structs.h"
 #include "nSPV_CCtx.h"
+//#include "nSPV_jpeg.h"
 #include "nSPV_superlite.h"
 #include "nSPV_wallet.h"
+#include "nSPV_htmlgui.h"
 #include "komodo_cJSON.c"
 #include "nSPV_rpc.h"
 
-/*
- Todo:
-add check for p2sh in script_to_address
- mempool tracking of balance
- mempool based pruning of utxos
- 
- cross chain superwallet (jaragua) -> blackjok3r
- 
- enhance cc/funcid filter in listtransactions/listunspent -> mihailo
- 
- */
-
 const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *template)
 {
-    btc_chainparams *chain = 0; char *filestr,*name,*seeds,*magic; int32_t i,n; cJSON *array,*coin; long filesize;
+    btc_chainparams *chain = 0; char *filestr,*name,*seeds,*magic=0; int32_t i,n; cJSON *array,*coin; long filesize;
     chain = calloc(1,sizeof(*chain));
     memcpy(chain,template,sizeof(*chain));
     chain->default_port = 0;
@@ -145,14 +137,16 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
                 //fprintf(stderr,"%s\n",jprint(coin,0));
                 if ( (name= jstr(coin,"coin")) != 0 && strcmp(name,symbol) == 0 && jstr(coin,"asset") != 0 )
                 {
-                    if ( (seeds= jstr(coin,"nSPV")) != 0 && strlen(seeds) < sizeof(chain->dnsseeds[0].domain)-1 && (magic= jstr(coin,"magic")) != 0 && strlen(magic) == 8 )
+                    if ( (seeds= jstr(coin,"nSPV")) != 0 && strlen(seeds) < sizeof(chain->dnsseeds[0].domain)-1 && (magic=jstr(coin,"magic")) != 0 && strlen(magic) == 8 )
                     {
                         if ( jstr(coin,"fname") != 0 )
                             strcpy(NSPV_fullname,jstr(coin,"fname"));
                         chain->default_port = juint(coin,"p2p");
                         chain->rpcport = juint(coin,"rpcport");
                         strcpy(chain->dnsseeds[0].domain,seeds);
-                        decode_hex((uint8_t *)chain->netmagic,4,magic);
+                        char tmp[9];
+                        strcpy(tmp,magic);
+                        decode_hex((uint8_t *)chain->netmagic,4,tmp);
                         strcpy(chain->name,symbol);
                         fprintf(stderr,"Found (%s) magic.%s, p2p.%u seeds.(%s)\n",symbol,magic,chain->default_port,seeds);
                         break;
@@ -164,7 +158,7 @@ const btc_chainparams *NSPV_coinlist_scan(char *symbol,const btc_chainparams *te
                 free(chain);
                 chain = 0;
             }
-            free(array);
+            cJSON_Delete(array);
         }
         else
         {
@@ -233,7 +227,7 @@ int main(int argc, char* argv[])
     strcpy(NSPV_symbol,chain->name);
     // get arguments
     uint16_t port = 0;
-    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:", long_options, &long_index)) != -1) {
+    while ((opt = getopt_long_only(argc, argv, "i:ctrds:m:f:p:x:l:", long_options, &long_index)) != -1) {
         switch (opt) {
         case 'c':
             quit_when_synced = false;
@@ -260,6 +254,20 @@ int main(int argc, char* argv[])
             port = (int)strtol(optarg, (char**)NULL, 0);
                 fprintf(stderr,"set port to %u\n",port);
             break;
+        case 'x':
+            if ( optarg != 0 )
+            {
+                NSPV_externalip = clonestr(optarg+1);
+                fprintf(stderr,"set external ip to %s\n",NSPV_externalip);
+            }
+            break;
+        case 'l':
+            if ( optarg != 0 )
+            {
+                strcpy(NSPV_language,optarg+1);
+                fprintf(stderr,"set language to (%s)\n",NSPV_language);
+            }
+            break;
         case 'f':
             dbfile = optarg;
             break;
@@ -274,6 +282,7 @@ int main(int argc, char* argv[])
     }
     if ( port == 0 )
         port = chain->rpcport;
+    else memcpy((void *)&chain->rpcport,&port,sizeof(chain->rpcport));
     NSPV_chain = chain;
     if ( chain->komodo != 0 )
     {
@@ -289,7 +298,8 @@ int main(int argc, char* argv[])
         fprintf(stderr," genesisblockhash %s\n",chain->name);
         data = (char *)"scan";
     }
-    if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,NSPV_rpcloop,(void *)&port) != 0 )
+    pthread_t thread;
+    if ( OS_thread_create(&thread,NULL,NSPV_rpcloop,(void *)&port) != 0 )
     {
         printf("error launching NSPV_rpcloop for port.%u\n",port);
         exit(-1);
@@ -357,6 +367,7 @@ int main(int argc, char* argv[])
             btc_spv_client_runloop(client);
             printf("end of client runloop\n");
             btc_spv_client_free(client);
+            pthread_cancel(thread); 
             ret = EXIT_SUCCESS;
         }
         btc_ecc_stop();
@@ -366,5 +377,6 @@ int main(int argc, char* argv[])
         printf("Invalid command (use -?)\n");
         ret = EXIT_FAILURE;
     }
+    pthread_join(thread,NULL);
     return ret;
 }

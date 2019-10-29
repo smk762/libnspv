@@ -27,14 +27,11 @@ def setup_module():
 
     wif_real = test_setup.get("wif")
     addr_send = test_setup.get("address")
+    coin = test_setup.get("chain")
 
     if not addr_send or not wif_real:
         pytest.exit("Please check test wif and address in test_setup.txt")
 
-    url = "http://127.0.0.1:12986"  # set correct port for chosen chain
-    userpass = "userpass"
-    coin = "ILN"
-    call = NRC(url, userpass)
     chain_params = {"KMD": {
                             'tx_list_address': 'RGShWG446Pv24CKzzxjA23obrzYwNbs1kA',
                             'min_chain_height': 1468080,
@@ -47,6 +44,7 @@ def setup_module():
                             'tx_proof_id': 'f7beb36a65bc5bcbc9c8f398345aab7948160493955eb4a1f05da08c4ac3784f',
                             'tx_spent_height': 1456212,
                             'tx_proof_height': '1468520',
+                            'port': '7771',
                            },
                     "ILN": {
                             'tx_list_address': 'RUp3xudmdTtxvaRnt3oq78FJBjotXy55uu',
@@ -60,8 +58,26 @@ def setup_module():
                             'tx_proof_id': '67ffe0eaecd6081de04675c492a59090b573ee78955c4e8a85b8ac0be0e8e418',
                             'tx_spent_height': 2681,
                             'tx_proof_height': '2690',
-                           }
+                            'port': '12986',
+                           },
+                    "HUSH": {
+                             'tx_list_address': 'RCNp322uAXmNo37ipQAEjcGQgBXY9EW9yv',
+                             'min_chain_height': 69951,
+                             'notarization_height': '69900',
+                             'prev_notarization_h': 69800,
+                             'next_notarization_h': 69700,
+                             'hdrs_proof_low': '66100',
+                             'hdrs_proof_high': '66200',
+                             'numhdrs_expected': 123,
+                             'tx_proof_id': '661bae364443948a009fa7f706c3c8b7d3fa6b0b27eca185b075abbe85bbdedc',
+                             'tx_spent_height': 2681,
+                             'tx_proof_height': '2690',
+                             'port': '18031'
+                            }
                     }
+    userpass = "userpass"
+    url = "http://127.0.0.1:" + chain_params.get(coin).get("port")
+    call = NRC(url, userpass)
     call.nspv_logout()
 
 
