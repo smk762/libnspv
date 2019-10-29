@@ -1,6 +1,6 @@
 name: LibNspvCI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -9,9 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Deps
+    - name: Build
       env: 
         DEBIAN_FRONTEND: noninteractive
-      run: apt-get install -q libsodium-dev curl libevent-dev git cmake nano wget ntp ntpdate automake unzip autoconf libtool -y
-    - name: Build
-      run: ./onetime
+      run: | 
+        sudo apt-get install -q libsodium-dev curl libevent-dev git cmake nano wget ntp ntpdate automake unzip autoconf libtool -y
+        ./onetime
