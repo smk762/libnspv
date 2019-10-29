@@ -1,0 +1,17 @@
+name: LibNspvCI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build
+      env: 
+        DEBIAN_FRONTEND: noninteractive
+      run: | 
+        sudo apt-get install -q libsodium-dev curl libevent-dev git cmake nano wget ntp ntpdate automake unzip autoconf libtool -y
+        ./onetime
