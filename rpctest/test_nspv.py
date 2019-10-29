@@ -7,6 +7,7 @@ from test_framework.nspvlib import NspvRpcCalls as NRC
 import pytest
 import time
 import json
+import os
 
 """
    Simple unittest based ob pytest framework for libnspv
@@ -21,13 +22,14 @@ import json
 def setup_module():
     global addr_send, wif_real, coin, call, chain_params
 
-    f = open("test_setup.txt", "r")
-    test_setup = json.load(f)
-    f.close()
+    #f = open("test_setup.txt", "r")
+    #test_setup = json.load(f)
+    #f.close()
 
-    wif_real = test_setup.get("wif")
-    addr_send = test_setup.get("address")
-    coin = test_setup.get("chain")
+    # wif_real = test_setup.get("wif")
+    wif_real = os.environ('WALL')
+    addr_send = os.environ('ADDRESS')
+    coin = os.environ('CHAIN')
 
     if not addr_send or not wif_real:
         pytest.exit("Please check test wif and address in test_setup.txt")
