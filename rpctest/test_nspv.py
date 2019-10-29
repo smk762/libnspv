@@ -27,9 +27,9 @@ def setup_module():
     #f.close()
 
     # wif_real = test_setup.get("wif")
-    wif_real = os.environ('WALL')
-    addr_send = os.environ('ADDRESS')
-    coin = os.environ('CHAIN')
+    wif_real = os.environ.get('WALL')
+    addr_send = os.environ.get('ADDRESS')
+    coin = os.environ.get('CHAIN')
 
     if not addr_send or not wif_real:
         pytest.exit("Please check test wif and address variables availability")

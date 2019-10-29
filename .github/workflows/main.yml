@@ -10,8 +10,16 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Build
-      env: 
+      env:
         DEBIAN_FRONTEND: noninteractive
       run: | 
         sudo apt-get install -q libsodium-dev curl libevent-dev git cmake nano wget ntp ntpdate automake unzip autoconf libtool -y
         ./onetime
+    - name: Tests
+        env:
+          WALL: ${{ secrets.LIN_WALL }}
+          ADDRESS: ${{ secrets.LIN_ADDRESS }}
+          CHAIN: ${{ secrets.LIN_CHAIN }}
+       run: |
+        /usr/bin/pip3 install -r ./rpctest/requirements.txt
+        /usr/bin/python3 ./rpctest/actions.py
