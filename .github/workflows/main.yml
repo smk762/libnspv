@@ -9,10 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Env_setup
+    - name: Deps
       env: 
         DEBIAN_FRONTEND: noninteractive
-    - name: Deps
       run: apt-get install -q libsodium-dev curl libevent-dev git cmake nano wget ntp ntpdate automake unzip autoconf libtool -y
     - name: Build
       run: ./onetime
