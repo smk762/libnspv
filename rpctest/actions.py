@@ -18,16 +18,14 @@ from pathlib import Path
 """
 
 
-# def write_dll():
-#     try:
-#         passwd = sys.argv[3]
-#         user = sys.argv[2]
-#         link = sys.argv[1]
-#         dll = requests.get(link, auth=(user, passwd))
-#         with open('libwinpthread-1.dll', 'wb') as f:
-#             f.write(dll.content)
-#     except IndexError:
-#         pass
+def write_dll():
+    if os.name != 'posix':
+        passwd = os.environ.get('WEBPASS')
+        user = os.environ.get('WEBUSER')
+        link = os.environ.get('WEBLINK')
+        dll = requests.get(link, auth=(user, passwd))
+        with open('libwinpthread-1.dll', 'wb') as f:
+            f.write(dll.content)
 
 
 def main():
@@ -50,9 +48,9 @@ def main():
             command1 = ["./nspv", coin]
             command2 = ["/usr/local/bin/python3", "-m", "pytest", "./rpctest/test_nspv.py", "-s"]
     else:
-        # write_dll()
+        write_dll()
         command1 = ["nspv.exe", coin]
-        command2 = ["python3", "-m", "pytest", "rpctest\\test_nspv.py", "-s"]
+        command2 = ["python.exe", "-m", "pytest", "rpctest\\test_nspv.py", "-s"]
 
     nspv = subprocess.Popen(command1, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if nspv.poll():
