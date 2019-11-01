@@ -19,13 +19,13 @@ jobs:
       if: runner.os == 'Linux'
       run: | 
         sudo apt-get install -q libsodium-dev curl libevent-dev cmake nano wget ntp ntpdate automake unzip autoconf libtool python3-dev python3-setuptools libcurl4-openssl-dev libssl-dev -y
-        pwd
         ./onetime
 
     - name: Build (MacOS)
       if: runner.os == 'macOS'
       run: | 
-        brew install libsodium libevent
+        brew install libsodium libevent automake autoconf libtool
+        brew install curl --with-openssl
         python3 -m pip install --upgrade setuptools
         python3 -m pip install --upgrade pip
         ./onetime
