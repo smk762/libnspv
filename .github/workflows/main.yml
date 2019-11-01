@@ -7,6 +7,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-18.04, ubuntu-16.04, macOS-10.14]
 
@@ -36,5 +37,5 @@ jobs:
         ADDRESS: ${{ secrets.LIN_ADDRESS }}
         CHAIN: ${{ secrets.LIN_CHAIN }}
       run: |
-        /usr/bin/pip3 install -r ./rpctest/requirements.txt
+        /usr/bin/pip install -r ./rpctest/requirements.txt
         /usr/bin/python3 ./rpctest/actions.py
