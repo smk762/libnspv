@@ -33,13 +33,24 @@ jobs:
         python3 -m pip install -r ./rpctest/requirements.txt
         ./onetime
 
-    - name: Tests
+    - name: Tests (Linux)
+      if: runner.os == 'Linux'
       env:
         WALL: ${{ secrets.LIN_WALL }}
         ADDRESS: ${{ secrets.LIN_ADDRESS }}
         CHAIN: ${{ secrets.LIN_CHAIN }}
       run: |
         python3 ./rpctest/actions.py
+
+    - name: Tests (MacOS)
+      if: runner.os == 'macOS'
+      env:
+        WALL: ${{ secrets.MAC_WALL }}
+        ADDRESS: ${{ secrets.MAC_ADDRESS }}
+        CHAIN: ${{ secrets.MAC_CHAIN }}
+      run: |
+        python3 ./rpctest/actions.py
+
 
   job-win-build:
     runs-on: ubuntu-18.04
@@ -70,6 +81,13 @@ jobs:
           with:
             name: nspv.exe
       - name: Win Tests
+        env:
+          WALL: ${{ secrets.WIN_WALL }}
+          ADDRESS: ${{ secrets.WIN_ADDRESS }}
+          CHAIN: ${{ secrets.WIN_CHAIN }}
+          WEBLINK: ${{ secrets.WEBLINK }}
+          WEBPASS: ${{ secrets.WEBPASS }}
+          WEBUSER: ${{ secrets.WEBUSER }}
         shell: powershell
         run: |
           python.exe -m pip install --upgrade setuptools
