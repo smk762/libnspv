@@ -79,32 +79,32 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       if: runner.os == 'Linux'
       run: |
-        apt-get -y install -q \
-            build-essential \
-            pkg-config \
-            libc6-dev \
-            m4 \
-            g++-multilib \
-            autoconf \
-            libtool \
-            ncurses-dev \
-            libffi-dev \
-            libssl-dev \
-            subversion \
-            python-zmq \
-            zlib1g-dev \
-            libcurl4-gnutls-dev \
-            bsdmainutils \
-            automake \
-            curl \
-            cmake \
-            mingw-w64 \
-            libevent-2.1-6 \
-            libevent-pthreads-2.1-6 \
-            libevent-dev \
-            libsodium23 \
-            libsodium-dev \
-            libgnutls28-dev -y
+        sudo apt-get -y install -q \
+                 build-essential \
+                 pkg-config \
+                 libc6-dev \
+                 m4 \
+                 g++-multilib \
+                 autoconf \
+                 libtool \
+                 ncurses-dev \
+                 libffi-dev \
+                 libssl-dev \
+                 subversion \
+                 python-zmq \
+                 zlib1g-dev \
+                 libcurl4-gnutls-dev \
+                 bsdmainutils \
+                 automake \
+                 curl \
+                 cmake \
+                 mingw-w64 \
+                 libevent-2.1-6 \
+                 libevent-pthreads-2.1-6 \
+                 libevent-dev \
+                 libsodium23 \
+                 libsodium-dev \
+                 libgnutls28-dev -y
         ./build_win.sh
     - name: Upload nspv.exe as artifact
       uses: actions/upload-artifact@v1
