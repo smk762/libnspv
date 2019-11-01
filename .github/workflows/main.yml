@@ -24,7 +24,7 @@ jobs:
     - name: Build (MacOS)
       if: runner.os == 'macOS'
       run: | 
-        brew install libsodium libevent automake autoconf libtool
+        brew install libsodium libevent automake autoconf glibtool
         brew install curl --with-openssl
         python3 -m pip install --upgrade setuptools
         python3 -m pip install --upgrade pip
