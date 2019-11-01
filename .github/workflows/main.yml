@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   job-main:
+    name: Linux and MacOS test
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -52,6 +53,7 @@ jobs:
         python3 ./rpctest/actions.py
 
   job-win-build:
+    name: Win build
     runs-on: ubuntu-18.04
 
     steps:
@@ -70,6 +72,7 @@ jobs:
         path: ./nspv.exe
 
   job-win-test:
+    name: Win tests
     needs: job-win-build
     runs-on: windows-latest
 
