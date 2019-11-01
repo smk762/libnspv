@@ -323,7 +323,7 @@ def test_mempool_call():
     print('\n', "testing mempool call")
     rpc_call = call.nspv_mempool()
     call.assert_success(rpc_call)
-    call.assert_contains(rpc_call, "txids")
+    # call.assert_contains(rpc_call, "txids") - mempool() response not always contains "txids" key, even on success
 
 
 def test_spentinfo_call():
