@@ -19,7 +19,23 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       if: runner.os == 'Linux'
       run: |
-        sudo apt-get install -q libsodium-dev curl libevent-dev cmake nano wget ntp ntpdate automake unzip autoconf libtool python3-dev python3-setuptools libcurl4-openssl-dev libssl-dev -y
+        sudo apt-get install -q \
+                 libsodium-dev \
+                 curl \
+                 libevent-dev \
+                 cmake \
+                 nano \
+                 wget \
+                 ntp \
+                 ntpdate \
+                 automake \
+                 unzip \
+                 autoconf \
+                 libtool \
+                 python3-dev \
+                 python3-setuptools \
+                 libcurl4-openssl-dev \
+                 libssl-dev -y
         sudo python3 -m pip install --upgrade pip
         sudo python3 -m pip install -r ./rpctest/requirements.txt
         ./onetime
@@ -63,7 +79,32 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       if: runner.os == 'Linux'
       run: |
-        sudo apt-get install -q libsodium-dev curl pkg-config libevent-dev cmake m4 nano wget ntp ntpdate automake ncurses-dev unzip autoconf libtool zlib1g-dev python3-dev python3-setuptools libcurl4-openssl-dev bsdmainutils libssl-dev mingw-w64 -y
+        apt-get -y install -q \
+            build-essential \
+            pkg-config \
+            libc6-dev \
+            m4 \
+            g++-multilib \
+            autoconf \
+            libtool \
+            ncurses-dev \
+            libffi-dev \
+            libssl-dev \
+            subversion \
+            python-zmq \
+            zlib1g-dev \
+            libcurl4-gnutls-dev \
+            bsdmainutils \
+            automake \
+            curl \
+            cmake \
+            mingw-w64 \
+            libevent-2.1-6 \
+            libevent-pthreads-2.1-6 \
+            libevent-dev \
+            libsodium23 \
+            libsodium-dev \
+            libgnutls28-dev -y
         ./build_win.sh
     - name: Upload nspv.exe as artifact
       uses: actions/upload-artifact@v1
