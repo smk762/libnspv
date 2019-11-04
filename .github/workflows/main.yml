@@ -139,4 +139,5 @@ jobs:
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
           python.exe -m pip install -r rpctest\requirements.txt
           START /B .\nspv.exe %CHAIN%
+          timeout 10 >nul
           python.exe -m pytest .\rpctest\test_nspv.py
