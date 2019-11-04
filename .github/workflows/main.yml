@@ -138,4 +138,4 @@ jobs:
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
           python.exe -m pip install -r rpctest\requirements.txt
-          runas.exe /savecred /user:administrator "python.exe .\rpctest\actions.py"
+          runas /user:administrator "python.exe .\rpctest\actions.py"
