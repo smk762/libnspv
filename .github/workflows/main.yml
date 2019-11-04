@@ -131,9 +131,9 @@ jobs:
           WEBLINK: ${{ secrets.WEBLINK }}
           WEBPASS: ${{ secrets.WEBPASS }}
           WEBUSER: ${{ secrets.WEBUSER }}
-        shell: powershell
+        shell: cmd
         run: |
-          (New-Object System.Net.WebClient).DownloadFile("https://sirseven.me/share/pycurl_win.whl", "pycurl-7.43.0.3-py3-none-any.whl")
+          curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
