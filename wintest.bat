@@ -1,2 +1,2 @@
 start "" nspv.exe %CHAIN%
-start "" /WAIT python.exe -m pytest rpctest\test_nspv.py
+start "" /B /wait python.exe -m pytest rpctest\test_nspv.py
