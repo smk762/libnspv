@@ -19,6 +19,7 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       if: runner.os == 'Linux'
       run: |
+        sudo apt-get update
         sudo apt-get install -q \
                  libsodium-dev \
                  curl \
@@ -79,6 +80,7 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       if: runner.os == 'Linux'
       run: |
+        sudo apt-get update
         sudo apt-get -y install -q \
                  build-essential \
                  pkg-config \
