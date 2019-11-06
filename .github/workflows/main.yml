@@ -111,7 +111,7 @@ jobs:
     - name: Upload nspv.exe as artifact
       uses: actions/upload-artifact@v1
       with:
-        name: nspv.exe
+        name: nspvbinary
         path: ./nspv.exe
 
   job-win-test:
@@ -124,7 +124,7 @@ jobs:
       - name: Win Tests
         uses: actions/download-artifact@v1
         with:
-          name: nspv.exe
+          name: nspvbinary
       - shell: cmd
         env:
           WALL: ${{ secrets.WALL }}
@@ -133,11 +133,11 @@ jobs:
         run: |
           curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
           curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
-          where nspv.exe
+          move nspvbinary\nspv.exe
           where libwinpthread-1.dll
           where pycurl-7.43.0.3-py3-none-any.whl
           dir
-          dir nspv.exe
+          dir nspvbinary
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
