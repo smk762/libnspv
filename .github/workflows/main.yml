@@ -136,6 +136,8 @@ jobs:
           where nspv.exe
           where libwinpthread-1.dll
           where pycurl-7.43.0.3-py3-none-any.whl
+          dir
+          dir nspv.exe
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
