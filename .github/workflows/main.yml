@@ -125,17 +125,17 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: nspv.exe
+      - shell: cmd
         env:
           WALL: ${{ secrets.WALL }}
           ADDRESS: ${{ secrets.ADDRESS }}
           CHAIN: ${{ secrets.CHAIN }}
-      - shell: cmd
         run: |
           curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
           curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
           where nspv.exe
-          where *.dll
-          where *.whl
+          where libwinpthread-1.dll
+          where pycurl-7.43.0.3-py3-none-any.whl
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
