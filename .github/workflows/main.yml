@@ -136,6 +136,8 @@ jobs:
         shell: cmd
         run: |
           curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
+          curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
+          echo %cd%
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
