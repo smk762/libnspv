@@ -39,6 +39,7 @@ jobs:
 
     - name: Build libs (Linux)
       run: |
+        sudo su
         mkdir /libs_build
         cd /libs_build
         wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz
