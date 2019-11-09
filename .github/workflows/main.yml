@@ -52,7 +52,6 @@ jobs:
         wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         tar xvf gmp-6.1.2.tar.bz2
         cd gmp-6.1.2
-        ./autogen.sh
         ./configure --enable-shared=no
         make
         cd $libdir
