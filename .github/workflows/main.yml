@@ -5,9 +5,11 @@ on: [push, pull_request]
 jobs:
   job-linux:
     name: Linux build and tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-16.04]
 
     steps:
     - uses: actions/checkout@v1
@@ -39,23 +41,23 @@ jobs:
 
     - name: Build libs (Linux)
       run: |
-        sudo su
-        mkdir /libs_build
-        cd /libs_build
+        libdir=$PWD/../libs_build
+        mkdir $libdir
+        cd $libdir
         wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz
         tar xvf libsodium-1.0.18.tar.gz
         cd libsodium-1.0.18
         ./autogen.sh
         ./configure --enable-shared=no
         make
-        cd /libs_build
+        cd $libdir
         wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
         tar xvf gmp-6.1.2.tar.bz2
         cd gmp-6.1.2
         ./autogen.sh
         ./configure --enable-shared=no
         make
-        cd /libs_build
+        cd $libdir
         wget https://github.com/libevent/libevent/archive/release-2.1.8-stable.tar.gz
         tar xvf release-2.1.8-stable.tar.gz
         cd release-2.1.8-stable
@@ -65,13 +67,14 @@ jobs:
       
     - name: Build Nspv (Linux)
       run: |
+        libdir=$PWD/../libs_build
         cd src/tools/cryptoconditions
         ./autogen.sh
         ./configure --enable-shared=no
         make
         cd ../../..
         ./autogen.sh
-        ./configure --enable-shared=no LDFLAGS="-L/libs_build/libsodium-1.0.18/src/libsodium/.libs -lsodium -L/libs_build/libevent-release-2.1.8-stable/.libs -levent -L/libs_build/gmp-6.1.2/.libs -lgmp -static"
+        ./configure --enable-shared=no LDFLAGS="-L$libdir/libsodium-1.0.18/src/libsodium/.libs -lsodium -L$libdir/libevent-release-2.1.8-stable/.libs -levent -L$libdir/gmp-6.1.2/.libs -lgmp -static"
         make
 
     - name: Tests (Linux)
