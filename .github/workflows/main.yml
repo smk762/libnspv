@@ -57,7 +57,7 @@ jobs:
         cd $libdir
         wget https://github.com/libevent/libevent/archive/release-2.1.8-stable.tar.gz
         tar xvf release-2.1.8-stable.tar.gz
-        cd release-2.1.8-stable
+        cd libevent-release-2.1.8-stable
         ./autogen.sh
         ./configure --enable-shared=no
         make
