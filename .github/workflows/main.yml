@@ -5,11 +5,9 @@ on: [push, pull_request]
 jobs:
   job-linux:
     name: Linux build and tests
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-18.04, ubuntu-16.04]
 
     steps:
     - uses: actions/checkout@v1
