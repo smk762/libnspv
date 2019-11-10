@@ -358,7 +358,7 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
         maxinputs = NSPV_MAXVINS;
     if ( maxinputs > 0 )
         threshold = total/maxinputs;
-    else threshold = total;
+    else threshold = 0;
     for (i=0; i<num; i++)
     {
         if ( num <= NSPV_MAXVINS || ptr[i].satoshis > threshold )
