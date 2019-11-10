@@ -361,11 +361,11 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
     else threshold = 0;
     for (i=0; i<num; i++)
     {
-        if ( n < NSPV_MAXVINS || ptr[i].satoshis > threshold )
+        if ( n < maxinputs || ptr[i].satoshis > threshold )
             utxos[n++] = ptr[i];
     }
     remains = total;
-fprintf(stderr,"threshold %.8f n.%d num.%d for total %.8f\n",(double)threshold/COIN,num,n,(double)total/COIN);
+fprintf(stderr,"threshold %.8f n.%d num.%d for total %.8f, maxvins.%d NSPV_MAXVINS.%d\n",(double)threshold/COIN,num,n,(double)total/COIN,maxinputs,NSPV_MAXVINS);
     for (i=0; i<maxinputs && n>0; i++)
     {
         below = above = 0;
