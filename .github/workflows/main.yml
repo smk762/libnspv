@@ -3,11 +3,9 @@ name: LibNspvCI
 on: [push, pull_request]
 
 jobs:
-  job-linux:
-    name: Linux build and tests
+  job-build-linux:
+    name: Build (Linux)
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     steps:
     - uses: actions/checkout@v1
@@ -29,13 +27,7 @@ jobs:
                  automake \
                  unzip \
                  autoconf \
-                 libtool \
-                 python3-dev \
-                 python3-setuptools \
-                 libcurl4-openssl-dev \
-                 libssl-dev -y
-        sudo python3 -m pip install --upgrade pip
-        sudo python3 -m pip install -r ./rpctest/requirements.txt
+                 libtool -y
 
     - name: Build libs (Linux)
       run: |
@@ -73,6 +65,39 @@ jobs:
         ./autogen.sh
         ./configure --enable-shared=no LDFLAGS="-L$libdir/libsodium-1.0.18/src/libsodium/.libs -lsodium -L$libdir/libevent-release-2.1.8-stable/.libs -levent -L$libdir/gmp-6.1.2/.libs -lgmp -static"
         make
+        tar -czvf nspv-linux.tar.gz nspv coins
+
+    - name: Upload nspv-linux.tar.gz as artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: nspv-linux
+        path: ./nspv-linux.tar.gz
+
+  job-test-linux:
+    name: Tests (Linux)
+    runs-on: ubuntu-latest
+    needs: job-build-linux
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Download nspv binary (Linux)
+      uses: actions/download-artifact@v1
+        with:
+          name: nspv-linux
+    - name: Install deps (Linux)
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update
+        sudo apt-get install -q \
+                 curl \
+                 python3-dev \
+                 python3-setuptools \
+                 libcurl4-openssl-dev \
+                 libssl-dev -y
+        sudo python3 -m pip install --upgrade pip
+        sudo python3 -m pip install -r ./rpctest/requirements.txt
 
     - name: Tests (Linux)
       env:
@@ -80,6 +105,8 @@ jobs:
         ADDRESS: ${{ secrets.ADDRESS }}
         CHAIN: ${{ secrets.CHAIN }}
       run: |
+        mv nspv-linux/nspv-linux.tar.gz .
+        tar xzvf nspv-linux.tar.gz
         python3 ./rpctest/actions.py
 
   job-macos:
