@@ -352,7 +352,7 @@ int32_t NSPV_vinselect(int32_t *aboveip,int64_t *abovep,int32_t *belowip,int64_t
 
 int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int32_t maxinputs,struct NSPV_utxoresp *ptr,int32_t num)
 {
-    int32_t abovei,belowi,ind,vout,i,n = 0; int64_t threshold,above,below; int64_t remains,totalinputs = 0; struct NSPV_utxoresp utxos[NSPV_MAXVINS+16],*up;
+    int32_t abovei,belowi,ind,vout,i,n = 0; int64_t threshold,above,below; int64_t remains,totalinputs = 0; struct NSPV_utxoresp utxos[NSPV_MAXVINS],*up;
     memset(utxos,0,sizeof(utxos));
     if ( maxinputs > NSPV_MAXVINS )
         maxinputs = NSPV_MAXVINS;
@@ -361,7 +361,7 @@ int64_t NSPV_addinputs(struct NSPV_utxoresp *used,btc_tx *mtx,int64_t total,int3
     else threshold = 0;
     for (i=0; i<num; i++)
     {
-        if ( num <= NSPV_MAXVINS || ptr[i].satoshis > threshold )
+        if ( n < NSPV_MAXVINS || ptr[i].satoshis > threshold )
             utxos[n++] = ptr[i];
     }
     remains = total;
