@@ -82,6 +82,7 @@ jobs:
     needs: job-build-linux
 
     steps:
+    - uses: actions/checkout@v1
     - name: Download nspv binary (Linux)
       uses: actions/download-artifact@v1
       with:
