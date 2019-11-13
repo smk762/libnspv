@@ -112,7 +112,7 @@ jobs:
         python3 ./rpctest/actions.py
 
   job-macos-build:
-    name: Macos build and tests
+    name: Build (MacOS)
     runs-on: macOS-latest
 
     steps:
