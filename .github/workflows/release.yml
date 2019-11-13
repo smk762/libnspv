@@ -3,7 +3,7 @@ name: LibNspvCI
 on: 
   push:
     branches:
-      - master    
+      - master
 
 jobs:
   job-build-linux:
@@ -111,6 +111,28 @@ jobs:
         tar xzvf nspv-linux.tar.gz
         python3 ./rpctest/actions.py
 
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nspv-linux.tar.gz
+          asset_name: nspv-linux${{ GITHUB_SHA }}.tar.gz
+          asset_content_type: application/tar+gzip
+
   job-macos:
     name: Macos build and tests
     runs-on: macOS-latest
@@ -174,11 +196,12 @@ jobs:
                  libsodium-dev \
                  libgnutls28-dev -y
         ./build_win.sh
-    - name: Upload nspv.exe as artifact
+         zip --junk-paths nspv-win nspv.exe coins
+    - name: Upload nspv-win.zip as artifact
       uses: actions/upload-artifact@v1
       with:
         name: nspvbinary
-        path: ./nspv.exe
+        path: ./nspv-win.zip
 
   job-win-test:
     name: Tests (Win)
@@ -199,13 +222,32 @@ jobs:
         run: |
           curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
           curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
-          move nspvbinary\nspv.exe
-          where libwinpthread-1.dll
-          where pycurl-7.43.0.3-py3-none-any.whl
-          dir
-          dir nspvbinary
+          move nspvbinary\nspv-win.zip
+          7z e nspv-win.zip
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
           python.exe -m pip install -r rpctest\requirements.txt
           wintest.bat
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+          id: upload-release-asset 
+          uses: actions/upload-release-asset@v1.0.1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./nspv-win.zip
+            asset_name: nspv-win${{ GITHUB_SHA }}.zip
+            asset_content_type: application/zip
