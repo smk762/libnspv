@@ -1,6 +1,11 @@
 name: LibNspvCI
 
-on: [push, pull_request]
+on: 
+  pull_request:
+    types: [opened, reopened]
+  push:
+    branches-ignore:
+      - master    
 
 jobs:
   job-build-linux:
