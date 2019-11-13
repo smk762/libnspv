@@ -276,7 +276,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./nspv-linux.tar.gz
-          asset_name: nspv-linux${{ GITHUB_SHA }}.tar.gz
+          asset_name: nspv-linux${{ github.sha }}.tar.gz
           asset_content_type: application/tar+gzip
 
       - name: Upload Release Asset (Win)
@@ -287,7 +287,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./nspv-win.zip
-          asset_name: nspv-win${{ GITHUB_SHA }}.zip
+          asset_name: nspv-win${{ github.sha }}.zip
           asset_content_type: application/zip
 
       - name: Upload Release Asset (MacOS)
@@ -298,5 +298,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./nspv-macos.tar.gz
-          asset_name: nspv-macos${{ GITHUB_SHA }}.tar.gz
+          asset_name: nspv-macos${{ github.sha }}.tar.gz
           asset_content_type: application/tar+gzip
