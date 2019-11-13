@@ -111,29 +111,7 @@ jobs:
         tar xzvf nspv-linux.tar.gz
         python3 ./rpctest/actions.py
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./nspv-linux.tar.gz
-          asset_name: nspv-linux${{ GITHUB_SHA }}.tar.gz
-          asset_content_type: application/tar+gzip
-
-  job-macos:
+  job-macos-build:
     name: Macos build and tests
     runs-on: macOS-latest
 
@@ -144,64 +122,89 @@ jobs:
       run: |
         brew install libsodium libevent automake autoconf libtool
         brew install curl
-        python3 -m pip install --upgrade setuptools
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r ./rpctest/requirements.txt
         ./onetime
+        tar -czvf nspv-macos.tar.gz nspv coins
 
-    - name: Tests (MacOS)
-      env:
-        WALL: ${{ secrets.WALL }}
-        ADDRESS: ${{ secrets.ADDRESS }}
-        CHAIN: ${{ secrets.CHAIN }}
-      run: |
-        python3 ./rpctest/actions.py
+    - name: Upload nspv-macos.tar.gz as artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: nspv-macos
+        path: ./nspv-macos.tar.gz
+
+  job-macos-test:
+    name: Tests (MacOS)
+    runs-on: macOS-latest
+    needs: job-macos-build
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Download nspv binary (MacOS)
+        uses: actions/download-artifact@v1
+        with:
+          name: nspv-macos
+
+      - name: Install deps (MacOS)
+        run: |
+          brew install curl
+          python3 -m pip install --upgrade setuptools
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r ./rpctest/requirements.txt
+
+      - name: Tests (MacOS)
+        env:
+          WALL: ${{ secrets.WALL }}
+          ADDRESS: ${{ secrets.ADDRESS }}
+          CHAIN: ${{ secrets.CHAIN }}
+        run: |
+          mv nspv-macos/nspv-macos.tar.gz .
+          tar xzvf nspv-macos.tar.gz
+          python3 ./rpctest/actions.py
 
   job-win-build:
     name: Build (Win)
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Build Win on Unix
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install -q \
-                 build-essential \
-                 pkg-config \
-                 libc6-dev \
-                 m4 \
-                 g++-multilib \
-                 autoconf \
-                 libtool \
-                 ncurses-dev \
-                 libffi-dev \
-                 libssl-dev \
-                 subversion \
-                 python-zmq \
-                 zlib1g-dev \
-                 libcurl4-gnutls-dev \
-                 bsdmainutils \
-                 automake \
-                 curl \
-                 cmake \
-                 mingw-w64 \
-                 libevent-2.1-6 \
-                 libevent-pthreads-2.1-6 \
-                 libevent-dev \
-                 libsodium23 \
-                 libsodium-dev \
-                 libgnutls28-dev -y
-        ./build_win.sh
-         zip --junk-paths nspv-win nspv.exe coins
-    - name: Upload nspv-win.zip as artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: nspvbinary
-        path: ./nspv-win.zip
+      - uses: actions/checkout@v1
+      - name: Build Win on Unix
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install -q \
+                   build-essential \
+                   pkg-config \
+                   libc6-dev \
+                   m4 \
+                   g++-multilib \
+                   autoconf \
+                   libtool \
+                   ncurses-dev \
+                   libffi-dev \
+                   libssl-dev \
+                   subversion \
+                   python-zmq \
+                   zlib1g-dev \
+                   libcurl4-gnutls-dev \
+                   bsdmainutils \
+                   automake \
+                   curl \
+                   cmake \
+                   mingw-w64 \
+                   libevent-2.1-6 \
+                   libevent-pthreads-2.1-6 \
+                   libevent-dev \
+                   libsodium23 \
+                   libsodium-dev \
+                   libgnutls28-dev -y
+          ./build_win.sh
+           zip --junk-paths nspv-win nspv.exe coins
+      - name: Upload nspv-win.zip as artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: nspv-win
+          path: ./nspv-win.zip
 
   job-win-test:
     name: Tests (Win)
@@ -213,7 +216,7 @@ jobs:
       - name: Win Tests
         uses: actions/download-artifact@v1
         with:
-          name: nspvbinary
+          name: nspv-win
       - shell: cmd
         env:
           WALL: ${{ secrets.WALL }}
@@ -222,13 +225,37 @@ jobs:
         run: |
           curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
           curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
-          move nspvbinary\nspv-win.zip
+          move nspv-win\nspv-win.zip
           7z e nspv-win.zip
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
           python.exe -m pip install -r rpctest\requirements.txt
           wintest.bat
+
+  job-release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [job-test-linux, job-win-test, job-macos-test]
+
+    steps:
+      - name: Download Artifacts (Linux)
+        uses: actions/download-artifact@v1
+        with:
+          name: nspv-linux
+      - name: Download Artifacts (Win)
+        uses: actions/download-artifact@v1
+        with:
+          name: nspv-win
+      - name: Download Artifacts (MacOS)
+        uses: actions/download-artifact@v1
+        with:
+          name: nspv-macos
+      - name: Prepare Archives
+        run: |
+          mv nspv-linux/nspv-linux.tar.gz .
+          mv nspv-win/nspv-win.zip .
+          mv nspv-macos/nspv-macos.tar.gz .
 
       - name: Create Release
         id: create_release
@@ -241,13 +268,35 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
-          id: upload-release-asset 
-          uses: actions/upload-release-asset@v1.0.1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./nspv-win.zip
-            asset_name: nspv-win${{ GITHUB_SHA }}.zip
-            asset_content_type: application/zip
+      - name: Upload Release Asset (Linux)
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nspv-linux.tar.gz
+          asset_name: nspv-linux${{ GITHUB_SHA }}.tar.gz
+          asset_content_type: application/tar+gzip
+
+      - name: Upload Release Asset (Win)
+        id: upload-release-asset-win 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nspv-win.zip
+          asset_name: nspv-win${{ GITHUB_SHA }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset (MacOS)
+        id: upload-release-asset-macos 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nspv-macos.tar.gz
+          asset_name: nspv-macos${{ GITHUB_SHA }}.tar.gz
+          asset_content_type: application/tar+gzip
