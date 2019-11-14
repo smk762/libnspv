@@ -33,7 +33,6 @@ jobs:
                  unzip \
                  autoconf \
                  libtool -y
-
     - name: Build libs (Linux)
       run: |
         libdir=$PWD/../libs_build
@@ -71,7 +70,6 @@ jobs:
         ./configure --enable-shared=no LDFLAGS="-L$libdir/libsodium-1.0.18/src/libsodium/.libs -lsodium -L$libdir/libevent-release-2.1.8-stable/.libs -levent -L$libdir/gmp-6.1.2/.libs -lgmp -static"
         make
         tar -czvf nspv-linux.tar.gz nspv coins
-
     - name: Upload nspv-linux.tar.gz as artifact
       uses: actions/upload-artifact@v1
       with:
@@ -85,7 +83,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-
     - name: Download nspv binary (Linux)
       uses: actions/download-artifact@v1
       with:
@@ -103,7 +100,6 @@ jobs:
                  libssl-dev -y
         sudo python3 -m pip install --upgrade pip
         sudo python3 -m pip install -r ./rpctest/requirements.txt
-
     - name: Tests (Linux)
       env:
         WALL: ${{ secrets.WALL }}
@@ -113,9 +109,8 @@ jobs:
         mv nspv-linux/nspv-linux.tar.gz .
         tar xzvf nspv-linux.tar.gz
         python3 ./rpctest/actions.py
-
-  job-macos:
-    name: Macos build and tests
+  job-macos-build:
+    name: Build (MacOS)
     runs-on: macOS-latest
 
     steps:
@@ -123,65 +118,125 @@ jobs:
 
     - name: Build (MacOS)
       run: |
-        brew install libsodium libevent automake autoconf libtool
-        brew install curl
-        python3 -m pip install --upgrade setuptools
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r ./rpctest/requirements.txt
-        ./onetime
-
-    - name: Tests (MacOS)
-      env:
-        WALL: ${{ secrets.WALL }}
-        ADDRESS: ${{ secrets.ADDRESS }}
-        CHAIN: ${{ secrets.CHAIN }}
+        brew install libsodium libevent automake autoconf libtool curl
+        
+    - name: Build libs (MacOS)
       run: |
-        python3 ./rpctest/actions.py
+        libdir=~/libs_build
+        mkdir $libdir
+        cd $libdir
+        wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz
+        tar xvf libsodium-1.0.18.tar.gz
+        cd libsodium-1.0.18
+        ./autogen.sh
+        ./configure --enable-shared=no
+        make
+        cd $libdir
+        wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2
+        tar xvf gmp-6.1.2.tar.bz2
+        cd gmp-6.1.2
+        ./configure --enable-shared=no
+        make
+        cd $libdir
+        wget https://github.com/libevent/libevent/archive/release-2.1.8-stable.tar.gz
+        tar xvf release-2.1.8-stable.tar.gz
+        cd libevent-release-2.1.8-stable
+        ./autogen.sh
+        ./configure --enable-shared=no
+        make
+        
+    - name: Build Nspv (MacOS)
+      run: |
+        libdir=~/libs_build
+        cd src/tools/cryptoconditions
+        ./autogen.sh
+        ./configure --enable-shared=no
+        make
+        cd ../../..
+        ./autogen.sh
+        ./configure --enable-shared=no LDFLAGS="-L$libdir/libsodium-1.0.18/src/libsodium/.libs -lsodium -L$libdir/libevent-release-2.1.8-stable/.libs -levent -L$libdir/gmp-6.1.2/.libs -lgmp"
+        make
+        tar -czvf nspv-macos.tar.gz nspv coins
+        
+    - name: Upload nspv-macos.tar.gz as artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: nspv-macos
+        path: ./nspv-macos.tar.gz
 
+  job-macos-test:
+    name: Tests (MacOS)
+    runs-on: macOS-latest
+    needs: job-macos-build
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Download nspv binary (MacOS)
+        uses: actions/download-artifact@v1
+        with:
+          name: nspv-macos
+
+      - name: Install deps (MacOS)
+        run: |
+          brew install curl
+          python3 -m pip install --upgrade setuptools
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r ./rpctest/requirements.txt
+      - name: Tests (MacOS)
+        env:
+          WALL: ${{ secrets.WALL }}
+          ADDRESS: ${{ secrets.ADDRESS }}
+          CHAIN: ${{ secrets.CHAIN }}
+        run: |
+          mv nspv-macos/nspv-macos.tar.gz .
+          tar xzvf nspv-macos.tar.gz
+          python3 ./rpctest/actions.py
   job-win-build:
     name: Build (Win)
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Build Win on Unix
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install -q \
-                 build-essential \
-                 pkg-config \
-                 libc6-dev \
-                 m4 \
-                 g++-multilib \
-                 autoconf \
-                 libtool \
-                 ncurses-dev \
-                 libffi-dev \
-                 libssl-dev \
-                 subversion \
-                 python-zmq \
-                 zlib1g-dev \
-                 libcurl4-gnutls-dev \
-                 bsdmainutils \
-                 automake \
-                 curl \
-                 cmake \
-                 mingw-w64 \
-                 libevent-2.1-6 \
-                 libevent-pthreads-2.1-6 \
-                 libevent-dev \
-                 libsodium23 \
-                 libsodium-dev \
-                 libgnutls28-dev -y
-        ./build_win.sh
-    - name: Upload nspv.exe as artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: nspvbinary
-        path: ./nspv.exe
+      - uses: actions/checkout@v1
+      - name: Build Win on Unix
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install -q \
+                   build-essential \
+                   pkg-config \
+                   libc6-dev \
+                   m4 \
+                   g++-multilib \
+                   autoconf \
+                   libtool \
+                   ncurses-dev \
+                   libffi-dev \
+                   libssl-dev \
+                   subversion \
+                   python-zmq \
+                   zlib1g-dev \
+                   libcurl4-gnutls-dev \
+                   bsdmainutils \
+                   automake \
+                   curl \
+                   cmake \
+                   mingw-w64 \
+                   libevent-2.1-6 \
+                   libevent-pthreads-2.1-6 \
+                   libevent-dev \
+                   libsodium23 \
+                   libsodium-dev \
+                   libgnutls28-dev -y
+          ./build_win.sh
+          curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
+          zip --junk-paths nspv-win nspv.exe coins libwinpthread-1.dll
+      - name: Upload nspv-win.zip as artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: nspv-win
+          path: ./nspv-win.zip
 
   job-win-test:
     name: Tests (Win)
@@ -193,7 +248,7 @@ jobs:
       - name: Win Tests
         uses: actions/download-artifact@v1
         with:
-          name: nspvbinary
+          name: nspv-win
       - shell: cmd
         env:
           WALL: ${{ secrets.WALL }}
@@ -201,12 +256,8 @@ jobs:
           CHAIN: ${{ secrets.CHAIN }}
         run: |
           curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
-          curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
-          move nspvbinary\nspv.exe
-          where libwinpthread-1.dll
-          where pycurl-7.43.0.3-py3-none-any.whl
-          dir
-          dir nspvbinary
+          move nspv-win\nspv-win.zip
+          7z e nspv-win.zip
           python.exe -m pip install --upgrade setuptools
           python.exe -m pip install --upgrade pip
           python.exe -m pip install pycurl-7.43.0.3-py3-none-any.whl
