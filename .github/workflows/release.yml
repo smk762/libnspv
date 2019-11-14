@@ -113,7 +113,7 @@ jobs:
 
 
   job-macos-build:
-    name: Macos build and tests
+    name: Build (MacOS)
     runs-on: macOS-latest
 
     steps:
@@ -235,7 +235,8 @@ jobs:
                    libsodium-dev \
                    libgnutls28-dev -y
           ./build_win.sh
-           zip --junk-paths nspv-win nspv.exe coins
+          curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
+          zip --junk-paths nspv-win nspv.exe coins libwinpthread-1.dll
       - name: Upload nspv-win.zip as artifact
         uses: actions/upload-artifact@v1
         with:
@@ -260,7 +261,6 @@ jobs:
           CHAIN: ${{ secrets.CHAIN }}
         run: |
           curl https://sirseven.me/share/pycurl_win.whl -o pycurl-7.43.0.3-py3-none-any.whl
-          curl https://sirseven.me/share/libwinpthread-1.dll -o libwinpthread-1.dll
           move nspv-win\nspv-win.zip
           7z e nspv-win.zip
           python.exe -m pip install --upgrade setuptools
@@ -312,7 +312,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./nspv-linux.tar.gz
-          asset_name: nspv-linux${{ github.sha }}.tar.gz
+          asset_name: nspv-linux-${{ github.sha }}.tar.gz
           asset_content_type: application/tar+gzip
 
       - name: Upload Release Asset (Win)
@@ -323,7 +323,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./nspv-win.zip
-          asset_name: nspv-win${{ github.sha }}.zip
+          asset_name: nspv-win-${{ github.sha }}.zip
           asset_content_type: application/zip
 
       - name: Upload Release Asset (MacOS)
@@ -334,5 +334,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./nspv-macos.tar.gz
-          asset_name: nspv-macos${{ github.sha }}.tar.gz
+          asset_name: nspv-macos-${{ github.sha }}.tar.gz
           asset_content_type: application/tar+gzip
