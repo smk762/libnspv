@@ -7,7 +7,7 @@ on:
     paths-ignore:
     - ./README.md
     tags-ignore:
-    - *.noci
+    - '*.noci'
 
 jobs:
   job-build-linux:
