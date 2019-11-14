@@ -120,7 +120,7 @@ xcode-select --install
 # Update brew and install dependencies
 brew update
 brew upgrade
-brew install libsodium libevent cmake git wget
+brew install libsodium libevent automake autoconf libtool cmake
 ```
 
 ##### Intall using brew

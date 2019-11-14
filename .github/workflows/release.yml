@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+    - ./README.md
+    tags-ignore:
+    - '*.noci'
 
 jobs:
   job-build-linux:
