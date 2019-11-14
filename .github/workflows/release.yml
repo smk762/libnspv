@@ -293,14 +293,20 @@ jobs:
           mv nspv-win/nspv-win.zip .
           mv nspv-macos/nspv-macos.tar.gz .
 
+      - name: Generate build number  # gen ${{ steps.buildnumber.outputs.build_number }} for release name
+        id: buildnumber
+        uses: einaregilsson/build-number@v1 
+        with:
+          token: ${{secrets.github_token}}        
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ Build.BuildNumber }}
-          release_name: Release ${{ Build.BuildNumber }}
+          tag_name: ${{ steps.buildnumber.outputs.build_number }}
+          release_name: Build - ${{ github.sha }}
           draft: false
           prerelease: false
 
