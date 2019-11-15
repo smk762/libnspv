@@ -86,16 +86,6 @@ static bool showError(const char* er)
     return 1;
 }
 
-#if defined(__ANDROID__) || defined(ANDROID)
-// no native implementation for pthread_cancel in Android NDK
-int pthread_cancel(pthread_t h) {
-    int rc = pthread_kill(h, 0);
-	if (rc != 0)
-		printf("error killing thread %d\n", rc);
-	return rc;
-}
-#endif
-
 btc_bool spv_header_message_processed(struct btc_spv_client_ *client, btc_node *node, btc_blockindex *newtip) {
     UNUSED(client);
     UNUSED(node);
@@ -377,7 +367,13 @@ int main(int argc, char* argv[])
             btc_spv_client_runloop(client);
             printf("end of client runloop\n");
             btc_spv_client_free(client);
+			NSPV_STOP_RECEIVED = (uint32_t)time(NULL);
+#if !defined(__ANDROID__) && !defined(ANDROID)
+			// no pthread_cancel in Android NDK
+			// actually no need to pthread_cancel if NSPV_STOP_RECEIVED is used to finishe the thread, 
+			// it is sufficient just to wait for the thread end in pthread_join
             pthread_cancel(thread); 
+#endif
             ret = EXIT_SUCCESS;
         }
         btc_ecc_stop();
