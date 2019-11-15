@@ -86,6 +86,16 @@ static bool showError(const char* er)
     return 1;
 }
 
+#if defined(__ANDROID__) || defined(ANDROID)
+// no native implementation for pthread_cancel in Android NDK
+int pthread_cancel(pthread_t h) {
+    int rc = pthread_kill(h, 0);
+	if (rc != 0)
+		printf("error killing thread %d\n", rc);
+	return rc;
+}
+#endif
+
 btc_bool spv_header_message_processed(struct btc_spv_client_ *client, btc_node *node, btc_blockindex *newtip) {
     UNUSED(client);
     UNUSED(node);
