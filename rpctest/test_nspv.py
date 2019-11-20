@@ -376,7 +376,16 @@ def test_autologout():
 
 
 def test_stop():
-    """Stop nspv process after tests"""
+    """Send funds to reset utxo amount in wallet
+       Stop nspv process after tests"""
+    print('\n', "Resending funds")
+    fee = 0.00001
+    call.nspv_login(wif_real)
+    res = call.type_convert(call.nspv_listunspent())
+    amount = res.get("balance") - fee
+    res = call.type_convert(call.nspv_spend(addr_send, amount))
+    hexs = res.get("hex")
+    call.nspv_broadcast(hexs)
     print('\n', "stopping nspv process")
     rpc_call = call.nspv_stop()
     call.assert_success(rpc_call)
