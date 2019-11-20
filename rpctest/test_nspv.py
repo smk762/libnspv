@@ -109,7 +109,7 @@ def test_check_balance():
     call.nspv_login(wif_real)
     res = call.type_convert(call.nspv_listunspent())
     amount = res.get("balance")
-    if amount > 0.001:
+    if amount > 0.1:
         pass
     else:
         pytest.exit("Not enough balance, please use another wif")
@@ -265,7 +265,7 @@ def test_litunspent_call():
 def test_spend_call():
     """Successful response should contain tx and transaction hex"""
     print('\n', "testing spend call")
-    amount = [False, 0.001]
+    amount = [False, 0.1]
     address = [False, addr_send]
 
     # Case 1 - false data
@@ -292,7 +292,7 @@ def test_broadcast_call():
     print('\n', "testing broadcast call")
     call.nspv_logout()
     call.nspv_login(wif_real)
-    rpc_call = call.nspv_spend(addr_send, 0.001)
+    rpc_call = call.nspv_spend(addr_send, 0.1)
     rep = call.type_convert(rpc_call)
     hex_res = rep.get("hex")
     hex = [False, "norealhexhere", hex_res]
@@ -371,12 +371,21 @@ def test_autologout():
     rpc_call = call.nspv_login(wif)
     call.assert_success(rpc_call)
     time.sleep(778)
-    rpc_call = call.nspv_spend(addr_send, 0.001)
+    rpc_call = call.nspv_spend(addr_send, 0.1)
     call.assert_error(rpc_call)
 
 
 def test_stop():
-    """Stop nspv process after tests"""
+    """Send funds to reset utxo amount in wallet
+       Stop nspv process after tests"""
+    print('\n', "Resending funds")
+    maxfee = 0.0001
+    call.nspv_login(wif_real)
+    res = call.type_convert(call.nspv_listunspent())
+    amount = res.get("balance") - maxfee
+    res = call.type_convert(call.nspv_spend(addr_send, amount))
+    hexs = res.get("hex")
+    call.nspv_broadcast(hexs)
     print('\n', "stopping nspv process")
     rpc_call = call.nspv_stop()
     call.assert_success(rpc_call)
