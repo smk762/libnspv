@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+9#!/usr/bin/env python3
 # Copyright (c) 2019 SuperNET developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -379,7 +379,7 @@ def test_stop():
     """Send funds to reset utxo amount in wallet
        Stop nspv process after tests"""
     print('\n', "Resending funds")
-    maxfee = 0.0001
+    maxfee = 0.01
     call.nspv_login(wif_real)
     res = call.type_convert(call.nspv_listunspent())
     amount = res.get("balance") - maxfee
